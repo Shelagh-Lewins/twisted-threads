@@ -1,0 +1,61 @@
+<template name="loading">
+{{> spinner}}
+</template>
+
+<template name="main">
+  
+  <div id="width" class="{{signed_in}} {{connection_status}} ">
+  {{> header}}
+  <div id="connection_status_holder">{{> connection_status}}</div>
+  <div id="content">{{> import_file_picker}}{{> yield}}</div>
+  </div>
+  {{> yield region="footer"}}
+  <!--{{> styles_palette}}-->
+</template>
+
+<template name="header">
+<div id="header">{{#if Template.subscriptionsReady}}
+  <div class="inner_tube">
+<div class="header_left">{{#if equals route_name "user"}}<a href="{{pathFor route='home'}}">Home</a>
+{{else}}
+{{#if equals route_name "pattern"}}
+<a href="{{pathFor route='home'}}">Home</a>
+{{#if pattern_exists _id}}{{#if is_weaving}}
+<a href="{{pathFor route='pattern'}}">Stop weaving</a>{{else}}
+<a href="{{pathFor route='pattern' weaving="weaving"}}">Start weaving</a>{{/if}}{{/if}}{{/if}}{{/if}}
+</div>
+<h1><span>{{#if equals route_name "home"}}Twisted Threads
+{{else}}
+{{#if equals route_name "user"}}{{#if Template.subscriptionsReady}}{{#if user_exists _id}}{{username}}{{else}}User not found{{/if}}{{/if}}
+{{else}}
+{{#if equals route_name "pattern"}}{{#if Template.subscriptionsReady}}{{#if pattern_exists _id}}{{name}}{{else}}Pattern not found{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}</span></h1>
+<div class="header_right">{{> loginButtons}}{{#if currentUser }}{{> menu}}{{/if}}</div></div>
+{{/if}}</div>
+</template>
+
+<template name="menu">
+<div id="menu" class="{{menu_open}}">
+<input type="button" id="menu_button" class="menu_button" value="">
+<div class="menu_list"><ul>
+<li><a href="#" id="import_pattern" >Import a pattern from JSON</a></li>
+{{#if Template.subscriptionsReady}}{{#if equals route_name "pattern"}}{{#if pattern_exists _id}}
+<li><a href="#" id="copy_pattern" >Copy this pattern</a></li>
+<li><a href="#" id="export_pattern" >Export this pattern to JSON</a></li>
+{{/if}}{{/if}}{{/if}}
+</ul></div></div>
+</template>
+
+<template name="import_file_picker">
+<div id="import_file_holder">
+<input type="file" id="import_file" name="import_file" />
+</div>
+</template>
+
+<!--https://github.com/webtempest/meteor-animate-->
+<template name="connection_status">
+{{#if equals connection_status "trying_to_connect"}}
+{{#transition in="slideInDown" out="slideOutUp"}}<div id="connection_status" class="animated out"><div class="text">
+Connection lost...trying to reconnect...
+</div></div>{{/transition}}
+{{/if}}
+</template>

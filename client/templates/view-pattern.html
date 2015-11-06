@@ -1,0 +1,87 @@
+<template name="view_pattern">
+  {{#if Template.subscriptionsReady}}
+{{> pattern_as_text}}
+<div id="pattern_info">
+<div class="box name">
+{{#if can_edit_pattern _id}}<div class="controls"><button class="edit_name">{{#if editing_pattern_name}}Done{{else}}Edit name{{/if}}</button></div>{{/if}}
+{{#if editing_pattern_name}}<input type="text" id="pattern_name_input" value="{{name}}">
+{{else}}<h2 class="pattern_name">{{name}}</h2>{{/if}}
+</div>
+{{#if can_edit_pattern _id}}<div class="box private">
+<div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
+<div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
+</div>{{/if}}
+<div class="box description">
+{{#if can_edit_pattern _id}}<div class="controls"><button class="edit_description">{{#if editing_pattern_description}}Done{{else}}Edit description{{/if}}</button></div>{{/if}}
+<div class="content">
+{{#if editing_pattern_description}}<textarea id="pattern_description_input">{{selected_pattern_description}}</textarea>{{else}}<div class="pattern_description {{style_pattern_description}}"><span class="description">{{selected_pattern_description}}</span><span class="placeholder">Tap "Edit description" to enter a description</span></div>{{/if}}
+</div></div></div>
+
+<h2>Weaving Chart</h2>
+{{#if can_edit_pattern _id}}
+<input type="button" id="add_row_at_start" value="Add row at bottom">
+<input type="button" id="add_row_at_end" value="Add row at top"><br/>
+<input type="button" id="add_tablet_at_start" value="Add tablet at left">
+<input type="button" id="add_tablet_at_end" value="Add tablet at right"><br/>{{/if}}
+<div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
+{{#each row_indexes}}
+<div class="row"><span class="row_number">{{this}}</span><ul>{{#each weaving_row this}}
+{{#with cell_style}}
+{{> pattern_cell}}
+{{/with}}
+{{/each}}{{#if can_remove_rows}}<li class="cell no_select remove_row">X</li>{{/if}}</ul></div>
+{{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
+{{#each tablet_indexes}}
+<li class="no_select remove_tablet">X</li>
+{{/each}}</ul></div>{{/if}}
+</div>
+
+<h2>Tablets</h2>
+<div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
+{{#each hole_indexes}}
+<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}
+{{#with cell_style}}
+{{> pattern_cell}}
+{{/with}}
+{{/each}}</ul></div>
+{{/each}}
+{{> orientation}}
+</div>
+<br/>
+<div class="notation">
+<img src="../images/tablet_labels.png" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
+</div><br/>
+{{/if}}
+</template>
+
+<template name="styles_palette">{{#if can_edit_pattern _id}}
+<div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}}">
+<div class="edit_style {{editing_style}}">
+ <h2>Background</h2>
+<div class="colorpicker_holder"><input type="text" id="background_colorpicker"></div>
+<h2>Line</h2>
+<div class="colorpicker_holder"><input type="text" id="line_colorpicker"></div>
+<div class="forward_stroke {{forward_stroke_on}}"></div>
+<div class="backward_stroke {{backward_stroke_on}}"></div>
+</div>
+<div class="styles">{{#if single_column}}<div class="pagination">
+<ul><li class="page_1 no_select {{is_selected_style_palette 1}}"><a href="#">Page 1</a></li><li class="page_2 no_select {{is_selected_style_palette 2}}"><a href="#">Page 2</a></li></ul></div>{{/if}}
+<input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style"><div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row">{{#each styles this}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
+</div></div></div>
+{{/if}}</template>
+
+<template name="style_cell">
+<li class="cell {{is_selected_style style}} {{forward_stroke}} {{backward_stroke}} {{is_dark}}" style="background-color: {{background_color}}"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
+</template>
+
+<template name="orientation">
+<div class="row orientation {{#if can_edit_pattern _id}}editable{{/if}}"><span class="spacer"></span><ul>
+{{#each tablet_orientation}}
+<li class="no_select {{style_orientation orientation}}"><span class="line"></span></li>
+{{/each}}</ul></div>
+<div class="hint"><span class="spacer"></span>Slope of line = angle of tablet viewed from above</div>
+</template>
+
+<template name="pattern_not_found">
+<h2>Pattern not found: {{id}}</h2>
+</template>

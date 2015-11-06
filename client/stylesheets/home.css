@@ -1,0 +1,92 @@
+h2 {
+  clear: both;
+}
+
+/* *** Patterns list *** */
+ul.patterns {
+  float: left;
+  width: 400px;
+}
+
+ul.patterns li {
+  float: left;
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 0;
+  background-color: #FFFFFF;
+  border: 1px solid #424A6C;
+}
+
+ul.patterns li a {
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+ul.patterns li .header {
+  padding: 16px;
+  display: block;
+  overflow: hidden;
+
+}
+
+ul.patterns li .header img.thumbnail {
+  margin: 0 16px 0 0;
+  float: left;
+}
+
+ul.patterns li .header .name {
+  display: block;
+  margin-left: 88px;
+  color: #666666;
+  height: 32px;
+  line-height: 32px;
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+ul.patterns li span.main {
+  padding: 0 16px 0 16px;
+  display: block;
+  cursor: pointer;
+  height: 3em;
+}
+
+ul.patterns li span.description {
+  display: block;
+  height: 3em;
+  font-size: 95%;
+  overflow: hidden;
+  white-space: pre-line;
+  color: #666666;
+}
+
+ul.patterns li.selected {
+  background-color: #CCCCFF;
+}
+
+ul.patterns li .buttons {
+  width: 100%;
+  float: left;
+  border-top: 1px solid #424A6C;
+  background-color: #424A6C;
+}
+
+ul.patterns li a.created_by {
+  float: left;
+  color: #FFFFFF;
+  margin: 8px;
+  cursor: pointer;
+}
+
+ul.patterns li input,
+ul.patterns li button {
+  float: right;
+  margin: 8px;
+}
+
+/* *** Import file input *** */
+#import_file_holder {
+  display: none;
+}

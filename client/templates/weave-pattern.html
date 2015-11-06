@@ -1,0 +1,18 @@
+<template name="weave_pattern">
+{{> pattern_as_text}}
+{{#if Template.subscriptionsReady}}
+<div class="row_controls"><label for="current_row_input">Row: </label><input type="text" id="current_row_input" value={{selected_row}}>
+<input type="button" id="first_row" value="First row" />
+<input type="button" id="last_row" value="Last row" /></div>
+<div class="pattern weave">
+{{> column_numbers}}
+{{#each row_indexes}}
+<div class="row {{selected_class this}}"><span class="row_number">{{this}}</span><ul>{{#each weaving_row this}}
+{{#with cell_style}}
+{{> pattern_cell}}
+{{/with}}
+{{/each}}</ul>{{#if is_selected_row this}}<div class="buttons"><div class="inner_tube"><input type="button" class="next_row" /><input type="button" class="previous_row" /></div></div>{{/if}}<div class="highlight"><div class="inner_tube"></div></div></div>
+{{/each}}
+</div>
+{{/if}}
+</template>

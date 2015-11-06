@@ -1,0 +1,22 @@
+<template name="pattern_as_text">
+{{#if Template.subscriptionsReady}}
+<div id="pattern_as_text" class="{{show_pattern_as_text}}"><div class="inner_tube">
+  <h2>{{name}} (JSON)</h2>
+  <p>Copy the text below into a text editor and save it with the file extension .json.</p>
+  <input type="button" class="select" value="Select text" >
+  <input type="button" class="close" value="Close" >
+  <textarea>{{pattern_as_json}}</textarea>
+</div></div>
+{{/if}}
+</template>
+
+<template name="pattern_cell">
+<li class="cell no_select {{forward_stroke}} {{backward_stroke}} {{is_dark}}" style="background-color: {{background_color}}"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
+</template>
+
+<template name="column_numbers">
+<div class="row column_number"><span class="spacer"></span><ul>
+{{#each tablet_indexes}}
+<li class="no_select">{{this}}</li>
+{{/each}}</ul></div>
+</template>

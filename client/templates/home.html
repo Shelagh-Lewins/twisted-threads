@@ -1,0 +1,57 @@
+<template name="home">
+{{#if Template.subscriptionsReady}}
+{{> patterns}}
+{{else}}
+  Loading...
+{{/if}}
+</template>
+
+<template name="patterns">
+  {{#if currentUser}}
+  {{> create_new_pattern}}
+  {{else}}
+  <p>Welcome to Twisted Threads, the online app for tablet weaving patterns.</p>
+  <p>Sign in to create and share patterns.</p>
+  {{/if}}
+
+{{#with recent_patterns}}{{#if this.length}}
+<h2>Recent patterns</h2>
+<ul class="patterns">
+{{#each this}}
+{{> pattern_overview}}
+{{/each}}
+</ul>
+{{else}}
+<p>Select a pattern and start weaving.</p>
+{{/if}}{{/with}}
+{{#with not_recent_patterns}}{{#if this.count}}
+<h2>Patterns</h2>
+<ul class="patterns">
+{{#each this}}
+{{> pattern_overview}}
+{{/each}}
+</ul>
+{{/if}}{{/with}}
+</template>
+
+<template name="create_new_pattern">
+  <form>
+    <input type="text" placeholder="Pattern name..." name="pattern_name">
+    <input type="submit" value="Create a new pattern">
+  </form>
+</template>
+
+<template name="pattern_overview"><li class="{{#if private}}private{{/if}}"><a href="{{pathFor route='pattern'}}">
+  <span class="header"><img src="{{thumbnail_url}}" class="thumbnail" width="80" height="80"/><span class="name">{{name}}</span></span>
+  <span class="main"><span class="description">{{description}}</span></span></a><div class="buttons"><a href="{{pathFor route='user' _id=created_by}}" class="created_by">{{created_by_username}}</a>{{#if can_edit_pattern _id}}<input type="button" class="delete" value="Delete" />
+<button class="toggle_private">
+{{#if private}}
+Private
+{{else}}
+Public
+{{/if}}
+</button>{{/if}}</div>
+</li>
+</template>
+
+

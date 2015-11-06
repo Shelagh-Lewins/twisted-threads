@@ -1,0 +1,18 @@
+<template name="user">
+{{#if Template.subscriptionsReady}}
+{{#if user_patterns_exist}}
+<h2>{{username}}'s patterns</h2>
+<ul class="patterns">
+{{#each user_patterns _id}}
+{{> pattern_overview}}
+{{/each}}
+</ul>
+{{else}}
+{{username}} has not created any patterns yet.
+{{/if}}
+{{/if}}
+</template>
+
+<template name="user_not_found">
+  <h2>User not found: {{id}}</h2>
+</template>
