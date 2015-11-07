@@ -9,8 +9,6 @@ Template.view_pattern.rendered = function() {
   Session.set('styles_palette', 1);
   Session.set("selected_style", 1);
 
-  Meteor.my_functions.reset_scroll();
-
   Meteor.my_functions.add_to_recent_patterns(Router.current().params._id);
 
   // latches for handling edit name
@@ -23,19 +21,14 @@ Template.view_pattern.rendered = function() {
   description_blur = false;
   description_change_latch = false;
 
-  Meteor.my_functions.size_view_pattern();
+  Meteor.my_functions.resize_page();
+  Meteor.my_functions.reset_scroll();
 }
 
 Template.pattern_not_found.helpers({
   'id': function(){
     return Router.current().params._id;
   }
-});
-
-Template.view_pattern.onCreated(function() {
-  $("#width").on('scroll resize orientationchange', function(e) {
-    Meteor.my_functions.size_view_pattern();   
-  });
 });
 
 Template.view_pattern.helpers({
@@ -192,7 +185,8 @@ Template.orientation.helpers({
   }
 });
 
-Template.styles_palette.rendered = function(){
+Template.styles_palette.onRendered(function(){
+  //console.log("rendered");
   var pattern_id = Router.current().params._id;
   this.subscribe('styles', pattern_id, {
       onReady: function(){
@@ -204,10 +198,12 @@ Template.styles_palette.rendered = function(){
 
       var offset = $('#styles_palette').outerHeight(true);
       panel.style.bottom = offset + "px";
+      //console.log("subscribed");
+      Meteor.my_functions.resize_page();
     }
   });
 
-}
+});
 
 Template.styles_palette.helpers({
   editing_style: function() {

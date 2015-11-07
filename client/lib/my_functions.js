@@ -506,27 +506,13 @@ Meteor.my_functions = {
     $('#width').scrollTop(0);
     $('#width').scrollLeft(0);
   },
-  size_home: function() {
+  resize_page: function() {
+    // set height of '#width' to fill viewport
     var new_height = $("body").innerHeight();
-    $("#width").css({
-        'height': new_height
-    });
-  },
-  size_view_pattern: function() {
-    // make the 'width' div fill the space left above the styles_palette
-    var new_height = $("body").innerHeight() -  $("#styles_palette").outerHeight(true);
-    $("#width").css({
-        'height': new_height
-    });
 
-    // keep the header in the viewport
-    $('#header').css({
-        'left': $("#width").scrollLeft() // Always at left edge of window
-    });
-  },
-  size_weave: function() {
-    // make the 'width' div fill the space left above the styles_palette
-    var new_height = $("body").innerHeight() -  $("#styles_palette").outerHeight(true);
+    if ($("#styles_palette").outerHeight(true) != null)
+      new_height -= $("#styles_palette").outerHeight(true);
+    
     $("#width").css({
         'height': new_height
     });

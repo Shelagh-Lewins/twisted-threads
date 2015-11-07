@@ -3,7 +3,8 @@ Template.weave_pattern.rendered = function() {
   Session.set('menu_open', false);
   Session.set('show_pattern_as_text', false);
   Meteor.my_functions.initialize_weave();
-  Meteor.my_functions.size_weave();
+  Meteor.my_functions.resize_page();
+  Meteor.my_functions.reset_scroll();
 }
 
 Template.weave_pattern.helpers({
@@ -18,12 +19,6 @@ Template.weave_pattern.helpers({
     if (Session.equals('current_weave_row', row_index))
         return true;
   }
-});
-
-Template.weave_pattern.onCreated(function() {
-  $("#width").on('scroll resize orientationchange', function(e) {
-    Meteor.my_functions.size_weave();   
-  });
 });
 
 Template.weave_pattern.events({

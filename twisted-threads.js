@@ -55,6 +55,9 @@ Router.route('/pattern/:_id/:weaving?', {
       this.render('view_pattern');
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         this.render('styles_palette', {to: 'footer'});
+
+      else
+        this.render(null, {to: 'footer'});
     }
          
   }
@@ -107,7 +110,19 @@ if (Meteor.isClient) {
     $('body').attr("class", "loading");
     Session.set('menu_open', false);
     Meteor.my_functions.reset_scroll();
+    Meteor.my_functions.resize_page();
   }
+
+  Template.main.rendered = function() {
+    // tie this to the main template since that is the one which contains the header and width divs
+     $(window).on('resize orientationchange', function(e) {
+      Meteor.my_functions.resize_page();  
+    });
+
+     $("#width").on('scroll', function(e) {
+      Meteor.my_functions.resize_page();  
+    });
+   }
 
   /* *** Helper functions that may be used by more than one template *** */
   // Allows a template to check whether a helper value equals a string
@@ -188,12 +203,11 @@ if (Meteor.isClient) {
 
 
   UI.registerHelper('can_edit_pattern', function(pattern_id) {
-    //var pattern_id = Router.current().params._id;
       return Meteor.my_functions.can_edit_pattern(pattern_id);
   });
+  
   ///////////////////////////////////
   // Menu - options for selected pattern
-
   Template.menu.events({
     'click #menu_button': function() {
       if (Session.equals('menu_open', true))
@@ -301,8 +315,25 @@ if (Meteor.isClient) {
         }
       }
     }
-    /*var width = $(window).width();
-    console.log("autotracker width " + width);*/
+
+    // detect login / logout
+    var currentUser=Meteor.user();
+    if(currentUser){
+      
+      if (!Session.equals('was_signed_in', true))
+      {
+        Session.set('was_signed_in', true);
+        setTimeout(function(){ Meteor.my_functions.resize_page();}, 20);
+      }
+    }
+    else if(!computation.firstRun){ // avoid useless logout detection on app startup
+      
+      if (Session.equals('was_signed_in', true))
+      {
+        Session.set('was_signed_in', false);
+        setTimeout(function(){ Meteor.my_functions.resize_page();}, 20);
+      }
+    }
   });
 }
 

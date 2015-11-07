@@ -1,7 +1,7 @@
 Template.home.rendered = function() {
   $('body').attr("class", "home");
   Session.set('menu_open', false);
-  Meteor.my_functions.size_home();
+  Meteor.my_functions.resize_page();
 }
 
 // *** create_new_pattern *** //
@@ -12,16 +12,6 @@ Template.create_new_pattern.events({
     Meteor.my_functions.new_pattern(pattern_name);
     $('[name=pattern_name]').val('');
   }
-});
-
-Template.home.onCreated(function() {
-  // TODO only if can edit and not weaving
-  // TODO if Android or iOS, use this code and set to Absolute
-  // Otherwise leave it fixed!
-
-  $("#width").on('scroll resize orientationchange', function(e) {
-    Meteor.my_functions.size_home();   
-  });
 });
 
 // *** Display patterns *** //
