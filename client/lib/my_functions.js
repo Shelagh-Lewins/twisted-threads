@@ -502,9 +502,18 @@ Meteor.my_functions = {
   },
   //////////////////////////////////
   // sizing and scrolling, to keep header and styles_palette in correct positions
-  reset_scroll: function() {
-    $('#width').scrollTop(0);
+  initialize_route: function() {
+    // tidying up to be done whenever the router renders a new template.
+    // this is called from each template's 'rendered' function
+    // I haven't found a way to do this from the router
+    Session.set('menu_open', false);
+    Meteor.my_functions.resize_page();
+    Session.set("loading", false);
+    Session.set('show_pattern_as_text', false);
+
+    // make sure scroll is top left
     $('#width').scrollLeft(0);
+    $('#width').scrollTop(0);
   },
   resize_page: function() {
     // set height of '#width' to fill viewport

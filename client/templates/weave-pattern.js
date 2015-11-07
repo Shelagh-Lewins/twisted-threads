@@ -1,10 +1,7 @@
 Template.weave_pattern.rendered = function() {
   $('body').attr("class", "weave");
-  Session.set('menu_open', false);
-  Session.set('show_pattern_as_text', false);
   Meteor.my_functions.initialize_weave();
-  Meteor.my_functions.resize_page();
-  Meteor.my_functions.reset_scroll();
+  Meteor.my_functions.initialize_route();
 }
 
 Template.weave_pattern.helpers({

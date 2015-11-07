@@ -96,6 +96,8 @@ if (Meteor.isClient) {
 
     Session.set('click_latch', false); // used to prevent double click on buttons
 
+    Session.set("loading", false);
+
     window.addEventListener('resize', function(){
       Session.set('window_width', $(window).width());
       Session.set('window_height', $(window).height());
@@ -108,13 +110,11 @@ if (Meteor.isClient) {
   /* *** Loading template *** */
   Template.loading.rendered = function() {
     $('body').attr("class", "loading");
-    Session.set('menu_open', false);
-    Meteor.my_functions.reset_scroll();
-    Meteor.my_functions.resize_page();
+    Meteor.my_functions.initialize_route();
   }
 
   Template.main.rendered = function() {
-    // tie this to the main template since that is the one which contains the header and width divs
+    // main template contains the header and width divs
      $(window).on('resize orientationchange', function(e) {
       Meteor.my_functions.resize_page();  
     });
@@ -123,6 +123,13 @@ if (Meteor.isClient) {
       Meteor.my_functions.resize_page();  
     });
    }
+
+  Template.main.helpers({
+    loading: function(){
+      if (Session.equals('loading', true))
+        return true;
+    }
+  });
 
   /* *** Helper functions that may be used by more than one template *** */
   // Allows a template to check whether a helper value equals a string
@@ -167,7 +174,7 @@ if (Meteor.isClient) {
   });
 
   //////////////////////////////////
-  // Uused in header to display correct buttons and title depending on route and params
+  // Used in header to display correct buttons and title depending on route and params
   // Used in menu to determine menu entries
   UI.registerHelper('route_name', function(){
     return Router.current().route.getName();
@@ -176,6 +183,16 @@ if (Meteor.isClient) {
   Template.header.onCreated(function() {
     this.subscribe('patterns');
     this.subscribe('recent_patterns');
+  });
+
+  Template.header.events({
+    // The router doesn't show the 'loading' template for these actions because only the data changes, not the route. So here we manually trigger a simple "Loading..." display to help the user when switching between view pattern and weave.
+    'click #start_weaving': function(){
+      Session.set("loading", true);
+    },
+    'click #stop_weaving': function(){
+      Session.set("loading", true);
+    }
   });
 
   UI.registerHelper('is_weaving', function(){
@@ -205,7 +222,7 @@ if (Meteor.isClient) {
   UI.registerHelper('can_edit_pattern', function(pattern_id) {
       return Meteor.my_functions.can_edit_pattern(pattern_id);
   });
-  
+
   ///////////////////////////////////
   // Menu - options for selected pattern
   Template.menu.events({

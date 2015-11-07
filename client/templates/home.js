@@ -1,7 +1,6 @@
 Template.home.rendered = function() {
   $('body').attr("class", "home");
-  Session.set('menu_open', false);
-  Meteor.my_functions.resize_page();
+  Meteor.my_functions.initialize_route();
 }
 
 // *** create_new_pattern *** //
