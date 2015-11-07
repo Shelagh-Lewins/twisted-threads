@@ -1,8 +1,6 @@
 Template.user.rendered = function() {
   $('body').attr("class", "user");
-  Session.set('menu_open', false);
-  Meteor.my_functions.reset_scroll();
-  Meteor.my_functions.resize_page();
+  Meteor.my_functions.initialize_route();
 }
 
 Template.user_not_found.helpers({

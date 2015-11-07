@@ -3,8 +3,12 @@
 </template>
 
 <template name="main">
-  
-  <div id="width" class="{{signed_in}} {{connection_status}} ">
+<div id="width" class="{{signed_in}} {{connection_status}} ">
+{{#if loading}}
+<div id="spinner_box"><div class="inner_tube">
+<p>Loading...</p>
+</div></div>
+{{/if}}
   {{> header}}
   <div id="connection_status_holder">{{> connection_status}}</div>
   <div id="content">{{> import_file_picker}}{{> yield}}</div>
@@ -21,8 +25,8 @@
 {{#if equals route_name "pattern"}}
 <a href="{{pathFor route='home'}}">Home</a>
 {{#if pattern_exists _id}}{{#if is_weaving}}
-<a href="{{pathFor route='pattern'}}">Stop weaving</a>{{else}}
-<a href="{{pathFor route='pattern' weaving="weaving"}}">Start weaving</a>{{/if}}{{/if}}{{/if}}{{/if}}
+<a href="{{pathFor route='pattern'}}" id="stop_weaving">Stop weaving</a>{{else}}
+<a href="{{pathFor route='pattern' weaving="weaving"}}" id="start_weaving">Start weaving</a>{{/if}}{{/if}}{{/if}}{{/if}}
 </div>
 <h1><span>{{#if equals route_name "home"}}Twisted Threads
 {{else}}

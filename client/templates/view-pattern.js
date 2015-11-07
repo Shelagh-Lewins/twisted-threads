@@ -3,8 +3,6 @@ Template.view_pattern.rendered = function() {
   if (Meteor.my_functions.can_edit_pattern(Router.current().params._id))
     $('body').addClass('editable');
 
-  Session.set('menu_open', false);
-  Session.set('show_pattern_as_text', false);
   Session.set('edit_style', false);
   Session.set('styles_palette', 1);
   Session.set("selected_style", 1);
@@ -21,8 +19,7 @@ Template.view_pattern.rendered = function() {
   description_blur = false;
   description_change_latch = false;
 
-  Meteor.my_functions.resize_page();
-  Meteor.my_functions.reset_scroll();
+  Meteor.my_functions.initialize_route();
 }
 
 Template.pattern_not_found.helpers({
