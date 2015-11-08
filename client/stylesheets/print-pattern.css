@@ -1,0 +1,17 @@
+body.print {
+  float: left;
+  overflow: auto;
+  width: auto;
+  height: auto;
+  background-color: #FFFFFF;
+  padding: 16px;
+}
+
+body.print h1 {
+  text-align: center;
+  font-weight: bold;
+}
+
+body.print p {
+  text-align: center;
+}

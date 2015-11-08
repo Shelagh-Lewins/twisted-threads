@@ -30,10 +30,10 @@
   border: none;
   color: #424A6C;
   cursor: pointer;
-  padding: 0;
+  padding: 8px 0 0 8px;
   margin: 0;
   line-height: 1.5;
-  font-size: 90%;
+  font-size: 80%;
 }
 
 #pattern_name_input {
