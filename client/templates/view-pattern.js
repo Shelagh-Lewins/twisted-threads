@@ -102,7 +102,7 @@ Template.view_pattern.helpers({
   },
   ////////////////////
   // Tablets
-  'hole_indexes': function() {
+ /* 'hole_indexes': function() {
     return [4,3,2,1]; // row 1 at bottom of page
   },
   'threading_hole': function(hole) {
@@ -121,7 +121,7 @@ Template.view_pattern.helpers({
     // holes are numbered 1, 2, 3, 4
     var labels = ["A", "B", "C", "D"];
     return labels[hole-1];
-  },
+  },*/
   // Edit style controls
   forward_stroke_on: function() {
     var selected_style = Session.get("selected_style");

@@ -7,7 +7,7 @@ Styles = new Mongo.Collection('styles'); // contains the individual styles for e
 Recent_Patterns = new Mongo.Collection('recent_patterns'); // records the patterns each user has viewed / woven recently
 
 Router.configure({
-  layoutTemplate: 'main',
+  layoutTemplate: 'main_layout',
   loadingTemplate: 'loading'
 });
 
@@ -27,7 +27,13 @@ Router.route('/pattern/:_id/:mode?', {
     var pattern_id = this.params._id;
     
     return [
-      Meteor.subscribe('patterns'),
+      Meteor.subscribe('patterns', {
+        onReady: function(){
+          var pattern_id = Router.current().params._id;
+          var created_by_id = Patterns.findOne({ _id: pattern_id}).created_by;
+          Meteor.subscribe('user_info', created_by_id);
+        }
+      }),
       Meteor.subscribe('weaving', pattern_id),
       Meteor.subscribe('threading', pattern_id),
       Meteor.subscribe('orientation', pattern_id),
@@ -40,6 +46,7 @@ Router.route('/pattern/:_id/:mode?', {
 
     if (Patterns.find({ _id: pattern_id}).count() == 0)
     {
+      this.layout('main_layout');
       this.render("pattern_not_found");
       this.render(null, {to: 'footer'}); // yield regions must be manually cleared
     }
@@ -47,6 +54,13 @@ Router.route('/pattern/:_id/:mode?', {
     else if (this.params.mode == "weaving")
     {
       this.render('weave_pattern');
+      this.render(null, {to: 'footer'});
+    }
+
+    else if (this.params.mode == "print")
+    {
+      this.layout('print_layout');
+      this.render('print_pattern');
       this.render(null, {to: 'footer'});
     }
 
@@ -113,7 +127,7 @@ if (Meteor.isClient) {
     Meteor.my_functions.initialize_route();
   }
 
-  Template.main.rendered = function() {
+  Template.main_layout.rendered = function() {
     // main template contains the header and width divs
      $(window).on('resize orientationchange', function(e) {
       Meteor.my_functions.resize_page();  
@@ -124,7 +138,7 @@ if (Meteor.isClient) {
     });
    }
 
-  Template.main.helpers({
+  Template.main_layout.helpers({
     loading: function(){
       if (Session.equals('loading', true))
         return true;
@@ -233,10 +247,13 @@ if (Meteor.isClient) {
       else
         Session.set('menu_open', true);
     },
+    'click #menu .menu_list ul li a': function(){
+      Session.set('menu_open', false);
+    },
     // import a pattern from a JSON file
     'click #import_pattern': function() {
       $('#import_file').trigger('click');
-      Session.set('menu_open', false);
+      //Session.set('menu_open', false);
       
     },
     // copy this pattern to a new pattern
@@ -245,12 +262,12 @@ if (Meteor.isClient) {
       if (Router.current().route.getName() == "pattern")
       {
         Meteor.my_functions.copy_pattern(template.data._id);
-        Session.set('menu_open', false);
+        //Session.set('menu_open', false);
       }
     },
     // display this pattern as JSON
     'click #export_pattern': function() {
-      Session.set('menu_open', false);
+      //Session.set('menu_open', false);
       Session.set('show_pattern_as_text', true);
     }
   });

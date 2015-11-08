@@ -2,19 +2,22 @@
 {{> spinner}}
 </template>
 
-<template name="main">
+<template name="main_layout">
 <div id="width" class="{{signed_in}} {{connection_status}} ">
 {{#if loading}}
 <div id="spinner_box"><div class="inner_tube">
 <p>Loading...</p>
 </div></div>
 {{/if}}
-  {{> header}}
-  <div id="connection_status_holder">{{> connection_status}}</div>
-  <div id="content">{{> import_file_picker}}{{> yield}}</div>
-  </div>
-  {{> yield region="footer"}}
-  <!--{{> styles_palette}}-->
+{{> header}}
+<div id="connection_status_holder">{{> connection_status}}</div>
+<div id="content">{{> import_file_picker}}{{> yield}}</div>
+</div>
+{{> yield region="footer"}}
+</template>
+
+<template name="print_layout">
+{{> yield}}
 </template>
 
 <template name="header">
@@ -43,8 +46,9 @@
 <div class="menu_list"><ul>
 <li><a href="#" id="import_pattern" >Load a pattern from JSON</a></li></ul>
 {{#if Template.subscriptionsReady}}{{#if equals route_name "pattern"}}{{#if pattern_exists _id}}<ul>
-<li><a href="#" id="copy_pattern" >Copy this pattern</a></li>
-<li><a href="#" id="export_pattern" >Export this pattern to JSON</a></li>
+<li><a href="{{pathFor route='pattern' mode="print"}}" target="_blank" id="print_pattern" >Printer-friendly pattern</a></li>
+<li><a href="#" id="copy_pattern" >Copy pattern</a></li>
+<li><a href="#" id="export_pattern" >Export pattern to JSON</a></li>
 </ul>
 {{/if}}{{/if}}{{/if}}
 </div></div>

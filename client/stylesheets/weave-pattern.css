@@ -121,16 +121,6 @@ body.weave,
   padding: 0;
 }
 
-/* Pair of selects to hide the "next" button on the first row that is not .column_number */
-/* http://stackoverflow.com/questions/25166234/css-first-child-without-certain-class */
-/*.pattern.weave div.row.selected:not(.column_number) .buttons input.next_row {
-  visibility: hidden;
-}
-
-.pattern.weave div.row:not(.column_number) ~ div.row.selected:not(.column_number) .buttons input.next_row {
-  visibility: visible;
-}*/
-
 .pattern.weave div.row.selected .buttons input.previous_row {
   visibility: visible;
 }

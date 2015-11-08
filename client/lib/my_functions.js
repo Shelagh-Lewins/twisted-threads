@@ -352,7 +352,7 @@ Meteor.my_functions = {
       var new_description = $('#pattern_description_input').val();
       Meteor.call('update_pattern_description', pattern_id, new_description);
     }
-    setTimeout(function(){ Meteor.my_functions.resize_page(); }, 10);
+    setTimeout(function(){ Meteor.my_functions.resize_page(); }, 0);
   },
   ///////////////////////////////
   // Color pickers

@@ -30,6 +30,29 @@ UI.registerHelper('weaving_row', function(row) {
     return Weaving.find({ $and: [{pattern_id: pattern_id, row:row}]}, {sort: {"tablet": 1}}).fetch();
 });
 
+//////////////////////////
+// Tablets
+UI.registerHelper('hole_indexes', function() {
+  return [4,3,2,1]; // row 1 at bottom of page
+});
+
+UI.registerHelper('threading_hole', function(hole) {
+  var pattern_id = Router.current().params._id;
+
+    return Threading.find({ $and: [{pattern_id: pattern_id, hole:hole}]}, {sort: {"tablet": 1}}).fetch();
+});
+
+UI.registerHelper('hole_label', function(hole) {
+  if (Session.equals("db_ready", false))
+        return;
+
+    var pattern_id = Router.current().params._id;
+
+    // holes are numbered 1, 2, 3, 4
+    var labels = ["A", "B", "C", "D"];
+    return labels[hole-1];
+});
+
 ///////////////////////////
   // Helpers for styles
   UI.registerHelper('style_orientation', function(orientation) {
