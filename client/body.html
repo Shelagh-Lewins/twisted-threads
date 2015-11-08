@@ -26,7 +26,7 @@
 <a href="{{pathFor route='home'}}">Home</a>
 {{#if pattern_exists _id}}{{#if is_weaving}}
 <a href="{{pathFor route='pattern'}}" id="stop_weaving">Stop weaving</a>{{else}}
-<a href="{{pathFor route='pattern' weaving="weaving"}}" id="start_weaving">Start weaving</a>{{/if}}{{/if}}{{/if}}{{/if}}
+<a href="{{pathFor route='pattern' mode="weaving"}}" id="start_weaving">Start weaving</a>{{/if}}{{/if}}{{/if}}{{/if}}
 </div>
 <h1><span>{{#if equals route_name "home"}}Twisted Threads
 {{else}}
@@ -41,12 +41,13 @@
 <div id="menu" class="{{menu_open}}">
 <input type="button" id="menu_button" class="menu_button" value="">
 <div class="menu_list"><ul>
-<li><a href="#" id="import_pattern" >Import a pattern from JSON</a></li>
-{{#if Template.subscriptionsReady}}{{#if equals route_name "pattern"}}{{#if pattern_exists _id}}
+<li><a href="#" id="import_pattern" >Load a pattern from JSON</a></li></ul>
+{{#if Template.subscriptionsReady}}{{#if equals route_name "pattern"}}{{#if pattern_exists _id}}<ul>
 <li><a href="#" id="copy_pattern" >Copy this pattern</a></li>
 <li><a href="#" id="export_pattern" >Export this pattern to JSON</a></li>
+</ul>
 {{/if}}{{/if}}{{/if}}
-</ul></div></div>
+</div></div>
 </template>
 
 <template name="import_file_picker">

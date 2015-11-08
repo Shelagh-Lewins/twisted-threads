@@ -136,8 +136,17 @@ body {
   border-radius: 4px;
 }
 
+#header #menu.open div.menu_list ul {
+  float: left;
+  border-bottom: 1px solid #7580ac;
+}
+
+#header #menu.open div.menu_list ul:last-child {
+  border-bottom: none;
+}
+
 #header #menu.open div.menu_list ul li {
-  
+  float: left;
 }
 
 #header #menu.open div.menu_list ul li a {
@@ -146,7 +155,7 @@ body {
   padding: 8px;
   width: 260px;
   color: #222222;
-  border-bottom: 1px solid #7580ac;
+  
   text-decoration: none;
 }
 
@@ -156,11 +165,7 @@ body {
 }
 
 #header #menu.open div.menu_list ul li:last-child a {
-  float: left;
-  line-height: 2;
-  padding: 8px;
-  width: 260px;
-  border-bottom: none;
+  
 }
 
 /* *** Import file input *** */
