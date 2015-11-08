@@ -16,7 +16,7 @@ Router.route('/', {
   template: 'home'
 });
 
-Router.route('/pattern/:_id/:weaving?', {
+Router.route('/pattern/:_id/:mode?', {
   name: 'pattern',
   data: function(){
     var pattern_id = this.params._id;
@@ -44,7 +44,7 @@ Router.route('/pattern/:_id/:weaving?', {
       this.render(null, {to: 'footer'}); // yield regions must be manually cleared
     }
  
-    else if (this.params.weaving == "weaving")
+    else if (this.params.mode == "weaving")
     {
       this.render('weave_pattern');
       this.render(null, {to: 'footer'});
@@ -196,7 +196,7 @@ if (Meteor.isClient) {
   });
 
   UI.registerHelper('is_weaving', function(){
-    if (Router.current().params.weaving=="weaving")
+    if (Router.current().params.mode=="weaving")
       return true;
   });
 

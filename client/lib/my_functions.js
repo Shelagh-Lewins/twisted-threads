@@ -328,7 +328,7 @@ Meteor.my_functions = {
     if (Session.equals('editing_pattern_name', true))
     {
     // give the input time to be rendered before attempting to focus on it
-      setTimeout(function(){$('#pattern_name_input').focus()}, 50);
+      setTimeout(function(){$('#pattern_name_input').focus()}, 10);
     }
     else
     {
@@ -336,6 +336,7 @@ Meteor.my_functions = {
       var new_name = $('#pattern_name_input').val();
       Meteor.call('update_pattern_name', pattern_id, new_name);
     }
+   setTimeout(function(){ Meteor.my_functions.resize_page(); }, 50);
   },
   toggle_edit_description: function(){
     var new_value = !Session.get('editing_pattern_description');
@@ -351,6 +352,7 @@ Meteor.my_functions = {
       var new_description = $('#pattern_description_input').val();
       Meteor.call('update_pattern_description', pattern_id, new_description);
     }
+    setTimeout(function(){ Meteor.my_functions.resize_page(); }, 10);
   },
   ///////////////////////////////
   // Color pickers
@@ -519,7 +521,7 @@ Meteor.my_functions = {
     // set height of '#width' to fill viewport
     var new_height = $("body").innerHeight();
 
-    if ($("#styles_palette").outerHeight(true) != null)
+    if (($("#styles_palette").outerHeight(true) != null) && $("#styles_palette").is(":visible"))
       new_height -= $("#styles_palette").outerHeight(true);
     
     $("#width").css({
@@ -572,7 +574,7 @@ Meteor.my_functions = {
 
     // Note that jQuery scrollIntoView messes things up
     setTimeout(function(){
-        var container = $('body');
+        var container = $('#width');
         var scrollTo = $('.pattern.weave .row.selected .inner_tube');
         container.scrollTop( scrollTo.offset().top - container.offset().top + container.scrollTop() );
       }, 50);
@@ -594,6 +596,12 @@ Meteor.my_functions = {
         Meteor.my_functions.scroll_selected_row_into_view();
       }, 50);
     }
+
+    // move the column numbers to sit above the selected row
+    var selected_row_index = number_of_rows - row_number;
+
+    var new_top = $($('.row').not(".column_number")[selected_row_index]).position().top - $('.row').not(".column_number").position().top;
+    $('.row.column_number').css({ top: new_top});
 
     Session.set('current_weave_row', row_number);
 
