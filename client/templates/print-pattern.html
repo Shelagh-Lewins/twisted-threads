@@ -1,4 +1,11 @@
 <template name="print_pattern">
+<div id="print_hint" class="visible"><div class="inner_tube">
+<input type="button" class="close" value="Close" >
+<h2>Check your print settings</h2>
+<p>Look at the print preview to see if your browser is set up to print background colours. If it isn't, your pattern will be printed as outlines only.</p>
+<p>If you're not sure how to change the print settings, try searching the web for instructions, for example "Firefox print background color" or "Internet Explorer 10 print background color".</p>
+<p>Important! After printing your pattern, you may want to change the settings back so you won't waste ink when printing standard web pages.</p>
+</div></div>
 <h1>{{name}}</h1>
 <p class="url">Printed from {{hostname}}{{pathFor route='pattern'}}</p>
 <p class="created_by">Created by {{created_by}}</p>

@@ -18,4 +18,10 @@ Template.print_pattern.helpers({
   }
 });
 
+Template.print_pattern.events({
+    'click #print_hint .close': function() {
+      $('#print_hint').removeClass("visible");
+    }
+  });
+
 

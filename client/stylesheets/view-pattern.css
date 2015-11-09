@@ -11,7 +11,7 @@
 /* *** Pattern Info *** */
 #pattern_info {
   max-width: 600px;
-  width: 90vw;
+  width: 100%;
 }
 
 #pattern_info .box {

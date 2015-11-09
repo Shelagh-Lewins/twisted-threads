@@ -174,15 +174,17 @@ body {
 }
 
 /* 'Show pattern as text' dialog, e.g. JSON */
-#pattern_as_text {
+#pattern_as_text,
+#print_hint {
   display: none;
 }
 
-#pattern_as_text.visible {
+#pattern_as_text.visible,
+#print_hint.visible {
   display: block;
   position: fixed;
   top: 24px;
-  left: 50vw;
+  left: 50%;
   width: 90%;
   max-width: 500px;
   z-index: 210;
@@ -190,7 +192,8 @@ body {
   background-color: transparent;
 }
 
-#pattern_as_text.visible .inner_tube {
+#pattern_as_text.visible .inner_tube,
+#print_hint.visible .inner_tube {
   position: relative;
   left: -50%;
   background: #FFFFFF;
@@ -199,9 +202,13 @@ body {
   -moz-border-radius: 4px;
   border-radius: 4px;
   padding: 16px 24px 16px 16px;
+  -webkit-box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.38);
+  -moz-box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.38);
+  box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.38);
 }
 
-#pattern_as_text h2 {
+#pattern_as_text h2,
+#print_hint h2 {
   text-align: center;
 }
 
@@ -210,11 +217,13 @@ body {
   height: 300px;
 }
 
-#pattern_as_text input {
+#pattern_as_text input,
+#print_hint input {
   margin-bottom: 8px;
 }
 
-#pattern_as_text input.close {
+#pattern_as_text input.close,
+#print_hint input.close {
   float: right;
 }
 
@@ -237,7 +246,7 @@ h2 {
 
 #connection_status_holder {
   position: absolute;
-  width: 100vw;
+  width: 100%;
   top: 3em;
   height: 3em;
   overflow: hidden;
