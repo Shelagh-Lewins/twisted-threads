@@ -1,10 +1,14 @@
 <template name="pattern_as_text">
 {{#if Template.subscriptionsReady}}
 <div id="pattern_as_text" class="{{show_pattern_as_text}}"><div class="inner_tube">
+<div class="buttons">
+  <input type="button" class="close" value="Close" >
+</div>
   <h2>{{name}} (JSON)</h2>
   <p>Copy the text below into a text editor and save it with the file extension .json.</p>
+<div class="buttons select">
   <input type="button" class="select" value="Select text" >
-  <input type="button" class="close" value="Close" >
+</div>
   <textarea>{{pattern_as_json}}</textarea>
 </div></div>
 {{/if}}

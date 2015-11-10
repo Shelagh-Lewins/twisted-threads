@@ -25,6 +25,9 @@ Meteor.my_functions = {
 
     var pattern_obj = {}; // JSON object to hold pattern
 
+    // version number
+    pattern_obj.version = "1.1";
+
     var number_of_rows = pattern.number_of_rows;
     var number_of_tablets = pattern.number_of_tablets;
 
@@ -165,21 +168,21 @@ Meteor.my_functions = {
       Meteor.my_functions.set_view('view_pattern');*/
     });
   },
-  import_pattern_from_file: function(filename) {
+  /*import_pattern_from_file: function(filename) {
     // pattern file should be in the 'private' folder
-    //Meteor.my_functions.start_activity_indicator("Importing pattern from file '" + filename + "'<br/>please wait...");
+
+    // TODO show spinner
 
     var options = {
       filename: filename
     };
+
     Meteor.call("new_pattern_from_json", options, function(error, result){
+      // TODO hide spinner
       // automatically view new pattern
       if (result == -1)
       {
-        /*setTimeout(function(){
-          Meteor.my_functions.start_activity_indicator("Unable to load file " + filename);
-          setTimeout(function(){ Meteor.my_functions.stop_activity_indicator(); }, 3000);
-        }, 2000);*/
+        
     // TODO show error if unable to create pattern //
       }
       else
@@ -192,24 +195,22 @@ Meteor.my_functions = {
         {
           Router.go('pattern', { _id: result });
         }
-      /*Meteor.my_functions.set_selected_pattern(pattern_id);
-        Meteor.my_functions.set_view('view_pattern');*/
       }
     });
-  },
+  },*/
   import_pattern_from_json: function(data) {
     // pattern file should be in the 'private' folder
-    //Meteor.my_functions.start_activity_indicator("Importing pattern '" + data.name + "'<br/>please wait...");
+   // TODO show spinner
+   Session.set('loading', true);
 
     var options = {
       name: data.name,
       data: data
     };
     Meteor.call('new_pattern_from_json', options, function(error, result){
+      Session.set('loading', false);
       // automatically view new pattern
-      //Meteor.my_functions.stop_activity_indicator();
-      /*Meteor.my_functions.set_selected_pattern(result);
-      Meteor.my_functions.set_view('view_pattern');*/
+      // TODO hide spinner
       if (error)
       {
         console.log("error running new_pattern_from_json: " + error.reason);
@@ -512,6 +513,7 @@ Meteor.my_functions = {
     Meteor.my_functions.resize_page();
     Session.set("loading", false);
     Session.set('show_pattern_as_text', false);
+    Session.set('show_import_pattern', false);
 
     // make sure scroll is top left
     $('#width').scrollLeft(0);

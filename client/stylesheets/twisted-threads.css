@@ -169,18 +169,20 @@ body {
 }
 
 /* *** Import file input *** */
-#import_file_holder {
+#import_pattern_holder {
   display: none;
 }
 
 /* 'Show pattern as text' dialog, e.g. JSON */
 #pattern_as_text,
-#print_hint {
+#print_hint,
+#import_pattern_dialog {
   display: none;
 }
 
 #pattern_as_text.visible,
-#print_hint.visible {
+#print_hint.visible,
+#import_pattern_dialog.visible {
   display: block;
   position: fixed;
   top: 24px;
@@ -193,7 +195,8 @@ body {
 }
 
 #pattern_as_text.visible .inner_tube,
-#print_hint.visible .inner_tube {
+#print_hint.visible .inner_tube,
+#import_pattern_dialog.visible .inner_tube {
   position: relative;
   left: -50%;
   background: #FFFFFF;
@@ -208,7 +211,8 @@ body {
 }
 
 #pattern_as_text h2,
-#print_hint h2 {
+#print_hint h2,
+#import_pattern_dialog h2 {
   text-align: center;
 }
 
@@ -218,13 +222,25 @@ body {
 }
 
 #pattern_as_text input,
-#print_hint input {
+#print_hint input,
+#import_pattern_dialog input {
   margin-bottom: 8px;
 }
 
 #pattern_as_text input.close,
-#print_hint input.close {
+#print_hint input.close,
+#import_pattern_dialog input.close {
   float: right;
+  margin-left: 8px;
+}
+
+#import_pattern_dialog .buttons.continue_holder,
+#pattern_as_text .buttons.select {
+  text-align: center;
+}
+
+#import_pattern_dialog .radio_button {
+  display: block;
 }
 
 /* *** content *** */

@@ -10,6 +10,7 @@
 </div></div>
 {{/if}}
 {{> header}}
+{{> import_pattern_dialog}}
 <div id="connection_status_holder">{{> connection_status}}</div>
 <div id="content">{{> import_file_picker}}{{> yield}}</div>
 </div>
@@ -54,9 +55,28 @@
 </div></div>
 </template>
 
+<template name="import_pattern_dialog">
+<div id="import_pattern_dialog" class="{{show_import_pattern}}"><div class="inner_tube">
+<div class="buttons">
+  <input type="button" class="close" value="Close" >
+</div>
+<h2>Import pattern</h2>
+<p>Choose the type of pattern file you want to import.</p>
+
+  <div class="radio_button"><input type="radio" id="json" name="file_type" value="JSON" checked="{{checked "JSON"}}" />
+  <label for="json">JSON</label></div>
+  <div class="radio_button"><input type="radio" id="gtt" name="file_type" value="GTT" checked="{{checked "GTT"}}" />
+  <label for="gtt">GTT</label></div>
+
+<div class="buttons continue_holder">
+  <input type="button" class="continue" value="Continue" {{disabled}}>
+</div>
+</div></div>
+</template>
+
 <template name="import_file_picker">
 <div id="import_file_holder">
-<input type="file" id="import_file" name="import_file" />
+<input type="file" id="file_picker" name="file_picker" />
 </div>
 </template>
 

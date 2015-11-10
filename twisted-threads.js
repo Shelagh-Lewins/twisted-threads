@@ -252,9 +252,7 @@ if (Meteor.isClient) {
     },
     // import a pattern from a JSON file
     'click #import_pattern': function() {
-      $('#import_file').trigger('click');
-      //Session.set('menu_open', false);
-      
+      Session.set('show_import_pattern', true);
     },
     // copy this pattern to a new pattern
     // if route="pattern", the template _id is a pattern_id
@@ -262,35 +260,89 @@ if (Meteor.isClient) {
       if (Router.current().route.getName() == "pattern")
       {
         Meteor.my_functions.copy_pattern(template.data._id);
-        //Session.set('menu_open', false);
       }
     },
     // display this pattern as JSON
     'click #export_pattern': function() {
-      //Session.set('menu_open', false);
       Session.set('show_pattern_as_text', true);
     }
   });
 
+  // Import pattern from file
+  // Dialog to choose which type of file to import
+  Template.import_pattern_dialog.helpers({
+    'show_import_pattern': function() {
+      if (Session.equals('show_import_pattern', true))
+          return "visible";
+    },
+    'checked': function(name){
+      if (Session.equals('import_file_type', name))
+        return "true";
+    },
+    'disabled': function(){
+      if (typeof Session.get('import_file_type') === "undefined")
+        return "disabled";
+    }
+  });
+
+  Template.import_pattern_dialog.events({
+    'click #import_pattern_dialog .close': function(event) {
+      Session.set('show_import_pattern', false);
+    },
+    'click #import_pattern_dialog .continue': function(event) {
+      $('#file_picker').trigger('click');
+      Session.set('show_import_pattern', false);
+    },
+    'change [name="file_type"]': function(){
+      var file_types = document.getElementsByName('file_type');
+      var selected_type;
+      for(var i = 0; i < file_types.length; i++){
+        if(file_types[i].checked){
+            selected_type = file_types[i].value;
+        }
+      }
+      Session.set('import_file_type', selected_type);
+    }
+  });
+
+  // Import a file
   Template.import_file_picker.events({
-  'change input#import_file': function(evt) {
-    var files = evt.target.files; // FileList object
+  'change input#file_picker': function(event) {
+    var files = event.target.files; // FileList object
      f = files[0];
       var reader = new FileReader();
 
       // Closure to capture the file information.
       reader.onload = (function(theFile) {
         return function(e) {
-          // Render thumbnail.
-         JsonObj = JSON.parse(e.target.result);
 
-         Meteor.my_functions.import_pattern_from_json(JsonObj);
+        JsonObj = JSON.parse(e.target.result);
+
+        switch(Session.get('import_file_type'))
+        {
+          case "JSON":
+            Meteor.my_functions.import_pattern_from_json(JsonObj);
+            break;
+
+          default:
+            alert("Unrecognised file type, cannot import pattern")
+            break;
+        }
+        
          
         };
       })(f);
 
       // Read in the image file as a data URL.
       reader.readAsText(f);
+
+      // reset the form so that the same file can be loaded twice in succession
+      $(event.target).wrap('<form>').closest('form').get(0).reset();
+      $(event.target).unwrap();
+
+      // Prevent form submission
+      event.stopPropagation();
+      event.preventDefault();
     }
   });
 
@@ -306,7 +358,30 @@ if (Meteor.isClient) {
           return;
 
       var pattern_id = this._id;
-      return JSON.stringify(Meteor.my_functions.export_pattern_to_json(pattern_id));
+      var pattern_as_text = JSON.stringify(Meteor.my_functions.export_pattern_to_json(pattern_id), null, '\t'); // prettify JSON with tabs
+
+      // make arrays more readable by removing new lines, spaces and tabs within them. But don't alter arrays of objects (styles).
+      var original_arrays = [];
+      var new_arrays = [];
+
+      //var re = /\[[^\]]*?\]/g;
+      var re = /\[[^\][^\}]*?\]/g;
+      // find text between [], may contain new lines http://stackoverflow.com/questions/6108555/replace-text-inside-of-square-brackets
+      // ignore text containing [] or {}, i.e. nested brackets and objects in arrays
+      for(m = re.exec(pattern_as_text); m; m = re.exec(pattern_as_text)){
+        original_arrays.push(m[0]);
+        var this_array = m[0];
+        this_array = this_array.replace(/ /g,'');
+        this_array = this_array.replace(/\t/g,'');
+        this_array = this_array.replace(/(\r\n|\n|\r)/gm,"");
+        // line break removal http://www.textfixer.com/tutorials/javascript-line-breaks.php
+        new_arrays.push(this_array);
+      }
+      for(var i = 0; i < original_arrays.length; i++) {
+        pattern_as_text = pattern_as_text.split(original_arrays[i]).join(new_arrays[i]);
+        // replace text http://stackoverflow.com/questions/5334380/replacing-text-inside-of-curley-braces-javascript
+      }
+      return pattern_as_text;
     }
   });
 
