@@ -42,17 +42,19 @@
 </template>
 
 <template name="menu">
+  {{#if show_menu Template.subscriptionsReady route_name _id}}
 <div id="menu" class="{{menu_open}}">
 <input type="button" id="menu_button" class="menu_button" value="">
 <div class="menu_list"><ul>
-<li><a href="#" id="import_pattern" >Load a pattern from JSON</a></li></ul>
+{{#if is_file_loading_supported}}<li><a href="#" id="import_pattern" >Import pattern from file</a></li>{{/if}}
+</ul>
 {{#if Template.subscriptionsReady}}{{#if equals route_name "pattern"}}{{#if pattern_exists _id}}<ul>
 <li><a href="{{pathFor route='pattern' mode="print"}}" target="_blank" id="print_pattern" >Printer-friendly pattern</a></li>
 <li><a href="#" id="copy_pattern" >Copy pattern</a></li>
 <li><a href="#" id="export_pattern" >Export pattern to JSON</a></li>
 </ul>
 {{/if}}{{/if}}{{/if}}
-</div></div>
+</div></div>{{/if}}
 </template>
 
 <template name="import_pattern_dialog">

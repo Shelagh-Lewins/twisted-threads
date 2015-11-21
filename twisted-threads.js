@@ -6,6 +6,31 @@ Orientation = new Mongo.Collection('orientation'); // contains the orientation (
 Styles = new Mongo.Collection('styles'); // contains the individual styles for each pattern
 Recent_Patterns = new Mongo.Collection('recent_patterns'); // records the patterns each user has viewed / woven recently
 
+// Polyfill in case indexOf not supported, not that we are necessarily expecting to support IE8-
+// https://gist.github.com/revolunet/1908355
+// Just being careful
+if (!Array.prototype.indexOf)
+{
+  Array.prototype.indexOf = function(elt /*, from*/)
+  {
+    var len = this.length >>> 0;
+    var from = Number(arguments[1]) || 0;
+    from = (from < 0)
+         ? Math.ceil(from)
+         : Math.floor(from);
+    if (from < 0)
+      from += len;
+
+    for (; from < len; from++)
+    {
+      if (from in this &&
+          this[from] === elt)
+        return from;
+    }
+    return -1;
+  };
+}
+
 Router.configure({
   layoutTemplate: 'main_layout',
   loadingTemplate: 'loading'
@@ -216,11 +241,11 @@ if (Meteor.isClient) {
 
   // this checks not only whether user_id is null but also whether the user curently has permission to see this user
   UI.registerHelper('user_exists', function(user_id){
-    return (Meteor.users.find({ _id: user_id}).count() != 0)
+    return (Meteor.users.find({ _id: user_id}).count() != 0);
   });
 
   UI.registerHelper('pattern_exists', function(pattern_id){
-    return (Patterns.find({ _id: pattern_id}).count() != 0)
+    return (Patterns.find({ _id: pattern_id}).count() != 0);
   });
 
   ///////////////////////////////
@@ -239,6 +264,23 @@ if (Meteor.isClient) {
 
   ///////////////////////////////////
   // Menu - options for selected pattern
+  Template.menu.helpers({
+    show_menu: function(subscriptionsReady, route_name, pattern_id){
+      // show the menu if either
+      // file loading is supported by the browser, OR the user is viewing a specific pattern
+      if (Meteor.my_functions.is_file_loading_supported() || (subscriptionsReady && (route_name == "pattern") && (Patterns.find({ _id: pattern_id}).count() != 0)))
+        return true;
+    },
+    is_file_loading_supported: function()
+    {
+      if (Meteor.my_functions.is_file_loading_supported())
+        return true;
+
+      else
+        return false;
+    }
+  });
+
   Template.menu.events({
     'click #menu_button': function() {
       if (Session.equals('menu_open', true))
@@ -308,41 +350,55 @@ if (Meteor.isClient) {
   // Import a file
   Template.import_file_picker.events({
   'change input#file_picker': function(event) {
-    var files = event.target.files; // FileList object
-     f = files[0];
-      var reader = new FileReader();
+    // Check for the various File API support.
+    if (Meteor.my_functions.is_file_loading_supported())
+    {
+      var files = event.target.files; // FileList object
+       f = files[0];
+       
+        var reader = new FileReader();
 
-      // Closure to capture the file information.
-      reader.onload = (function(theFile) {
-        return function(e) {
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+          return function(e) {
 
-        JsonObj = JSON.parse(e.target.result);
+            // find the filename so it can be used as a fallback pattern name
+            // e.g. GTT files don't always have a name
+            var filename = Meteor.my_functions.trim_file_extension(theFile.name);
 
-        switch(Session.get('import_file_type'))
-        {
-          case "JSON":
-            Meteor.my_functions.import_pattern_from_json(JsonObj);
-            break;
+            // be cautious about uploading large files
+            if (theFile.size > 1000000)
+              alert("Unable to load a file larger than 1MB");
 
-          default:
-            alert("Unrecognised file type, cannot import pattern")
-            break;
-        }
-        
-         
-        };
-      })(f);
+            switch(Session.get('import_file_type'))
+            {
+              case "JSON":
+                JsonObj = JSON.parse(e.target.result);
+                Meteor.my_functions.import_pattern_from_json(JsonObj);
+                break;
 
-      // Read in the image file as a data URL.
-      reader.readAsText(f);
+              case "GTT":
+                Meteor.my_functions.import_pattern_from_gtt(e.target.result, filename);
+                break;
 
-      // reset the form so that the same file can be loaded twice in succession
-      $(event.target).wrap('<form>').closest('form').get(0).reset();
-      $(event.target).unwrap();
+              default:
+                alert("Unrecognised file type, cannot import pattern")
+                break;
+            }
+          };
+        })(f);
 
-      // Prevent form submission
-      event.stopPropagation();
-      event.preventDefault();
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
+
+        // reset the form so that the same file can be loaded twice in succession
+        $(event.target).wrap('<form>').closest('form').get(0).reset();
+        $(event.target).unwrap();
+
+        // Prevent form submission
+        event.stopPropagation();
+        event.preventDefault();
+      }
     }
   });
 

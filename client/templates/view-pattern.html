@@ -77,7 +77,7 @@
 <template name="orientation">
 <div class="row orientation {{#if can_edit_pattern _id}}editable{{/if}}"><span class="spacer"></span><ul>
 {{#each tablet_orientation}}
-<li class="no_select {{style_orientation orientation}}"><span class="line"></span></li>
+<li class="no_select {{style_orientation orientation}}" title="Click to change orientation"><span class="line"></span></li>
 {{/each}}</ul></div>
 <div class="hint"><span class="spacer"></span>Slope of line = angle of tablet viewed from above</div>
 </template>
