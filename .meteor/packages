@@ -25,3 +25,4 @@ iron:router
 themeteorchef:jquery-validation
 sacha:spin
 webtempest:animate
+peerlibrary:xml2js

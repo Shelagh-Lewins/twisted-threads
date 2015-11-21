@@ -44,8 +44,11 @@ Meteor.methods({
     }
 
     // Numbers of rows and columns
+    if (typeof data.threading[0] === "undefined") // no rows of threading have been defined
+      console.log("error creating pattern from JSON. No threading data");
+
     var number_of_rows = data.weaving.length;
-    var number_of_tablets = data.weaving[0].length;
+    var number_of_tablets = data.threading[0].length; // there may be no weaving rows but there must be threading
 
     if(options.name == "")
       options.name = "New pattern";
@@ -131,7 +134,38 @@ Meteor.methods({
       });
     return pattern_id;
   },
+  xml2js: function(data) {
+    // use xml2js package to convert XML to JSON
+    // see https://github.com/Leonidas-from-XIV/node-xml2js for documentation of xml2js
+    check(data, String);
 
+    var convertAsyncToSync  = Meteor.wrapAsync( xml2js.parseString ),
+      resultOfAsyncToSync = convertAsyncToSync( data, {} ); // {} would be 'this' context if required
+    return resultOfAsyncToSync;
+
+    /*
+    package:
+    https://github.com/peerlibrary/meteor-xml2js
+    meteor add peerlibrary:xml2js
+
+    usage:
+    https://github.com/Leonidas-from-XIV/node-xml2js
+
+    wrapasync tutorial:
+    https://themeteorchef.com/snippets/synchronous-methods/#tmc-using-wrapasync
+
+    // usage from client:
+    var data = "<root>Hello xml2js! New2</root>";
+    Meteor.call('xml2js',data, function(error, result){
+      if (!error) {
+      console.log("got xml " + JSON.stringify(result));
+      }
+      else {
+        console.log(error);
+      }
+    })
+    */
+  },
   ///////////////////////////////
   // Modify patterns
   remove_pattern: function(pattern_id) {
