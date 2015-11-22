@@ -29,10 +29,10 @@
 {{#with cell_style}}
 {{> pattern_cell}}
 {{/with}}
-{{/each}}{{#if can_remove_rows}}<li class="cell no_select remove_row">X</li>{{/if}}</ul></div>
+{{/each}}{{#if can_remove_rows}}<li class="cell no_select remove_row" title="Delete this row (delete cannot be undone)" >X</li>{{/if}}</ul></div>
 {{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
 {{#each tablet_indexes}}
-<li class="no_select remove_tablet">X</li>
+<li class="no_select remove_tablet" title="Delete this tablet (delete cannot be undone)" >X</li>
 {{/each}}</ul></div>{{/if}}
 </div>
 

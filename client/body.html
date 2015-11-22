@@ -43,7 +43,7 @@
 
 <template name="menu">
   {{#if show_menu Template.subscriptionsReady route_name _id}}
-<div id="menu" class="{{menu_open}}">
+<div id="menu" class="{{menu_open}}" title="Menu" >
 <input type="button" id="menu_button" class="menu_button" value="">
 <div class="menu_list">{{#if currentUser }}<ul>
 {{#if is_file_loading_supported}}<li><a href="#" id="import_pattern" >Import pattern from file</a></li>{{/if}}
