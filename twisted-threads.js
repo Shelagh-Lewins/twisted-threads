@@ -267,8 +267,12 @@ if (Meteor.isClient) {
   Template.menu.helpers({
     show_menu: function(subscriptionsReady, route_name, pattern_id){
       // show the menu if either
-      // file loading is supported by the browser, OR the user is viewing a specific pattern
-      if (Meteor.my_functions.is_file_loading_supported() || (subscriptionsReady && (route_name == "pattern") && (Patterns.find({ _id: pattern_id}).count() != 0)))
+      // file loading is supported by the browser and the user is signed in,
+      // OR the user is viewing a specific pattern
+      // if the user is not signed in, the only available menu option is to view the printer-friendly pattern
+      // import, copy and export pattern are only available to signed in users
+
+      if ((Meteor.my_functions.is_file_loading_supported() && Meteor.userId()) || (subscriptionsReady && (route_name == "pattern") && (Patterns.find({ _id: pattern_id}).count() != 0)))
         return true;
     },
     is_file_loading_supported: function()
