@@ -1,6 +1,9 @@
 UI.registerHelper('tablet_indexes', function() {
     var pattern_id = this._id;
     var pattern = Patterns.findOne({_id: pattern_id});
+    if (typeof pattern === "undefined") // avoid error if user signs out while viewing a private  pattern
+      return;
+
     var tablet_indexes = [];
 
     for (var i=0; i<pattern.number_of_tablets; i++)
@@ -14,6 +17,8 @@ UI.registerHelper('tablet_indexes', function() {
 UI.registerHelper('row_indexes', function() {
     var pattern_id = this._id;
     var pattern = Patterns.findOne({_id: pattern_id});
+    if (typeof pattern === "undefined") // avoid error if user signs out while viewing a private  pattern
+      return;
 
     var row_indexes = [];
     for (var i=0; i<pattern.number_of_rows; i++)

@@ -1,4 +1,27 @@
 Patterns = new Meteor.Collection('patterns');
+// tags on patterns
+Tags.TagsMixin(Patterns); // https://atmospherejs.com/patrickleet/tags
+Patterns.allowTags(function (userId) { return true; });
+
+// search patterns
+patternsIndex = new EasySearch.Index({
+  collection: Patterns,
+  fields: ['name', 'tags', 'created_by_username'],
+  defaultSearchOptions: {
+    limit: 6
+  },
+  engine: new EasySearch.Minimongo() // search only on the client, so only published documents are returned
+});
+
+usersIndex = new EasySearch.Index({
+  collection: Meteor.users,
+  fields: ['username'],
+  defaultSearchOptions: {
+    limit: 6
+  },
+  engine: new EasySearch.Minimongo() // search only on the client, so only published documents are returned
+});
+
 //Settings = new Mongo.Collection('settings');
 Threading = new Mongo.Collection('threading'); // contains the individual threading cells for each pattern
 Weaving = new Mongo.Collection('weaving'); // contains the individual weaving schedule cells for each pattern
@@ -55,10 +78,14 @@ Router.route('/pattern/:_id/:mode?', {
       Meteor.subscribe('patterns', {
         onReady: function(){
           var pattern_id = Router.current().params._id;
-          var created_by_id = Patterns.findOne({ _id: pattern_id}).created_by;
-          Meteor.subscribe('user_info', created_by_id);
+          /*if (Patterns.find({ _id: pattern_id}).count() != 0)
+          {
+            var created_by_id = Patterns.findOne({ _id: pattern_id}).created_by;
+            Meteor.subscribe('user_info', created_by_id);
+          }*/
         }
       }),
+      Meteor.subscribe('tags'),
       Meteor.subscribe('weaving', pattern_id),
       Meteor.subscribe('threading', pattern_id),
       Meteor.subscribe('orientation', pattern_id),
@@ -117,7 +144,7 @@ Router.route('/user/:_id', {
     var user_id = this.params._id;
     
     return [
-      Meteor.subscribe('user_info', user_id),
+      //Meteor.subscribe('user_info', user_id),
       Meteor.subscribe('patterns', user_id)
     ]
   }
@@ -231,6 +258,126 @@ if (Meteor.isClient) {
     },
     'click #stop_weaving': function(){
       Session.set("loading", true);
+    }
+  });
+
+  Template.search.helpers({
+    indexes: function () {
+      return [patternsIndex, usersIndex];
+    },
+    patternsIndex: function () {
+      return patternsIndex;
+    },
+    usersIndex: function () {
+      return usersIndex;
+    },
+    attributes: function () {
+      if (Session.get('window_width') > 650)
+        return { 'class': 'easy-search-input', 'placeholder': 'Search for patterns...' };
+
+      else if (Session.get('window_width') < 460)
+        return { 'class': 'easy-search-input', 'placeholder': '' };
+
+      else
+        return { 'class': 'easy-search-input', 'placeholder': 'Search...' };
+    },
+    search_term: function() {
+      //return $('input.easy-search-input').val();
+      return patternsIndex.getComponentDict().get('searchDefinition');
+    },
+    css_class: function() {
+      if (Session.get('window_width') > 650)
+        return "wide";
+
+      else if (Session.get('window_width') < 460)
+        return "narrow";
+    },
+    is_searching: function() {
+      if (patternsIndex.getComponentMethods().isSearching() && usersIndex.getComponentMethods().isSearching())
+        return true;
+    },
+    no_results: function() {
+      if (patternsIndex.getComponentMethods().hasNoResults() && usersIndex.getComponentMethods().hasNoResults())
+        return true;
+    },
+    more_documents: function() {
+      if (patternsIndex.getComponentMethods().hasMoreDocuments() || usersIndex.getComponentMethods().hasMoreDocuments())
+        return true;
+    }
+  });
+
+  Template.search.onRendered(function () {
+    $('body').on("click", function(event){
+      // close the results list if the user clicks outside it
+
+      // if the results list is shown
+      if ($('#search .results-wrapper').length != 0)
+      {
+        // did the user click outside the results list
+        var results_list = $('.results-wrapper');
+
+        if (!results_list.is(event.target) // if the target of the click isn't the container...
+        && results_list.has(event.target).length === 0) // ... nor a descendant of the container
+        {
+          // but not in the search input?
+          var input = $('#search .input-wrapper input.easy-search-input');
+
+            if (!input.is(event.target)
+          && input.has(event.target).length === 0)
+          {
+            Meteor.my_functions.hide_search_results();
+          }
+        }
+      }
+    });
+
+    $(window).on("keyup", function(event) {
+      // close the results list if the user presses 'Esc'
+
+      // if the results list is shown
+      if ($('#search .results-wrapper').length != 0)
+      {
+        if (event.which == 27) // user pressed 'Esc'
+        Meteor.my_functions.hide_search_results();
+      }
+    })
+  });
+
+  Template.search.onDestroyed(function () {
+    $('body').off("click");
+
+    $(window).off("keyup");
+  });
+
+  Template.search.events({
+    'click li': function () {
+      // clear the search when you select a result
+      $('input.easy-search-input').val("");
+      Meteor.my_functions.hide_search_results();
+    },
+    'click #load_more': function(event) {
+      event.preventDefault();
+
+      if (patternsIndex.getComponentMethods().hasMoreDocuments())
+      {
+        if (usersIndex.getComponentMethods().hasMoreDocuments())
+        {
+          // load more docs from both indexes
+          usersIndex.getComponentMethods().loadMore(4);
+          patternsIndex.getComponentMethods().loadMore(4);
+        }
+        else
+        {
+          // load more docs for patternsIndex only
+          patternsIndex.getComponentMethods().loadMore(8);
+        }
+      }
+      else if (usersIndex.getComponentMethods().hasMoreDocuments())
+      {
+        // load more docs for usersIndex only
+        usersIndex.getComponentMethods().loadMore(8);
+      }
+
     }
   });
 
@@ -424,15 +571,32 @@ if (Meteor.isClient) {
       var original_arrays = [];
       var new_arrays = [];
 
-      //var re = /\[[^\]]*?\]/g;
+      //var re = /\[[^\"[^\][^\}]*?\]/g;
       var re = /\[[^\][^\}]*?\]/g;
       // find text between [], may contain new lines http://stackoverflow.com/questions/6108555/replace-text-inside-of-square-brackets
       // ignore text containing [] or {}, i.e. nested brackets and objects in arrays
       for(m = re.exec(pattern_as_text); m; m = re.exec(pattern_as_text)){
         original_arrays.push(m[0]);
         var this_array = m[0];
-        this_array = this_array.replace(/ /g,'');
-        this_array = this_array.replace(/\t/g,'');
+
+        //this_array = this_array.replace(/ /g,'');// original, works but strips spaces from inside strings such as tags
+        /*this_array.replace(/([^"]+)|("(?:[^"\\]|\\.)+")/, function($0, $1, $2) {
+            if ($1) {
+                return $1.replace(/\s/g, '');
+            } else {
+                return $2; 
+            } 
+        });*/ // works but long, from same source as below
+
+        // remove spaces except for those between double quotes
+        // http://stackoverflow.com/questions/14540094/javascript-regular-expression-for-removing-all-spaces-except-for-what-between-do
+        var regex = /"[^"]+"|( )/g;
+        this_array.replace(regex, function(m, group1) {
+            if (group1 == "" ) return m;
+            else return "";
+        });
+
+        this_array = this_array.replace(/\t/g,''); //remove tabs
         this_array = this_array.replace(/(\r\n|\n|\r)/gm,"");
         // line break removal http://www.textfixer.com/tutorials/javascript-line-breaks.php
         new_arrays.push(this_array);
@@ -454,6 +618,7 @@ if (Meteor.isClient) {
     }
   });
 
+
   ///////////////////////////////////
   // reacting to database changes
   Tracker.autorun(function (computation) {
@@ -469,18 +634,23 @@ if (Meteor.isClient) {
 
     if (my_pattern_ids)
     {
+      //console.log("subscribing");
       Meteor.subscribe('recent_patterns', Math.random());
+
 
       if(Router.current())
       {
+        Meteor.subscribe('user_info', Math.random());
+
         if (Router.current().route.getName() == "pattern")
         {
           var pattern_id = Router.current().params._id;
           
-          Meteor.subscribe('weaving', pattern_id, Math.random()),
-          Meteor.subscribe('threading', pattern_id, Math.random()),
-          Meteor.subscribe('orientation', pattern_id, Math.random()),
-          Meteor.subscribe('styles', pattern_id, Math.random())
+          Meteor.subscribe('weaving', pattern_id, Math.random());
+          //Meteor.subscribe('tags', Math.random()),
+          Meteor.subscribe('threading', pattern_id, Math.random());
+          Meteor.subscribe('orientation', pattern_id, Math.random());
+          Meteor.subscribe('styles', pattern_id, Math.random());
         }
       }
     }

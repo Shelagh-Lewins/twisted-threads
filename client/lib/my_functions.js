@@ -34,6 +34,11 @@ Meteor.my_functions = {
     // Basic pattern properties
     pattern_obj.name = pattern.name;
     pattern_obj.description = pattern.description;
+    if (typeof pattern.tags !== "undefined")
+      pattern_obj.tags = pattern.tags;
+
+    else
+      pattern_obj.tags = [];
 
     // Styles
     var styles = Styles.find({pattern_id: pattern_id}, {sort: {"style": 1}}).fetch();
@@ -260,13 +265,15 @@ Meteor.my_functions = {
         if (!local_error)
         {
           // now start analysing the data
-
-          // TODO scope the vars, for now they are global for easy console access while debugging
-          pattern_data = data.Pattern[0];
-          pattern_obj = {}; // JSON object to hold pattern
+          var pattern_data = data.Pattern[0];
+          var pattern_obj = {}; // JSON object to hold pattern
 
           // version number
-          pattern_obj.version = "1.1";
+          /*
+            1.1 first ever
+            1.11 added tags
+          */
+          pattern_obj.version = "1.11";
 
           // pattern name
           if ((typeof pattern_data.Name[0] === "string") && (pattern_data.Name[0] != "")) // if present in pattern
@@ -284,6 +291,8 @@ Meteor.my_functions = {
             if ((typeof pattern_data.Notes[0] === "string") && (pattern_data.Notes[0] != "")) // if present in pattern
               pattern_obj.description = pattern_data.Notes[0];
           }
+
+          pattern_obj.tags = ["gtt"];
 
           //////////////////////////
           // Pattern type
@@ -323,6 +332,7 @@ Meteor.my_functions = {
     // pattern_data is the file data converted to JSON
     // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
     var error;
+    pattern_obj.tags.push("threaded-in");
 
     // analyse tablet orientation and thread colour
     var tablets_data = pattern_data.Cards[0].Card;
@@ -342,8 +352,7 @@ Meteor.my_functions = {
       [] // hole D
     ];
     var unique_colours_counter = {}; // for counting occurrences of colours
-    var unique_colors_list = []; // TODO var (not global)
-    //pattern_obj.threading = [[],[],[],[]]; // TODO fill in
+    var unique_colors_list = [];
     pattern_obj.weaving = []; // TODO fill in
     pattern_obj.styles = [];
     for (var i=0; i<32; i++)
@@ -1095,5 +1104,12 @@ Meteor.my_functions = {
     }
 
     return new_value;
+  },
+  ///////////////////////////////////
+  // Searching
+  hide_search_results: function()
+  {
+    patternsIndex.getComponentMethods().search("");
+    usersIndex.getComponentMethods().search("");
   }
 }

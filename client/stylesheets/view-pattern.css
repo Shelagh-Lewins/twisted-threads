@@ -61,6 +61,19 @@
   display: block;
 }
 
+#pattern_info .tags .text {
+  float: left;
+  line-height: 2;
+}
+
+#pattern_info .tags .selectize-control {
+  margin-left: 60px;
+}
+
+#pattern_info .tags .tags {
+  display: inline;
+}
+
 /* *** Styles *** */
 #styles_palette {
   position: absolute;

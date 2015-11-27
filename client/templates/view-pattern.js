@@ -105,12 +105,10 @@ Template.view_pattern.helpers({
   forward_stroke_on: function() {
     var selected_style = Session.get("selected_style");
     var pattern_id = Router.current().params._id;
-    //var db_document = Patterns.findOne({_id: pattern_id});
 
     if (typeof selected_style === "undefined") // can be undefined at startup
         return;
 
-    //if (typeof db_document === "undefined")
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
 
@@ -162,7 +160,6 @@ Template.orientation.helpers({
 });
 
 Template.styles_palette.onRendered(function(){
-  //console.log("rendered");
   var pattern_id = Router.current().params._id;
   this.subscribe('styles', pattern_id, {
       onReady: function(){
@@ -174,7 +171,6 @@ Template.styles_palette.onRendered(function(){
 
       var offset = $('#styles_palette').outerHeight(true);
       panel.style.bottom = offset + "px";
-      //console.log("subscribed");
       Meteor.my_functions.resize_page();
     }
   });

@@ -32,13 +32,51 @@
 <a href="{{pathFor route='pattern'}}" id="stop_weaving">Stop weaving</a>{{else}}
 <a href="{{pathFor route='pattern' mode="weaving"}}" id="start_weaving">Start weaving</a>{{/if}}{{/if}}{{/if}}{{/if}}
 </div>
-<h1><span>{{#if equals route_name "home"}}Twisted Threads
-{{else}}
-{{#if equals route_name "user"}}{{#if Template.subscriptionsReady}}{{#if user_exists _id}}{{username}}{{else}}User not found{{/if}}{{/if}}
-{{else}}
-{{#if equals route_name "pattern"}}{{#if Template.subscriptionsReady}}{{#if pattern_exists _id}}{{name}}{{else}}Pattern not found{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}</span></h1>
-<div class="header_right">{{> loginButtons}}{{> menu}}</div></div>
+<div class="header_right">{{> search}}{{> loginButtons}}{{> menu}}</div></div>
 {{/if}}</div>
+</template>
+
+<template name="search">
+<div id="search" class="{{css_class}}">
+<div class="input-wrapper">
+{{> EasySearch.Input indexes=indexes attributes=attributes }}
+</div>
+
+{{#EasySearch.IfInputEmpty index=patternsIndex}}
+{{else}}
+<div class="results-wrapper">
+{{#if is_searching}}
+<span class="no_results">Searching...</span>
+{{else}}
+{{#if no_results}}
+<span class="no_results">No results found for <span class="search_term">{{search_term}}</span></span>
+{{else}}
+
+{{#EasySearch.IfNoResults index=usersIndex}}
+{{else}}
+<h2>People</h2>
+  <ul class="results">
+{{#EasySearch.Each index=usersIndex}}
+<li class="user_results"><a href="{{pathFor route='user' _id=_id}}"><span class="main_icon"></span><span class="username">{{username}}</span></a></li>
+{{/EasySearch.Each}}
+</ul>
+{{/EasySearch.IfNoResults}}
+
+{{#EasySearch.IfNoResults index=patternsIndex}}
+{{else}}
+<h2>Patterns</h2>
+<ul class="results">
+{{#EasySearch.Each index=patternsIndex}}
+<li class="pattern_results"><a href="{{pathFor route='pattern' _id=_id}}"><span class="main_icon"></span><span class="name">{{name}}</span><span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a></li>
+{{/EasySearch.Each}}
+</ul>
+{{#if more_documents}}
+<a href="#" id="load_more"><span class="icon"></span>Find more results for <span class="search_term">{{search_term}}</span></a>
+{{/if}}
+{{/EasySearch.IfNoResults}}{{/if}}{{/if}}
+</div>
+{{/EasySearch.IfInputEmpty}}
+</div>
 </template>
 
 <template name="menu">
@@ -90,3 +128,5 @@ Connection lost...trying to reconnect...
 </div></div>{{/transition}}
 {{/if}}
 </template>
+
+

@@ -19,6 +19,11 @@ Meteor.publish('patterns', function(created_by){
     });
 });
 
+Meteor.publish('tags', function(){
+  // The collection is readonly and all tags should be public
+  return Meteor.tags.find();
+});
+
 // trigger is there to force a resubscription when pattern ids or private have changed, otherwise Meteor is "smart" and doesn't run it.
 Meteor.publish('weaving', function(pattern_id, trigger){
   check(pattern_id, String);
@@ -100,7 +105,51 @@ Meteor.publish('recent_patterns', function(trigger){
   return Recent_Patterns.find({ $and: [{pattern_id: {$in:my_patterns}}, {user_id: this.userId}]});
 });
 
-Meteor.publish('user_info', function(user_id){
+/*Meteor.publish('user_info', function(user_id){
   check(user_id, String);
-  return Meteor.users.find({ _id: user_id }, {fields: {_id: 1, username: 1}});
+console.log("user_id " + user_id) ;
+console.log("is public " + (Patterns.find( {
+    $and: [
+          { private: {$ne: true} },
+          { created_by: user_id } ] }).count()));
+    console.log("is me " + (user_id == this.userId));
+  // show only the current user and any users who have public patterns
+  if ((Patterns.find( {
+    $and: [
+          { private: {$ne: true} },
+          { created_by: user_id }
+        ]
+    }).count() != 0) || (user_id == this.userId))
+    return Meteor.users.find({ _id: user_id }, {fields: {_id: 1, username: 1}});
+
+    else
+      return [];
+});*/
+
+Meteor.publish('user_info', function(trigger){
+//console.log("id " + _id);
+  // show only the current user and any users who have public patterns
+
+  // TODO add trigger
+  check(trigger, Match.Optional(Number));
+
+  var my_patterns = Patterns.find({
+    $or: [
+      { private: {$ne: true} },
+      { created_by: this.userId }
+    ]
+  }).map(function(pattern) {return pattern.created_by});
+
+  return Meteor.users.find({ $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]});
+
+  /*if ((Patterns.find( {
+    $and: [
+          { private: {$ne: true} },
+          { created_by: _id }
+        ]
+    }).count() != 0) || (_id == this.userId))
+    return Meteor.users.find({ _id: _id }, {fields: {_id: 1, username: 1}});
+
+    else
+      this.ready();*/
 });

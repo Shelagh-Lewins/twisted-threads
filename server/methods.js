@@ -1,6 +1,9 @@
 Meteor.methods({
   //////////////////////
   // Pattern management
+  show_pattern_tags: function() {
+    console.log("All tags " + Meteor.tags.find().fetch().map(function(tag) {return tag.name}));
+  },
   new_pattern_from_json: function(options) {
     // options
     /* {
@@ -55,6 +58,10 @@ Meteor.methods({
 
     data.name = options.name;
 
+    // tags
+    if (typeof data.tags === "undefined")
+      data.tags = [];
+
     var description ="";
     if (typeof data.description !== "undefined")
       description = data.description;
@@ -71,6 +78,12 @@ Meteor.methods({
         created_by: Meteor.userId(),           // _id of logged in user
         created_by_username: Meteor.user().username  // username of logged in user
       }, function(err, pattern_id) {
+        // Tags
+        for (var i=0; i<data.tags.length; i++)
+        {
+          Patterns.addTag(data.tags[i], { _id: pattern_id });
+        }
+
         // Styles
         for (var i=0; i<32; i++) // create 32 styles
         {

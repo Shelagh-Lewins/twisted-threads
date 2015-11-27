@@ -1,0 +1,12 @@
+<!-- Context is object with 'tags' property -->
+<template name='tags'>
+{{#with tags}}
+{{#if this.length}}Tags: 
+  <div class='tags'>
+    {{#each this}}
+      <span class="label label-tag">{{this}}</span>
+    {{/each}}
+  </div>
+  {{/if}}
+{{/with}}
+</template>

@@ -1,5 +1,5 @@
 <template name="view_pattern">
-  {{#if Template.subscriptionsReady}}
+{{#if Template.subscriptionsReady}}
 {{> pattern_as_text}}
 <div id="pattern_info">
 <div class="box name">
@@ -15,7 +15,13 @@
 {{#if can_edit_pattern _id}}<div class="controls"><button class="edit_description">{{#if editing_pattern_description}}Done{{else}}Edit description{{/if}}</button></div>{{/if}}
 <div class="content">
 {{#if editing_pattern_description}}<textarea id="pattern_description_input">{{selected_pattern_description}}</textarea>{{else}}<div class="pattern_description {{style_pattern_description}}"><span class="description">{{selected_pattern_description}}</span><span class="placeholder">Tap "Edit description" to enter a description</span></div>{{/if}}
-</div></div></div>
+</div></div>
+{{#if can_edit_pattern _id}}
+<div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
+{{else}}
+<div class="box tags">{{> tags}}</div>
+{{/if}}
+</div>
 
 <h2>Weaving Chart</h2>
 {{#if can_edit_pattern _id}}

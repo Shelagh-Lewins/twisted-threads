@@ -20,9 +20,11 @@ accounts-password
 accounts-ui
 ryanswapp:spectrum-colorpicker
 check
-audit-argument-checks
 iron:router
 themeteorchef:jquery-validation
 sacha:spin
 webtempest:animate
 peerlibrary:xml2js
+patrickleet:tags
+jeremy:selectize
+easy:search
