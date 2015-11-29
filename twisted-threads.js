@@ -134,19 +134,28 @@ Router.route('/user/:_id', {
   data: function(){
     var user_id = this.params._id;
 
-    if (Meteor.users.find({ _id: user_id}).count() == 0)
-      this.render("user_not_found");
+    //if (Meteor.users.find({ _id: user_id}).count() == 0)
+      //this.render("user_not_found");
     
-    else
+    //else
       return Meteor.users.findOne({ _id: user_id });
   },
   waitOn: function(){
     var user_id = this.params._id;
     
     return [
-      //Meteor.subscribe('user_info', user_id),
+      Meteor.subscribe('user_info'),
       Meteor.subscribe('patterns', user_id)
     ]
+  },
+  action: function() {
+    var user_id = this.params._id;
+
+    if (Meteor.users.find({ _id: user_id}).count() == 0)
+      this.render("user_not_found");
+    
+    else
+      return this.render("user");
   }
 })
 

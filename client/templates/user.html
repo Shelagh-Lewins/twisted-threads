@@ -1,11 +1,13 @@
 <template name="user">
 {{#if Template.subscriptionsReady}}
-{{#if user_patterns_exist}}
+{{#if show_profile _id}}
 <h2>{{username}}</h2>
 <div class="user_info">
 {{> editable_field extendContext collection="users" property="profile" data=profile multiple=true button_text="Edit profile" placeholder_text="Tap \"Edit profile\" to enter a profile"}}
 </div>
+{{/if}}
 
+{{#if user_patterns_exist _id}}
 <h2>{{username}}'s patterns</h2>
 <ul class="patterns">
 {{#each user_patterns _id}}

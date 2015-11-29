@@ -13,10 +13,17 @@ Template.user.helpers({
   user_patterns: function(user_id){
     return Patterns.find({ created_by: user_id});
   },
-  user_patterns_exist: function() {
+  user_patterns_exist: function(user_id) {
     // indicate whether this user has any patterns
-    if (Patterns.find().count() != 0)
+    if (Patterns.find({created_by: user_id}).count() != 0)
         return true;
+  },
+  show_profile: function(user_id){
+    // show the profile if either the user can edit it, or there is a profile defined
+    var has_profile = ((typeof profile !== "undefined") && (profile != ""))
+
+    if (has_profile || user_id == Meteor.userId())
+      return true;
   }
 });
 
