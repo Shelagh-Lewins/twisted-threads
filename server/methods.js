@@ -66,9 +66,19 @@ Meteor.methods({
     if (typeof data.description !== "undefined")
       description = data.description;
 
+    var weaving_notes = "";
+    if (typeof data.weaving_notes !== "undefined")
+      weaving_notes = data.weaving_notes;
+
+    var threading_notes = "";
+    if (typeof data.threading_notes !== "undefined")
+      threading_notes = data.threading_notes;
+
     var pattern_id = Patterns.insert({
         name: data.name,
         description: description,
+        weaving_notes: weaving_notes,
+        threading_notes: threading_notes,
         private: true, // patterns are private by default so the user can edit them before revealing them to the world
         // TODO add specific thumbnails for patterns
         thumbnail_url: "../images/default_pattern_thumbnail.png",
@@ -415,15 +425,68 @@ Meteor.methods({
     if (name == "")
         return;
 
-    if (typeof name === "undefined")
-        return;
+    //if (typeof name === "undefined")
+        //return;
 
     Patterns.update({_id: pattern_id}, {$set: {name: name}});
   },
-  update_pattern_description: function(pattern_id, description)
+  update_text_property: function(collection, object_id, property, value)
+  {
+    // used by the editable_field template
+    // this function updates specified text properties of specified collections. It deliberately checks for known collections and properties to avoid unexpected database changes.
+    check(object_id, String);
+    check(collection, String);
+    check(property, String);
+    check(value, String);
+
+    if (collection == "patterns")
+    {
+      var pattern = Patterns.findOne({_id: object_id});
+      //var property = property;
+
+      if (pattern.created_by != Meteor.userId()) {
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized");
+      }
+
+      switch (property)
+      {
+        case "name":
+        case "description":
+        case "weaving_notes":
+        case "threading_notes":
+          if ((property == "name") && (value == ""))
+            return;
+
+          var update = {};
+          update[property] = value; // this construction is necessary to handle a variable property name
+          Patterns.update({_id: object_id}, {$set: update});
+          break;
+      }
+    }
+
+    if (collection == "users")
+    {
+      // only the user can update their own profile
+      if (object_id != Meteor.userId())
+      {
+        throw new Meteor.Error("not-authorized");
+      }
+
+      switch (property)
+      {
+        case "profile":
+          var update = {};
+          update[property] = value; // this construction is necessary to handle a variable property name
+          Meteor.users.update({_id: object_id}, {$set: update});
+          break;
+      }
+    }
+  },
+  update_weaving_notes: function(pattern_id, weaving_notes)
   {
     check(pattern_id, String);
-    check(description, String);
+    check(weaving_notes, String);
 
     var pattern = Patterns.findOne({_id: pattern_id});
 
@@ -432,10 +495,21 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized");
     }
 
-    if (typeof description === "undefined")
-        return;
+    Patterns.update({_id: pattern_id}, {$set: {weaving_notes: weaving_notes}});
+  },
+  update_threading_notes: function(pattern_id, threading_notes)
+  {
+    check(pattern_id, String);
+    check(threading_notes, String);
 
-    Patterns.update({_id: pattern_id}, {$set: {description: description}});
+    var pattern = Patterns.findOne({_id: pattern_id});
+
+    if (pattern.created_by != Meteor.userId()) {
+      // Only the owner can edit a pattern
+      throw new Meteor.Error("not-authorized");
+    }
+
+    Patterns.update({_id: pattern_id}, {$set: {threading_notes: threading_notes}});
   },
   add_weaving_row: function(pattern_id, position, style) {
     check(pattern_id, String);

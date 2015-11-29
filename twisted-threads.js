@@ -571,7 +571,6 @@ if (Meteor.isClient) {
       var original_arrays = [];
       var new_arrays = [];
 
-      //var re = /\[[^\"[^\][^\}]*?\]/g;
       var re = /\[[^\][^\}]*?\]/g;
       // find text between [], may contain new lines http://stackoverflow.com/questions/6108555/replace-text-inside-of-square-brackets
       // ignore text containing [] or {}, i.e. nested brackets and objects in arrays

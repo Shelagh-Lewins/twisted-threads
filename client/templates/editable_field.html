@@ -1,0 +1,31 @@
+<template name="editable_field">
+<div class="box editable_field">
+{{#if can_edit _id}}
+  <div class="controls">
+     <button class="edit">
+    {{#if editing}}Done
+    {{else}}{{button_text}}
+    {{/if}}</button>
+  </div>
+{{/if}}
+<div class="content">
+{{#if editing}}
+  {{#if multiple}}
+  <textarea class="text_input">{{data}}</textarea>
+  {{else}}
+  <input type="text" class="text_input" value="{{name}}">
+  {{/if}}
+{{else}}
+  {{#if data}}
+  <span class="text">{{data}}</span>
+  {{else}}
+    {{#if can_edit _id}}
+    {{#if placeholder_text}}
+    <span class="text">{{placeholder_text}}</span>
+    {{/if}}
+    {{/if}}
+  {{/if}}
+{{/if}}
+</div>
+</div>
+</template>

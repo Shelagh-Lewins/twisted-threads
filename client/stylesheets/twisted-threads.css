@@ -223,11 +223,11 @@ body {
 }
 
 #header #search div.results-wrapper li.pattern_results a .tablets_count .icon {
-  background: url("../images/tablets_count.png") #FFFFFF no-repeat left top;
+  background: url("../images/tablets_count.png") transparent no-repeat left top;
 }
 
 #header #search div.results-wrapper li.pattern_results a .created_by .icon {
-  background: url("../images/created_by.png") #FFFFFF no-repeat left top;
+  background: url("../images/created_by.png") transparent no-repeat left top;
 }
 
 #header #search div.results-wrapper a#load_more {

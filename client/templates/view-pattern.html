@@ -1,21 +1,23 @@
 <template name="view_pattern">
 {{#if Template.subscriptionsReady}}
 {{> pattern_as_text}}
-<div id="pattern_info">
-<div class="box name">
-{{#if can_edit_pattern _id}}<div class="controls"><button class="edit_name">{{#if editing_pattern_name}}Done{{else}}Edit name{{/if}}</button></div>{{/if}}
-{{#if editing_pattern_name}}<input type="text" id="pattern_name_input" value="{{name}}">
-{{else}}<h2 class="pattern_name">{{name}}</h2>{{/if}}
+<div class="pattern_info">
+{{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
+
+{{#if can_edit_pattern _id}}
+{{else}}
+<div class="box summary">
+<span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
 </div>
+{{/if}}
+
 {{#if can_edit_pattern _id}}<div class="box private">
 <div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
 <div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
 </div>{{/if}}
-<div class="box description">
-{{#if can_edit_pattern _id}}<div class="controls"><button class="edit_description">{{#if editing_pattern_description}}Done{{else}}Edit description{{/if}}</button></div>{{/if}}
-<div class="content">
-{{#if editing_pattern_description}}<textarea id="pattern_description_input">{{selected_pattern_description}}</textarea>{{else}}<div class="pattern_description {{style_pattern_description}}"><span class="description">{{selected_pattern_description}}</span><span class="placeholder">Tap "Edit description" to enter a description</span></div>{{/if}}
-</div></div>
+
+{{> editable_field extendContext collection="patterns" property="description" data=description multiple=true button_text="Edit description" placeholder_text="Tap \"Edit description\" to enter a description"}}
+
 {{#if can_edit_pattern _id}}
 <div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
 {{else}}
@@ -24,6 +26,10 @@
 </div>
 
 <h2>Weaving Chart</h2>
+<div class="pattern_info">
+{{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
+</div>
+
 {{#if can_edit_pattern _id}}
 <input type="button" id="add_row_at_start" value="Add row at bottom">
 <input type="button" id="add_row_at_end" value="Add row at top"><br/>
@@ -43,6 +49,9 @@
 </div>
 
 <h2>Tablets</h2>
+<div class="pattern_info">
+  {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
+</div>
 <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
 {{#each hole_indexes}}
 <div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}

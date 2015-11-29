@@ -1,0 +1,34 @@
+/* desription, weaving notes, threading notes */
+.editable_field .controls {
+  border-bottom: 1px solid #424A6C;
+  float: left;
+  width: 100%;
+}
+
+.editable_field .controls button {
+  float: right;
+  background-color: transparent;
+  border: none;
+  color: #424A6C;
+  cursor: pointer;
+  padding: 8px 0 0 8px;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 80%;
+}
+
+.editable_field textarea.text_input {
+  height: 150px;
+  width: 90%;
+  margin-top: 8px;
+}
+
+.editable_field input.text_input {
+  width: 300px;
+}
+
+.editable_field .content .text {
+  display: block;
+  width: 100%;
+  white-space: pre-line;
+}

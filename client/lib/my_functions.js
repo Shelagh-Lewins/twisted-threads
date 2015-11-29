@@ -26,7 +26,12 @@ Meteor.my_functions = {
     var pattern_obj = {}; // JSON object to hold pattern
 
     // version number
-    pattern_obj.version = "1.1";
+    /*
+      1.1 first ever
+      1.11 added tags
+      1.12 added weaving notes, threading notes
+    */
+    pattern_obj.version = "1.12";
 
     var number_of_rows = pattern.number_of_rows;
     var number_of_tablets = pattern.number_of_tablets;
@@ -34,6 +39,12 @@ Meteor.my_functions = {
     // Basic pattern properties
     pattern_obj.name = pattern.name;
     pattern_obj.description = pattern.description;
+    if (typeof pattern.weaving_notes !== "undefined")
+      pattern_obj.weaving_notes = pattern.weaving_notes;
+
+    if (typeof pattern.threading_notes !== "undefined")
+      pattern_obj.threading_notes = pattern.threading_notes;
+
     if (typeof pattern.tags !== "undefined")
       pattern_obj.tags = pattern.tags;
 
@@ -268,11 +279,6 @@ Meteor.my_functions = {
           var pattern_data = data.Pattern[0];
           var pattern_obj = {}; // JSON object to hold pattern
 
-          // version number
-          /*
-            1.1 first ever
-            1.11 added tags
-          */
           pattern_obj.version = "1.11";
 
           // pattern name
@@ -720,41 +726,6 @@ Meteor.my_functions = {
 
     else
        return false;
-  },
-  toggle_edit_name: function(){
-    // the user has clicked "Edit name" in view_pattern. The button toggles between "Edit name" and "Done".
-    //console.log("edit name");
-    var new_value = !Session.get('editing_pattern_name');
-    Session.set('editing_pattern_name', new_value);
-
-    if (Session.equals('editing_pattern_name', true))
-    {
-    // give the input time to be rendered before attempting to focus on it
-      setTimeout(function(){$('#pattern_name_input').focus()}, 10);
-    }
-    else
-    {
-      var pattern_id = Router.current().params._id;
-      var new_name = $('#pattern_name_input').val();
-      Meteor.call('update_pattern_name', pattern_id, new_name);
-    }
-   setTimeout(function(){ Meteor.my_functions.resize_page(); }, 50);
-  },
-  toggle_edit_description: function(){
-    var new_value = !Session.get('editing_pattern_description');
-    Session.set('editing_pattern_description', new_value);
-
-    if (Session.equals('editing_pattern_description', true))
-    {
-      setTimeout(function(){$('#pattern_description_input').focus()}, 50);
-    }
-    else
-    {
-      var pattern_id = Router.current().params._id;
-      var new_description = $('#pattern_description_input').val();
-      Meteor.call('update_pattern_description', pattern_id, new_description);
-    }
-    setTimeout(function(){ Meteor.my_functions.resize_page(); }, 0);
   },
   ///////////////////////////////
   // Color pickers

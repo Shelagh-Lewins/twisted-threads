@@ -9,22 +9,25 @@
 }
 
 /* *** Pattern Info *** */
-#pattern_info {
+.pattern_info {
   max-width: 600px;
   width: 100%;
 }
 
-#pattern_info .box {
+.pattern_info .box {
+  clear: both;
+  overflow: hidden;
   margin: 0 0 16px 0;
 }
 
-#pattern_info .controls {
+/* public private */
+.pattern_info .controls {
   border-bottom: 1px solid #424A6C;
   float: left;
   width: 100%;
 }
 
-#pattern_info .controls button {
+.pattern_info .controls button {
   float: right;
   background-color: transparent;
   border: none;
@@ -36,41 +39,46 @@
   font-size: 80%;
 }
 
-#pattern_name_input {
-  width: 300px;
+/* number of tablets, created by */
+.pattern_info .tablets_count,
+.pattern_info .created_by {
+  float: left;
+  margin: 0 8px 0 0;
+  line-height: 1;
 }
 
-#pattern_description_input {
-  height: 150px;
-  width: 90%;
-  margin-top: 8px;
+.pattern_info .created_by {
+  color: #424A6C;
+  text-decoration: underline;
 }
 
-.pattern_description .description {
-  display: block;
-  width: 100%;
-  white-space: pre-line;
+.pattern_info .tablets_count .icon,
+.pattern_info .created_by .icon {
+  float: left;
+  height: 16px;
+  width: 16px;
+  margin: 0 8px 0 0;
 }
 
-.pattern_description .placeholder {
-  display: none;
-  color: #666666;
+.pattern_info .tablets_count .icon {
+  background: url("../images/tablets_count.png") transparent no-repeat left top;
 }
 
-.pattern_description.no_description_exists .placeholder {
-  display: block;
+.pattern_info .created_by .icon {
+  background: url("../images/created_by.png") transparent no-repeat left top;
 }
 
-#pattern_info .tags .text {
+/* tags */
+.pattern_info .tags .text {
   float: left;
   line-height: 2;
 }
 
-#pattern_info .tags .selectize-control {
+.pattern_info .tags .selectize-control {
   margin-left: 60px;
 }
 
-#pattern_info .tags .tags {
+.pattern_info .tags .tags {
   display: inline;
 }
 
