@@ -9,7 +9,6 @@ Template.tagInput.rendered = function () {
     labelField: 'name',
     searchField: ['name'],
     create: function(input, cb) {
-      console.log('create tag: ', input)
       //Patterns.addTag(input.toLowerCase(), {_id: that.data._id}); // would like to use this to force all tags to be saved as lowercase but "NewTag" is not recognised as "newtag" until page refresh.
       Patterns.addTag(input, {_id: that.data._id});
       var tag =  Meteor.tags.findOne({collection: 'patterns', name: input});
@@ -37,11 +36,9 @@ Template.tagInput.rendered = function () {
         }
     },
     onItemAdd: function(value, $item) {
-      console.log('add tag: ', value);
       Patterns.addTag(value, {_id: that.data._id});
     },
     onItemRemove: function(value) {
-      console.log('remove tag: ', value);
       Patterns.removeTag(value, {_id: that.data._id});
     },
     createFilter: function (value)
