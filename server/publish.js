@@ -130,26 +130,12 @@ Meteor.publish('user_info', function(trigger){
 //console.log("id " + _id);
   // show only the current user and any users who have public patterns
 
-  // TODO add trigger
   check(trigger, Match.Optional(Number));
 
   var my_patterns = Patterns.find({
-    $or: [
-      { private: {$ne: true} },
-      { created_by: this.userId }
-    ]
+    private: {$ne: true}
   }).map(function(pattern) {return pattern.created_by});
 
-  return Meteor.users.find({ $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]});
-
-  /*if ((Patterns.find( {
-    $and: [
-          { private: {$ne: true} },
-          { created_by: _id }
-        ]
-    }).count() != 0) || (_id == this.userId))
-    return Meteor.users.find({ _id: _id }, {fields: {_id: 1, username: 1}});
-
-    else
-      this.ready();*/
+  // the user's emails will be returned but for other users, only public information should be shown.
+  return Meteor.users.find({ $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}});
 });

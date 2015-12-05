@@ -1,0 +1,26 @@
+<template name="account_settings">
+{{#if Template.subscriptionsReady}}
+  <h2>Account settings</h2>
+  {{#if currentUser}}
+    <div class="user_info">
+    {{> editable_field extendContext _id=currentUser._id collection="users" property="email_address" data=currentUser.emails.[0].address button_text="Edit email address" placeholder_text="Tap \"Edit email address\" to enter an email address"}}
+    
+    {{#if currentUser.emails.[0]}}
+      {{#if currentUser.emails.[0].verified}}
+        <p class="status">Status: verified</p>
+      {{else}}
+        <p class="status">Status: unverified</p>
+        <br/>
+        <p>A verification email has been automatically sent to your email address. When you receive the email, click the link in the email to verify your address.</p>
+        <p>If you don't receive the email within a few minutes, check your Junk folder in case it has been marked as spam.</p>
+        <input type="button" class="send_verification_email" value="Resend verification email">
+      {{/if}}
+    {{else}}
+    <p>Add an email address so that you can get back into your account if you forget your password.</p>
+    {{/if}}
+    </div>
+  {{else}}
+    <p>You need to sign in before you can check your account settings.</p>
+  {{/if}}
+{{/if}}
+</template>

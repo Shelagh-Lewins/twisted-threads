@@ -125,13 +125,22 @@
   color: #424A6C;
   background-color: #FFFFFF;
   font-size: 100%;
+  line-height: 1.5;
   padding: 4px 8px 4px 8px;
   cursor: pointer;
+  -webkit-appearance: none;
 }
 
 .styles input#edit_style_button.editing {
   background-color: #424A6C;
   color: #FFFFFF;
+}
+
+.styles .pagination {
+  display: block;
+  padding: 0;
+  margin: 0 8px 0 0;
+  border-radius: 0;
 }
 
 .styles .pagination ul {
@@ -154,6 +163,7 @@
   line-height: 1.5;
   cursor: pointer;
   text-decoration: none;
+  display: inline-block;
 }
 
 .styles .pagination ul li:first-child a {
@@ -167,25 +177,25 @@
 
 #styles_palette.single_column .styles {
   float: left;
-  width: 345px;
+  width: 352px;
 }
 
 #styles_palette .styles .box {
   clear: both;
-  height: 95px;
+  height: 90px;
   overflow: hidden;
   position: relative;
 }
 
 #styles_palette.single_column .styles .box.page_2 .row {
   position: relative;
-  top: -95px;
+  top: -99px;
 }
 
 .styles ul.row {
   display: inline-block;
   width: 352px;
-  margin: 0;
+  margin: 4px 0 0 0;
   padding: 0;
   list-style: none;
   font-size: 0;

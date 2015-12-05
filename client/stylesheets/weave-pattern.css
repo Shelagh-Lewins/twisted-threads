@@ -17,7 +17,7 @@ body.weave,
   border-bottom: 1px solid black;
 }
 
-.weave.pattern div.row:nth-child(2) ul, .tablets div.row:nth-child(2) ul {
+.tablets div.row:nth-child(2) ul {
   border-top: none;
 }
 
@@ -47,6 +47,10 @@ body.weave,
   height: 32px;
   top: 0;
   left: 0;
+}
+
+.pattern.weave div.row:nth-child(2) .highlight {
+  height: 33px;
 }
 
 .pattern.weave div.row .highlight .inner_tube {
@@ -140,8 +144,8 @@ body.weave,
 }
 
 .pattern.weave div.row {
-  background-color: #FFFFFF;
-  color: #000000;
+  background-color: #333333;
+  color: #FFFFFF;
 }
 
 .pattern.weave div.row.column_number {

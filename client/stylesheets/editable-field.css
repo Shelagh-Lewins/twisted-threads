@@ -32,3 +32,42 @@
   width: 100%;
   white-space: pre-line;
 }
+
+.editable_field .content .text a {
+  text-decoration: underline;
+}
+
+.editable_field .error p {
+  color: #FF3333;
+  font-size: 90%;
+}
+
+.editable_field .hint {
+  padding: 4px;
+  font-size: 90%;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  color: #666666;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  display: block;
+}
+
+.editable_field .hint ul
+{
+  list-style: none;
+}
+
+.editable_field ul {
+  list-style: disc;
+  margin-left: 1em;
+  padding-left: 1em;
+}
+
+.editable_field ol {
+  list-style: decimal;
+  margin-left: 1em;
+  padding-left: 1em;
+}
+

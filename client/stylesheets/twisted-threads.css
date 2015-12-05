@@ -10,6 +10,11 @@
     outline-style:none;/*IE*/
 }
 
+/* required for "markdown" package to show as bold text */
+strong {
+  font-weight: bold;
+}
+
 /* *** Structure *** */
 html {
   width: 100%;
@@ -36,8 +41,6 @@ body {
   height: 3em;
   background-color: #7580ac;
   color: #FFFFFF;
-  /*position: fixed;
-  top: 0;*/
   position: absolute;
   z-index: 200;
   width: 100%;
@@ -46,10 +49,15 @@ body {
 
 #content {
   margin: 3.5em 0 0 0;
-  padding: 16px;
+  padding: 0;
   float: left;
   height: 100%;
+  min-width: 100%;
+}
 
+/* extra div provides padding without forcing horizontal scroll */
+#content > .inner_tube {
+  padding: 16px;
 }
 
 /* *** Header *** */
@@ -90,7 +98,7 @@ body {
 /* Search box */
 #header #search {
   float: left;
-  margin: 8px 8px 0 0;
+  margin: 4px 8px 0 0;
   position: relative;
   z-index: 2;
 }
@@ -99,6 +107,7 @@ body {
 #header #search input.easy-search-input {
   padding: 4px;
   background: url("../images/search.png") #FFFFFF no-repeat right 2px top 2px;
+  color: #666666;
   width: 120px;
   line-height: 1.5;
 }
@@ -263,19 +272,30 @@ body {
 
 /* Login */
 #header #login-buttons {
-  float: left;
+  float: left !important;
   margin: 0 8px 0 8px;
   position: relative;
   z-index: 2;
-  line-height: 2.7;
+  line-height: 2.5;
+  list-style-type: none;
 }
 
 #header #login-dropdown-list {
+  position: absolute;
   left: auto;
-  right: 0;
-  top: 0;
+  top: 100%;
+  right: 4px;
+  margin-top: 4px;
 }
 
+#header #login-buttons .login-close-text {
+  float: right;
+}
+
+#header .accounts-dialog .additional-link {
+  font-size: 90%;
+  padding: 8px 0 8px 0;
+}
 
 /* Options menu */
 #header #menu {
