@@ -81,18 +81,12 @@
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffffff",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "forward_stroke": false,
+      "backward_stroke": true
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffffff",
-      "forward_stroke": false,
-      "backward_stroke": true
-    },
-    {
-      "background_color": "#BBBBBB",
-      "line_color": "#000000",
       "forward_stroke": true,
       "backward_stroke": false
     },
@@ -103,6 +97,12 @@
       "backward_stroke": true
     },
     {
+      "background_color": "#BBBBBB",
+      "line_color": "#000000",
+      "forward_stroke": true,
+      "backward_stroke": false
+    },
+    {
       "background_color": "#ffffff",
       "line_color": "#cc0000",
       "forward_stroke": true,
@@ -153,18 +153,12 @@
     {
       "background_color": "#BBBBBB",
       "line_color": "#cc0000",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "forward_stroke": false,
+      "backward_stroke": true
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#cc0000",
-      "forward_stroke": false,
-      "backward_stroke": true
-    },
-    {
-      "background_color": "#BBBBBB",
-      "line_color": "#ffd966",
       "forward_stroke": true,
       "backward_stroke": false
     },
@@ -176,7 +170,7 @@
     },
     {
       "background_color": "#BBBBBB",
-      "line_color": "#6aa84f",
+      "line_color": "#ffd966",
       "forward_stroke": true,
       "backward_stroke": false
     },
@@ -188,7 +182,7 @@
     },
     {
       "background_color": "#BBBBBB",
-      "line_color": "#1c4587",
+      "line_color": "#6aa84f",
       "forward_stroke": true,
       "backward_stroke": false
     },
@@ -197,6 +191,12 @@
       "line_color": "#1c4587",
       "forward_stroke": false,
       "backward_stroke": true
+    },
+    {
+      "background_color": "#BBBBBB",
+      "line_color": "#1c4587",
+      "forward_stroke": true,
+      "backward_stroke": false
     }
   ],
   "orientation": ["S","S","S","S","S","S","S","S"],

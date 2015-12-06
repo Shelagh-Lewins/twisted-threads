@@ -6,7 +6,7 @@ Patterns.allowTags(function (userId) { return true; });
 // search patterns
 patternsIndex = new EasySearch.Index({
   collection: Patterns,
-  fields: ['name', 'tags', 'created_by_username'],
+  fields: ['name', 'tags', 'created_by_username', 'number_of_tablets'],
   defaultSearchOptions: {
     limit: 6
   },
@@ -15,7 +15,7 @@ patternsIndex = new EasySearch.Index({
 
 usersIndex = new EasySearch.Index({
   collection: Meteor.users,
-  fields: ['username'],
+  fields: ['username', 'profile.description'],
   defaultSearchOptions: {
     limit: 6
   },
@@ -155,15 +155,41 @@ Router.route('/user/:_id', {
       this.render("user_not_found");
     
     else
-      return this.render("user");
+      this.render("user");
+  }
+});
+
+Router.route('/account-settings', {
+  name: 'account_settings',
+  data: function() {
+    var user_id = this.params._id;
+    return Meteor.users.findOne({ _id: user_id });
+  },
+  waitOn: function(){
+    return [
+      Meteor.subscribe('user_info')
+    ]
+  },
+  action: function() {
+    var user_id = this.params._id;
+    this.render("account_settings");
   }
 })
 
-if (Meteor.isClient) {
-  Accounts.ui.config({
-    passwordSignupFields: "USERNAME_ONLY"
-  });
+////////////////////////
+// extends 'check' functionality
+// check(userId, NonEmptyString);
+NonEmptyString = Match.Where(function (x) {
+  check(x, String);
+  return x.length > 0;
+});
 
+if (Meteor.isClient) {
+  // default accounts-ui package
+  Accounts.ui.config({
+    passwordSignupFields: "USERNAME_AND_EMAIL"
+  });
+  
   Session.set('window_width', $(window).width());
   Session.set('window_height', $(window).height()); 
 
