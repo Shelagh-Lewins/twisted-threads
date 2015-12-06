@@ -253,25 +253,43 @@ if (Meteor.isClient) {
       offline (user disconnected the connection)
     */
 
+    // there is a 3 second delay before reporting connection lost, partly to avoid a false 'connection lost' message when the page is first loaded.
+
     switch (Meteor.status().status)
     {
       case "connecting":  // Fallthrough
       case "waiting":
-        return "trying_to_connect";
+        if (typeof connection_timeout === "undefined")
+          connection_timeout = setTimeout(function(){
+            Session.set("connection_status", "trying_to_connect");
+          }, 3000);
         break;
 
       case "failed":  // Fallthrough
       case "offline":
-        return "disconnected";
+        if (typeof disconnected_timeout === "undefined")
+          disconnected_timeout = setTimeout(function(){
+            Session.set("connection_status", "disconnected");
+          }, 3000);
+        Session.set("connection_status", "disconnected");
         break;
 
       case "connected":
-        return "connected";
+        Session.set("connected", true);
+        if (typeof connection_timeout !== "undefined")
+          clearTimeout(connection_timeout);
+
+        if (typeof disconnected_timeout !== "undefined")
+          clearTimeout(disconnected_timeout);
+
+        Session.set("connection_status", "connected");
         break;
 
       default:
-        return;
+        Session.set("connection_status", "disconnected");
+        break;
     }
+    return Session.get("connection_status");
   });
 
   //////////////////////////////////

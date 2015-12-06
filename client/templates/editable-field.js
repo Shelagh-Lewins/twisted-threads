@@ -10,22 +10,7 @@ if (Meteor.isClient) {
     })
     return result;
   });
-
-  //var editable_field_number = 0;
 }
-
-//Template.editable_field.onRendered(function() {
-  //console.log("rendered " + this.data.data);
-  
-  //var that = this;
-  //setTimeout(function(){
-    //Session.set("markdown_data" + this.editable_field_number, that.data.data);
-    //Session.set("markdown_data" + that.editable_field_number, that.data.data);
-  
-  //console.log("iniital data " + Session.get("markdown_data" + that.editable_field_number));
-  //}, 50);
-  
-//})
 
 Template.editable_field.onCreated(function() {
   this.down = false;
@@ -33,13 +18,12 @@ Template.editable_field.onCreated(function() {
   this.change_latch = false;
   this.editing = new ReactiveVar(false);
   this.error = new ReactiveVar();
-  //this.editable_field_number = editable_field_number;
-  //editable_field_number += 1;
   
   this.toggle_edit = function(template, collection, property){
     var editing = !template.editing.get();
     template.editing.set(editing);
     template.error.set("");
+    console.log("editing " + editing);
 
     if (editing)
     {
@@ -49,9 +33,10 @@ Template.editable_field.onCreated(function() {
     }
     else
     {
-      Session.set("editing_text", false);
-      
       var new_value = $('.text_input').val();
+      Session.set("editing_text", false);
+      console.log("new value " + new_value);
+      
 
       var route_name = Router.current().route.getName();
       switch (route_name)
@@ -82,13 +67,6 @@ Template.editable_field.onCreated(function() {
           }
           template.error.set(text);
         }
-        /*else
-        {
-          console.log("*** callback");
-          console.log("new value " + new_value);
-        Session.set("markdown_data" + template.editable_field_number, new_value);
-        console.log("updated data " + Session.get("markdown_data" + template.editable_field_number));
-        }*/
       });
     }
     setTimeout(function(){ Meteor.my_functions.resize_page(); }, 0);
@@ -111,17 +89,7 @@ Template.editable_field.helpers({
   },
   error: function() {
     return Template.instance().error.get();
-  }/*,
-  get_data: function() {
-    //console.log("data " + Session.get("markdown_data" + Template.instance().editable_field_number));
-    //return Session.get("markdown_data");
-    var test = Session.get("markdown_data" + Template.instance().editable_field_number);
-console.log("get_data " + test);
-return test;
-//    return "*something*";
-  //  return Session.get("markdown_data" + Template.instance().editable_field_number);
-    //return Template.instance().data.data;
-  }*/
+  }
 })
 
 Template.editable_field.events({

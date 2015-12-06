@@ -23,7 +23,7 @@ Template.user.helpers({
     var profile = Meteor.users.findOne({_id: user_id}).profile;
     description = profile.description;
 
-    if ((description != "") || user_id == Meteor.userId())
+    if (((description != "") && (typeof description !== "undefined"))|| user_id == Meteor.userId())
       return true;
   }
 });
