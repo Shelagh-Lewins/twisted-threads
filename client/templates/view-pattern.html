@@ -1,4 +1,5 @@
 <template name="view_pattern">
+  Ready: {{Template.subscriptionsReady}}
 {{#if Template.subscriptionsReady}}
 {{> pattern_as_text}}
 <div class="pattern_info">
@@ -37,14 +38,10 @@
 <input type="button" id="add_tablet_at_end" value="Add tablet at right"><br/>{{/if}}
 <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
 {{#each row_indexes}}
-<div class="row"><span class="row_number">{{this}}</span><ul>{{#each weaving_row this}}
-{{#with cell_style}}
-{{> pattern_cell}}
-{{/with}}
-{{/each}}{{#if can_remove_rows}}<li class="cell no_select remove_row" title="Delete this row (delete cannot be undone)" >X</li>{{/if}}</ul></div>
+{{> pattern_row}}
 {{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
 {{#each tablet_indexes}}
-<li class="no_select remove_tablet" title="Delete this tablet (delete cannot be undone)" >X</li>
+{{> remove_tablet}}
 {{/each}}</ul></div>{{/if}}
 </div>
 
@@ -53,12 +50,7 @@
   {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
 </div>
 <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
-{{#each hole_indexes}}
-<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}
-{{#with cell_style}}
-{{> pattern_cell}}
-{{/with}}
-{{/each}}</ul></div>
+{{#each hole_indexes}}{{> threading_row}}
 {{/each}}
 {{> orientation}}
 </div>
@@ -67,6 +59,30 @@
 <img src="../images/tablet_labels.png" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
 </div><br/>
 {{/if}}
+</template>
+
+<template name="pattern_row">
+<div class="row">{{> row_number}}<ul>{{#each weaving_row this}}
+{{#with cell_style}}
+{{> pattern_cell}}
+{{/with}}
+{{/each}}{{> remove_row}}</ul></div>
+</template>
+
+<template name="remove_row">
+{{#if can_remove_rows}}<li class="cell no_select remove_row" title="Delete this row (delete cannot be undone)" >X</li>{{/if}}
+</template>
+
+<template name="remove_tablet">
+<li class="no_select remove_tablet" title="Delete this tablet (delete cannot be undone)" >X</li>
+</template>
+
+<template name="threading_row">
+<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}
+{{#with cell_style}}
+{{> pattern_cell}}
+{{/with}}
+{{/each}}</ul></div>
 </template>
 
 <template name="styles_palette">{{#if can_edit_pattern _id}}

@@ -72,17 +72,13 @@ Router.route('/pattern/:_id/:mode?', {
     return Patterns.findOne({ _id: pattern_id });
   },
   waitOn: function(){
+    console.log("in waitOn");
     var pattern_id = this.params._id;
     
     return [
       Meteor.subscribe('patterns', {
         onReady: function(){
           var pattern_id = Router.current().params._id;
-          /*if (Patterns.find({ _id: pattern_id}).count() != 0)
-          {
-            var created_by_id = Patterns.findOne({ _id: pattern_id}).created_by;
-            Meteor.subscribe('user_info', created_by_id);
-          }*/
         }
       }),
       Meteor.subscribe('tags'),
@@ -118,6 +114,7 @@ Router.route('/pattern/:_id/:mode?', {
 
     else
     {
+      console.log("render view_pattern");
       this.render('view_pattern');
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         this.render('styles_palette', {to: 'footer'});

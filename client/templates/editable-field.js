@@ -23,7 +23,6 @@ Template.editable_field.onCreated(function() {
     var editing = !template.editing.get();
     template.editing.set(editing);
     template.error.set("");
-    console.log("editing " + editing);
 
     if (editing)
     {
@@ -35,8 +34,6 @@ Template.editable_field.onCreated(function() {
     {
       var new_value = $('.text_input').val();
       Session.set("editing_text", false);
-      console.log("new value " + new_value);
-      
 
       var route_name = Router.current().route.getName();
       switch (route_name)

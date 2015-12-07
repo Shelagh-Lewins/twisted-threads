@@ -474,6 +474,9 @@ Meteor.methods({
           // correct for me having messed up profiles by setting them as a text string not knowing it already existed
           // profile is an object to which editable properties may be added
           var profile = Meteor.users.findOne({ _id: object_id}).profile;
+          if (typeof profile === "undefined")
+            profile = {};
+          
           profile[property] = value;
 
           Meteor.users.update({_id: object_id}, {$set: {profile: profile}});

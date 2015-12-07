@@ -4,14 +4,19 @@ Template.weave_pattern.rendered = function() {
   Meteor.my_functions.initialize_route();
 }
 
-Template.weave_pattern.helpers({
-  selected_row: function(){
-    return Session.get('current_weave_row');
-  },
+// used in 2 templates
+UI.registerHelper('selected_row', function(){
+  return Session.get('current_weave_row');
+});
+
+Template.weave_row.helpers({
   selected_class: function(row_index) {
     if (Session.equals('current_weave_row', row_index))
         return "selected";
-  },
+  }
+});
+
+Template.weave_row_buttons.helpers({
   is_selected_row: function(row_index) {
     if (Session.equals('current_weave_row', row_index))
         return true;

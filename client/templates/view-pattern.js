@@ -1,4 +1,5 @@
 Template.view_pattern.rendered = function() {
+  console.log("view pattern rendered");
   $('body').attr("class", "view_pattern");
   if (Meteor.my_functions.can_edit_pattern(Router.current().params._id))
     $('body').addClass('editable');
@@ -9,26 +10,6 @@ Template.view_pattern.rendered = function() {
 
   Meteor.my_functions.add_to_recent_patterns(Router.current().params._id);
 
-  // latches for handling edit name
-  name_down = false;
-  name_blur = false;
-  name_change_latch = false;
-
-  // latches for handling edit description
-  description_down = false;
-  description_blur = false;
-  description_change_latch = false;
-
-  // latches for handling edit weaving notes
-  weaving_notes_down = false;
-  weaving_notes_blur = false;
-  weaving_notes_change_latch = false;
-
-  // latches for handling edit threading notes
-  threading_notes_down = false;
-  threading_notes_blur = false;
-  threading_notes_change_latch = false;
-
   Meteor.my_functions.initialize_route();
 }
 
@@ -38,117 +19,20 @@ Template.pattern_not_found.helpers({
   }
 });
 
+Template.remove_row.helpers({
+  can_remove_rows: function() {
+    // is there more than 1 row?
+    var pattern_id = Router.current().params._id;
+    var second_row = Weaving.findOne({ $and: [{pattern_id: pattern_id}, {row: 2}]});
+
+    if (typeof second_row !== "undefined") {
+      if (Meteor.my_functions.can_edit_pattern(pattern_id))
+        return true;
+    }
+  }
+});
+
 Template.view_pattern.helpers({
-  /*editing_pattern_name: function() {
-    var pattern_id = Router.current().params._id;
-
-    if (Meteor.my_functions.can_edit_pattern(pattern_id))
-    {
-      if (Session.equals('editing_pattern_name', true))
-        return true;
-
-      else
-        return false;
-    }
-  },*/
-  ////////////////////
-  // Pattern info
-  /*selected_pattern_description: function () {
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (typeof pattern === "undefined")
-      return;
-
-    var description = pattern.description;
-    if ((typeof description !== "undefined") || (description != null) || (description == ""))
-        return description;
-  },*/
-  editing_pattern_description: function() {
-    var pattern_id = Router.current().params._id;
-
-    if (Meteor.my_functions.can_edit_pattern(pattern_id))
-    {
-      if (Session.equals('editing_pattern_description', true))
-        return true;
-
-      else
-        return false;
-    }
-  },
-  style_pattern_description: function() {
-      var pattern_id = Router.current().params._id;
-      var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (typeof pattern === "undefined")
-      return;
-
-    var description = pattern.description;
-
-    if ((typeof description === "undefined") || (description == null) || (description == ""))
-    {
-      if (Meteor.my_functions.can_edit_pattern(pattern_id))
-        return "no_description_exists";
-    }
-  },
-  ////////////////
-  // Weaving notes
-  editing_weaving_notes: function() {
-    var pattern_id = Router.current().params._id;
-
-    if (Meteor.my_functions.can_edit_pattern(pattern_id))
-    {
-      if (Session.equals('editing_weaving_notes', true))
-        return true;
-
-      else
-        return false;
-    }
-  },
-  style_weaving_notes: function() {
-      var pattern_id = Router.current().params._id;
-      var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (typeof pattern === "undefined")
-      return;
-
-    var weaving_notes = pattern.weaving_notes;
-
-    if ((typeof weaving_notes === "undefined") || (weaving_notes == null) || (weaving_notes == ""))
-    {
-      if (Meteor.my_functions.can_edit_pattern(pattern_id))
-        return "no_weaving_notes_exist";
-    }
-  },
-  ////////////////
-  // Threading notes
-  editing_threading_notes: function() {
-    var pattern_id = Router.current().params._id;
-
-    if (Meteor.my_functions.can_edit_pattern(pattern_id))
-    {
-      if (Session.equals('editing_threading_notes', true))
-        return true;
-
-      else
-        return false;
-    }
-  },
-  style_threading_notes: function() {
-      var pattern_id = Router.current().params._id;
-      var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (typeof pattern === "undefined")
-      return;
-
-    var threading_notes = pattern.threading_notes;
-
-    if ((typeof threading_notes === "undefined") || (threading_notes == null) || (threading_notes == ""))
-    {
-      if (Meteor.my_functions.can_edit_pattern(pattern_id))
-        return "no_threading_notes_exist";
-    }
-  },
   /////////////////////
   // pattern
   can_remove_tablets: function() {
@@ -160,7 +44,7 @@ Template.view_pattern.helpers({
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         return true;
   },
-  can_remove_rows: function() {
+  /*can_remove_rows: function() {
     // is there more than 1 row?
     var pattern_id = Router.current().params._id;
     var second_row = Weaving.findOne({ $and: [{pattern_id: pattern_id}, {row: 2}]});
@@ -169,7 +53,7 @@ Template.view_pattern.helpers({
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         return true;
     }
-  },
+  },*/
 
   // Edit style controls
   forward_stroke_on: function() {
@@ -252,7 +136,7 @@ Template.styles_palette.helpers({
     if (Session.equals('edit_style', true))
         return "editing";
   },
-  editing_text: function(){ // on touch devices, the styles palette interferes with text editing by hiding the keyboard
+  editing_text: function(){ // on small screens, the styles palette interferes with text editing
     if (Session.equals('editing_text', true))
     {
       return "editing_text";
@@ -305,45 +189,6 @@ Template.styles_palette.helpers({
 });
 
 Template.view_pattern.events({
-  // Edit name
-  // code ensures the user can stop editing and save the name either by clicking "Done" or by moving focus out of the input, and keyboard nav works.
-  /*'click button.edit_name': function(event) {
-    event.preventDefault();
-    
-    if (!name_down)
-      Meteor.my_functions.toggle_edit_name();
-
-  },
-  'mousedown button.edit_name': function(event) {
-    name_down = true;
-  },
-  'mouseup button.edit_name': function(event) {
-    event.preventDefault();
-
-    if (name_down && !name_blur) // down then up = click. focus has just left the input
-      Meteor.my_functions.toggle_edit_name();
-    
-    setTimeout(function(){
-      name_down = false;
-      name_blur = false;
-      }, 20); // delay prevents same event being processed as click also. stopPropagation doesn't seem to work.
-  },
-  'mouseout button.edit_name': function() {
-    name_down = false;
-    name_blur = false;
-  },
-  'change #pattern_name_input, focusout #pattern_name_input': function(event) {
-    // if the user types and then moves focus away, only process one event
-    if (!name_change_latch)
-    {
-      name_change_latch = true;
-      if (name_down)
-        name_blur = true; // focus has been lost because user mouse-clicked the button. Tell the button not to process the event because this function has already done it.
-
-      Meteor.my_functions.toggle_edit_name();
-      setTimeout(function(){ name_change_latch = false}, 20);
-    }
-  },*/
   // Make pattern private / public
   "click .toggle_private": function () {
     Meteor.call("set_private", this._id, !this.private);

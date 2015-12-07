@@ -140,12 +140,9 @@ body.weave,
 }
 
 .pattern.weave div.row {
-  color: #FFFFFF;
-}
-
-.pattern.weave div.row {
   background-color: #333333;
   color: #FFFFFF;
+  font-size: 0px; /* avoid space between inline-block elements row number and inner_tube */
 }
 
 .pattern.weave div.row.column_number {

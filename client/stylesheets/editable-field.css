@@ -54,6 +54,11 @@
   display: block;
 }
 
+.editable_field .hint a {
+  font-size: 100%;
+  color: #666666;
+}
+
 .editable_field .hint ul
 {
   list-style: none;

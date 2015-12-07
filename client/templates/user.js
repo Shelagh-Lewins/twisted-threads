@@ -19,12 +19,24 @@ Template.user.helpers({
       return true;
   },
   show_description: function(user_id){
-    // show the profile if either the user can edit it, or there is a profile defined
-    var profile = Meteor.users.findOne({_id: user_id}).profile;
-    description = profile.description;
+    // show the description if either the user can edit it, or there is a description defined
+    var user = Meteor.users.findOne({_id: user_id});
 
-    if (((description != "") && (typeof description !== "undefined"))|| user_id == Meteor.userId())
+    if (typeof user === "undefined")
+      return false;
+
+    // if it's your own page you can add a description
+    if (user_id == Meteor.userId())
       return true;
+
+    // if it's another user's page, only show description if profile is defined and description is a non-empty string
+    else if (typeof user.profile !== "undefined")
+    {
+      description = user.profile.description;
+
+      if ((description != "") && (typeof description !== "undefined"))
+        return true;
+    }
   }
 });
 
