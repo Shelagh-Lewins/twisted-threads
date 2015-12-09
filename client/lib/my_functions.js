@@ -727,8 +727,126 @@ Meteor.my_functions = {
     else
        return false;
   },
+  build_pattern_display_data:  function(pattern_id)
+  {
+    console.log("START BUILDING DATA");
+    /*CurrentPattern = new Meteor.Collection(null);
+    var data = Weaving.find({pattern_id: pattern_id}).fetch();
+    data.forEach(function(doc){
+      var cell = {
+        pattern_id: doc.pattern_id,
+        cell_id: doc._id,
+        row: doc.row,
+        style: doc.style,
+        tablet: doc.tablet
+      }
+      CurrentPattern.insert(cell);
+    });*/
+
+    // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
+    // TODO if this db request gets slow when there are many patterns, consider whether each pattern should have its own dynamically created collection.
+
+    // reactive arrays need to be updated with arr.splice(pos, 1 new_value) to be reactive
+    
+    //current_pattern_cells_trigger = new ReactiveVar(0);
+    
+    var pattern = Patterns.findOne({ _id: pattern_id});
+
+    // build the weaving chart data
+    number_of_tablets = pattern.number_of_tablets;
+    number_of_rows = pattern.number_of_rows;
+    //console.log("tablets " + number_of_tablets);
+    //console.log("rows " + number_of_rows);
+
+
+    var weaving_data = Weaving.find({pattern_id: pattern_id}, {sort: {"row": 1, "tablet": 1}}).fetch();
+    
+    // assign array of arrays to hold data
+    var rows = new Array(number_of_rows);
+
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_pattern_cells !== "undefined")
+      current_pattern_cells.clear();
+
+    current_pattern_cells = new ReactiveArray(rows);
+    //
+    //var blank_row = new Array(number_of_tablets);
+
+    for (var i=0; i<number_of_rows; i++)
+    {
+      var row = new Array(number_of_tablets);
+      current_pattern_cells[i] = new ReactiveArray(row);
+    }
+
+    var current_row = 0;
+    for (var i=0; i<number_of_rows; i++) {
+      for (var j=0; j<number_of_tablets; j++) {
+        current_pattern_cells[i][j] = weaving_data[i*number_of_tablets + j];
+      }
+    }
+
+    // build the threading chart data
+    var threading_data = Threading.find({pattern_id: pattern_id}, {sort: {"hole": 1, "tablet": 1}}).fetch();
+
+    var rows = new Array(4);
+
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_threading_cells !== "undefined")
+      current_threading_cells.clear();
+
+    current_threading_cells = new ReactiveArray(rows);
+
+    for (var i=0; i<4; i++)
+    {
+      var row = new Array(number_of_tablets);
+      current_threading_cells[i] = new ReactiveArray(row);
+    }
+
+    var current_row = 0;
+    for (var i=0; i<4; i++) {
+      for (var j=0; j<number_of_tablets; j++) {
+        current_threading_cells[i][j] = threading_data[i*number_of_tablets + j];
+      }
+    }
+
+    // build the styles data
+    var styles_data = Styles.find({pattern_id: pattern_id}, {sort: {"style": 1}}).fetch();
+    var number_of_styles = styles_data.length;
+
+    var styles_array = new Array(number_of_styles);
+    for (var i=0; i<number_of_styles; i++)
+    {
+      styles_array[i] = styles_data[i];
+
+      if (typeof styles_array[i].background_color === "undefined")
+        styles_array[i].background_color = "#FFFFFF";
+
+      if (typeof styles_array[i].line_color === "undefined")
+        styles_array[i].line_color = "#000000";
+
+      if (styles_array[i].forward_stroke)
+        styles_array[i].forward_stroke = "forward_stroke";
+
+      else
+        styles_array[i].forward_stroke = null;
+
+      if (styles_array[i].backward_stroke)
+        styles_array[i].backward_stroke = "backward_stroke";
+
+      else
+        styles_array[i].backward_stroke = null;
+    }
+
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_styles !== "undefined")
+      current_styles.clear();
+
+    current_styles = new ReactiveArray(styles_array);
+    
+    console.log("END BUILDING DATA");
+  },
   ///////////////////////////////
-  // Color pickers
+  // Color pickers 
   initialize_background_color_picker: function()
   {
     // Set the #background_colorpicker to the selected style's background colour
@@ -776,6 +894,13 @@ Meteor.my_functions = {
           };
 
           var pattern_id = Router.current().params._id;
+
+          // update local reactiveArray
+          var obj = current_styles[selected_style-1];
+          obj.background_color = options.background_color;
+          current_styles.splice(selected_style-1, 1, obj);
+
+          // update database
           Meteor.call('edit_style', pattern_id, selected_style, options);
 
         },
@@ -837,8 +962,14 @@ Meteor.my_functions = {
         };
 
         var pattern_id = Router.current().params._id;
-        Meteor.call('edit_style', pattern_id, selected_style, options);
 
+        // update local reactiveArray
+        var obj = current_styles[selected_style-1];
+        obj.line_color = options.line_color;
+        current_styles.splice(selected_style-1, 1, obj);
+
+        // update database
+        Meteor.call('edit_style', pattern_id, selected_style, options);
       },
       palette: [
           ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)",

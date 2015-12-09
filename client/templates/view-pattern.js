@@ -13,6 +13,39 @@ Template.view_pattern.rendered = function() {
   Meteor.my_functions.initialize_route();
 }
 
+Template.view_pattern.onCreated(function(){
+  console.log("created");
+
+  var pattern_id = Router.current().params._id;
+  Meteor.my_functions.build_pattern_display_data(pattern_id);
+
+  /*var pattern = Patterns.findOne({ _id: pattern_id});
+  number_of_tablets = pattern.number_of_tablets;
+  number_of_rows = pattern.number_of_rows;
+
+    var data = Weaving.find({pattern_id: pattern_id}, {sort: {"row": 1, "tablet": 1}}).fetch();
+  console.log("START DATA");
+
+  // assign array of arrays to hold data
+  current_pattern_cells = new Array(number_of_rows);
+  //
+  var blank_row = new Array(number_of_tablets);
+
+  for (var i=0; i<number_of_rows; i++)
+  {
+    current_pattern_cells[i] = new Array(number_of_rows);;
+  }
+
+  var current_row = 0;
+  for (var i=0; i<number_of_rows; i++) {
+    for (var j=0; j<number_of_tablets; j++) {
+      current_pattern_cells[i][j] = data[i*number_of_tablets + j];
+    }
+  }
+  console.log("END DATA");*/
+});
+
+
 Template.pattern_not_found.helpers({
   'id': function(){
     return Router.current().params._id;
@@ -101,7 +134,7 @@ Template.orientation.helpers({
         return;
 
     var pattern_id = Router.current().params._id;
-
+console.log("helper tablet_orientation");
     return Orientation.find({ $and: [{pattern_id: pattern_id,}]}, {sort: {"tablet": 1}}).fetch();
   },
   'style_orientation': function(orientation) {
@@ -198,7 +231,10 @@ Template.view_pattern.events({
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('add_weaving_row', pattern_id, 1, Session.get("selected_style"));
+      Meteor.call('add_weaving_row', pattern_id, 1, Session.get("selected_style"), function(error, result){
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
+      });
+      
     }
   },
   'click #add_row_at_end': function () {
@@ -206,35 +242,45 @@ Template.view_pattern.events({
     {
       var pattern_id = Router.current().params._id;
 
-      Meteor.call('add_weaving_row', pattern_id, -1, Session.get("selected_style"));
+      Meteor.call('add_weaving_row', pattern_id, -1, Session.get("selected_style"), function(error, result){
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
+      });
     }
   },
   'click .pattern .remove_row': function () {
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('remove_row', pattern_id, parseInt(this));
+      Meteor.call('remove_row', pattern_id, parseInt(this), function(error, result){
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
+      });
     }
   },
   'click #add_tablet_at_start': function () {
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('add_tablet', pattern_id, 1, Session.get("selected_style"));
+      Meteor.call('add_tablet', pattern_id, 1, Session.get("selected_style"), function(error, result){
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
+      });
     }
   },
   'click #add_tablet_at_end': function () {
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('add_tablet', pattern_id, -1, Session.get("selected_style"));
+      Meteor.call('add_tablet', pattern_id, -1, Session.get("selected_style"), function(error, result){
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
+      });
     }
   },
   'click .pattern .remove_tablet': function () {
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('remove_tablet', pattern_id, parseInt(this));
+      Meteor.call('remove_tablet', pattern_id, parseInt(this), function(error, result){
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
+      });
     }
   },
   'click .pattern li.cell': function(event, template){
@@ -242,6 +288,12 @@ Template.view_pattern.events({
     {
       var new_style = Session.get("selected_style");
       var pattern_id = Router.current().params._id;
+
+      var cell = Weaving.findOne({_id: this._id});
+
+      var obj = current_pattern_cells[cell.row-1][cell.tablet-1];
+      obj.style = new_style;
+      current_pattern_cells[cell.row-1].splice(cell.tablet-1, 1, obj);
 
       Meteor.call('set_pattern_cell_style', pattern_id, this._id, new_style);
     }
@@ -251,6 +303,12 @@ Template.view_pattern.events({
     {
       var new_style = Session.get("selected_style");
       var pattern_id = Router.current().params._id;
+
+      var cell = Threading.findOne({_id: this._id});
+
+      var obj = current_threading_cells[cell.hole-1][cell.tablet-1];
+      obj.style = new_style;
+      current_threading_cells[cell.hole-1].splice(cell.tablet-1, 1, obj);
 
       Meteor.call('set_threading_cell_style', pattern_id, this._id, new_style);
     }
@@ -292,6 +350,18 @@ Template.styles_palette.events({
 
     var options = { forward_stroke: forward_stroke };
     var pattern_id = Router.current().params._id;
+
+    // update local reactiveArray
+    var obj = current_styles[style.style-1];
+    if (forward_stroke)
+      obj.forward_stroke = "forward_stroke";
+
+    else
+      obj.forward_stroke = null;
+
+    current_styles.splice(style.style-1, 1, obj);
+
+    // update database
     Meteor.call('edit_style', pattern_id, selected_style, options);
   },
   'click .edit_style .backward_stroke': function () {
@@ -303,6 +373,18 @@ Template.styles_palette.events({
 
     var options = { backward_stroke: backward_stroke };
     var pattern_id = Router.current().params._id;
+
+    // update local reactiveArray
+    var obj = current_styles[style.style-1];
+    if (backward_stroke)
+      obj.backward_stroke = "backward_stroke";
+
+    else
+      obj.backward_stroke = null;
+
+    current_styles.splice(style.style-1, 1, obj);
+
+    // update database
     Meteor.call('edit_style', pattern_id, selected_style, options);
   }
  });

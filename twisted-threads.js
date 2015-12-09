@@ -2,6 +2,10 @@ Patterns = new Meteor.Collection('patterns');
 // tags on patterns
 Tags.TagsMixin(Patterns); // https://atmospherejs.com/patrickleet/tags
 Patterns.allowTags(function (userId) { return true; });
+/*
+Patterns.after.update(function (userId, doc, fieldNames, modifier, options) {
+  console.log("update " + doc);
+});*/
 
 // search patterns
 patternsIndex = new EasySearch.Index({
@@ -73,6 +77,7 @@ Router.route('/pattern/:_id/:mode?', {
   },
   waitOn: function(){
     console.log("in waitOn");
+    //initializing = true;
     var pattern_id = this.params._id;
     
     return [
@@ -87,6 +92,7 @@ Router.route('/pattern/:_id/:mode?', {
       Meteor.subscribe('orientation', pattern_id),
       Meteor.subscribe('styles', pattern_id),
       Meteor.subscribe('recent_patterns') // to check for current_weave_row
+      
     ];
   },
   action: function() {
@@ -114,7 +120,9 @@ Router.route('/pattern/:_id/:mode?', {
 
     else
     {
-      console.log("render view_pattern");
+      //console.log("subscribed");
+      //initializing = false;
+      console.log("router says render view_pattern");
       this.render('view_pattern');
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         this.render('styles_palette', {to: 'footer'});
@@ -183,6 +191,7 @@ NonEmptyString = Match.Where(function (x) {
 
 if (Meteor.isClient) {
   // default accounts-ui package
+  
   Accounts.ui.config({
     passwordSignupFields: "USERNAME_AND_EMAIL"
   });
@@ -694,6 +703,60 @@ if (Meteor.isClient) {
         if (Router.current().route.getName() == "pattern")
         {
           var pattern_id = Router.current().params._id;
+          ////////////////////
+          // try to detect change to weaving cell(s)
+          /*var query = Weaving.find({pattern_id: pattern_id});
+          var handle = query.observeChanges({
+            changed(id, fields)
+            {
+              //console.log("changed " + JSON.stringify(fields));
+              //console.log("doc " + id);
+              var cell = Weaving.findOne({_id: id});
+              //console.log("cell " + Weaving.findOne({ _id: id}));
+              //current_pattern_cells.list()[cell.row-1].list()[cell.tablet-1].style = cell.style;
+              var obj = current_pattern_cells[cell.row-1][cell.tablet-1];
+              obj.style = cell.style;
+              current_pattern_cells[cell.row-1].splice(cell.tablet-1, 1, obj);
+
+              // force the helper to rerun because reactiveArray seems not to react to changes to existing values
+              //var trigger = current_pattern_cells_trigger.get() + 1;
+              //current_pattern_cells_trigger.set(trigger);
+            },
+            added: function(id, user)
+            {
+              if (!initializing)
+              {
+                console.log("something was added");
+                Meteor.my_functions.build_pattern_display_data(pattern_id);
+              }
+            },
+            removed: function()
+            {
+              Meteor.my_functions.build_pattern_display_data(pattern_id);
+            }
+          })*/
+          //////////////////////
+//initializing = false;
+    //console.log("DONE");
+          /////////////////////////
+          // now try with a local collection
+          /*var query = Weaving.find({pattern_id: pattern_id});
+          var handle = query.observeChanges({
+            changed(id, fields)
+            {
+              //console.log("changed " + JSON.stringify(fields));
+              //console.log("doc " + id);
+              var cell = Weaving.findOne({_id: id});
+              //console.log("cell " + Weaving.findOne({ _id: id}));
+              //current_pattern_cells.list()[cell.row-1].list()[cell.tablet-1].style = cell.style;
+
+              // force the helper to rerun because reactiveArray seems not to react to changes to existing values
+              //var trigger = current_pattern_cells_trigger.get() + 1;
+              //current_pattern_cells_trigger.set(trigger);
+            }
+          })*/
+          //////////////////////////
+          
           
           Meteor.subscribe('weaving', pattern_id, Math.random());
           //Meteor.subscribe('tags', Math.random()),

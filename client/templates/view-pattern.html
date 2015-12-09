@@ -1,7 +1,10 @@
 <template name="view_pattern">
-  Ready: {{Template.subscriptionsReady}}
 {{#if Template.subscriptionsReady}}
 {{> pattern_as_text}}
+<!--{{#each array_test}}
+test {{this}}
+{{/each}}-->
+
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
 
@@ -63,6 +66,7 @@
 
 <template name="pattern_row">
 <div class="row">{{> row_number}}<ul>{{#each weaving_row this}}
+<!--{{> new_pattern_cell}}--><!-- test -->
 {{#with cell_style}}
 {{> pattern_cell}}
 {{/with}}
@@ -81,7 +85,7 @@
 <div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}
 {{#with cell_style}}
 {{> pattern_cell}}
-{{/with}}
+{{/with}}-->
 {{/each}}</ul></div>
 </template>
 
@@ -102,7 +106,7 @@
 {{/if}}</template>
 
 <template name="style_cell">
-<li class="cell {{is_selected_style style}} {{forward_stroke}} {{backward_stroke}} {{is_dark}}" style="background-color: {{background_color}}"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
+<li class="cell {{is_selected_style style}} {{forward_stroke}} {{backward_stroke}}" style="background-color: {{background_color}}"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
 </template>
 
 <template name="orientation">

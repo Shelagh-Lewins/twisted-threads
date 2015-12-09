@@ -6,8 +6,8 @@
   padding: 16px 0 16px 0;
 }
 
-.pattern div.row,
-.tablets div.row {
+.pattern .row,
+.tablets .row {
   clear: both;
   float: left;
   white-space: nowrap;
@@ -15,10 +15,10 @@
   color: #000000;
 }
 
-.pattern span.row_number,
-.pattern span.spacer,
-.tablets span.spacer,
-.tablets span.hole_number {
+.pattern .row_number,
+.pattern .spacer,
+.tablets .spacer,
+.tablets .hole_number {
   display: inline-block;
   width: 32px;
   height: 32px;
@@ -27,8 +27,8 @@
   vertical-align: top; /* prevents empty span from changing layout */
 }
 
-.pattern div.row ul,
-.tablets div.row ul {
+.pattern .row ul,
+.tablets .row ul {
   white-space: nowrap;
   display: inline-block;
   margin: 0;
@@ -39,18 +39,18 @@
   vertical-align: top; /* prevents empty span from changing layout */
 }
 
-.pattern div.row:nth-child(2) ul,
-.tablets div.row:nth-child(2) ul {
+.pattern .row:nth-child(2) ul,
+.tablets .row:nth-child(2) ul {
   border-top: 1px solid black;
 }
 
-.pattern div.row ul li.cell,
-.pattern div.row ul li.remove_tablet,
-.pattern div.row ul li.remove_row,
-.pattern div.row.column_number ul li,
-.tablets div.row ul li.cell,
-.tablets div.row.column_number ul li,
-.tablets div.row.orientation ul li {
+.pattern .row .cell,
+.pattern .row .remove_tablet,
+.pattern .row .remove_row,
+.pattern .row.column_number li,
+.tablets .row .cell,
+.tablets .row.column_number li,
+.tablets .row.orientation li {
   display: inline-block;
   width: 32px;
   height: 32px;
@@ -65,30 +65,38 @@
   -webkit-print-color-adjust: exact;
 }
 
-.pattern.editable div.row ul li.remove_tablet,
-.pattern.editable div.row ul li.remove_row,
-.pattern.editable div.row ul li.cell,
-.tablets.editable div.row ul li.cell,
-.tablets.editable div.row.orientation ul li {
+.pattern.editable .cell:active,
+.tablets.editable .cell:active,
+.remove_tablet:active,
+.remove_row:active,
+.orientation:active {
+  background-color: #9999FF !important;
+}
+
+.pattern.editable .row li.remove_tablet,
+.pattern.editable .row li.remove_row,
+.pattern.editable .row li.cell,
+.tablets.editable .row li.cell,
+.tablets.editable .row.orientation li {
   cursor: pointer;
 }
 
-.pattern.editable div.row ul li.remove_tablet,
-.pattern.editable div.row ul li.remove_row {
+.pattern.editable .row li.remove_tablet,
+.pattern.editable .row li.remove_row {
   background-color: #FFFFFF;
 }
 
-.pattern div.row.column_number ul {
+.pattern .row.column_number ul {
   border: none;
   color: #000000;
 }
 
-.tablets div.row.column_number ul {
+.tablets .row.column_number ul {
   border-bottom: 1pd solid #000000;
 }
 
-.pattern div.row.column_number ul li,
-.tablets div.row.column_number ul li {
+.pattern .row.column_number li,
+.tablets .row.column_number li {
   border-left: 1px solid rgba(0,0,0,0);
 }
 
@@ -106,10 +114,10 @@
 
 */
 
-.pattern div.row ul li.cell.forward_stroke .line_forward,
-.tablets div.row ul li.cell.forward_stroke .line_forward,
-.pattern div.row ul li.cell.backward_stroke .line_backward,
-.tablets div.row ul li.cell.backward_stroke .line_backward {
+.pattern .row .cell.forward_stroke .line_forward,
+.tablets .row .cell.forward_stroke .line_forward,
+.pattern .row .cell.backward_stroke .line_backward,
+.tablets .row .cell.backward_stroke .line_backward {
   position: absolute;
   width: 100%;
   height: 25%;
@@ -124,8 +132,8 @@
 }
 
 
-.pattern div.row ul li.cell.forward_stroke .line_forward,
-.tablets div.row ul li.cell.forward_stroke .line_forward {
+.pattern .row .cell.forward_stroke .line_forward,
+.tablets .row .cell.forward_stroke .line_forward {
   -webkit-transform:rotate(-45deg);
   -moz-transform:rotate(-45deg);
   -ms-transform:rotate(-45deg);
@@ -133,8 +141,8 @@
   transform:rotate(-45deg);
 }
 
-.pattern div.row ul li.cell.backward_stroke .line_backward,
-.tablets div.row ul li.cell.backward_stroke .line_backward {
+.pattern .row .cell.backward_stroke .line_backward,
+.tablets .row .cell.backward_stroke .line_backward {
   -webkit-transform:rotate(45deg);
   -moz-transform:rotate(45deg);
   -ms-transform:rotate(45deg);
@@ -149,23 +157,23 @@
   border-color: #FFFFFF;
 }*/
 
-.pattern div.row li.cell:last-child,
-.pattern div.row li.remove_tablet:last-child,
-.tablets div.row li.cell:last-child {
+.pattern .row .cell:last-child,
+.pattern .row .remove_tablet:last-child,
+.tablets .row .cell:last-child {
   border-right: 1px solid black;
 }
 
 /* Orientation */
-.tablets div.row.orientation ul {
+.tablets .row.orientation ul {
   margin-top: 4px;
   border-color: rgba(0,0,0,0);
 }
-.tablets div.row.orientation ul li {
+.tablets .row.orientation li {
   border-color: rgba(0,0,0,0);
 }
 
-.tablets div.row.orientation ul li.orientation_z .line,
-.tablets div.row.orientation ul li.orientation_s .line {
+.tablets .row.orientation .orientation_z .line,
+.tablets .row.orientation .orientation_s .line {
   position: absolute;
   width: 100%;
   height: 10%;
@@ -179,7 +187,7 @@
   background-color: #333333;
 }
 
-.tablets div.row.orientation ul li.orientation_z .line {
+.tablets .row.orientation li.orientation_z .line {
   -webkit-transform:rotate(45deg);
   -moz-transform:rotate(45deg);
   -ms-transform:rotate(45deg);
@@ -187,7 +195,7 @@
   transform:rotate(45deg);
 }
 
-.tablets div.row.orientation ul li.orientation_s .line {
+.tablets .row.orientation .orientation_s .line {
   -webkit-transform:rotate(-45deg);
   -moz-transform:rotate(-45deg);
   -ms-transform:rotate(-45deg);
@@ -210,3 +218,21 @@
   -moz-border-radius: 8px;
   border-radius: 8px;  
 }
+
+
+/* test */
+/*.pattern .row .new_cell,
+.tablets .row .new_cell {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border-left: 1px solid black;
+  line-height: 32px;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  vertical-align: top;*/ /* prevents empty span from changing layout */
+  /*position: relative;
+  -webkit-print-color-adjust: exact;
+}*/
