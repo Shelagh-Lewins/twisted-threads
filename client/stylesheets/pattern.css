@@ -69,7 +69,7 @@
 .tablets.editable .cell:active,
 .remove_tablet:active,
 .remove_row:active,
-.orientation:active {
+.orientation.editable li:active {
   background-color: #9999FF !important;
 }
 

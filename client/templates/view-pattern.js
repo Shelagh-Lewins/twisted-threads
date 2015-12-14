@@ -1,5 +1,5 @@
 Template.view_pattern.rendered = function() {
-  console.log("view pattern rendered");
+  //console.log("view pattern rendered");
   $('body').attr("class", "view_pattern");
   if (Meteor.my_functions.can_edit_pattern(Router.current().params._id))
     $('body').addClass('editable');
@@ -14,37 +14,10 @@ Template.view_pattern.rendered = function() {
 }
 
 Template.view_pattern.onCreated(function(){
-  console.log("created");
-
+  //console.log("view pattern created");
   var pattern_id = Router.current().params._id;
   Meteor.my_functions.build_pattern_display_data(pattern_id);
-
-  /*var pattern = Patterns.findOne({ _id: pattern_id});
-  number_of_tablets = pattern.number_of_tablets;
-  number_of_rows = pattern.number_of_rows;
-
-    var data = Weaving.find({pattern_id: pattern_id}, {sort: {"row": 1, "tablet": 1}}).fetch();
-  console.log("START DATA");
-
-  // assign array of arrays to hold data
-  current_pattern_cells = new Array(number_of_rows);
-  //
-  var blank_row = new Array(number_of_tablets);
-
-  for (var i=0; i<number_of_rows; i++)
-  {
-    current_pattern_cells[i] = new Array(number_of_rows);;
-  }
-
-  var current_row = 0;
-  for (var i=0; i<number_of_rows; i++) {
-    for (var j=0; j<number_of_tablets; j++) {
-      current_pattern_cells[i][j] = data[i*number_of_tablets + j];
-    }
-  }
-  console.log("END DATA");*/
 });
-
 
 Template.pattern_not_found.helpers({
   'id': function(){
@@ -56,9 +29,9 @@ Template.remove_row.helpers({
   can_remove_rows: function() {
     // is there more than 1 row?
     var pattern_id = Router.current().params._id;
-    var second_row = Weaving.findOne({ $and: [{pattern_id: pattern_id}, {row: 2}]});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
 
-    if (typeof second_row !== "undefined") {
+    if (pattern.number_of_rows > 1) {
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         return true;
     }
@@ -71,23 +44,12 @@ Template.view_pattern.helpers({
   can_remove_tablets: function() {
     // is there more than 1 tablet?
     var pattern_id = Router.current().params._id;
-    var second_tablet = Weaving.findOne({ $and: [{pattern_id: pattern_id}, {tablet: 2}]});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
 
-    if (typeof second_tablet !== "undefined")
+    if (pattern.number_of_tablets > 1)
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         return true;
   },
-  /*can_remove_rows: function() {
-    // is there more than 1 row?
-    var pattern_id = Router.current().params._id;
-    var second_row = Weaving.findOne({ $and: [{pattern_id: pattern_id}, {row: 2}]});
-
-    if (typeof second_row !== "undefined") {
-      if (Meteor.my_functions.can_edit_pattern(pattern_id))
-        return true;
-    }
-  },*/
-
   // Edit style controls
   forward_stroke_on: function() {
     var selected_style = Session.get("selected_style");
@@ -130,12 +92,8 @@ Template.view_pattern.helpers({
 Template.orientation.helpers({
   'tablet_orientation': function()
   {
-    if (Session.equals("db_ready", false))
-        return;
-
-    var pattern_id = Router.current().params._id;
-console.log("helper tablet_orientation");
-    return Orientation.find({ $and: [{pattern_id: pattern_id,}]}, {sort: {"tablet": 1}}).fetch();
+    if (typeof current_orientation !== "undefined")
+      return current_orientation.list();   
   },
   'style_orientation': function(orientation) {
     if (orientation == "Z")
@@ -231,10 +189,11 @@ Template.view_pattern.events({
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('add_weaving_row', pattern_id, 1, Session.get("selected_style"), function(error, result){
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-      });
+
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
       
+      Meteor.my_functions.add_weaving_row(pattern_id, 1, Session.get("selected_style"));
     }
   },
   'click #add_row_at_end': function () {
@@ -242,60 +201,73 @@ Template.view_pattern.events({
     {
       var pattern_id = Router.current().params._id;
 
-      Meteor.call('add_weaving_row', pattern_id, -1, Session.get("selected_style"), function(error, result){
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-      });
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+
+      Meteor.my_functions.add_weaving_row(pattern_id, -1, Session.get("selected_style"));
     }
   },
   'click .pattern .remove_row': function () {
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('remove_row', pattern_id, parseInt(this), function(error, result){
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-      });
+
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+      //console.log("remove row " + parseInt(this));
+      Meteor.my_functions.remove_weaving_row(pattern_id, parseInt(this));
     }
   },
   'click #add_tablet_at_start': function () {
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('add_tablet', pattern_id, 1, Session.get("selected_style"), function(error, result){
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-      });
+
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+      /*Meteor.call('add_tablet', pattern_id, 1, Session.get("selected_style"), function(error, result){
+      });*/
+      Meteor.my_functions.add_tablet(pattern_id, 1, Session.get("selected_style"));
     }
   },
   'click #add_tablet_at_end': function () {
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('add_tablet', pattern_id, -1, Session.get("selected_style"), function(error, result){
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-      });
+
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+      /*Meteor.call('add_tablet', pattern_id, -1, Session.get("selected_style"), function(error, result){
+      });*/
+      Meteor.my_functions.add_tablet(pattern_id, -1, Session.get("selected_style"));
     }
   },
   'click .pattern .remove_tablet': function () {
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      Meteor.call('remove_tablet', pattern_id, parseInt(this), function(error, result){
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-      });
+      /*Meteor.call('remove_tablet', pattern_id, parseInt(this), function(error, result){
+      });*/
+      Meteor.my_functions.remove_tablet(pattern_id, parseInt(this));
     }
   },
   'click .pattern li.cell': function(event, template){
     if (Meteor.my_functions.accept_click())
     {
+  //    console.log("clicked");
+      
+
       var new_style = Session.get("selected_style");
       var pattern_id = Router.current().params._id;
 
-      var cell = Weaving.findOne({_id: this._id});
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
 
-      var obj = current_pattern_cells[cell.row-1][cell.tablet-1];
+      var obj = current_weaving_cells[this.row-1][this.tablet-1];
       obj.style = new_style;
-      current_pattern_cells[cell.row-1].splice(cell.tablet-1, 1, obj);
+      current_weaving_cells[this.row-1].splice(this.tablet-1, 1, obj);
 
-      Meteor.call('set_pattern_cell_style', pattern_id, this._id, new_style);
+      Meteor.my_functions.save_weaving_as_text(pattern_id);
     }
   },
   'click .tablets li.cell': function(event, template) {
@@ -304,20 +276,34 @@ Template.view_pattern.events({
       var new_style = Session.get("selected_style");
       var pattern_id = Router.current().params._id;
 
-      var cell = Threading.findOne({_id: this._id});
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
 
-      var obj = current_threading_cells[cell.hole-1][cell.tablet-1];
+      var obj = current_threading_cells[this.hole-1][this.tablet-1];
       obj.style = new_style;
-      current_threading_cells[cell.hole-1].splice(cell.tablet-1, 1, obj);
+      current_threading_cells[this.hole-1].splice(this.tablet-1, 1, obj);
 
-      Meteor.call('set_threading_cell_style', pattern_id, this._id, new_style);
+      Meteor.my_functions.save_threading_as_text(pattern_id);
     }
   },
   'click .tablets .row.orientation li': function(event, template)
   {
     var pattern_id = Router.current().params._id;
-    // although 'this' reads as a number here, it is actually an object and must be converted to an int for the method
-    Meteor.call('toggle_orientation', pattern_id, this._id);
+
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
+    var new_orientation = "S";
+    if (this.orientation == "S")
+    {
+      new_orientation = "Z";
+    }
+
+    var obj = current_orientation[this.tablet-1];
+      obj.orientation = new_orientation;
+      current_orientation.splice(this.tablet-1, 1, obj);
+
+    Meteor.my_functions.save_orientation_as_text(pattern_id);
   }
 });
 

@@ -13,11 +13,14 @@ Meteor.methods({
       filename: "pattern.json" // one of filename or data is required
     } */
 
+    // if number_of_tablets and number_of_rows are both specified, a blank pattern will be built with style 1 for all weaving and threading cells
+
     check(options, {
-      name: String,
+      number_of_tablets: Match.Optional(String),
+      number_of_rows: Match.Optional(String),
+      name: Match.Optional(String),
       data: Match.Optional(Object),
-      filename: Match.Optional(String)
-      
+      filename: Match.Optional(String) 
     });
 
     if (!Meteor.isServer) // minimongo cannot simulate loading data with Assets
@@ -39,17 +42,82 @@ Meteor.methods({
       }
       catch(e)
       {
-        return -1;
+        //return -1;
+        throw new Meteor.Error("file-load-failed", "File load error in new_pattern_from_json");
       }
     }
     else
     {
-      return -1;
+      //return -1;
+      throw new Meteor.Error("file-load-failed", "File load error in new_pattern_from_json");
     }
 
-    // Numbers of rows and columns
-    if (typeof data.threading[0] === "undefined") // no rows of threading have been defined
+    // Numbers of rows and tablets
+    // have both rows and tablets been specified as positive integers less than 100?
+    var build_new = true; // whether to build a blank pattern using a specified number of tablets and rows
+    if ((typeof options.number_of_tablets !== "undefined") && (typeof options.number_of_rows !== "undefined"))
+    {
+      var tablets = parseInt(options.number_of_tablets);
+
+      if (isNaN(tablets))
+        build_new = false;
+
+      else if ((tablets <1) || (tablets > 100))
+        build_new = false;
+
+      var rows = parseInt(options.number_of_rows);
+
+      if ((rows <1) || (rows > 100))
+        build_new = false;
+
+      else if ((rows <1) || (rows > 100))
+        build_new = false;
+    }
+    else
+    {
+      build_new = false;
+    }
+
+    if (build_new)
+    {
+      // build pattern data
+      // weaving
+      data.weaving = new Array(options.number_of_rows);
+
+      for (var i=0; i<options.number_of_rows; i++)
+      {
+        data.weaving[i] = new Array(options.number_of_tablets);
+        for (var j=0; j<options.number_of_tablets; j++)
+        {
+          data.weaving[i][j] = 3; // plain white in default pattern
+        }
+      }
+
+      // threading
+      data.threading = new Array(options.number_of_rows);
+
+      for (var i=0; i<4; i++)
+      {
+        data.threading[i] = new Array(options.number_of_tablets);
+        for (var j=0; j<options.number_of_tablets; j++)
+        {
+          data.threading[i][j] = 3; // plain white in default pattern
+        }
+      }
+
+      // orientation
+      data.orientation = new Array(number_of_tablets);
+      for (var i=0; i<options.number_of_tablets; i++)
+      {
+        data.orientation[i] = "S";
+
+      }
+      //console.log("orientation data " + data.orientation);
+    }
+    else if (typeof data.threading[0] === "undefined") // no rows of threading have been defined
+    {
       throw new Meteor.Error("no-threading-data", "error creating pattern from JSON. No threading data");
+    }
 
     var number_of_rows = data.weaving.length;
     var number_of_tablets = data.threading[0].length; // there may be no weaving rows but there must be threading
@@ -76,86 +144,91 @@ Meteor.methods({
       threading_notes = data.threading_notes;
 
     var pattern_id = Patterns.insert({
-        name: data.name,
-        description: description,
-        weaving_notes: weaving_notes,
-        threading_notes: threading_notes,
-        private: true, // patterns are private by default so the user can edit them before revealing them to the world
-        // TODO add specific thumbnails for patterns
-        thumbnail_url: "../images/default_pattern_thumbnail.png",
-        number_of_rows: number_of_rows,
-        number_of_tablets: number_of_tablets,
-        created_at: new Date(),            // current time
-        created_by: Meteor.userId(),           // _id of logged in user
-        created_by_username: Meteor.user().username  // username of logged in user
-      }, function(err, pattern_id) {
-        // Tags
-        for (var i=0; i<data.tags.length; i++)
-        {
-          Patterns.addTag(data.tags[i], { _id: pattern_id });
-        }
+      name: data.name,
+      description: description,
+      weaving_notes: weaving_notes,
+      threading_notes: threading_notes,
+      private: true, // patterns are private by default so the user can edit them before revealing them to the world
+      // TODO add specific thumbnails for patterns
+      thumbnail_url: "../images/default_pattern_thumbnail.png",
+      number_of_rows: number_of_rows,
+      number_of_tablets: number_of_tablets,
+      created_at: new Date(),            // current time
+      created_by: Meteor.userId(),           // _id of logged in user
+      created_by_username: Meteor.user().username  // username of logged in user
+    });
+      // Tags
+    for (var i=0; i<data.tags.length; i++)
+    {
+      Patterns.addTag(data.tags[i], { _id: pattern_id });
+    }
 
-        // Styles
-        for (var i=0; i<32; i++) // create 32 styles
-        {
-          var style = data.styles[i];
+    // Styles
+    for (var i=0; i<32; i++) // create 32 styles
+    {
+      var style = data.styles[i];
 
-          if (typeof style === "undefined") // use defaults if no data
-          {
-            var options = {
-              background_color: "#FFFFFF",
-              line_color: "#000000",
-              forward_stroke: false,
-              backward_stroke: false
-            };
-          }
-          else
-          {
-            var options = {
-              background_color: style.background_color,
-              line_color: style.line_color,
-              forward_stroke: style.forward_stroke,
-              backward_stroke: style.backward_stroke
-            };
-          }
+      if (typeof style === "undefined") // use defaults if no data
+      {
+        var options = {
+          background_color: "#FFFFFF",
+          line_color: "#000000",
+          forward_stroke: false,
+          backward_stroke: false
+        };
+      }
+      else
+      {
+        var options = {
+          background_color: style.background_color,
+          line_color: style.line_color,
+          forward_stroke: style.forward_stroke,
+          backward_stroke: style.backward_stroke
+        };
+      }
 
-          Meteor.call('add_style', pattern_id, options);
-        }
+      Meteor.call('add_style', pattern_id, options);
+    }
 
-        // Pattern
-        for (var i=0; i<number_of_tablets; i++)
-        {
-          // Threading
-          for (var j=0; j<4; j++)
-          {
-            Threading.insert({
-              pattern_id: pattern_id,
-              tablet: i+1,
-              hole: j+1,
-              style: data.threading[j][i]
-            });
-          }
+    // Pattern
+    var weaving = new Array(number_of_rows);
+    for (var i=0; i<number_of_rows; i++)
+    {
+      weaving[i] = new Array(number_of_tablets);
 
-          // Orientation
-          Orientation.insert({
-            pattern_id: pattern_id,
-            tablet: i+1,
-            orientation: data.orientation[i]
-          })
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        weaving[i][j] = data.weaving[i][j];
+      }
+    }
 
-          // Weaving
-          for (var j=0; j<number_of_rows; j++)
-          {
-            Weaving.insert({
-              pattern_id: pattern_id,
-              tablet: i+1,
-              row: j+1,
-              style: data.weaving[j][i]
-            }, function(err, new_id){
-            });
-          }
-        }
-      });
+    Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
+
+    //////////////////////////////
+
+    // Threading
+    var threading = new Array(4);
+    for (var i=0; i< 4; i++)
+    {
+      threading[i] = new Array(number_of_tablets);
+
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        threading[i][j] = data.threading[i][j];
+      }
+    }
+    console.log("threading " + JSON.stringify(threading));
+    Patterns.update({_id: pattern_id}, {$set: {threading: JSON.stringify(threading)}});
+
+    // Orientation
+    var orientation = new Array(number_of_tablets);
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      orientation[i] = data.orientation[i];
+    }
+
+    Patterns.update({_id: pattern_id}, {$set: {orientation: JSON.stringify(orientation)}});
+
     return pattern_id;
   },
   xml2js: function(data) {
@@ -198,13 +271,12 @@ Meteor.methods({
     if (!Meteor.isServer) // attempt to avoid error "server sent add for existing id"
         return;
 
-    if (Patterns.find({ _id: pattern_id, created_by: Meteor.userId()}).count() == 0)
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1}});
+
+    if (pattern.created_by != Meteor.userId())
       throw new Meteor.Error("not-authorized", "You can only remove patterns that you created");
 
     Patterns.remove(pattern_id);
-    Weaving.remove({pattern_id: pattern_id});
-    Threading.remove({pattern_id: pattern_id});
-    Orientation.remove({pattern_id: pattern_id});
     Styles.remove({pattern_id: pattern_id});
     Recent_Patterns.remove({pattern_id: pattern_id});
   },
@@ -212,52 +284,116 @@ Meteor.methods({
     check(pattern_id, String);
     check(set_to_private, Boolean);
 
-    var pattern = Patterns.findOne(pattern_id);
- 
-    // Make sure only the pattern created_by can make a pattern private
-    if (pattern.created_by !== Meteor.userId()) {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1}});
+
+    if (pattern.created_by != Meteor.userId())
       throw new Meteor.Error("not-authorized", "You can only change the privacy on a pattern you created");
-    }
  
     Patterns.update(pattern_id, { $set: { private: set_to_private } });
   },
+  ///////////////////////////////
+  // EXPERIMENTAL
+  save_weaving_as_text: function(pattern_id, text, number_of_rows, number_of_tablets)
+  {
+    check(pattern_id, String);
+    check(text, String);
+    check(number_of_rows, Number);
+    check(number_of_tablets, Number);
 
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
+
+    // Save the individual cell data
+    Patterns.update({_id: pattern_id}, {$set: { weaving: text}});
+
+    // Record the number of rows
+    Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_rows}});
+
+    // Record the number of tablets
+    Patterns.update({_id: pattern_id}, {$set: {number_of_tablets: number_of_tablets}});
+  },
+  save_threading_as_text: function(pattern_id, text)
+  {
+    check(pattern_id, String);
+    check(text, String);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
+
+    // Save the individual cell data
+    Patterns.update({_id: pattern_id}, {$set: { threading: text}});
+  },
+  save_orientation_as_text: function(pattern_id, text)
+  {
+    check(pattern_id, String);
+    check(text, String);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
+
+    // Save the individual cell data
+    Patterns.update({_id: pattern_id}, {$set: { orientation: text}});
+  },
   ///////////////////////////////
   // Edit styles
-  set_pattern_cell_style: function(pattern_id, cell_id, new_style)
+  set_pattern_cell_style: function(pattern_id, row, tablet, new_style)
   {
     check(pattern_id, String);
-    check(cell_id, String);
+    check(row, Number);
+    check(tablet, Number);
     check(new_style, Number);
 
-    var pattern = Patterns.findOne({_id: pattern_id});
+    if (Meteor.isServer)
+    {
+      var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1}});
 
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
+      if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
+//console.log("setting style in server");
+      // This construction allows variable properties of the document to be set
+      var update = {};
+      update["weaving." + row + "." + tablet + ".style"] = new_style;
+      Patterns.update({_id: pattern_id}, {$set: update});
+      //console.log("done setting style in server");
     }
-    Weaving.update({_id: cell_id}, {$set: {style: new_style}});
   },
-  set_threading_cell_style: function(pattern_id, cell_id, new_style)
+  set_threading_cell_style: function(pattern_id, hole, tablet, new_style)
   {
     check(pattern_id, String);
-    check(cell_id, String);
+    check(hole, Number);
+    check(tablet, Number);
     check(new_style, Number);
 
-    var pattern = Patterns.findOne({_id: pattern_id});
+    if (Meteor.isServer)
+    {
+      var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1}});
 
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only edit threading in a pattern you created");
+      if (pattern.created_by != Meteor.userId()) {
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit threading in a pattern you created");
+      }
+
+      // This construction allows variable properties of the document to be set
+      var update = {};
+      update["threading." + hole + "." + tablet + ".style"] = new_style;
+      Patterns.update({_id: pattern_id}, {$set: update});
     }
-
-    Threading.update({_id: cell_id}, {$set: {style: new_style}});
   },
   add_style: function(pattern_id, options) {
     check(pattern_id, String);
     check(options, Match.Optional(Object));
 
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
 
     var style_number = Styles.find({ pattern_id: pattern_id }).count()+1;
 
@@ -293,12 +429,11 @@ Meteor.methods({
     check(style_number, Number);
     check(options, Match.Optional(Object));
 
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
 
-    if (pattern.created_by != Meteor.userId()) {
+    if (pattern.created_by != Meteor.userId())
       // Only the owner can edit a pattern
       throw new Meteor.Error("not-authorized", "You can only edit styles in a pattern you created");
-    }
 
     var style_id = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: style_number}]})._id;
 
@@ -405,26 +540,6 @@ Meteor.methods({
   },
   ///////////////////////////////
   // Edit pattern properties
-  update_pattern_name: function(pattern_id, name)
-  {
-    check(pattern_id, String);
-    check(name, String);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only change the name of a pattern you created");
-    }
-
-    if (name == "")
-        return;
-
-    //if (typeof name === "undefined")
-        //return;
-
-    Patterns.update({_id: pattern_id}, {$set: {name: name}});
-  },
   update_text_property: function(collection, object_id, property, value)
   {
     // used by the editable_field template
@@ -436,13 +551,10 @@ Meteor.methods({
 
     if (collection == "patterns")
     {
-      var pattern = Patterns.findOne({_id: object_id});
-      //var property = property;
+      var pattern = Patterns.findOne({_id: object_id}, { fields: {created_by: 1}});
 
-      if (pattern.created_by != Meteor.userId()) {
-        // Only the owner can edit a pattern
+      if (pattern.created_by != Meteor.userId())
         throw new Meteor.Error("not-authorized", "You can only update patterns you created");
-      }
 
       switch (property)
       {
@@ -464,9 +576,7 @@ Meteor.methods({
     {
       // only the user can update their own profile
       if (object_id != Meteor.userId())
-      {
         throw new Meteor.Error("not-authorized", "You can only change your own user details");
-      }
 
       switch (property)
       {
@@ -516,281 +626,7 @@ Meteor.methods({
       }
     }
   },
-  /*update_weaving_notes: function(pattern_id, weaving_notes)
-  {
-    check(pattern_id, String);
-    check(weaving_notes, String);
 
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized");
-    }
-
-    Patterns.update({_id: pattern_id}, {$set: {weaving_notes: weaving_notes}});
-  },
-  update_threading_notes: function(pattern_id, threading_notes)
-  {
-    check(pattern_id, String);
-    check(threading_notes, String);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized");
-    }
-
-    Patterns.update({_id: pattern_id}, {$set: {threading_notes: threading_notes}});
-  },*/
-  add_weaving_row: function(pattern_id, position, style) {
-    check(pattern_id, String);
-    check(position, Number);
-    check(style, Number);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only add a row to a pattern you created");
-    }
-
-    var number_of_tablets = pattern.number_of_tablets;
-    var number_of_rows = pattern.number_of_rows;
-
-    if (number_of_rows == 0)
-      position = 1;
-
-    if (position == -1) // -1 is a shorthand meaning add row at end
-      var position = number_of_rows+1;
-
-    // increment row number of subsequent rows to make space
-    Weaving.find({pattern_id: pattern_id}).forEach(function(cell){ 
-
-      if (cell.row >= position)
-      {
-        var new_row_value = cell.row + 1;
-        var cell_id = cell._id;
-        Weaving.update({_id: cell_id}, {$set: {row: new_row_value}});
-      }
-    });
-
-    // add new row
-    for (var i=0; i<number_of_tablets; i++)
-    {
-      Weaving.insert({
-        pattern_id: pattern_id,
-        tablet: i+1,
-        row: position,
-        style: style
-      });
-    }
-
-    // Increment the number of rows
-    Patterns.update({_id: pattern_id}, {$inc: {number_of_rows: 1}});
-
-  },
-  add_tablet: function (pattern_id, position, style) {
-    check(pattern_id, String);
-    check(position, Number);
-    check(style, Number);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only add a tablet to a pattern you created");
-    }
-
-    var number_of_tablets = pattern.number_of_tablets;
-    var number_of_rows = pattern.number_of_rows;
-
-    if (position == -1) // -1 is a shorthand meaning add tablet at end
-      var position = number_of_tablets+1;
-
-    // add tablet to weaving
-    // increment tablet number of subsequent weaving tablets to make space
-    Weaving.find({pattern_id: pattern_id}).forEach(function(cell){ 
-      if (cell.tablet >= position)
-      {
-        var new_tablet_value = cell.tablet + 1;
-        var cell_id = cell._id;
-        Weaving.update({_id: cell_id}, {$set: {tablet: new_tablet_value}});
-      }
-    });
-
-    // add new tablet to weaving
-    for (var i=0; i<number_of_rows; i++)
-    {
-      Weaving.insert({
-        pattern_id: pattern_id,
-        tablet: position,
-        row: i+1,
-        style: style
-      });
-    }
-
-    // add tablet to threading
-    // increment tablet number of subsequent threading tablets to make space
-    Threading.find({pattern_id: pattern_id}).forEach(function(cell){ 
-
-      if (cell.tablet >= position)
-      {
-        var new_tablet_value = cell.tablet + 1;
-        var cell_id = cell._id;
-        Threading.update({_id: cell_id}, {$set: {tablet: new_tablet_value}});
-      }
-    });
-
-    // add new tablet to threading
-    for (var i=0; i<4; i++)
-    {
-      Threading.insert({
-        pattern_id: pattern_id,
-        tablet: position,
-        hole: i+1,
-        style: style
-      });
-    }
-
-    // add tablet to orientation
-    // increment tablet number of subsequent orientation tablets to make space
-    Orientation.find({pattern_id: pattern_id}).forEach(function(cell){ 
-
-      if (cell.tablet >= position)
-      {
-        var new_tablet_value = cell.tablet + 1;
-        var cell_id = cell._id;
-        Orientation.update({_id: cell_id}, {$set: {tablet: new_tablet_value}});
-      }
-    });
-
-    Orientation.insert({
-      pattern_id: pattern_id,
-      tablet: position,
-      orientation: "S"
-    });
-
-    // Increment the number of tablets
-    Patterns.update({_id: pattern_id}, {$inc: {number_of_tablets: 1}});
-  },
-  remove_row: function(pattern_id, position) {
-    check(pattern_id, String);
-    check(position, Number);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only remove a row from a pattern you created");
-    }
-
-    // is there more than 1 row?
-    var second_tablet = Weaving.findOne({ $and: [{pattern_id: pattern_id}, {row: 2}]});
-    if (typeof second_tablet === "undefined") {
-      throw new Meteor.Error("cannot-remove-only-row", "Cannot remove the only row in a pattern", "remove_row in methods.js is attempting to remove the only row in a pattern");
-    }
-
-    // remove all cells in the row
-    Weaving.remove({ $and: [{pattern_id: pattern_id}, {row: position}]});
-
-    // decrement row number of subsequent rows to to fill the gap
-    Weaving.find({pattern_id: pattern_id}).forEach(function(cell){ 
-      if (cell.row > position)
-      {
-        var new_row_value = cell.row - 1;
-        var cell_id = cell._id;
-        Weaving.update({_id: cell_id}, {$set: {row: new_row_value}});
-      }
-    });
-
-    // Decrement the number of rows
-    Patterns.update({_id: pattern_id}, {$inc: {number_of_rows: -1}});
-  },
-  remove_tablet: function(pattern_id, position) {
-    check(pattern_id, String);
-    check(position, Number);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only remove a tablet from a pattern you created");
-    }
-
-    // is there more than 1 tablet?
-    var second_tablet = Weaving.findOne({ $and: [{pattern_id: pattern_id}, {tablet: 2}]});
-    if (typeof second_tablet === "undefined") {
-      throw new Meteor.Error("cannot-remove-only-tablet", "Cannot remove the only tablet in a pattern", "remove_tablet in methods.js is attempting to remove the only row in a pattern");
-    }
-
-    // Remove tablet from Weaving collection
-    // remove all cells in the row
-    Weaving.remove({$and: [{pattern_id: pattern_id}, {tablet: position}]});
-
-    // decrement tablet number of subsequent rows to to fill the gap
-    Weaving.find({pattern_id: pattern_id}).forEach(function(cell){ 
-      if (cell.tablet > position)
-      {
-        var new_tablet_value = cell.tablet - 1;
-        var cell_id = cell._id;
-        Weaving.update({_id: cell_id}, {$set: {tablet: new_tablet_value}});
-      }
-    });
-
-    // Remove tablet from Threading collection
-    // remove all cells in the row
-    Threading.remove({$and: [{pattern_id: pattern_id}, {tablet: position}]});
-
-    // decrement tablet number of subsequent rows to to fill the gap
-    Threading.find({pattern_id: pattern_id}).forEach(function(cell){ 
-      if (cell.tablet > position)
-      {
-        var new_tablet_value = cell.tablet - 1;
-        var cell_id = cell._id;
-        Threading.update({_id: cell_id}, {$set: {tablet: new_tablet_value}});
-      }
-    });
-    
-    // Remove tablet from Orientation collection
-    // remove all cells in the row
-    Orientation.remove({$and: [{pattern_id: pattern_id}, {tablet: position}]});
-
-    // decrement tablet number of subsequent rows to to fill the gap
-    Orientation.find({pattern_id: pattern_id}).forEach(function(cell){ 
-      if (cell.tablet > position)
-      {
-        var new_tablet_value = cell.tablet - 1;
-        var cell_id = cell._id;
-        Orientation.update({_id: cell_id}, {$set: {tablet: new_tablet_value}});
-      }
-    });
-
-    // Decrement the number of tablets
-    Patterns.update({_id: pattern_id}, {$inc: {number_of_tablets: -1}});
-  },
-  toggle_orientation: function(pattern_id, orientation_id) {
-    // orientation_id is the _id of the tablet's corresponding document in the Orientation collection
-    check(pattern_id, String);
-    check(orientation_id, String);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only change tablet orientation in a pattern you created");
-    }
-
-    var tablet = Orientation.findOne({_id: orientation_id});
-
-    var orientation = "S";
-    if (tablet.orientation == "S")
-    {
-      orientation = "Z";
-    }
-    Orientation.update({_id: orientation_id}, { $set: {orientation: orientation }});
-  },
   ///////////////////////////////
   // user account management
   sendVerificationEmail(userId, email)
@@ -798,10 +634,9 @@ Meteor.methods({
     check(userId, NonEmptyString);
     check(email, Match.Optional(String));
 
-    if (userId != Meteor.userId()) {
+    if (userId != Meteor.userId())
       // Only the owner can request a verification email
       throw new Meteor.Error("not-authorized", "You can only request verification emails for your own email addresses");
-    }
 
     if (typeof email !== "string")
       Accounts.sendVerificationEmail(Meteor.userId(), email);

@@ -1,9 +1,6 @@
 <template name="view_pattern">
 {{#if Template.subscriptionsReady}}
 {{> pattern_as_text}}
-<!--{{#each array_test}}
-test {{this}}
-{{/each}}-->
 
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
@@ -33,7 +30,7 @@ test {{this}}
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
 </div>
-
+  ready: {{Template.subscriptionsReady}}
 {{#if can_edit_pattern _id}}
 <input type="button" id="add_row_at_start" value="Add row at bottom">
 <input type="button" id="add_row_at_end" value="Add row at top"><br/>
@@ -65,12 +62,19 @@ test {{this}}
 </template>
 
 <template name="pattern_row">
-<div class="row">{{> row_number}}<ul>{{#each weaving_row this}}
-<!--{{> new_pattern_cell}}--><!-- test -->
+<div class="row">{{> row_number}}<ul>
+{{#each weaving_row this}}
+{{#with cell_style this}}
+{{> pattern_cell}}
+{{/with}}
+{{/each}}
+<!--{{#each tablet_indexes}}
+Test{{test this}}
 {{#with cell_style}}
 {{> pattern_cell}}
 {{/with}}
-{{/each}}{{> remove_row}}</ul></div>
+{{/each}}-->
+{{> remove_row}}</ul></div>
 </template>
 
 <template name="remove_row">

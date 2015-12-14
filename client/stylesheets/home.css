@@ -2,6 +2,31 @@ h2 {
   clear: both;
 }
 
+/* *** New Pattern form *** */
+#new_pattern {
+  width: 400px;
+  background-color: #FFFFFF;
+  color: #111111;
+  border: 1px solid #7580ac;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+#new_pattern form {
+  padding: 16px;
+}
+
+#new_pattern input[type=text] {
+  width: 250px;
+}
+
+#new_pattern label {
+  float: left;
+  width: 4em;
+  margin-right: 16px;
+}
+
 /* *** Patterns list *** */
 ul.patterns {
   float: left;

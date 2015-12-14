@@ -1,15 +1,24 @@
 Template.home.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();
+  //Meteor.subscribe('weaving'); // TODO remove
+  //Meteor.subscribe('threading'); // TODO remove
+  //Meteor.subscribe('orientation'); // TODO remove
 }
 
 // *** create_new_pattern *** //
 Template.create_new_pattern.events({
   'submit form': function(event){
     event.preventDefault();
-    var pattern_name = $('[name=pattern_name]').val();
-    Meteor.my_functions.new_pattern(pattern_name);
-    $('[name=pattern_name]').val('');
+
+    var number_of_tablets = $('#num_tablets').val();
+    var number_of_rows = $('#num_rows').val();
+    var pattern_name = $('#pattern_name').val();
+
+    Meteor.my_functions.new_pattern(pattern_name, number_of_tablets, number_of_rows);
+
+    $('[name=pattern_name]').val(''); // reset pattern name
+    // however do not reset numbers, in case user wants to create another similar pattern?
   }
 });
 

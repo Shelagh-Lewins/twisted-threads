@@ -1,11 +1,15 @@
 Template.print_pattern.rendered = function() {
   $('body').attr("class", "print");
-  //Meteor.my_functions.initialize_weave();
-  //Meteor.my_functions.initialize_route();
+
   var pattern_id = Router.current().params._id;
-  var created_by_id = Patterns.findOne({ _id: pattern_id}).created_by;
-  Meteor.subscribe('user_info', created_by_id);
+  var created_by_id = Patterns.findOne({ _id: pattern_id}, {fields: {created_by: 1 }}).created_by;
+  Meteor.subscribe('user_info');
 }
+
+Template.print_pattern.onCreated(function(){
+  var pattern_id = Router.current().params._id;
+  Meteor.my_functions.build_pattern_display_data(pattern_id);
+});
 
 Template.print_pattern.helpers({
   hostname: function(){
@@ -13,7 +17,7 @@ Template.print_pattern.helpers({
   },
   created_by: function(){
     var pattern_id = Router.current().params._id;
-    var created_by_id = Patterns.findOne({ _id: pattern_id}).created_by;
+    var created_by_id = Patterns.findOne({ _id: pattern_id}, {fields: {created_by: 1 }}).created_by;
     return Meteor.users.findOne({ _id: created_by_id}).username;
   }
 });
