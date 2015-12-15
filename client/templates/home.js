@@ -1,9 +1,6 @@
 Template.home.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();
-  //Meteor.subscribe('weaving'); // TODO remove
-  //Meteor.subscribe('threading'); // TODO remove
-  //Meteor.subscribe('orientation'); // TODO remove
 }
 
 // *** create_new_pattern *** //

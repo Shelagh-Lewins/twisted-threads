@@ -112,7 +112,6 @@ Meteor.methods({
         data.orientation[i] = "S";
 
       }
-      //console.log("orientation data " + data.orientation);
     }
     else if (typeof data.threading[0] === "undefined") // no rows of threading have been defined
     {
@@ -164,6 +163,7 @@ Meteor.methods({
     }
 
     // Styles
+    var styles_array = [];
     for (var i=0; i<32; i++) // create 32 styles
     {
       var style = data.styles[i];
@@ -186,9 +186,9 @@ Meteor.methods({
           backward_stroke: style.backward_stroke
         };
       }
-
-      Meteor.call('add_style', pattern_id, options);
+      styles_array[i] = style;
     }
+    Patterns.update({_id: pattern_id}, {$set: {styles: JSON.stringify(styles_array)}});
 
     // Pattern
     var weaving = new Array(number_of_rows);
@@ -217,7 +217,7 @@ Meteor.methods({
         threading[i][j] = data.threading[i][j];
       }
     }
-    console.log("threading " + JSON.stringify(threading));
+
     Patterns.update({_id: pattern_id}, {$set: {threading: JSON.stringify(threading)}});
 
     // Orientation
@@ -292,7 +292,7 @@ Meteor.methods({
     Patterns.update(pattern_id, { $set: { private: set_to_private } });
   },
   ///////////////////////////////
-  // EXPERIMENTAL
+  // Stringify pattern data and save it
   save_weaving_as_text: function(pattern_id, text, number_of_rows, number_of_tablets)
   {
     check(pattern_id, String);
@@ -343,6 +343,20 @@ Meteor.methods({
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { orientation: text}});
   },
+  save_styles_as_text: function(pattern_id, text)
+  {
+    check(pattern_id, String);
+    check(text, String);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit styles in a pattern you created");
+
+    // Save the individual cell data
+    Patterns.update({_id: pattern_id}, {$set: { styles: text}});
+  },
   ///////////////////////////////
   // Edit styles
   set_pattern_cell_style: function(pattern_id, row, tablet, new_style)
@@ -359,12 +373,11 @@ Meteor.methods({
       if (pattern.created_by != Meteor.userId())
         // Only the owner can edit a pattern
         throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
-//console.log("setting style in server");
+
       // This construction allows variable properties of the document to be set
       var update = {};
       update["weaving." + row + "." + tablet + ".style"] = new_style;
       Patterns.update({_id: pattern_id}, {$set: update});
-      //console.log("done setting style in server");
     }
   },
   set_threading_cell_style: function(pattern_id, hole, tablet, new_style)
@@ -387,81 +400,6 @@ Meteor.methods({
       var update = {};
       update["threading." + hole + "." + tablet + ".style"] = new_style;
       Patterns.update({_id: pattern_id}, {$set: update});
-    }
-  },
-  add_style: function(pattern_id, options) {
-    check(pattern_id, String);
-    check(options, Match.Optional(Object));
-
-    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
-
-    var style_number = Styles.find({ pattern_id: pattern_id }).count()+1;
-
-    var options = options || {};
-    if (pattern.created_by != Meteor.userId()) {
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only add a style in a pattern you created");
-    }
-
-    if (typeof options.background_color === "undefined")
-      options.background_color = "#FFFFFF";
-
-    if (typeof options.line_color === "undefined")
-      options.line_color = "#0000FF";
-
-    if (typeof options.forward_stroke === "undefined")
-      options.forward_stroke = false;
-
-    if (typeof options.backward_stroke === "undefined")
-      options.backward_stroke = false;
-
-    Styles.insert({
-      pattern_id: pattern_id,
-      style: style_number,
-      forward_stroke: options.forward_stroke,
-      backward_stroke: options.backward_stroke,
-      background_color: options.background_color,
-      line_color: options.line_color
-    })
-  },
-  edit_style: function(pattern_id, style_number, options) {
-    check(pattern_id, String);
-    check(style_number, Number);
-    check(options, Match.Optional(Object));
-
-    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
-
-    if (pattern.created_by != Meteor.userId())
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only edit styles in a pattern you created");
-
-    var style_id = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: style_number}]})._id;
-
-    var options = options || {};
-
-    if (typeof options.background_color !== "undefined")
-    {
-      Styles.update({_id: style_id}, { $set: {background_color: options.background_color}});
-    }
-
-    if (typeof options.line_color !== "undefined")
-    {
-      Styles.update({_id: style_id}, { $set: {line_color: options.line_color}});
-    }
-
-    if (typeof options.is_dark !== "undefined")
-    {
-      Styles.update({_id: style_id}, { $set: {is_dark: options.is_dark}});
-    }
-
-    if (typeof options.forward_stroke !== "undefined")
-    {
-      Styles.update({_id: style_id}, { $set: {forward_stroke: options.forward_stroke}});
-    }
-
-    if (typeof options.backward_stroke !== "undefined")
-    {
-      Styles.update({_id: style_id}, { $set: {backward_stroke: options.backward_stroke}});
     }
   },
 

@@ -1,7 +1,7 @@
 // Publish pattern data, checking that the user has permission to view the pattern
 Meteor.publish('patterns', function(created_by){
   check(created_by, Match.Optional(String));
-//console.log("publishing patterns");
+
   if (typeof created_by === "string")
     return Patterns.find({
       $and: [
@@ -19,33 +19,10 @@ Meteor.publish('patterns', function(created_by){
     });
 });
 
-// TODO delete
-/*Meteor.publish('test_db', function(){
-  // The collection is readonly and all tags should be public
-  return Meteor.test_db.find();
-});*/
-
 Meteor.publish('tags', function(){
   // The collection is readonly and all tags should be public
   return Meteor.tags.find();
 });
-/*
-// TODO remove
-Meteor.publish('weaving', function(){
-  // The collection is readonly and all tags should be public;
-  //console.log("publishing weaving " + Meteor.weaving.find());
-  return Meteor.weaving.find();
-});
-
-Meteor.publish('threading', function(){
-  // The collection is readonly and all tags should be public
-  return Meteor.threading.find();
-});
-
-Meteor.publish('orientation', function(){
-  // The collection is readonly and all tags should be public
-  return Meteor.orientation.find();
-});*/
 
 // trigger is there to force a resubscription when pattern ids or private have changed, otherwise Meteor is "smart" and doesn't run it.
 

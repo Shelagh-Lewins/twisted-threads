@@ -8,7 +8,7 @@ Patterns.allowTags(function (userId) { return true; });
 Weaving = new Mongo.Collection('weaving');
 Threading = new Mongo.Collection('threading');
 Orientation = new Mongo.Collection('orientation');
-//Test_db = new Mongo.Collection('test_db');
+Styles = new Mongo.Collection('styles');
 
 // search patterns
 patternsIndex = new EasySearch.Index({
@@ -29,7 +29,7 @@ usersIndex = new EasySearch.Index({
   engine: new EasySearch.Minimongo() // search only on the client, so only published documents are returned
 });
 
-Styles = new Mongo.Collection('styles'); // contains the individual styles for each pattern
+
 Recent_Patterns = new Mongo.Collection('recent_patterns'); // records the patterns each user has viewed / woven recently
 
 // Polyfill in case indexOf not supported, not that we are necessarily expecting to support IE8-
@@ -553,19 +553,7 @@ if (Meteor.isClient) {
       $('#pattern_as_text textarea').select();
     }
   });
-/*
-  var query = Patterns.find({}, {fields: {weaving: 1}});
-  var handle = query.observeChanges({
-    added: function (id, user) {
-      console.log("pattern added");
-    },
-    changed: function (id, user) {
-      console.log("pattern changed");
-    },
-    removed: function () {
-      console.log("pattern removed");
-    }
-  });*/
+
   ///////////////////////////////////
   // reacting to database changes
   Tracker.autorun(function (computation) {
@@ -578,11 +566,11 @@ if (Meteor.isClient) {
         { created_by: this.userId }
       ]
     }, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
-//console.log("autorun");
+
     if (my_pattern_ids)
     {
       Meteor.subscribe('recent_patterns', Math.random());
-//console.log("my_pattern_ids");
+
       if(Router.current())
       {
         Meteor.subscribe('user_info', Math.random());

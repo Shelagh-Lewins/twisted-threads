@@ -48,8 +48,6 @@ Template.weave_pattern.events({
     Meteor.my_functions.set_current_weave_row(row_number);
   },
   'click #first_row': function() {
-    //var pattern_id = Router.current().params._id;
-    //var pattern = Patterns.findOne({_id: pattern_id});
     var row_number = 1;
     
     Meteor.my_functions.set_current_weave_row(row_number);
@@ -59,8 +57,8 @@ Template.weave_pattern.events({
       }, 50);
   },
   'click #last_row': function() {
-    //var pattern_id = Router.current().params._id;
-    //var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id});
     var row_number = pattern.number_of_rows;
 
     Meteor.my_functions.set_current_weave_row(row_number);

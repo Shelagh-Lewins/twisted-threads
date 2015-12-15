@@ -26,6 +26,10 @@ Meteor.startup(function () {
   Threading.remove({}); // This absolutely must only be run once! And only after the data have been safely migrated.
 
     Orientation.remove({}); // This absolutely must only be run once! And only after the data have been safely migrated.
+
+    Styles.remove({}); // This absolutely must only be run once! And only after the data have been safely migrated.
+
+    // Then remove all refs in code to these collections
     */
 
   //var weaving = new Object(); // todo define inside loop
@@ -110,7 +114,7 @@ Meteor.startup(function () {
         }
 
       });
-      console.log("threading " + JSON.stringify(threading));
+      //console.log("threading " + JSON.stringify(threading));
       Patterns.update({_id: pattern._id}, {$set: {threading: JSON.stringify(threading)}});
 
       // orientation
@@ -130,8 +134,29 @@ Meteor.startup(function () {
         
       });
 
-      console.log("orientation " + JSON.stringify(orientation));
+      //console.log("orientation " + JSON.stringify(orientation));
       Patterns.update({_id: pattern._id}, {$set: {orientation: JSON.stringify(orientation)}});
+
+      console.log("converting styles");
+
+      var styles = new Array(32);
+
+      Styles.find({ pattern_id: pattern._id}).forEach(function(style)
+      {
+        if((style.style > 32) || (style.style < 1))
+        {
+          console.log("!!problem style tablet !! " + style.style);
+        }
+        else
+        {
+          styles[parseInt(style.style)-1] = style;
+        }
+        
+      });
+
+      //console.log("orientation " + JSON.stringify(orientation));
+      Patterns.update({_id: pattern._id}, {$set: {styles: JSON.stringify(styles)}});
+
   });
 
 

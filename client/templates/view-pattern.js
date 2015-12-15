@@ -1,5 +1,4 @@
 Template.view_pattern.rendered = function() {
-  //console.log("view pattern rendered");
   $('body').attr("class", "view_pattern");
   if (Meteor.my_functions.can_edit_pattern(Router.current().params._id))
     $('body').addClass('editable');
@@ -14,7 +13,6 @@ Template.view_pattern.rendered = function() {
 }
 
 Template.view_pattern.onCreated(function(){
-  //console.log("view pattern created");
   var pattern_id = Router.current().params._id;
   Meteor.my_functions.build_pattern_display_data(pattern_id);
 });
@@ -143,24 +141,26 @@ Template.styles_palette.helpers({
   styles: function(page) {
     var pattern_id = Router.current().params._id;
 
-    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
-      return [];
-
-    else
+    var styles_array = [];
+    if (typeof page === "undefined")
     {
-      if (typeof page === "undefined")
+      for (var i=0; i<current_styles.length; i++)
       {
-        return Styles.find({ pattern_id: pattern_id }, {sort: {"style": 1}}).fetch();
-      }
-
-      else
-      {
-        var number_per_page = 16;
-        var lower = (page - 1) * number_per_page;
-        var upper = (page * number_per_page) + 1;
-        return Styles.find({$and: [{ pattern_id: pattern_id}, { style: {$gt: lower, $lt: upper}}]}, {sort: {"style": 1}}).fetch();
+        styles_array.push({style: i+1});
       }
     }
+    else
+    {
+      var number_per_page = 16;
+      var lower = (page - 1) * number_per_page;
+      
+      for (var i=0; i<number_per_page; i++)
+      {
+        styles_array.push({style: lower+i+1});
+      }
+    }
+
+    return styles_array;
   },
   style_pages: function() {
     // display styles in pages. Currently 32 styles are shown in 2 pages.
@@ -214,7 +214,7 @@ Template.view_pattern.events({
 
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
-      //console.log("remove row " + parseInt(this));
+
       Meteor.my_functions.remove_weaving_row(pattern_id, parseInt(this));
     }
   },
@@ -225,8 +225,7 @@ Template.view_pattern.events({
 
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
-      /*Meteor.call('add_tablet', pattern_id, 1, Session.get("selected_style"), function(error, result){
-      });*/
+
       Meteor.my_functions.add_tablet(pattern_id, 1, Session.get("selected_style"));
     }
   },
@@ -237,8 +236,7 @@ Template.view_pattern.events({
 
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
-      /*Meteor.call('add_tablet', pattern_id, -1, Session.get("selected_style"), function(error, result){
-      });*/
+
       Meteor.my_functions.add_tablet(pattern_id, -1, Session.get("selected_style"));
     }
   },
@@ -246,17 +244,13 @@ Template.view_pattern.events({
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
-      /*Meteor.call('remove_tablet', pattern_id, parseInt(this), function(error, result){
-      });*/
+
       Meteor.my_functions.remove_tablet(pattern_id, parseInt(this));
     }
   },
   'click .pattern li.cell': function(event, template){
     if (Meteor.my_functions.accept_click())
     {
-  //    console.log("clicked");
-      
-
       var new_style = Session.get("selected_style");
       var pattern_id = Router.current().params._id;
 
@@ -331,7 +325,7 @@ Template.styles_palette.events({
     var selected_style = Session.get("selected_style");
     var pattern_id = Router.current().params._id;
 
-    var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
+    var style = current_styles[selected_style-1];
     var forward_stroke = !style.forward_stroke;
 
     var options = { forward_stroke: forward_stroke };
@@ -348,13 +342,13 @@ Template.styles_palette.events({
     current_styles.splice(style.style-1, 1, obj);
 
     // update database
-    Meteor.call('edit_style', pattern_id, selected_style, options);
+    Meteor.my_functions.save_styles_as_text(pattern_id);
   },
   'click .edit_style .backward_stroke': function () {
     var selected_style = Session.get("selected_style");
     var pattern_id = Router.current().params._id;
 
-    var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
+    var style = current_styles[selected_style-1];
     var backward_stroke = !style.backward_stroke;
 
     var options = { backward_stroke: backward_stroke };
@@ -371,6 +365,6 @@ Template.styles_palette.events({
     current_styles.splice(style.style-1, 1, obj);
 
     // update database
-    Meteor.call('edit_style', pattern_id, selected_style, options);
+    Meteor.my_functions.save_styles_as_text(pattern_id);
   }
  });

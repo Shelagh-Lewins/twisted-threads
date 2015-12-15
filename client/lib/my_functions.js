@@ -155,7 +155,7 @@ Meteor.my_functions = {
 
       if (error)
       {
-        console.log("error running new_pattern_from_json: " + error.reason);
+        throw new Meteor.Error("new-pattern-error", "error running new_pattern_from_json: " + error.reason);
       }
       else
       {
@@ -183,7 +183,7 @@ Meteor.my_functions = {
       // automatically view new pattern
       if (error)
       {
-        console.log("error running new_pattern_from_json: " + error.reason);
+        throw new Meteor.Error("new-pattern-error", "error running new_pattern_from_json: " + error.reason);
       }
       else
       {
@@ -241,7 +241,7 @@ Meteor.my_functions = {
       
       if (error)
       {
-        console.log("error running new_pattern_from_json: " + error.reason);
+        throw new Meteor.Error("new-pattern-error", "error running new_pattern_from_json: " + error.reason);
       }
       else
       {
@@ -406,7 +406,6 @@ Meteor.my_functions = {
     }
     for (var property in unique_colours_counter) {
       if (unique_colours_counter.hasOwnProperty(property)) {
-        //console.log("adding colour index " + property);
         unique_colors_list.push(parseInt(property));
       }
     }
@@ -550,8 +549,7 @@ Meteor.my_functions = {
 
       if (direction == current_turn_direction[tablet])
       {
-        // TODO check for distance == 2 or 1
-        // turning 3 is unlikely because you would turn 1 the other way
+        // TODO check for distance == 3, 2 or 1
 
         // update the visible thread
         if (direction == "F")
@@ -735,15 +733,11 @@ Meteor.my_functions = {
   },
   build_pattern_display_data:  function(pattern_id)
   {
-    //console.log("START BUILDING DATA ");
-
     // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
-    // TODO if this db request gets slow when there are many patterns, consider whether each pattern should have its own dynamically created collection.
 
-    // reactive arrays need to be updated with arr.splice(pos, 1 new_value) to be reactive
+    // elements in reactive arrays need to be updated with arr.splice(pos, 1 new_value) to be reactive
 
-    //var pattern_id = Router.current().params._id; // TODO remove
-    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {weaving: 1, threading: 1, orientation: 1, number_of_rows: 1, number_of_tablets: 1}});
+    var pattern = Patterns.findOne({_id: pattern_id});
 
     number_of_tablets = pattern.number_of_tablets;
     number_of_rows = pattern.number_of_rows;
@@ -813,7 +807,6 @@ Meteor.my_functions = {
     for (var i=0; i<4; i++)
     {
       var row = new Array(number_of_tablets);
-      //console.log("row " + i);
       current_threading_cells[i] = new ReactiveArray(row);
 
       for (var j=0; j<number_of_tablets; j++)
@@ -849,21 +842,17 @@ Meteor.my_functions = {
       current_orientation[i] = obj;
     }
 
-    // put the orientation data into the array
-    /*$.each(orientation_data, function(key, value){
-      // tablets
-       current_orientation[value.tablet-1] = value;
-    })*/
-
     //////////////////////////////
     // build the styles data
-    var styles_data = Styles.find({pattern_id: pattern_id}, {sort: {"style": 1}}).fetch();
+    var styles_data = JSON.parse(pattern.styles);
     var number_of_styles = styles_data.length;
 
     var styles_array = new Array(number_of_styles);
     for (var i=0; i<number_of_styles; i++)
     {
       styles_array[i] = styles_data[i];
+
+      styles_array[i].style = i+1;
 
       if (typeof styles_array[i].background_color === "undefined")
         styles_array[i].background_color = "#FFFFFF";
@@ -889,8 +878,6 @@ Meteor.my_functions = {
       current_styles.clear();
 
     current_styles = new ReactiveArray(styles_array);
-    
-    //console.log("END BUILDING DATA");
   },
   add_weaving_row: function(pattern_id, position, style)
   {
@@ -1107,6 +1094,15 @@ Meteor.my_functions = {
 
     Meteor.call('save_orientation_as_text', pattern_id, JSON.stringify(orientation_array));   
   },
+  save_styles_as_text: function(pattern_id)
+  {
+    var styles_array = [];
+    for (var i=0; i<current_styles.length; i++)
+    {
+      styles_array[i] = current_styles[i];
+    }
+    Meteor.call('save_styles_as_text', pattern_id, JSON.stringify(styles_array)); 
+  },
   ///////////////////////////////
   // Color pickers 
   initialize_background_color_picker: function()
@@ -1122,7 +1118,7 @@ Meteor.my_functions = {
     }
     else
     {
-      var selected_background_color = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]}).background_color;
+      var selected_background_color = current_styles[selected_style-1].background_color;
       // Spectrum color picker
       // https://atmospherejs.com/ryanswapp/spectrum-colorpicker
       // https://bgrins.github.io/spectrum/
@@ -1163,7 +1159,7 @@ Meteor.my_functions = {
           current_styles.splice(selected_style-1, 1, obj);
 
           // update database
-          Meteor.call('edit_style', pattern_id, selected_style, options);
+          Meteor.my_functions.save_styles_as_text(pattern_id);
 
         },
         palette: [
@@ -1191,7 +1187,7 @@ Meteor.my_functions = {
     var selected_style = Session.get("selected_style");
     var pattern_id = Router.current().params._id;
 
-    var selected_line_color = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]}).line_color;
+    var selected_line_color = current_styles[selected_style-1].line_color;
     // Spectrum color picker
     // https://atmospherejs.com/ryanswapp/spectrum-colorpicker
     // https://bgrins.github.io/spectrum/
@@ -1231,7 +1227,7 @@ Meteor.my_functions = {
         current_styles.splice(selected_style-1, 1, obj);
 
         // update database
-        Meteor.call('edit_style', pattern_id, selected_style, options);
+        Meteor.my_functions.save_styles_as_text(pattern_id);
       },
       palette: [
           ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)",
@@ -1255,15 +1251,15 @@ Meteor.my_functions = {
   {
     // Set the #background_colorpicker to the selected style's background colour
     var selected_style = Session.get("selected_style");
-    var pattern_id = Router.current().params._id;
+    //var pattern_id = Router.current().params._id;
 
     // Background color picker
-    var selected_background_color = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]}).background_color;
+    var selected_background_color = current_styles[selected_style-1].background_color;
 
     $("#background_colorpicker").spectrum("set", selected_background_color);
 
     // Line color picker
-    var selected_line_color = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]}).line_color;
+    var selected_line_color = current_styles[selected_style-1].line_color;
 
     $("#line_colorpicker").spectrum("set", selected_line_color);
     $("#line_colorpicker").spectrum("set", selected_line_color);
@@ -1443,9 +1439,6 @@ Meteor.my_functions = {
     var number_of_rows = pattern.number_of_rows;
 
     var new_value = parseInt(index);
-
-    //if (typeof Patterns.findOne({_id: pattern_id}) === "undefined")
-      //return index;
 
     if (isNaN(new_value))
     {
