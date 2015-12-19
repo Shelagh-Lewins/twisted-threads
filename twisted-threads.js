@@ -3,13 +3,6 @@ Patterns = new Meteor.Collection('patterns');
 Tags.TagsMixin(Patterns); // https://atmospherejs.com/patrickleet/tags
 Patterns.allowTags(function (userId) { return true; });
 
-
-// TODO remove after migration
-/*Weaving = new Mongo.Collection('weaving');
-Threading = new Mongo.Collection('threading');
-Orientation = new Mongo.Collection('orientation');
-Styles = new Mongo.Collection('styles');*/
-
 // search patterns
 patternsIndex = new EasySearch.Index({
   collection: Patterns,
