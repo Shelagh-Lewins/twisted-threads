@@ -3,6 +3,13 @@ Patterns = new Meteor.Collection('patterns');
 Tags.TagsMixin(Patterns); // https://atmospherejs.com/patrickleet/tags
 Patterns.allowTags(function (userId) { return true; });
 
+
+// TODO remove after migration
+/*Weaving = new Mongo.Collection('weaving');
+Threading = new Mongo.Collection('threading');
+Orientation = new Mongo.Collection('orientation');
+Styles = new Mongo.Collection('styles');*/
+
 // search patterns
 patternsIndex = new EasySearch.Index({
   collection: Patterns,
@@ -22,11 +29,7 @@ usersIndex = new EasySearch.Index({
   engine: new EasySearch.Minimongo() // search only on the client, so only published documents are returned
 });
 
-//Settings = new Mongo.Collection('settings');
-Threading = new Mongo.Collection('threading'); // contains the individual threading cells for each pattern
-Weaving = new Mongo.Collection('weaving'); // contains the individual weaving schedule cells for each pattern
-Orientation = new Mongo.Collection('orientation'); // contains the orientation (S or Z) for each tablet in each pattern
-Styles = new Mongo.Collection('styles'); // contains the individual styles for each pattern
+
 Recent_Patterns = new Mongo.Collection('recent_patterns'); // records the patterns each user has viewed / woven recently
 
 // Polyfill in case indexOf not supported, not that we are necessarily expecting to support IE8-
@@ -54,125 +57,6 @@ if (!Array.prototype.indexOf)
   };
 }
 
-Router.configure({
-  layoutTemplate: 'main_layout',
-  loadingTemplate: 'loading'
-});
-
-Router.route('/', {
-  name: 'home',
-  template: 'home'
-});
-
-Router.route('/pattern/:_id/:mode?', {
-  name: 'pattern',
-  data: function(){
-    var pattern_id = this.params._id;
-
-    return Patterns.findOne({ _id: pattern_id });
-  },
-  waitOn: function(){
-    console.log("in waitOn");
-    var pattern_id = this.params._id;
-    
-    return [
-      Meteor.subscribe('patterns', {
-        onReady: function(){
-          var pattern_id = Router.current().params._id;
-        }
-      }),
-      Meteor.subscribe('tags'),
-      Meteor.subscribe('weaving', pattern_id),
-      Meteor.subscribe('threading', pattern_id),
-      Meteor.subscribe('orientation', pattern_id),
-      Meteor.subscribe('styles', pattern_id),
-      Meteor.subscribe('recent_patterns') // to check for current_weave_row
-    ];
-  },
-  action: function() {
-    var pattern_id = this.params._id;
-
-    if (Patterns.find({ _id: pattern_id}).count() == 0)
-    {
-      this.layout('main_layout');
-      this.render("pattern_not_found");
-      this.render(null, {to: 'footer'}); // yield regions must be manually cleared
-    }
- 
-    else if (this.params.mode == "weaving")
-    {
-      this.render('weave_pattern');
-      this.render(null, {to: 'footer'});
-    }
-
-    else if (this.params.mode == "print")
-    {
-      this.layout('print_layout');
-      this.render('print_pattern');
-      this.render(null, {to: 'footer'});
-    }
-
-    else
-    {
-      console.log("render view_pattern");
-      this.render('view_pattern');
-      if (Meteor.my_functions.can_edit_pattern(pattern_id))
-        this.render('styles_palette', {to: 'footer'});
-
-      else
-        this.render(null, {to: 'footer'});
-    }
-         
-  }
-});
-
-Router.route('/user/:_id', {
-  name: 'user',
-  data: function(){
-    var user_id = this.params._id;
-
-    //if (Meteor.users.find({ _id: user_id}).count() == 0)
-      //this.render("user_not_found");
-    
-    //else
-      return Meteor.users.findOne({ _id: user_id });
-  },
-  waitOn: function(){
-    var user_id = this.params._id;
-    
-    return [
-      Meteor.subscribe('user_info'),
-      Meteor.subscribe('patterns', user_id)
-    ]
-  },
-  action: function() {
-    var user_id = this.params._id;
-
-    if (Meteor.users.find({ _id: user_id}).count() == 0)
-      this.render("user_not_found");
-    
-    else
-      this.render("user");
-  }
-});
-
-Router.route('/account-settings', {
-  name: 'account_settings',
-  data: function() {
-    var user_id = this.params._id;
-    return Meteor.users.findOne({ _id: user_id });
-  },
-  waitOn: function(){
-    return [
-      Meteor.subscribe('user_info')
-    ]
-  },
-  action: function() {
-    var user_id = this.params._id;
-    this.render("account_settings");
-  }
-})
-
 ////////////////////////
 // extends 'check' functionality
 // check(userId, NonEmptyString);
@@ -183,6 +67,7 @@ NonEmptyString = Match.Where(function (x) {
 
 if (Meteor.isClient) {
   // default accounts-ui package
+  
   Accounts.ui.config({
     passwordSignupFields: "USERNAME_AND_EMAIL"
   });
@@ -298,6 +183,7 @@ if (Meteor.isClient) {
 
   Template.header.onCreated(function() {
     this.subscribe('patterns');
+    this.subscribe('weaving'); // TODO remove
     this.subscribe('recent_patterns');
   });
 
@@ -442,7 +328,8 @@ if (Meteor.isClient) {
   });
 
   UI.registerHelper('pattern_exists', function(pattern_id){
-    return (Patterns.find({ _id: pattern_id}).count() != 0);
+    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() != 0)
+      return true;
   });
 
   ///////////////////////////////
@@ -667,7 +554,6 @@ if (Meteor.isClient) {
     }
   });
 
-
   ///////////////////////////////////
   // reacting to database changes
   Tracker.autorun(function (computation) {
@@ -679,29 +565,11 @@ if (Meteor.isClient) {
         { private: {$ne: true} },
         { created_by: this.userId }
       ]
-    }).map(function(pattern) {return pattern._id});
+    }, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
 
     if (my_pattern_ids)
     {
-      //console.log("subscribing");
       Meteor.subscribe('recent_patterns', Math.random());
-
-
-      if(Router.current())
-      {
-        Meteor.subscribe('user_info', Math.random());
-
-        if (Router.current().route.getName() == "pattern")
-        {
-          var pattern_id = Router.current().params._id;
-          
-          Meteor.subscribe('weaving', pattern_id, Math.random());
-          //Meteor.subscribe('tags', Math.random()),
-          Meteor.subscribe('threading', pattern_id, Math.random());
-          Meteor.subscribe('orientation', pattern_id, Math.random());
-          Meteor.subscribe('styles', pattern_id, Math.random());
-        }
-      }
     }
 
     // detect login / logout

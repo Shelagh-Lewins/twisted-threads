@@ -4,6 +4,11 @@ Template.weave_pattern.rendered = function() {
   Meteor.my_functions.initialize_route();
 }
 
+Template.weave_pattern.onCreated(function(){
+  var pattern_id = Router.current().params._id;
+  Meteor.my_functions.build_pattern_display_data(pattern_id);
+});
+
 // used in 2 templates
 UI.registerHelper('selected_row', function(){
   return Session.get('current_weave_row');
@@ -43,8 +48,6 @@ Template.weave_pattern.events({
     Meteor.my_functions.set_current_weave_row(row_number);
   },
   'click #first_row': function() {
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
     var row_number = 1;
     
     Meteor.my_functions.set_current_weave_row(row_number);

@@ -1,38 +1,17 @@
 UI.registerHelper('tablet_indexes', function() {
-    var pattern_id = this._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
-    if (typeof pattern === "undefined") // avoid error if user signs out while viewing a private  pattern
-      return;
-
-    var tablet_indexes = [];
-
-    for (var i=0; i<pattern.number_of_tablets; i++)
-    {
-      tablet_indexes.push(i+1);
-    }
-
-    return tablet_indexes;
+  return current_tablet_indexes.list();
 });
 
 UI.registerHelper('row_indexes', function() {
-    var pattern_id = this._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
-    if (typeof pattern === "undefined") // avoid error if user signs out while viewing a private  pattern
-      return;
-
-    var row_indexes = [];
-    for (var i=0; i<pattern.number_of_rows; i++)
-    {
-      row_indexes.unshift(i+1); // row 1 at bottom of page
-    }
-
-    return row_indexes;
+  return current_row_indexes.list();
 });
 
 UI.registerHelper('weaving_row', function(row) {
-    var pattern_id = Router.current().params._id;
 
-    return Weaving.find({ $and: [{pattern_id: pattern_id, row:row}]}, {sort: {"tablet": 1}}).fetch();
+  if (typeof current_weaving_cells !== "undefined")
+   // can happen if you just added a row
+    if (typeof current_weaving_cells.list()[row-1] !== "undefined")
+      return current_weaving_cells.list()[row-1].list();
 });
 
 //////////////////////////
@@ -42,15 +21,12 @@ UI.registerHelper('hole_indexes', function() {
 });
 
 UI.registerHelper('threading_hole', function(hole) {
-  var pattern_id = Router.current().params._id;
-
-    return Threading.find({ $and: [{pattern_id: pattern_id, hole:hole}]}, {sort: {"tablet": 1}}).fetch();
+  if (typeof current_threading_cells !== "undefined")
+      if (typeof current_threading_cells.list()[hole-1] !== "undefined")
+        return current_threading_cells.list()[hole-1].list(); 
 });
 
 UI.registerHelper('hole_label', function(hole) {
-  if (Session.equals("db_ready", false))
-        return;
-
     var pattern_id = Router.current().params._id;
 
     // holes are numbered 1, 2, 3, 4
@@ -73,44 +49,29 @@ UI.registerHelper('hole_label', function(hole) {
         return "selected";
   });
 
-  UI.registerHelper('cell_style', function() {
-    var cell_style = {}; 
+  UI.registerHelper('cell_style', function(row, tablet) {
+    var style = current_styles.list()[this.style-1];
+    if (typeof style === "undefined")
+          return;
 
-    var pattern_id = Router.current().params._id;
-    var style_number = this.style;
-    var pattern_style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: style_number}]});
+    // remember to update this if style defs change
+    // could use a clone but it's cleaner to control the properties directly
+    var cell_style = {
+      background_color: style.background_color,
+      backward_stroke: style.backward_stroke,
+      forward_stroke: style.forward_stroke,
+      line_color: style.line_color,
+      style: style.style
+    }
 
-    if (typeof pattern_style === "undefined")
-        return;
-      
-    cell_style.style = style_number;
-    cell_style._id = this._id;
+    if (typeof this.row !== "undefined")
+      cell_style.row =  this.row;
 
-    // background color
-    if (typeof pattern_style.background_color !== "undefined")
-      cell_style.background_color = pattern_style.background_color;
+    if (typeof this.tablet !== "undefined")
+      cell_style.tablet = this.tablet;
 
-    else
-      cell_style.background_color = "#FFFFFF";
-
-    // line color
-    if (typeof pattern_style.line_color !== "undefined")
-      cell_style.line_color = pattern_style.line_color;
-
-    else
-      cell_style.line_color = "#000000";
-
-    // is the background color dark?
-    if (pattern_style.is_dark)
-      cell_style.is_dark = "is_dark";
-
-    // forward stroke?
-    if (pattern_style.forward_stroke)
-      cell_style.forward_stroke = "forward_stroke";
-
-    // backward stroke?
-    if (pattern_style.backward_stroke)
-      cell_style.backward_stroke = "backward_stroke";
+    if (typeof this.hole !== "undefined")
+      cell_style.hole = this.hole;
 
     return cell_style;
   });

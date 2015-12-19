@@ -1,7 +1,7 @@
 <template name="view_pattern">
-  Ready: {{Template.subscriptionsReady}}
 {{#if Template.subscriptionsReady}}
 {{> pattern_as_text}}
+
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
 
@@ -30,7 +30,7 @@
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
 </div>
-
+  ready: {{Template.subscriptionsReady}}
 {{#if can_edit_pattern _id}}
 <input type="button" id="add_row_at_start" value="Add row at bottom">
 <input type="button" id="add_row_at_end" value="Add row at top"><br/>
@@ -62,11 +62,19 @@
 </template>
 
 <template name="pattern_row">
-<div class="row">{{> row_number}}<ul>{{#each weaving_row this}}
+<div class="row">{{> row_number}}<ul>
+{{#each weaving_row this}}
+{{#with cell_style this}}
+{{> pattern_cell}}
+{{/with}}
+{{/each}}
+<!--{{#each tablet_indexes}}
+Test{{test this}}
 {{#with cell_style}}
 {{> pattern_cell}}
 {{/with}}
-{{/each}}{{> remove_row}}</ul></div>
+{{/each}}-->
+{{> remove_row}}</ul></div>
 </template>
 
 <template name="remove_row">
@@ -81,7 +89,7 @@
 <div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}
 {{#with cell_style}}
 {{> pattern_cell}}
-{{/with}}
+{{/with}}-->
 {{/each}}</ul></div>
 </template>
 
@@ -102,7 +110,7 @@
 {{/if}}</template>
 
 <template name="style_cell">
-<li class="cell {{is_selected_style style}} {{forward_stroke}} {{backward_stroke}} {{is_dark}}" style="background-color: {{background_color}}"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
+<li class="cell {{is_selected_style style}} {{forward_stroke}} {{backward_stroke}}" style="background-color: {{background_color}}"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
 </template>
 
 <template name="orientation">
