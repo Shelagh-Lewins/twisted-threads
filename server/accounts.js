@@ -34,7 +34,7 @@ Meteor.startup(function () {
 
   //var weaving = new Object(); // todo define inside loop
   // Migrate weaving data to Patterns collection
-  Patterns.find().forEach(function(pattern){
+  /*Patterns.find().forEach(function(pattern){
     console.log("migrating weaving data for pattern " + pattern.name);
     //if (typeof pattern.weaving !== "object")
     //{
@@ -149,7 +149,14 @@ Meteor.startup(function () {
         }
         else
         {
-          styles[parseInt(style.style)-1] = style;
+          var new_style = {
+            background_color: style.background_color,
+            backward_stroke: style.backward_stroke,
+            forward_stroke: style.forward_stroke,
+            line_color: style.line_color,
+            style: style.style
+          };
+          styles[parseInt(style.style)-1] = new_style;
         }
         
       });
@@ -157,7 +164,7 @@ Meteor.startup(function () {
       //console.log("orientation " + JSON.stringify(orientation));
       Patterns.update({_id: pattern._id}, {$set: {styles: JSON.stringify(styles)}});
 
-  });
+  });*/
 
 
   Accounts.config({

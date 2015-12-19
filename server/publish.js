@@ -26,22 +26,6 @@ Meteor.publish('tags', function(){
 
 // trigger is there to force a resubscription when pattern ids or private have changed, otherwise Meteor is "smart" and doesn't run it.
 
-Meteor.publish('styles', function(pattern_id, trigger){
-  check(pattern_id, String);
-  check(trigger, Match.Optional(Number));
-
-  if(Patterns.find( {_id: pattern_id}, {
-    $or: [
-          { private: {$ne: true} },
-          { created_by: this.userId }
-        ]
-    }).count() != 0)
-    return Styles.find({ pattern_id: pattern_id });
-
-  else
-    return [];
-});
-
 Meteor.publish('recent_patterns', function(trigger){
   // return details of patterns the user has viewed / woven
   // check the pattern is viewable by this user

@@ -52,17 +52,22 @@ Meteor.my_functions = {
       pattern_obj.tags = [];
 
     // Styles
-    var styles = Styles.find({pattern_id: pattern_id}, {sort: {"style": 1}}).fetch();
+    //var styles = Styles.find({pattern_id: pattern_id}, {sort: {"style": 1}}).fetch();
     pattern_obj.styles = [];
 
-    styles.forEach(function(style) {
+    /*styles.forEach(function(style) {
       var obj = {};
       obj.background_color = style.background_color;
       obj.line_color = style.line_color;
       obj.forward_stroke = style.forward_stroke;
       obj.backward_stroke = style.backward_stroke;
       pattern_obj.styles.push(obj);
-    });
+    });*/
+
+    for (var i=0; i<current_styles.length; i++)
+    {
+      pattern_obj.styles[i] = current_styles[i];
+    }
 
     // Orientation of tablets
     pattern_obj.orientation = new Array(number_of_tablets);

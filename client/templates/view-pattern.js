@@ -8,7 +8,6 @@ Template.view_pattern.rendered = function() {
   Session.set("selected_style", 1);
 
   Meteor.my_functions.add_to_recent_patterns(Router.current().params._id);
-
   Meteor.my_functions.initialize_route();
 }
 
@@ -59,7 +58,9 @@ Template.view_pattern.helpers({
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
 
-    var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
+    var style = current_styles.list()[selected_style-1];
+
+    //var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
 
     if (typeof style === "undefined")
         return;
@@ -77,7 +78,8 @@ Template.view_pattern.helpers({
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
 
-    var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
+    //var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
+    var style = current_styles.list()[selected_style-1];
 
     if (typeof style === "undefined")
         return;
@@ -104,20 +106,15 @@ Template.orientation.helpers({
 
 Template.styles_palette.onRendered(function(){
   var pattern_id = Router.current().params._id;
-  this.subscribe('styles', pattern_id, {
-      onReady: function(){
-      Meteor.my_functions.initialize_line_color_picker();
-      Meteor.my_functions.initialize_background_color_picker();
+    Meteor.my_functions.initialize_line_color_picker();
+    Meteor.my_functions.initialize_background_color_picker();
 
-      // correctly position the Edit Style panel
-      var panel = $('#styles_palette .edit_style')[0];
+    // correctly position the Edit Style panel
+    var panel = $('#styles_palette .edit_style')[0];
 
-      var offset = $('#styles_palette').outerHeight(true);
-      panel.style.bottom = offset + "px";
-      Meteor.my_functions.resize_page();
-    }
-  });
-
+    var offset = $('#styles_palette').outerHeight(true);
+    panel.style.bottom = offset + "px";
+    Meteor.my_functions.resize_page();
 });
 
 Template.styles_palette.helpers({

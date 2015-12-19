@@ -277,7 +277,7 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized", "You can only remove patterns that you created");
 
     Patterns.remove(pattern_id);
-    Styles.remove({pattern_id: pattern_id});
+    //Styles.remove({pattern_id: pattern_id});
     Recent_Patterns.remove({pattern_id: pattern_id});
   },
   set_private: function (pattern_id, set_to_private) {

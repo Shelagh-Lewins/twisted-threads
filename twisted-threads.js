@@ -5,10 +5,10 @@ Patterns.allowTags(function (userId) { return true; });
 
 
 // TODO remove after migration
-Weaving = new Mongo.Collection('weaving');
+/*Weaving = new Mongo.Collection('weaving');
 Threading = new Mongo.Collection('threading');
 Orientation = new Mongo.Collection('orientation');
-Styles = new Mongo.Collection('styles');
+Styles = new Mongo.Collection('styles');*/
 
 // search patterns
 patternsIndex = new EasySearch.Index({
@@ -570,18 +570,6 @@ if (Meteor.isClient) {
     if (my_pattern_ids)
     {
       Meteor.subscribe('recent_patterns', Math.random());
-
-      if(Router.current())
-      {
-        Meteor.subscribe('user_info', Math.random());
-
-        if (Router.current().route.getName() == "pattern")
-        {
-          var pattern_id = Router.current().params._id;    
-
-          Meteor.subscribe('styles', pattern_id, Math.random());
-        }
-      }
     }
 
     // detect login / logout
