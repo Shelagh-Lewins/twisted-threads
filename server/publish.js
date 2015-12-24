@@ -26,7 +26,8 @@ Meteor.publish('tags', function(){
 
 // trigger is there to force a resubscription when pattern ids or private have changed, otherwise Meteor is "smart" and doesn't run it.
 
-Meteor.publish('recent_patterns', function(trigger){
+//Meteor.publish('recent_patterns', function(){
+  Meteor.publish('recent_patterns', function(trigger){
   // return details of patterns the user has viewed / woven
   // check the pattern is viewable by this user
   // trigger is there to force a resubscription when pattern ids or private have changed, otherwise Meteor is "smart" and doesn't run it.

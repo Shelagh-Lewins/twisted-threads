@@ -410,7 +410,7 @@ Meteor.methods({
     // If it's already in the collection, update the accessed_at time
     // Recent patterns are stored for each user separately
     check(pattern_id, String);
-    
+    //console.log("adding to recent patterns " +pattern_id)
     if (!Meteor.userId()) // user is not signed in
       return;
 
@@ -419,6 +419,7 @@ Meteor.methods({
 
     if (Recent_Patterns.find({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
     {
+      //console.log("adding to recent patterns " +pattern_id);
       // the pattern is not in the list, so add it
       Recent_Patterns.insert({
         pattern_id: pattern_id,
@@ -442,12 +443,12 @@ Meteor.methods({
   maintain_recent_patterns: function() {
     // remove any patterns that no longer exist or are now hidden from the user
 
-    // the patterns the user has permission to see
+    // Publish only returns the patterns the user has permission to see
     var my_patterns = Patterns.find({
-      $or: [
+      /*$or: [
         { private: {$ne: true} },
         { created_by: Meteor.userId() }
-      ]
+      ]*/
     }).map(function(pattern) {return pattern._id});
 
     Recent_Patterns.remove({pattern_id: {$nin:my_patterns}});

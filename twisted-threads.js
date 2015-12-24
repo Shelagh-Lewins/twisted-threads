@@ -11,6 +11,18 @@ patternsIndex = new EasySearch.Index({
     limit: 6
   },
   engine: new EasySearch.Minimongo() // search only on the client, so only published documents are returned
+  /*engine: new EasySearch.MongoDB({
+    selector: function (searchObject, options, aggregation) {
+      let selector = this.defaultConfiguration().selector(searchObject, options, aggregation);
+
+      selector.createdBy = options.userId;
+      console.log("searchObject " + Object.keys(searchObject));
+      console.log("aggregation " + Object.keys(aggregation));
+      console.log("id " + options.userId);
+
+      return selector;
+    }
+  })*/
 });
 
 usersIndex = new EasySearch.Index({
@@ -78,6 +90,8 @@ if (Meteor.isClient) {
       Session.set('window_width', $(window).width());
       Session.set('window_height', $(window).height());
     });
+
+    Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
   });
 
   //////////////////////////////
@@ -553,7 +567,7 @@ if (Meteor.isClient) {
     
     // The publish functions don't automatically update queries to other collections. So the client resubscribes to pattern-related collections whenever the list of patterns that the user can see changes.
     // my_pattern_ids detects that Patterns has changed. Math.random triggers the re-subscription, otherwise Meteor refuses to run it.
-    var my_pattern_ids = Patterns.find({
+    /*var my_pattern_ids = Patterns.find({
       $or: [
         { private: {$ne: true} },
         { created_by: this.userId }
@@ -562,8 +576,18 @@ if (Meteor.isClient) {
 
     if (my_pattern_ids)
     {
+      console.log("resubscribe");
+      Meteor.subscribe('recent_patterns', Math.random());
+    }*/
+    //console.log("autorun");
+    var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
+    if (my_pattern_ids)
+    {
+      //console.log("Patterns autorun");
+      //Meteor.subscribe('recent_patterns');
       Meteor.subscribe('recent_patterns', Math.random());
     }
+    
 
     // detect login / logout
     var currentUser=Meteor.user();
