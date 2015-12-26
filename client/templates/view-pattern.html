@@ -30,10 +30,11 @@
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
 </div>
-  ready: {{Template.subscriptionsReady}}
 {{#if can_edit_pattern _id}}
+<input type="button" id="undo" value="Undo" disabled="{{undo_disabled}}">
+<input type="button" id="redo" value="Redo" disabled="{{redo_disabled}}">
 <input type="button" id="add_row_at_start" value="Add row at bottom">
-<input type="button" id="add_row_at_end" value="Add row at top"><br/>
+<input type="button" id="add_row_at_end" value="Add row at top">
 <input type="button" id="add_tablet_at_start" value="Add tablet at left">
 <input type="button" id="add_tablet_at_end" value="Add tablet at right"><br/>{{/if}}
 <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
@@ -68,12 +69,6 @@
 {{> pattern_cell}}
 {{/with}}
 {{/each}}
-<!--{{#each tablet_indexes}}
-Test{{test this}}
-{{#with cell_style}}
-{{> pattern_cell}}
-{{/with}}
-{{/each}}-->
 {{> remove_row}}</ul></div>
 </template>
 

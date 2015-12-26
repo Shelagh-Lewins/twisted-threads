@@ -55,7 +55,6 @@ Router.route('/pattern/:_id/:mode?', {
 
     else
     {
-      //console.log("router says render view_pattern");
       this.render('view_pattern');
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         this.render('styles_palette', {to: 'footer'});

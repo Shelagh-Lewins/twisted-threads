@@ -357,6 +357,23 @@ Meteor.methods({
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { styles: text}});
   },
+  restore_pattern: function(data)
+  {
+    check(data, Object);
+
+    var pattern = Patterns.findOne({_id: data._id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only restore a pattern you created");
+
+    // reconstruct the pattern according to the data, e.g. for undo
+    Meteor.call('save_weaving_as_text', data._id, JSON.stringify(data.weaving), data.number_of_rows, data.number_of_tablets);
+    Meteor.call('save_threading_as_text', data._id, JSON.stringify(data.threading));
+    Meteor.call('save_orientation_as_text', data._id, JSON.stringify(data.orientation));
+    Meteor.call('save_styles_as_text', data._id, JSON.stringify(data.styles)); 
+    return
+  },
   ///////////////////////////////
   // Edit styles
   set_pattern_cell_style: function(pattern_id, row, tablet, new_style)

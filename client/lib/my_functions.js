@@ -637,6 +637,87 @@ Meteor.my_functions = {
       How do you weave from double faced and 3/1 broken twill?
     */
   },
+  store_pattern: function(pattern_id)
+  {
+    var pattern = Patterns.findOne({_id: pattern_id});
+
+    var data = {};
+    data._id = pattern_id;
+    data.number_of_tablets = current_weaving_cells[0].length;
+    data.number_of_rows = current_weaving_cells.length;
+
+    data.weaving = Meteor.my_functions.get_weaving_as_text(pattern_id);
+    data.threading = Meteor.my_functions.get_threading_as_text(pattern_id);
+    data.orientation = Meteor.my_functions.get_orientation_as_text(pattern_id);
+    data.styles = Meteor.my_functions.get_styles_as_text(pattern_id);
+
+    // remove any stored states after this point
+    var splice_position = Session.get('undo_stack_position') + 1;
+    var number_to_splice = stored_patterns.length - splice_position;
+    stored_patterns.splice(splice_position, number_to_splice);
+
+    stored_patterns.push(data); // add the new stored pattern to the stack
+
+    if (stored_patterns.length > Meteor.my_params.undo_stack_length)
+    {
+      stored_patterns.splice(0, stored_patterns.length - Meteor.my_params.undo_stack_length); // 'forget' stored patterns if the stack is too long
+      // the stack length has not changed, so don't update the position
+    }
+    else
+    {
+      // stack is longer so move position up by 1
+      var position = parseInt(Session.get('undo_stack_position'));
+      Session.set('undo_stack_position', position + 1);
+    }
+  },
+  restore_pattern: function(index, pattern_id)
+  {
+    // restore the current pattern from the index position in the stored_patterns stack
+    if (index < 0)
+      return;
+
+    if (index >= (Meteor.my_params.undo_stack_length))
+      return;
+
+    if (index >= stored_patterns.length)
+      return;
+
+    var data = stored_patterns[index];
+
+    if (data._id != pattern_id)
+      return;
+
+    Meteor.call('restore_pattern', data, function(){
+      Meteor.my_functions.build_pattern_display_data(pattern_id);
+      Meteor.my_functions.initialize_background_color_picker();
+      Meteor.my_functions.initialize_line_color_picker()
+    });
+  },
+  undo: function(pattern_id)
+  {
+    
+    var position = parseInt(Session.get('undo_stack_position')) - 1;
+    
+    // nothing to undo
+    if (position < 0)
+      return;
+
+    Meteor.my_functions.restore_pattern(position, pattern_id);
+
+    // update stack position
+    Session.set('undo_stack_position', position);
+  },
+  redo: function(pattern_id)
+  {
+    var position = parseInt(Session.get('undo_stack_position'))+1;
+
+    if (position >= stored_patterns.length)
+      return;
+
+    Meteor.my_functions.restore_pattern(position, pattern_id);
+    // update stack position
+    Session.set('undo_stack_position', (position));
+  },
   //////////////////////////////////
   // Recent Patterns
   add_to_recent_patterns: function(pattern_id)
@@ -782,6 +863,8 @@ Meteor.my_functions = {
     }
 
     // put the weaving data into the array of arrays
+    //console.log("raw weaving data " + pattern.weaving);
+    //console.log("num tabs " + number_of_tablets);
     var weaving_data = JSON.parse(pattern.weaving);
 
     for (var i=0; i<number_of_rows; i++)
@@ -1047,7 +1130,7 @@ Meteor.my_functions = {
     Meteor.my_functions.save_threading_as_text(pattern_id);
     Meteor.my_functions.save_orientation_as_text(pattern_id);
   },
-  save_weaving_as_text: function(pattern_id)
+  get_weaving_as_text: function(pattern_id)
   {
     var number_of_rows = current_weaving_cells.length;
     var number_of_tablets = current_weaving_cells[0].length;
@@ -1065,9 +1148,31 @@ Meteor.my_functions = {
       }
     }
 
+    return weaving_array;
+  },
+  //save_weaving_as_text: function(pattern_id)
+  save_weaving_as_text: function(pattern_id)
+  {
+    /*var number_of_rows = current_weaving_cells.length;
+    var number_of_tablets = current_weaving_cells[0].length;
+
+    // turn the reactive array of objects into simple nested arrays of style values
+    var weaving_array = new Array(number_of_rows);
+
+    for (var i=0; i<number_of_rows; i++)
+    {
+      weaving_array[i] = new Array(number_of_tablets);
+
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        weaving_array[i][j] = current_weaving_cells[i][j].style;
+      }
+    }*/
+    var weaving_array = Meteor.my_functions.get_weaving_as_text(pattern_id);
+
     Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets);
   },
-  save_threading_as_text: function(pattern_id)
+  get_threading_as_text: function(pattern_id)
   {
     var number_of_tablets = current_threading_cells[0].length;
 
@@ -1084,9 +1189,14 @@ Meteor.my_functions = {
       }
     }
 
+    return threading_array;
+  },
+  save_threading_as_text: function(pattern_id)
+  {
+    var threading_array = Meteor.my_functions.get_threading_as_text(pattern_id);
     Meteor.call('save_threading_as_text', pattern_id, JSON.stringify(threading_array));
   },
-  save_orientation_as_text: function(pattern_id)
+  get_orientation_as_text: function(pattern_id)
   {
     var number_of_tablets = current_orientation.length;
 
@@ -1097,15 +1207,28 @@ Meteor.my_functions = {
       orientation_array[i] = current_orientation[i].orientation;
     }
 
+    return orientation_array;
+  },
+  save_orientation_as_text: function(pattern_id)
+  {
+    var orientation_array = Meteor.my_functions.get_orientation_as_text(pattern_id);
+
     Meteor.call('save_orientation_as_text', pattern_id, JSON.stringify(orientation_array));   
   },
-  save_styles_as_text: function(pattern_id)
+  get_styles_as_text: function(pattern_id)
   {
     var styles_array = [];
     for (var i=0; i<current_styles.length; i++)
     {
-      styles_array[i] = current_styles[i];
+      styles_array[i] = jQuery.extend({}, current_styles[i]);
     }
+
+    return styles_array;
+  },
+  save_styles_as_text: function(pattern_id)
+  {
+    var styles_array = Meteor.my_functions.get_styles_as_text(pattern_id);
+
     Meteor.call('save_styles_as_text', pattern_id, JSON.stringify(styles_array)); 
   },
   ///////////////////////////////
@@ -1166,6 +1289,8 @@ Meteor.my_functions = {
           // update database
           Meteor.my_functions.save_styles_as_text(pattern_id);
 
+          // store style for undo stack
+          Meteor.my_functions.store_pattern(pattern_id);
         },
         palette: [
             ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)",
@@ -1233,6 +1358,9 @@ Meteor.my_functions = {
 
         // update database
         Meteor.my_functions.save_styles_as_text(pattern_id);
+
+        // store style for undo stack
+        Meteor.my_functions.store_pattern(pattern_id);      
       },
       palette: [
           ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)",

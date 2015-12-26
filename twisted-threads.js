@@ -78,7 +78,11 @@ if (Meteor.isClient) {
   });
   
   Session.set('window_width', $(window).width());
-  Session.set('window_height', $(window).height()); 
+  Session.set('window_height', $(window).height());
+
+  // general parameters
+  Meteor.my_params = {}; // namespace for parameters
+  Meteor.my_params.undo_stack_length = 10;
 
   Meteor.startup(function () {
 

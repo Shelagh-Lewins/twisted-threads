@@ -14,6 +14,12 @@ Template.view_pattern.rendered = function() {
 Template.view_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
   Meteor.my_functions.build_pattern_display_data(pattern_id);
+  
+  // intialise the 'undo' stack
+  // ideally the undo stack would be maintained over server refreshes but I'm not sure a session var could hold multiple patterns, and nothing else except the database is persistent. Also it doesn't need to be reactive so a session var might be a performance hit.
+  stored_patterns = [];
+  Session.set('undo_stack_position', -1);
+  Meteor.my_functions.store_pattern(pattern_id);
 });
 
 Template.pattern_not_found.helpers({
@@ -46,6 +52,18 @@ Template.view_pattern.helpers({
     if (pattern.number_of_tablets > 1)
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         return true;
+  },
+  undo_disabled: function() {
+    var position = parseInt(Session.get('undo_stack_position')) - 1;
+
+    if (position < 0)
+      return "disabled";
+  },
+  redo_disabled: function() {
+    var position = parseInt(Session.get('undo_stack_position'))+1;
+
+    if (position >= stored_patterns.length)
+      return "disabled";
   },
   // Edit style controls
   forward_stroke_on: function() {
@@ -181,6 +199,14 @@ Template.view_pattern.events({
   "click .toggle_private": function () {
     Meteor.call("set_private", this._id, !this.private);
   },
+  'click #undo': function() {
+    var pattern_id = Router.current().params._id;
+    Meteor.my_functions.undo(pattern_id);
+  },
+  'click #redo': function() {
+    var pattern_id = Router.current().params._id;
+    Meteor.my_functions.redo(pattern_id);
+  },
   // add rows
   'click #add_row_at_start': function () {
     if (Meteor.my_functions.accept_click())
@@ -191,6 +217,7 @@ Template.view_pattern.events({
         return;
       
       Meteor.my_functions.add_weaving_row(pattern_id, 1, Session.get("selected_style"));
+      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click #add_row_at_end': function () {
@@ -202,6 +229,7 @@ Template.view_pattern.events({
         return;
 
       Meteor.my_functions.add_weaving_row(pattern_id, -1, Session.get("selected_style"));
+      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .pattern .remove_row': function () {
@@ -213,6 +241,7 @@ Template.view_pattern.events({
         return;
 
       Meteor.my_functions.remove_weaving_row(pattern_id, parseInt(this));
+      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click #add_tablet_at_start': function () {
@@ -224,6 +253,7 @@ Template.view_pattern.events({
         return;
 
       Meteor.my_functions.add_tablet(pattern_id, 1, Session.get("selected_style"));
+      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click #add_tablet_at_end': function () {
@@ -235,6 +265,7 @@ Template.view_pattern.events({
         return;
 
       Meteor.my_functions.add_tablet(pattern_id, -1, Session.get("selected_style"));
+      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .pattern .remove_tablet': function () {
@@ -243,6 +274,7 @@ Template.view_pattern.events({
       var pattern_id = Router.current().params._id;
 
       Meteor.my_functions.remove_tablet(pattern_id, parseInt(this));
+      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .pattern li.cell': function(event, template){
@@ -257,8 +289,9 @@ Template.view_pattern.events({
       var obj = current_weaving_cells[this.row-1][this.tablet-1];
       obj.style = new_style;
       current_weaving_cells[this.row-1].splice(this.tablet-1, 1, obj);
-
+      
       Meteor.my_functions.save_weaving_as_text(pattern_id);
+      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .tablets li.cell': function(event, template) {
@@ -275,6 +308,7 @@ Template.view_pattern.events({
       current_threading_cells[this.hole-1].splice(this.tablet-1, 1, obj);
 
       Meteor.my_functions.save_threading_as_text(pattern_id);
+      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .tablets .row.orientation li': function(event, template)
@@ -295,6 +329,7 @@ Template.view_pattern.events({
       current_orientation.splice(this.tablet-1, 1, obj);
 
     Meteor.my_functions.save_orientation_as_text(pattern_id);
+    Meteor.my_functions.store_pattern(pattern_id);
   }
 });
 
@@ -340,6 +375,7 @@ Template.styles_palette.events({
 
     // update database
     Meteor.my_functions.save_styles_as_text(pattern_id);
+    Meteor.my_functions.store_pattern(pattern_id);
   },
   'click .edit_style .backward_stroke': function () {
     var selected_style = Session.get("selected_style");
@@ -363,5 +399,6 @@ Template.styles_palette.events({
 
     // update database
     Meteor.my_functions.save_styles_as_text(pattern_id);
+    Meteor.my_functions.store_pattern(pattern_id);
   }
  });
