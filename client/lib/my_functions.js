@@ -1428,6 +1428,16 @@ Meteor.my_functions = {
     $('#header').css({
         'left': $("#width").scrollLeft() // Always at left edge of window
     });
+
+    // keep the toolbar in the viewport
+    if ($("#toolbar").length > 0)
+    {
+      var toolbar_offset = $("#toolbar").position().top;
+      $("#toolbar .inner_tube").css("top", Math.max(-1 * toolbar_offset, 0));
+
+      var left = $("#width").scrollLeft();
+      $("#toolbar .inner_tube").css("left", left);
+    }    
   },
   //////////////////////////////////////////////
   // Weave View

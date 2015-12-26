@@ -81,6 +81,41 @@
   display: inline;
 }
 
+/* *** Toolbar *** */
+#toolbar {
+  position: relative;
+  height: 64px; /* reserve space for buttons when window not scrolled */
+  z-index: 3;
+}
+
+#toolbar .inner_tube {
+  position: absolute;
+  padding: 8px;
+  background-color: #CCCCCC;
+  -webkit-box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.38);
+  -moz-box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.38);
+  box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.38);
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  z-index: 3;
+}
+
+#toolbar button {
+  float: left;
+  padding: 4px;
+  background-color: #EEEEEE;
+  border: 1px solid #424A6C;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  margin-right: 8px;
+}
+
+#toolbar button:last-child {
+  margin-right: 0;
+}
+
 /* *** Styles *** */
 #styles_palette {
   position: absolute;

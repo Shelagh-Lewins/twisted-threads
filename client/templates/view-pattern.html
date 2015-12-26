@@ -31,13 +31,16 @@
 {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
 </div>
 {{#if can_edit_pattern _id}}
-<input type="button" id="undo" value="Undo" disabled="{{undo_disabled}}">
-<input type="button" id="redo" value="Redo" disabled="{{redo_disabled}}">
-<input type="button" id="add_row_at_start" value="Add row at bottom">
-<input type="button" id="add_row_at_end" value="Add row at top">
-<input type="button" id="add_tablet_at_start" value="Add tablet at left">
-<input type="button" id="add_tablet_at_end" value="Add tablet at right"><br/>{{/if}}
-<div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
+<div id="toolbar" ><div class="inner_tube">
+<button id="undo" disabled="{{undo_disabled}}" title="Undo"><img src="{{#if equals undo_disabled "disabled"}}../images/undo_disabled.svg{{else}}../images/undo.svg{{/if}}" width="32" height="32" ></button>
+<button id="redo" disabled="{{redo_disabled}}" title="Redo"><img src="{{#if equals redo_disabled "disabled"}}../images/redo_disabled.svg{{else}}../images/redo.svg{{/if}}" width="32" height="32" ></button>
+<button id="add_row_at_start" title="Add row at bottom"><img src="../images/row_bottom.svg" width="32" height="32" ></button>
+<button id="add_row_at_end" title="Add row at top"><img src="../images/row_top.svg" width="32" height="32" ></button>
+<button id="add_tablet_at_start" title="Add tablet at left"><img src="../images/tablet_left.svg" width="32" height="32" ></button>
+<button id="add_tablet_at_end" title="Add tablet at right"><img src="../images/tablet_right.svg" width="32" height="32" ></button>
+</div></div>{{/if}}
+<div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
+{{> column_numbers}}
 {{#each row_indexes}}
 {{> pattern_row}}
 {{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
