@@ -20,6 +20,7 @@ Template.view_pattern.onCreated(function(){
   stored_patterns = [];
   Session.set('undo_stack_position', -1);
   Meteor.my_functions.store_pattern(pattern_id);
+  Session.set('row_indexes_forcer', true);
 });
 
 Template.pattern_not_found.helpers({
@@ -197,15 +198,21 @@ Template.styles_palette.helpers({
 Template.view_pattern.events({
   // Make pattern private / public
   "click .toggle_private": function () {
-    Meteor.call("set_private", this._id, !this.private);
+      Meteor.call("set_private", this._id, !this.private);
   },
   'click #undo': function() {
-    var pattern_id = Router.current().params._id;
-    Meteor.my_functions.undo(pattern_id);
+    if (Meteor.my_functions.accept_click())
+    {
+      var pattern_id = Router.current().params._id;
+      Meteor.my_functions.undo(pattern_id);
+    }
   },
   'click #redo': function() {
-    var pattern_id = Router.current().params._id;
-    Meteor.my_functions.redo(pattern_id);
+    if (Meteor.my_functions.accept_click())
+    {
+      var pattern_id = Router.current().params._id;
+      Meteor.my_functions.redo(pattern_id);
+    }
   },
   // add rows
   'click #add_row_at_start': function () {
@@ -313,23 +320,26 @@ Template.view_pattern.events({
   },
   'click .tablets .row.orientation li': function(event, template)
   {
-    var pattern_id = Router.current().params._id;
-
-    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
-      return;
-
-    var new_orientation = "S";
-    if (this.orientation == "S")
+    if (Meteor.my_functions.accept_click())
     {
-      new_orientation = "Z";
+      var pattern_id = Router.current().params._id;
+
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+
+      var new_orientation = "S";
+      if (this.orientation == "S")
+      {
+        new_orientation = "Z";
+      }
+
+      var obj = current_orientation[this.tablet-1];
+        obj.orientation = new_orientation;
+        current_orientation.splice(this.tablet-1, 1, obj);
+
+      Meteor.my_functions.save_orientation_as_text(pattern_id);
+      Meteor.my_functions.store_pattern(pattern_id);
     }
-
-    var obj = current_orientation[this.tablet-1];
-      obj.orientation = new_orientation;
-      current_orientation.splice(this.tablet-1, 1, obj);
-
-    Meteor.my_functions.save_orientation_as_text(pattern_id);
-    Meteor.my_functions.store_pattern(pattern_id);
   }
 });
 

@@ -10,7 +10,7 @@ Meteor.my_functions = {
 
       setTimeout(function(){
         Session.set('click_latch', false);
-      }, 250);
+      }, 300);
     }
     return accept_click;
   },
@@ -830,19 +830,27 @@ Meteor.my_functions = {
 
     //////////////////////////////
     // tablet numbers (tablet_indexes)
-    current_tablet_indexes = new ReactiveArray(new Array(number_of_tablets));
+    var indexes = new Array(number_of_tablets);
     for (var i=0; i<number_of_tablets; i++)
     {
-      current_tablet_indexes[i] = i+1;
+      indexes[i] = i+1; // row 1 at bottom
     }
+    current_tablet_indexes = new ReactiveArray(indexes);
 
     //////////////////////////////
     // row numbers (row_indexes)
-    current_row_indexes = new ReactiveArray(new Array(number_of_rows));
+    // If a row is removed, the reactive array doesn't always notice, leading to an empty row on the pattern. Manually removing the index here forces the row helper to refresh
+    // the issue only appears to apply to rows, not tablets
+    if (typeof current_row_indexes !== "undefined")
+      if (current_row_indexes.length > number_of_rows)
+        current_row_indexes.splice(number_of_rows, current_row_indexes.length - number_of_rows);
+
+    var indexes = new Array(number_of_rows);
     for (var i=0; i<number_of_rows; i++)
     {
-      current_row_indexes[i] = number_of_rows-i; // row 1 at bottom
+      indexes[i] = number_of_rows-i; // row 1 at bottom
     }
+    current_row_indexes = new ReactiveArray(indexes);
 
     //////////////////////////////
     // build the weaving chart data
@@ -1139,7 +1147,7 @@ Meteor.my_functions = {
     var weaving_array = new Array(number_of_rows);
 
     for (var i=0; i<number_of_rows; i++)
-    {
+    {;
       weaving_array[i] = new Array(number_of_tablets);
 
       for (var j=0; j<number_of_tablets; j++)
@@ -1153,21 +1161,6 @@ Meteor.my_functions = {
   //save_weaving_as_text: function(pattern_id)
   save_weaving_as_text: function(pattern_id)
   {
-    /*var number_of_rows = current_weaving_cells.length;
-    var number_of_tablets = current_weaving_cells[0].length;
-
-    // turn the reactive array of objects into simple nested arrays of style values
-    var weaving_array = new Array(number_of_rows);
-
-    for (var i=0; i<number_of_rows; i++)
-    {
-      weaving_array[i] = new Array(number_of_tablets);
-
-      for (var j=0; j<number_of_tablets; j++)
-      {
-        weaving_array[i][j] = current_weaving_cells[i][j].style;
-      }
-    }*/
     var weaving_array = Meteor.my_functions.get_weaving_as_text(pattern_id);
 
     Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets);
