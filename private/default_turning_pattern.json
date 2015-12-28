@@ -2,7 +2,7 @@
   "version": "1.1",
   "name": "New pattern",
   "description": "A pattern woven by forward and backward turning of the tablets.",
-  "weaving_notes": "White background = turn tablet forwards\nGrey background = turn tablet backwards\nLine colour = visible pattern thread",
+  "weaving_notes": "White background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread",
   "threading_notes": "Cell colour = thread colour for that hole",
   "tags": [],
   "styles": [
@@ -197,69 +197,6 @@
       "line_color": "#1c4587",
       "forward_stroke": true,
       "backward_stroke": false
-    }
-  ],
-  "special_styles": [
-    {
-      "background_color": "#FFFFFF",
-      "image": "/images/special_forward_2.svg"
-    },
-    {
-      "background_color": "#FFFFFF",
-      "image": "/images/special_backward_2.svg"
-    },
-    {
-      "background_color": "#FFFFFF",
-      "image": "/images/special_forward_3.svg"
-    },
-    {
-      "background_color": "#FFFFFF",
-      "image": "/images/special_backward_3.svg"
-    },
-    {
-      "background_color": "#FFFFFF",
-      "image": "/images/special_forward_4.svg"
-    },
-    {
-      "background_color": "#FFFFFF",
-      "image": "/images/special_backward_4.svg"
-    },
-    {
-      "background_color": "#FFFFFF",
-      "image": "/images/special_empty.svg"
-    },
-    {
-      "placeholder": true
-    },
-    {
-      "background_color": "#BBBBBB",
-      "image": "/images/special_backward_2.svg"
-    },
-    {
-      "background_color": "#BBBBBB",
-      "image": "/images/special_forward_2.svg"
-    },
-    {
-      "background_color": "#BBBBBB",
-      "image": "/images/special_backward_3.svg"
-    },
-    {
-      "background_color": "#BBBBBB",
-      "image": "/images/special_forward_3.svg"
-    },
-    {
-      "background_color": "#BBBBBB",
-      "image": "/images/special_backward_4.svg"
-    },
-    {
-      "background_color": "#BBBBBB",
-      "image": "/images/special_forward_4.svg"
-    },
-    {
-      "placeholder": true
-    },
-    {
-      "placeholder": true
     }
   ],
   "orientation": ["S","S","S","S","S","S","S","S"],

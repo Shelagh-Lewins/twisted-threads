@@ -56,6 +56,10 @@ Router.route('/pattern/:_id/:mode?', {
     else
     {
       this.render('view_pattern');
+      //console.log("router changes");
+      //Meteor.my_functions.initialize_view_pattern(pattern_id);
+      Meteor.my_functions.add_to_recent_patterns(pattern_id);
+
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         this.render('styles_palette', {to: 'footer'});
 

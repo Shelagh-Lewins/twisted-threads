@@ -45,8 +45,22 @@ UI.registerHelper('hole_label', function(hole) {
   });
 
   UI.registerHelper('is_selected_style', function() {
-    if (Session.equals('selected_style', this.style))
+    var special = false;
+
+    if (typeof this.style === "string")
+      if (this.style.charAt(0) == "S")
+        special = true;
+
+    if (special)
+    {
+      if (Session.equals('selected_special_style', this.style))
         return "selected";
+    }
+    else
+    {
+      if (Session.equals('selected_style', this.style))
+        return "selected";
+    }
   });
 
   UI.registerHelper('cell_style', function(row, tablet) {

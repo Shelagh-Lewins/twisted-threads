@@ -134,11 +134,11 @@ default_special_styles = [
 },
 {
   "background_color": "#FFFFFF",
-  "image": ""
+  "image": "/images/special_backward_strike.svg"
 },
 {
   "background_color": "#FFFFFF",
-  "image": "g"
+  "image": "/images/special_forward_strike.svg"
 }
 ];
 

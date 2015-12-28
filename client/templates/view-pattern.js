@@ -1,35 +1,13 @@
 Template.view_pattern.rendered = function() {
   $('body').attr("class", "view_pattern");
-  if (Meteor.my_functions.can_edit_pattern(Router.current().params._id))
-    $('body').addClass('editable');
-
-  Session.set('edit_style', false);
-
-  if (typeof Session.get('styles_palette') === "undefined")
-    Session.set('styles_palette', "styles_1");
-
-  if (Session.equals('styles_palette', "special"))
-    Session.set('show_special_styles', true);
-
-  else
-    Session.set('show_special_styles', false);
-
-  Session.set("selected_style", 1);
-
-  Meteor.my_functions.add_to_recent_patterns(Router.current().params._id);
+  var pattern_id = Router.current().params._id;
+  Meteor.my_functions.view_pattern_render(pattern_id);
   Meteor.my_functions.initialize_route();
 }
 
 Template.view_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
-  Meteor.my_functions.build_pattern_display_data(pattern_id);
-  
-  // intialise the 'undo' stack
-  // ideally the undo stack would be maintained over server refreshes but I'm not sure a session var could hold multiple patterns, and nothing else except the database is persistent. Also it doesn't need to be reactive so a session var might be a performance hit.
-  stored_patterns = [];
-  Session.set('undo_stack_position', -1);
-  Meteor.my_functions.store_pattern(pattern_id);
-  Session.set('row_indexes_forcer', true);
+  Meteor.my_functions.view_pattern_created(pattern_id);
 });
 
 Template.pattern_not_found.helpers({
@@ -279,8 +257,10 @@ Template.view_pattern.events({
 
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
+
+      var style = Meteor.my_functions.get_selected_style();
       
-      Meteor.my_functions.add_weaving_row(pattern_id, 1, Session.get("selected_style"));
+      Meteor.my_functions.add_weaving_row(pattern_id, 1, style);
       Meteor.my_functions.store_pattern(pattern_id);
     }
   },
@@ -292,7 +272,9 @@ Template.view_pattern.events({
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
 
-      Meteor.my_functions.add_weaving_row(pattern_id, -1, Session.get("selected_style"));
+      var style = Meteor.my_functions.get_selected_style();
+
+      Meteor.my_functions.add_weaving_row(pattern_id, -1, style);
       Meteor.my_functions.store_pattern(pattern_id);
     }
   },
@@ -316,7 +298,9 @@ Template.view_pattern.events({
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
 
-      Meteor.my_functions.add_tablet(pattern_id, 1, Session.get("selected_style"));
+      var style = Meteor.my_functions.get_selected_style();
+
+      Meteor.my_functions.add_tablet(pattern_id, 1, style);
       Meteor.my_functions.store_pattern(pattern_id);
     }
   },
@@ -328,7 +312,9 @@ Template.view_pattern.events({
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
 
-      Meteor.my_functions.add_tablet(pattern_id, -1, Session.get("selected_style"));
+      var style = Meteor.my_functions.get_selected_style();
+
+      Meteor.my_functions.add_tablet(pattern_id, -1, style);
       Meteor.my_functions.store_pattern(pattern_id);
     }
   },
@@ -344,7 +330,8 @@ Template.view_pattern.events({
   'click .pattern li.cell': function(event, template){
     if (Meteor.my_functions.accept_click())
     {
-      var new_style = Session.get("selected_style");
+      var new_style = Meteor.my_functions.get_selected_style();
+
       var pattern_id = Router.current().params._id;
 
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
@@ -401,9 +388,13 @@ Template.view_pattern.events({
 });
 
 Template.styles_palette.events({
- 'click .styles .cell': function () {
+ 'click .styles .row.style .cell': function () {
     Session.set("selected_style", this.style);
     Meteor.my_functions.update_color_pickers();
+  },
+  'click .styles .row.special .cell': function () {
+    Session.set("selected_special_style", this.style);
+    //Meteor.my_functions.update_color_pickers();
   },
   'click #edit_style_button': function() {
     if (Session.equals('edit_style', true))

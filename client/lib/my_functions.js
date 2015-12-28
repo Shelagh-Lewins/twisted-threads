@@ -164,6 +164,7 @@ Meteor.my_functions = {
       else
       {
         Router.go('pattern', { _id: result });
+        Meteor.my_functions.refresh_view_pattern(result);
       }
     });
   },
@@ -251,6 +252,7 @@ Meteor.my_functions = {
       {
         // automatically view new pattern
         Router.go('pattern', { _id: result });
+        Meteor.my_functions.refresh_view_pattern(result);
       }
     });
   },
@@ -825,6 +827,14 @@ Meteor.my_functions = {
 
     return editable;
   },
+  get_selected_style: function() {
+    // which style to use depends on the selected page in the styles palette
+    if (Session.equals('styles_palette', "special"))
+      return Session.get("selected_special_style");
+
+    else
+      return Session.get("selected_style");
+  },
   build_pattern_display_data:  function(pattern_id)
   {
     // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
@@ -838,6 +848,10 @@ Meteor.my_functions = {
 
     //////////////////////////////
     // tablet numbers (tablet_indexes)
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_tablet_indexes !== "undefined")
+      current_tablet_indexes.clear();
+
     var indexes = new Array(number_of_tablets);
     for (var i=0; i<number_of_tablets; i++)
     {
@@ -992,11 +1006,7 @@ Meteor.my_functions = {
     var special_styles_array = new Array(Meteor.my_params.special_styles_number);
     for (var i=0; i<Meteor.my_params.special_styles_number; i++)
     {
-      if (typeof special_styles_data[i] === "undefined")
-        special_styles_array[i] = default_special_styles[i];
-
-      // using the defaults here allows the 3 blank styles to be filled in later
-      else if (special_styles_data[i].placeholder = true)
+      if ((typeof special_styles_data[i] === "undefined") || (special_styles_data[i] == null))
         special_styles_array[i] = default_special_styles[i];
 
       else 
@@ -1455,6 +1465,39 @@ Meteor.my_functions = {
     $('#width').scrollLeft(0);
     $('#width').scrollTop(0);
   },
+  //////////////////////////////////
+  // set up and draw the view pattern. This must be refreshed if the user switches pattern without switching view: e.g. using copy, import
+  view_pattern_created: function(pattern_id) {
+    Meteor.my_functions.build_pattern_display_data(pattern_id);
+  
+    // intialise the 'undo' stack
+    // ideally the undo stack would be maintained over server refreshes but I'm not sure a session var could hold multiple patterns, and nothing else except the database is persistent. Also it doesn't need to be reactive so a session var might be a performance hit.
+    stored_patterns = [];
+    Session.set('undo_stack_position', -1);
+    Meteor.my_functions.store_pattern(pattern_id);
+  },
+  view_pattern_render: function(pattern_id) {
+    if (Meteor.my_functions.can_edit_pattern(pattern_id))
+    $('body').addClass('editable');
+
+    Session.set('edit_style', false);
+
+    if (typeof Session.get('styles_palette') === "undefined")
+      Session.set('styles_palette', "styles_1");
+
+    if (Session.equals('styles_palette', "special"))
+      Session.set('show_special_styles', true);
+
+    else
+      Session.set('show_special_styles', false);
+
+    Session.set("selected_style", 1);
+    Session.set("selected_special_style", "S1");
+  },
+  refresh_view_pattern: function(pattern_id) {
+    Meteor.my_functions.view_pattern_created(pattern_id);
+    Meteor.my_functions.view_pattern_render(pattern_id);
+  },
   resize_page: function() {
     // set height of '#width' to fill viewport
     var new_height = $("body").innerHeight();
@@ -1522,10 +1565,13 @@ Meteor.my_functions = {
 
     // Note that jQuery scrollIntoView messes things up
     setTimeout(function(){
-        var container = $('#width');
-        var scrollTo = $('.pattern.weave .row.selected .inner_tube');
-        container.scrollTop( scrollTo.offset().top - container.offset().top + container.scrollTop() );
-      }, 50);
+      var container = $('#width');
+      var scrollTo = $('.pattern.weave .row.selected .inner_tube');
+      var scroll_amount = (scrollTo.offset().top + scrollTo.outerHeight(true)) - container.outerHeight(true);
+
+      if (scroll_amount > 0)
+        container.scrollTop(scroll_amount);
+    }, 50);
   },
   set_current_weave_row: function(row_number) {
     if (typeof row_number === "undefined")

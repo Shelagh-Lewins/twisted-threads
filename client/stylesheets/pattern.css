@@ -1,6 +1,7 @@
 /* *** Pattern *** */
 .pattern,
 .tablets {
+  clear: both;
   float: left;
   margin-bottom: 20px;
   padding: 16px 0 16px 0;

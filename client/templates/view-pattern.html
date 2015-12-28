@@ -85,11 +85,11 @@
 </template>
 
 <template name="remove_row">
-{{#if can_remove_rows}}<li class="cell no_select remove_row" title="Delete this row (delete cannot be undone)" >X</li>{{/if}}
+{{#if can_remove_rows}}<li class="cell no_select remove_row" title="Delete this row" >X</li>{{/if}}
 </template>
 
 <template name="remove_tablet">
-<li class="no_select remove_tablet" title="Delete this tablet (delete cannot be undone)" >X</li>
+<li class="no_select remove_tablet" title="Delete this tablet" >X</li>
 </template>
 
 <template name="threading_row">
@@ -106,7 +106,7 @@
   <div class="edit_style {{editing_style}}">
  <h2>Background</h2>
 <div class="colorpicker_holder"><input type="text" id="background_colorpicker"></div>
-<h2>Line</h2>
+<h2>Thread</h2>
 <div class="colorpicker_holder"><input type="text" id="line_colorpicker"></div>
 <div class="forward_stroke {{forward_stroke_on}}"></div>
 <div class="backward_stroke {{backward_stroke_on}}"></div>
@@ -122,13 +122,10 @@
 </ul></div>
 
 <input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style">
-<div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row">{{#each styles this}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
-<div class="special_styles"><ul class="row">{{#each special_styles}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
+<div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
+<div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
 
-<!--<template name="old_style_cell">
-<li class="cell {{is_selected_style style}} {{forward_stroke}} {{backward_stroke}}" style="background-color: {{background_color}}; background-image: url('{{image}}')"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
-</template>-->
 <template name="style_cell">
 <li class="cell no_select {{is_selected_style style}}" style="background-color: {{background_color}}; background-image: url('{{image}}')">
 {{#if equals forward_stroke "forward_stroke"}}
