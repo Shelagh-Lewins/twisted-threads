@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg id="svg2" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="256" viewBox="0 0 256 256" width="256" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
- <g id="layer1" transform="translate(-22.223 -474.12)">
-  <path id="path3352" stroke="#000" stroke-width="1px" fill="none" d="m195.97 264.44z"/>
-  <g id="g3371" transform="matrix(.38928 0 0 .38928 14.06 436.14)">
-   <path id="path3350" fill-rule="evenodd" d="m133.38 286.67c74.246-95.459 205.19-184.94 377.12-115.17 96.25 39.055 147.42 120.76 148.76 243.29 1.3454 122.53-108.42 305.9-108.42 305.9s42.038-205.9 25.603-287.15c-15.062-74.465-63.999-115.91-138.7-129.33-86.373-15.521-173.3 57.701-190.23 107.72z"/>
-   <path id="rect3362" d="m39.396 190.7 308.1 308.1h-308.1z"/>
-  </g>
- </g>
+ <path id="path3352" d="m173.75-209.68z" stroke="#000" stroke-width="1px" fill="none"/>
+ <path id="path3350" fill-rule="evenodd" d="m143.46 19.104c-43.705 0.08-77.664 26.369-99.356 54.082l-36.93-36.93-0.0002 119.93h119.94l-37.432-37.43c9.189-19.17 40.972-43.994 72.562-38.317 29.08 5.224 48.13 21.357 53.99 50.347 6.4 31.63-9.96 111.78-9.96 111.78s42.73-71.38 42.2-119.08c-0.52-47.698-20.44-79.505-57.91-94.709-16.73-6.79-32.46-9.704-47.1-9.677z"/>
 </svg>

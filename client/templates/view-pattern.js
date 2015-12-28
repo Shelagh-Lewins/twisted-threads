@@ -4,7 +4,16 @@ Template.view_pattern.rendered = function() {
     $('body').addClass('editable');
 
   Session.set('edit_style', false);
-  Session.set('styles_palette', 1);
+
+  if (typeof Session.get('styles_palette') === "undefined")
+    Session.set('styles_palette', "styles_1");
+
+  if (Session.equals('styles_palette', "special"))
+    Session.set('show_special_styles', true);
+
+  else
+    Session.set('show_special_styles', false);
+
   Session.set("selected_style", 1);
 
   Meteor.my_functions.add_to_recent_patterns(Router.current().params._id);
@@ -183,16 +192,64 @@ Template.styles_palette.helpers({
     return [1, 2];
   },
   style_page_class: function() {
-    if (Session.equals('styles_palette', 1))
-      return "page_1";
+    switch(Session.get('styles_palette'))
+    {
+      case "styles_1":
+        if (Session.get('window_width') >= 724)
+        {
+          Session.set('styles_palette', 'all_styles');
+          return "all_styles";
+        }
+        else
+        {
+          return "styles_1";
+        }
 
-    else if (Session.equals('styles_palette', 2))
-      return "page_2";
+      case "styles_2":
+        if (Session.get('window_width') >= 724)
+        {
+          Session.set('styles_palette', 'all_styles');
+          return "all_styles";
+        }
+        else
+        {
+          return "styles_2";
+        }
+
+      case "all_styles":
+        if (Session.get('window_width') < 724)
+        {
+          Session.set('styles_palette', 'styles_1');
+          return "styles_1";
+        }
+        else
+        {
+          return "all_styles";
+        };
+
+      case "special":
+        return "special";
+    }
   },
-  is_selected_style_palette: function(number) {
-    if (Session.equals('styles_palette', number))
+  is_selected_style_palette: function(page) {
+    if (Session.equals('styles_palette', page))
         return "selected";
   },
+  special_styles: function(){
+    var pattern_id = Router.current().params._id;
+
+    var special_styles_array = [];
+    for (var i=0; i<current_special_styles.length; i++)
+    {
+      special_styles_array.push({style: current_special_styles[i].style});
+    }
+
+    return special_styles_array;
+  },
+  show_special_styles: function(){
+    if (Session.equals('show_special_styles', true))
+      return "show_special_styles";
+  }
 });
 
 Template.view_pattern.events({
@@ -355,13 +412,25 @@ Template.styles_palette.events({
     else
       Session.set('edit_style', true);  
   },
-  'click #styles_palette .pagination li.page_1 a': function(event, template) {
+  'click #styles_palette .pagination li.styles_1 a': function(event, template) {
     event.preventDefault();
-    Session.set('styles_palette', 1);
+    Session.set('styles_palette', "styles_1");
+    Session.set('show_special_styles', false);
   },
-  'click #styles_palette .pagination li.page_2 a': function(event, template) {
+  'click #styles_palette .pagination li.styles_2 a': function(event, template) {
     event.preventDefault();
-    Session.set('styles_palette', 2);
+    Session.set('styles_palette', "styles_2");
+    Session.set('show_special_styles', false);
+  },
+  'click #styles_palette .pagination li.all_styles a': function(event, template) {
+    event.preventDefault();
+    Session.set('styles_palette', "all_styles");
+    Session.set('show_special_styles', false);
+  },
+  'click #styles_palette .pagination li.special a': function(event, template) {
+    event.preventDefault();
+    Session.set('styles_palette', "special");
+    Session.set('show_special_styles', true);
   },
   'click .edit_style .forward_stroke': function () {
     var selected_style = Session.get("selected_style");

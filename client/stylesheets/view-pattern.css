@@ -139,9 +139,11 @@
 }
 }
 
-.styles {
+#styles_palette .styles {
+  position: relative;
   margin: 0 8px 0 8px;
   padding: 0 0 0 0;
+  width: 705px;
 }
 
 #styles_palette h2 {
@@ -151,16 +153,17 @@
 }
 
 .styles input#edit_style_button {
-  float: left;
+  float: right;
   border: 1px solid #424A6C;
-  -webkit-border-radius: 0.75em;
-  -moz-border-radius: 0.75em;
-  border-radius: 0.75em; 
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px; 
   color: #424A6C;
   background-color: #FFFFFF;
   font-size: 100%;
   line-height: 1.5;
   padding: 4px 8px 4px 8px;
+  margin: 0 8px 0 0;
   cursor: pointer;
   -webkit-appearance: none;
 }
@@ -178,17 +181,18 @@
 }
 
 .styles .pagination ul {
-  float: right;
+  float: left;
   border: 1px solid #424A6C;
-  -webkit-border-radius: 0.75em;
-  -moz-border-radius: 0.75em;
-  border-radius: 0.75em; 
-  
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px; 
+  font-size: 0;
   overflow: hidden;
 }
 
 .styles .pagination ul li {
   display: inline;
+  margin: 0;
 }
 
 .styles .pagination ul li a {
@@ -198,10 +202,11 @@
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
+  border-right: 1px solid #424A6C
 }
 
-.styles .pagination ul li:first-child a {
-  border-right: 1px solid #424A6C;
+.styles .pagination ul li:last-child a {
+  border-right: none;
 }
 
 .styles .pagination ul li.selected a {
@@ -221,7 +226,16 @@
   position: relative;
 }
 
-#styles_palette.single_column .styles .box.page_2 .row {
+#styles_palette .styles .box {
+  clear: both;
+  height: 90px;
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+}
+
+
+#styles_palette.single_column .styles .box.styles_2 .row {
   position: relative;
   top: -99px;
 }
@@ -251,6 +265,7 @@
   padding: 0;
   font-size: medium;
   cursor: pointer;
+  background-size: 32px 32px;
 }
 
 /* http://stackoverflow.com/questions/14593415/how-to-strike-through-obliquely-with-css */
@@ -291,11 +306,31 @@
   border-color: #4444EE;
 }
 
+/* Special styles */
+.styles .special_styles {
+  display: none;
+}
+
+#styles_palette.show_special_styles .styles {
+  width: 352px;
+}
+
+#styles_palette.show_special_styles .special_styles {
+  display: block;
+}
+
+#styles_palette.show_special_styles .box > .row {
+  display: none;
+}
+
+#styles_palette.show_special_styles #edit_style_button {
+  display: none;
+}
+
 /* *** Edit Style *** */
 .edit_style {
   position: absolute;
-
-  left: 0;
+  right: 8px;
   padding: 0 8px 8px 8px;
   width: 140px;
   border: 1px solid #7580AC;

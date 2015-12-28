@@ -1,7 +1,7 @@
 <template name="view_pattern">
 {{#if Template.subscriptionsReady}}
 {{> pattern_as_text}}
-
+{{> stroke_svgs}}
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
 
@@ -32,12 +32,20 @@
 </div>
 {{#if can_edit_pattern _id}}
 <div id="toolbar" ><div class="inner_tube">
-<button id="undo" disabled="{{undo_disabled}}" title="Undo"><img src="{{#if equals undo_disabled "disabled"}}../images/undo_disabled.svg{{else}}../images/undo.svg{{/if}}" width="32" height="32" ></button>
-<button id="redo" disabled="{{redo_disabled}}" title="Redo"><img src="{{#if equals redo_disabled "disabled"}}../images/redo_disabled.svg{{else}}../images/redo.svg{{/if}}" width="32" height="32" ></button>
-<button id="add_row_at_start" title="Add row at bottom"><img src="../images/row_bottom.svg" width="32" height="32" ></button>
-<button id="add_row_at_end" title="Add row at top"><img src="../images/row_top.svg" width="32" height="32" ></button>
-<button id="add_tablet_at_start" title="Add tablet at left"><img src="../images/tablet_left.svg" width="32" height="32" ></button>
-<button id="add_tablet_at_end" title="Add tablet at right"><img src="../images/tablet_right.svg" width="32" height="32" ></button>
+<button id="undo" disabled="{{undo_disabled}}" title="Undo">
+{{#if equals undo_disabled "disabled"}}
+<img src="../images/undo_disabled.svg" onerror="this.src='/images/undo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
+<img src="../images/undo.svg" onerror="this.src='/images/undo.png';this.onerror=null;" width="32" height="32" >
+{{/if}}</button>
+<button id="redo" disabled="{{redo_disabled}}" title="Redo">
+{{#if equals redo_disabled "disabled"}}
+<img src="../images/redo_disabled.svg" onerror="this.src='/images/redo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
+<img src="../images/redo.svg" onerror="this.src='/images/redo.png';this.onerror=null;" width="32" height="32" >
+{{/if}}</button>
+<button id="add_row_at_start" title="Add row at bottom"><img src="../images/row_bottom.svg" onerror="this.src='/images/row_bottom.png';this.onerror=null;" width="32" height="32" ></button>
+<button id="add_row_at_end" title="Add row at top"><img src="../images/row_top.svg" onerror="this.src='/images/row_top.png';this.onerror=null;" width="32" height="32" ></button>
+<button id="add_tablet_at_start" title="Add tablet at left"><img src="../images/tablet_left.svg" onerror="this.src='/images/tablet_left.png';this.onerror=null;" width="32" height="32" ></button>
+<button id="add_tablet_at_end" title="Add tablet at right"><img src="../images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
 </div></div>{{/if}}
 <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
 {{> column_numbers}}
@@ -93,8 +101,9 @@
 </template>
 
 <template name="styles_palette">{{#if can_edit_pattern _id}}
-<div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}}">
-<div class="edit_style {{editing_style}}">
+<div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}} {{show_special_styles}}">
+<div class="styles">
+  <div class="edit_style {{editing_style}}">
  <h2>Background</h2>
 <div class="colorpicker_holder"><input type="text" id="background_colorpicker"></div>
 <h2>Line</h2>
@@ -102,14 +111,38 @@
 <div class="forward_stroke {{forward_stroke_on}}"></div>
 <div class="backward_stroke {{backward_stroke_on}}"></div>
 </div>
-<div class="styles">{{#if single_column}}<div class="pagination">
-<ul><li class="page_1 no_select {{is_selected_style_palette 1}}"><a href="#">Page 1</a></li><li class="page_2 no_select {{is_selected_style_palette 2}}"><a href="#">Page 2</a></li></ul></div>{{/if}}
-<input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style"><div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row">{{#each styles this}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
-</div></div></div>
+<div class="pagination"><ul>
+{{#if single_column}}
+<li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a href="#">Styles 1</a></li>
+<li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a href="#">Styles 2</a></li>
+{{else}}
+<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a href="#">Styles</a></li>
+{{/if}}
+<li class="special no_select {{is_selected_style_palette "special"}}"><a href="#">Special</a></li>
+</ul></div>
+
+<input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style">
+<div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row">{{#each styles this}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
+<div class="special_styles"><ul class="row">{{#each special_styles}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
 
+<!--<template name="old_style_cell">
+<li class="cell {{is_selected_style style}} {{forward_stroke}} {{backward_stroke}}" style="background-color: {{background_color}}; background-image: url('{{image}}')"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
+</template>-->
 <template name="style_cell">
-<li class="cell {{is_selected_style style}} {{forward_stroke}} {{backward_stroke}}" style="background-color: {{background_color}}"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
+<li class="cell no_select {{is_selected_style style}}" style="background-color: {{background_color}}; background-image: url('{{image}}')">
+{{#if equals forward_stroke "forward_stroke"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_stroke_symbol" x="0" y="0"/>
+</svg>
+{{else}}
+{{#if equals backward_stroke "backward_stroke"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_stroke_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{/if}}
+</li>
 </template>
 
 <template name="orientation">

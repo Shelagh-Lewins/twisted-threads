@@ -70,6 +70,78 @@ NonEmptyString = Match.Where(function (x) {
   return x.length > 0;
 });
 
+// general parameters
+Meteor.my_params = {}; // namespace for parameters
+Meteor.my_params.undo_stack_length = 10;
+Meteor.my_params.special_styles_number = 16; // currently up to 16 special styles allowing 3 multiple turns and 4 other single styles
+
+default_special_styles = [
+{
+  "background_color": "#FFFFFF",
+  "image": "/images/special_forward_2.svg"
+},
+{
+  "background_color": "#FFFFFF",
+  "image": "/images/special_backward_2.svg"
+},
+{
+  "background_color": "#FFFFFF",
+  "image": "/images/special_forward_3.svg"
+},
+{
+  "background_color": "#FFFFFF",
+  "image": "/images/special_backward_3.svg"
+},
+{
+  "background_color": "#FFFFFF",
+  "image": "/images/special_forward_4.svg"
+},
+{
+  "background_color": "#FFFFFF",
+  "image": "/images/special_backward_4.svg"
+},
+{
+  "background_color": "#FFFFFF",
+  "image": "/images/special_empty.svg"
+},
+{
+  "background_color": "#FFFFFF",
+  "image": ""
+},
+{
+  "background_color": "#BBBBBB",
+  "image": "/images/special_backward_2.svg"
+},
+{
+  "background_color": "#BBBBBB",
+  "image": "/images/special_forward_2.svg"
+},
+{
+  "background_color": "#BBBBBB",
+  "image": "/images/special_backward_3.svg"
+},
+{
+  "background_color": "#BBBBBB",
+  "image": "/images/special_forward_3.svg"
+},
+{
+  "background_color": "#BBBBBB",
+  "image": "/images/special_backward_4.svg"
+},
+{
+  "background_color": "#BBBBBB",
+  "image": "/images/special_forward_4.svg"
+},
+{
+  "background_color": "#FFFFFF",
+  "image": ""
+},
+{
+  "background_color": "#FFFFFF",
+  "image": "g"
+}
+];
+
 if (Meteor.isClient) {
   // default accounts-ui package
   
@@ -79,10 +151,6 @@ if (Meteor.isClient) {
   
   Session.set('window_width', $(window).width());
   Session.set('window_height', $(window).height());
-
-  // general parameters
-  Meteor.my_params = {}; // namespace for parameters
-  Meteor.my_params.undo_stack_length = 10;
 
   Meteor.startup(function () {
 

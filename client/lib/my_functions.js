@@ -30,8 +30,9 @@ Meteor.my_functions = {
       1.1 first ever
       1.11 added tags
       1.12 added weaving notes, threading notes
+      1.13 added special styles
     */
-    pattern_obj.version = "1.12";
+    pattern_obj.version = "1.13";
 
     var number_of_rows = pattern.number_of_rows;
     var number_of_tablets = pattern.number_of_tablets;
@@ -52,21 +53,19 @@ Meteor.my_functions = {
       pattern_obj.tags = [];
 
     // Styles
-    //var styles = Styles.find({pattern_id: pattern_id}, {sort: {"style": 1}}).fetch();
     pattern_obj.styles = [];
-
-    /*styles.forEach(function(style) {
-      var obj = {};
-      obj.background_color = style.background_color;
-      obj.line_color = style.line_color;
-      obj.forward_stroke = style.forward_stroke;
-      obj.backward_stroke = style.backward_stroke;
-      pattern_obj.styles.push(obj);
-    });*/
 
     for (var i=0; i<current_styles.length; i++)
     {
       pattern_obj.styles[i] = current_styles[i];
+    }
+
+    // Special styles
+    pattern_obj.special_styles = [];
+
+    for (var i=0; i<current_special_styles.length; i++)
+    {
+      pattern_obj.special_styles[i] = current_special_styles[i];
     }
 
     // Orientation of tablets
@@ -817,6 +816,15 @@ Meteor.my_functions = {
     else
        return false;
   },
+  can_edit_style: function(style) {
+    var editable = true;
+
+    if (typeof style === "string") // special styles are not editable
+      if (style.charAt(0) == "S")
+        editable = false;
+
+    return editable;
+  },
   build_pattern_display_data:  function(pattern_id)
   {
     // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
@@ -839,11 +847,9 @@ Meteor.my_functions = {
 
     //////////////////////////////
     // row numbers (row_indexes)
-    // If a row is removed, the reactive array doesn't always notice, leading to an empty row on the pattern. Manually removing the index here forces the row helper to refresh
-    // the issue only appears to apply to rows, not tablets
+    // if rebuilding, clearing the array forces helpers to rerun
     if (typeof current_row_indexes !== "undefined")
-      if (current_row_indexes.length > number_of_rows)
-        current_row_indexes.splice(number_of_rows, current_row_indexes.length - number_of_rows);
+      current_row_indexes.clear();
 
     var indexes = new Array(number_of_rows);
     for (var i=0; i<number_of_rows; i++)
@@ -871,9 +877,8 @@ Meteor.my_functions = {
     }
 
     // put the weaving data into the array of arrays
-    //console.log("raw weaving data " + pattern.weaving);
-    //console.log("num tabs " + number_of_tablets);
     var weaving_data = JSON.parse(pattern.weaving);
+    test = weaving_data;
 
     for (var i=0; i<number_of_rows; i++)
     {
@@ -940,6 +945,7 @@ Meteor.my_functions = {
 
     //////////////////////////////
     // build the styles data
+    // Regular styles - editable by user
     var styles_data = JSON.parse(pattern.styles);
     var number_of_styles = styles_data.length;
 
@@ -974,6 +980,36 @@ Meteor.my_functions = {
       current_styles.clear();
 
     current_styles = new ReactiveArray(styles_array);
+
+    ////////////////////////////////
+    // Special styles - not editable
+    if (typeof pattern.special_styles !== "undefined") // older patterns don't have special styles
+      special_styles_data = JSON.parse(pattern.special_styles);
+
+    else
+      special_styles_data = [];
+
+    var special_styles_array = new Array(Meteor.my_params.special_styles_number);
+    for (var i=0; i<Meteor.my_params.special_styles_number; i++)
+    {
+      if (typeof special_styles_data[i] === "undefined")
+        special_styles_array[i] = default_special_styles[i];
+
+      // using the defaults here allows the 3 blank styles to be filled in later
+      else if (special_styles_data[i].placeholder = true)
+        special_styles_array[i] = default_special_styles[i];
+
+      else 
+        special_styles_array[i] = special_styles_data[i];
+
+      special_styles_array[i].style = "S" + (i+1);
+    }
+
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_special_styles !== "undefined")
+      current_special_styles.clear();
+
+    current_special_styles = new ReactiveArray(special_styles_array);
   },
   add_weaving_row: function(pattern_id, position, style)
   {
@@ -1161,6 +1197,9 @@ Meteor.my_functions = {
   //save_weaving_as_text: function(pattern_id)
   save_weaving_as_text: function(pattern_id)
   {
+    var number_of_rows = current_weaving_cells.length;
+    var number_of_tablets = current_weaving_cells[0].length;
+
     var weaving_array = Meteor.my_functions.get_weaving_as_text(pattern_id);
 
     Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets);
@@ -1230,6 +1269,10 @@ Meteor.my_functions = {
   {
     // Set the #background_colorpicker to the selected style's background colour
     var selected_style = Session.get("selected_style");
+
+    if (!Meteor.my_functions.can_edit_style(selected_style))
+        return;
+      
     var pattern_id = Router.current().params._id;
 
     //if (Patterns.findOne({_id: pattern_id}) == null)
@@ -1308,6 +1351,10 @@ Meteor.my_functions = {
   {
     // Set the #line_colorpicker to the selected style's background colour
     var selected_style = Session.get("selected_style");
+
+    if (!Meteor.my_functions.can_edit_style(selected_style))
+        return;
+
     var pattern_id = Router.current().params._id;
 
     var selected_line_color = current_styles[selected_style-1].line_color;
@@ -1377,7 +1424,9 @@ Meteor.my_functions = {
   {
     // Set the #background_colorpicker to the selected style's background colour
     var selected_style = Session.get("selected_style");
-    //var pattern_id = Router.current().params._id;
+    
+    if (!Meteor.my_functions.can_edit_style(selected_style))
+      return;
 
     // Background color picker
     var selected_background_color = current_styles[selected_style-1].background_color;

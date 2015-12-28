@@ -199,6 +199,69 @@
       "backward_stroke": false
     }
   ],
+  "special_styles": [
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_forward_2.svg"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_backward_2.svg"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_forward_3.svg"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_backward_3.svg"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_forward_4.svg"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_backward_4.svg"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_empty.svg"
+    },
+    {
+      "placeholder": true
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_backward_2.svg"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_forward_2.svg"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_backward_3.svg"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_forward_3.svg"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_backward_4.svg"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_forward_4.svg"
+    },
+    {
+      "placeholder": true
+    },
+    {
+      "placeholder": true
+    }
+  ],
   "orientation": ["S","S","S","S","S","S","S","S"],
   "threading": [
     [3,3,3,3,3,3,3,3],

@@ -166,9 +166,9 @@ Meteor.methods({
     var styles_array = [];
     for (var i=0; i<32; i++) // create 32 styles
     {
-      var style = data.styles[i];
+      //var style = data.styles[i];
 
-      if (typeof style === "undefined") // use defaults if no data
+      /*if (typeof style === "undefined") // use defaults if no data
       {
         var options = {
           background_color: "#FFFFFF",
@@ -185,10 +185,22 @@ Meteor.methods({
           forward_stroke: style.forward_stroke,
           backward_stroke: style.backward_stroke
         };
-      }
-      styles_array[i] = style;
+      }*/
+      //styles_array[i] = style;
+      styles_array[i] = data.styles[i];
     }
     Patterns.update({_id: pattern_id}, {$set: {styles: JSON.stringify(styles_array)}});
+
+    // Special styles
+    var special_styles_array = [];
+    if (typeof data.special_styles === "undefined")
+      data.special_styles = [];
+
+    for (var i=0; i<Meteor.my_params.special_styles_number; i++)
+    {
+      special_styles_array[i] = data.special_styles[i];
+    }
+    Patterns.update({_id: pattern_id}, {$set: {special_styles: JSON.stringify(special_styles_array)}});
 
     // Pattern
     var weaving = new Array(number_of_rows);

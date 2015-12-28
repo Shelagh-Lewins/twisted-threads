@@ -50,20 +50,41 @@ UI.registerHelper('hole_label', function(hole) {
   });
 
   UI.registerHelper('cell_style', function(row, tablet) {
-    var style = current_styles.list()[this.style-1];
-    if (typeof style === "undefined")
-          return;
+    if (typeof this.style == "string")
+    {
+      if (this.style.charAt(0) == "S")
+      {
+        var style_number = parseInt(this.style.substring(1));
+        var style = current_special_styles.list()[style_number-1];
+        if (typeof style === "undefined")
+            return;
 
-    // remember to update this if style defs change
-    // could use a clone but it's cleaner to control the properties directly
-    var cell_style = {
-      background_color: style.background_color,
-      backward_stroke: style.backward_stroke,
-      forward_stroke: style.forward_stroke,
-      line_color: style.line_color,
-      style: style.style
+        // Important! update this if style defs change
+        // could use a clone but it's cleaner to control the properties directly
+
+        var cell_style = {
+          background_color: style.background_color,
+          image: style.image,
+          style: style.style
+        }
+      }
     }
+    else
+    {
+      var style = current_styles.list()[this.style-1];
+      if (typeof style === "undefined")
+            return;
 
+      // Important! update this if style defs change
+      // could use a clone but it's cleaner to control the properties directly
+      var cell_style = {
+        background_color: style.background_color,
+        backward_stroke: style.backward_stroke,
+        forward_stroke: style.forward_stroke,
+        line_color: style.line_color,
+        style: style.style
+      }
+    }
     if (typeof this.row !== "undefined")
       cell_style.row =  this.row;
 
