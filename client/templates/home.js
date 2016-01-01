@@ -1,6 +1,32 @@
 Template.home.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();
+  Session.set('patterns_in_row', Meteor.my_functions.patterns_in_row());
+}
+
+// Subsidiary 'home' pages
+Template.recent_patterns.rendered = function() {
+  $('body').attr("class", "home");
+  Meteor.my_functions.initialize_route();
+  Session.set('patterns_in_row', Meteor.my_functions.patterns_in_row());
+}
+
+Template.new_patterns.rendered = function() {
+  $('body').attr("class", "home");
+  Meteor.my_functions.initialize_route();
+  Session.set('patterns_in_row', Meteor.my_functions.patterns_in_row());
+}
+
+Template.my_patterns.rendered = function() {
+  $('body').attr("class", "home");
+  Meteor.my_functions.initialize_route();
+  Session.set('patterns_in_row', Meteor.my_functions.patterns_in_row());
+}
+
+Template.all_patterns.rendered = function() {
+  $('body').attr("class", "home");
+  Meteor.my_functions.initialize_route();
+  Session.set('patterns_in_row', Meteor.my_functions.patterns_in_row());
 }
 
 // *** create_new_pattern *** //
@@ -19,62 +45,30 @@ Template.create_new_pattern.events({
   }
 });
 
-// *** Display patterns *** //
-// *** patterns *** //
-Template.patterns.helpers({
-  recent_patterns: function(){
-    if (Meteor.userId()) // user is signed in
-    {
-      var pattern_ids = Recent_Patterns.find({}, {sort: {accessed_at: -1}}).map(function(pattern){ return pattern.pattern_id});
-    }
-    else
-    {
-      var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
-    }
-    // return the patterns in recency order
-    var patterns = [];
-    for (var i=0; i<pattern_ids.length; i++)
-    {
-      var id = pattern_ids[i];
-      // Check for null id or non-existent pattern
-      if (id == null) continue;
-      if (typeof id === "undefined") continue;
-      
-      var pattern = Patterns.findOne({_id: id});
-      if (typeof pattern === "undefined") continue;
-
-      patterns.push(pattern);
-    }
-
-    return patterns; // Note this is an array because order is important, so in the template use .length to find number of items, not .count
-  },
-  not_recent_patterns: function(){
-    // any visible pattern that is not shown in Recent Patterns
-    if (Meteor.userId()) // user is signed in
-      var pattern_ids = Recent_Patterns.find().map(function(pattern){ return pattern.pattern_id});
-
-    else
-    {
-      var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
-    }
-
-    return Patterns.find({_id: {$nin: pattern_ids}}); // This is a cursor use use .count in template to find number of items
-  },
-  all_patterns: function(){
-    return Patterns.find({}, {sort: {name: 1}});
+Template.home_patterns.helpers({
+  header_width: function() {
+    var number = Session.get('patterns_in_row');
+    return (number * Meteor.my_params.pattern_thumbnail_width) + ((number - 1) * Meteor.my_params.pattern_thumbnail_rmargin);
   }
 });
 
 /* *** Individual pattern in list *** */
-Template.pattern_overview.helpers({
+Template.pattern_thumbnail.helpers({
+  width: function() {
+    return Meteor.my_params.pattern_thumbnail_width + "px";
+  },
+  rmargin: function() {
+    return Meteor.my_params.pattern_thumbnail_rmargin + "px";
+  },
   created_by_current_user: function () {
     return this.created_by === Meteor.userId();
   }
 });
 
-Template.pattern_overview.events({
+Template.pattern_thumbnail.events({
 // Delete pattern
-  'click input.delete': function() {
+  'click #delete': function(event) {
+    event.preventDefault();
     var name = Patterns.findOne({ _id: this._id}).name;
     var pattern_id = this._id;
 
@@ -84,7 +78,8 @@ Template.pattern_overview.events({
       Meteor.call('remove_pattern', pattern_id);
     }
   },
-  "click .toggle_private": function () {
+  "click #toggle_private": function (event) {
+    event.preventDefault();
     Meteor.call("set_private", this._id, !this.private);
   }
 });

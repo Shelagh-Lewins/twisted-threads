@@ -1,4 +1,54 @@
 Patterns = new Meteor.Collection('patterns');
+
+// https://github.com/alethes/meteor-pages
+this.AllPatterns = new Meteor.Pagination(Patterns, {
+  itemTemplate: "pattern_thumbnail",
+  templateName: "all_patterns",
+  perPage: 12,
+  sort: {
+    name: 1
+  }
+});
+
+this.NewPatterns = new Meteor.Pagination(Patterns, {
+  itemTemplate: "pattern_thumbnail",
+  templateName: "new_patterns",
+  perPage: 12,
+  sort: {
+    created_at: -1
+  }
+});
+
+this.MyPatterns = new Meteor.Pagination(Patterns, {
+  itemTemplate: "pattern_thumbnail",
+  templateName: "my_patterns",
+  perPage: 12,
+  sort: {
+    name: 1
+  },
+  auth: function(skip, sub){
+    var _filters = {created_by: sub.userId};
+    var _options = {sort: {name: 1}};
+    return [_filters, _options];
+    //return Patterns.find({created_by: sub.userId}); // this ought to work but doesn't
+  }
+});
+
+this.RecentPatterns = new Meteor.Pagination(Patterns, {
+  itemTemplate: "pattern_thumbnail",
+  templateName: "recent_patterns",
+  perPage: 12,
+  sort: {
+    name: 1
+  },
+  availableSettings: {
+    filters: true,
+    settings: true,
+    sort: true
+  },
+  filters: {}
+});
+
 // tags on patterns
 Tags.TagsMixin(Patterns); // https://atmospherejs.com/patrickleet/tags
 Patterns.allowTags(function (userId) { return true; });
@@ -74,6 +124,8 @@ NonEmptyString = Match.Where(function (x) {
 Meteor.my_params = {}; // namespace for parameters
 Meteor.my_params.undo_stack_length = 10;
 Meteor.my_params.special_styles_number = 16; // currently up to 16 special styles allowing 3 multiple turns and 4 other single styles
+Meteor.my_params.pattern_thumbnail_width = 248; // tiled pattern thumbnails
+Meteor.my_params.pattern_thumbnail_rmargin = 16; // right margin
 
 default_special_styles = [
 {
@@ -161,9 +213,12 @@ if (Meteor.isClient) {
     window.addEventListener('resize', function(){
       Session.set('window_width', $(window).width());
       Session.set('window_height', $(window).height());
+      Session.set('patterns_in_row', Meteor.my_functions.patterns_in_row());
     });
 
     Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
+    reactive_recent_patterns = new ReactiveArray();
+
   });
 
   //////////////////////////////
@@ -260,6 +315,130 @@ if (Meteor.isClient) {
     return Router.current().route.getName();
   });
 
+  //////////////////////////////////
+  // provide lists of patterns in different categories
+  UI.registerHelper('recent_patterns', function(limit){
+    if (Meteor.userId()) // user is signed in
+      var pattern_ids = Recent_Patterns.find({}, {sort: {accessed_at: -1}}).map(function(pattern){ return pattern.pattern_id});
+
+    else
+      var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
+
+    // stored for "recent patterns" route pagination
+    reactive_recent_patterns.clear();
+    reactive_recent_patterns = new ReactiveArray(pattern_ids);
+
+    RecentPatterns.set({
+      filters: {
+          _id: {
+            $in: reactive_recent_patterns.array()
+          }
+        }
+    });
+
+    // return the patterns in recency order
+    var patterns = [];
+    //var max_number = Meteor.my_functions.number_of_pattern_thumbs();
+    //console.log("recents max_number " + Session.get('patterns_in_row'));
+    for (var i=0; i<pattern_ids.length; i++)
+    {
+      var id = pattern_ids[i];
+      // Check for null id or non-existent pattern
+      if (id == null) continue;
+      if (typeof id === "undefined") continue;
+      
+      var pattern = Patterns.findOne({_id: id});
+      if (typeof pattern === "undefined") continue;
+
+      if (limit)
+        if (i >= Session.get('patterns_in_row'))
+          break;
+      
+      patterns.push(pattern);
+    }
+
+    return patterns; // Note this is an array because order is important, so in the template use .length to find number of items, not .count
+  });
+
+  UI.registerHelper('not_recent_patterns', function(limit){
+    // any visible pattern that is not shown in Recent Patterns
+    if (Meteor.userId()) // user is signed in
+      var pattern_ids = Recent_Patterns.find().map(function(pattern){ return pattern.pattern_id});
+
+    else
+      var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
+
+    var obj = {};     
+    obj["sort"] = {};
+    obj["sort"]["name"] = 1;
+
+    if (limit)
+      obj["limit"] = Session.get('patterns_in_row');
+      
+    return Patterns.find({_id: {$nin: pattern_ids}}, obj);
+    // This is a cursor use use .count in template to find number of items
+  });
+
+  UI.registerHelper('my_patterns', function(limit){
+    if (!Meteor.userId())
+      return;
+
+    var obj = {};
+      
+    obj["sort"] = {};
+    obj["sort"]["name"] = 1;
+
+    if (limit)
+      obj["limit"] = Session.get('patterns_in_row');
+
+    return Patterns.find({created_by: Meteor.userId()}, obj);
+    // This is a cursor use use .count in template to find number of items
+  });
+
+  UI.registerHelper('new_patterns', function(limit){
+    var obj = {};
+    obj["sort"] = {};
+    obj["sort"]["created_at"] = -1;
+
+    if (limit)
+      obj["limit"] = Session.get('patterns_in_row');
+
+    return Patterns.find({}, obj);
+    // This is a cursor use use .count in template to find number of items
+  });
+
+  UI.registerHelper('all_patterns', function(limit){
+    //console.log("all " + limit);
+    var obj = {};
+    obj["sort"] = {};
+    obj["sort"]["created_at"] = -1;
+
+    if (limit)
+      obj["limit"] = Session.get('patterns_in_row');
+
+    return Patterns.find({}, obj);
+    // This is a cursor use use .count in template to find number of items
+  });
+
+  Template.left_column.helpers({
+    selected: function(item) {
+      //console.log("Route " + Router.current().route.getName());
+      var route = Router.current().route.getName();
+      switch(item)
+      {
+        case "home":
+        case "recent_patterns":
+        case "new_patterns":
+        case "my_patterns":
+        case "all_patterns":
+          if (route == item)
+            return "selected";
+          break;
+      }
+    }
+  });
+
+  ////////////////////////////////////
   Template.header.onCreated(function() {
     this.subscribe('patterns');
     this.subscribe('weaving'); // TODO remove

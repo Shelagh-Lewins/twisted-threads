@@ -120,63 +120,6 @@
   border-left: 1px solid rgba(0,0,0,0);
 }
 
-/* Note: for a diagonal line corner to corner, use:
-  width: 147%;
-  left: -23%;
-  top: 46%;
-  right: 0;
-
-  -webkit-transform:rotate(45deg);
-  -moz-transform:rotate(45deg);
-  -ms-transform:rotate(45deg);
-  -o-transform:rotate(45deg);
-  transform:rotate(45deg);
-
-*/
-/*
-.pattern .row .cell.forward_stroke .line_forward,
-.tablets .row .cell.forward_stroke .line_forward,
-.pattern .row .cell.backward_stroke .line_backward,
-.tablets .row .cell.backward_stroke .line_backward {
-  position: absolute;
-  width: 100%;
-  height: 25%;
-  left: -2%;
-  top: 34%;
-  right: 0;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  border-radius: 8px;
-  border: 1px solid black;
-  -webkit-print-color-adjust: exact;
-}
-
-
-.pattern .row .cell.forward_stroke .line_forward,
-.tablets .row .cell.forward_stroke .line_forward {
-  -webkit-transform:rotate(-45deg);
-  -moz-transform:rotate(-45deg);
-  -ms-transform:rotate(-45deg);
-  -o-transform:rotate(-45deg);
-  transform:rotate(-45deg);
-}
-
-.pattern .row .cell.backward_stroke .line_backward,
-.tablets .row .cell.backward_stroke .line_backward {
-  -webkit-transform:rotate(45deg);
-  -moz-transform:rotate(45deg);
-  -ms-transform:rotate(45deg);
-  -o-transform:rotate(45deg);
-  transform:rotate(45deg);
-}*/
-/*
-.pattern div.row li.cell.forward_stroke.is_dark .line_before,
-.pattern div.row li.cell.backward_stroke.is_dark .line_after,
-.tablets div.row li.cell.forward_stroke.is_dark .line_before,
-.tablets div.row li.cell.backward_stroke.is_dark .line_after {
-  border-color: #FFFFFF;
-}*/
-
 /* *** SVG stroke *** */
 svg.forward_stroke,
 svg.backward_stroke {

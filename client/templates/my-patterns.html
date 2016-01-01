@@ -1,0 +1,19 @@
+<template name="my_patterns">
+{{#if Template.subscriptionsReady}}
+{{> left_column}}
+<div id="main_column">
+{{#with my_patterns}}{{#if this.count}}
+<h2>My patterns</h2>
+<ul class="patterns">
+{{> pages}}
+</ul>
+{{> pagesNav}}
+{{else}}
+<p>You have not created any patterns yet</p>
+{{/if}}{{/with}}
+</div>
+{{else}}
+  Loading...
+{{/if}}
+</template>
+

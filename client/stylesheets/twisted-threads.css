@@ -38,7 +38,7 @@ body {
 }
 
 #header {
-  height: 3em;
+  height: 48px;
   background-color: #7580ac;
   color: #FFFFFF;
   position: absolute;
@@ -58,7 +58,7 @@ body {
 /* extra div provides padding without forcing horizontal scroll */
 #content > .inner_tube {
   padding: 16px;
-  margin-top: 70px;
+  margin-top: 48px;
 }
 
 /* *** Header *** */
@@ -81,15 +81,6 @@ body {
   line-height: 2.7;
   text-align: center;
 }
-/*
-#header h1 span {
-  display: block;
-  width: 220px;
-  margin: 0 auto 0 auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}*/
 
 #header .header_right {
   float: right;
@@ -233,7 +224,8 @@ body {
 }
 
 #header #search div.results-wrapper li.pattern_results a .tablets_count .icon {
-  background: url("../images/tablets_count.png") transparent no-repeat left top;
+  background: url("../images/tablet_count.svg") transparent no-repeat left top;
+  background-size: 16px 16px;
 }
 
 #header #search div.results-wrapper li.pattern_results a .created_by .icon {
@@ -442,7 +434,7 @@ body {
 
 /* *** content *** */
 h2 {
-  clear: both;
+  /*clear: both;*/
   font-weight: bold;
   font-size: 100%;
   margin-top: 16px;
@@ -525,4 +517,41 @@ body.loading {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+}
+
+/* *** Left column for navigation *** */
+#left_column .left_menu {
+  float: left;
+  padding: 16px 0 16px 0;
+}
+
+#left_column .left_menu li {
+  float: left;
+  width: 100%;
+}
+
+#left_column .left_menu li a {
+  float: left;
+  width: 100%;
+  text-decoration: none;
+  color: #666666;
+  line-height: 2;
+  font-size: 12px;
+}
+
+#left_column .left_menu li:not(.selected) a:hover {
+  background-color: #EEEEEE;
+}
+
+#left_column .left_menu li a span {
+  padding: 0 16px 0 16px;
+  white-space: nowrap; 
+  text-overflow: ellipsis;
+  white-space: pre-line;
+  cursor: pointer;
+}
+
+#left_column .left_menu .selected a {
+  color: #333333;
+  background-color: #CCCCCC;
 }

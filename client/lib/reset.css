@@ -21,9 +21,18 @@ time, mark, audio, video {
   border: 0;
   font-family: "Helvetica Neue", HelveticaNeue, TeXGyreHeros, FreeSans, "Nimbus Sans L", "Liberation Sans", Helvetica, Arial, sans-serif;
   voice-family: "\"}\""; voice-family:inherit;
-  font-size: medium;
+  font-size: 16px;
   font-weight:  normal;
   vertical-align: baseline;
+}
+
+/* https://developers.google.com/speed/docs/insights/UseLegibleFontSizes?hl=en*/
+.font-small {
+  font-size: 12px; /* 75% of the baseline */
+}
+
+.font-large {
+  font-size: 20px; /* 125% of the baseline */
 }
 
 /* HTML5 display-role reset for older browsers */

@@ -1,0 +1,19 @@
+<template name="recent_patterns">
+{{#if Template.subscriptionsReady}}
+{{> left_column}}
+<div id="main_column">
+{{#with recent_patterns}}{{#if this.length}}
+<h2>Recent patterns</h2>
+<ul class="patterns">
+{{> pages}}
+</ul>
+{{> pagesNav}}
+{{else}}
+<p>You havent yet viewed any patterns</p>
+{{/if}}{{/with}}
+</div>
+{{else}}
+  Loading...
+{{/if}}
+</template>
+

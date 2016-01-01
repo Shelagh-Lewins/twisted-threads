@@ -720,6 +720,17 @@ Meteor.my_functions = {
     Session.set('undo_stack_position', (position));
   },
   //////////////////////////////////
+  // Pattern thumbnails - how many will fit in a single row across the home screen
+  patterns_in_row: function()
+  {
+    var available_width = $('#main_column').width();
+
+    var thumbnail_width = Meteor.my_params.pattern_thumbnail_width + Meteor.my_params.pattern_thumbnail_rmargin;
+
+    var number_to_show = Math.floor(available_width / thumbnail_width);
+    return number_to_show;
+  },
+  //////////////////////////////////
   // Recent Patterns
   add_to_recent_patterns: function(pattern_id)
   {
@@ -1113,7 +1124,7 @@ Meteor.my_functions = {
         current_threading_cells[i][j].tablet += 1;
       }
       var obj = {
-        row: i+1,
+        hole: i+1,
         tablet: position,
         style: style
       }

@@ -8,6 +8,26 @@ Router.route('/', {
   template: 'home'
 });
 
+Router.route('/recent-patterns', {
+  name: 'recent_patterns',
+  template: 'recent_patterns'
+});
+
+Router.route('/new-patterns', {
+  name: 'new_patterns',
+  template: 'new_patterns'
+});
+
+Router.route('/my-patterns', {
+  name: 'my_patterns',
+  template: 'my_patterns'
+});
+
+Router.route('/all-patterns', {
+  name: 'all_patterns',
+  template: 'all_patterns'
+});
+
 Router.route('/pattern/:_id/:mode?', {
   name: 'pattern',
   data: function(){

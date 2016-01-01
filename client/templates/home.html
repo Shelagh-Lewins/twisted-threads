@@ -1,12 +1,29 @@
 <template name="home">
 {{#if Template.subscriptionsReady}}
-{{> patterns}}
+{{> left_column}}
+<div id="main_column">
+{{> home_patterns}}
+</div>
 {{else}}
   Loading...
 {{/if}}
 </template>
 
-<template name="patterns">
+<template name="left_column">
+<div id="left_column">
+<ul class="left_menu">
+<li class="{{selected "home"}}"><a href="{{pathFor route='home'}}"><span>Home</span></a></li>
+<li class="{{selected "recent_patterns"}}"><a href="{{pathFor route='recent_patterns'}}"><span>Recent patterns</span></a></li>
+<li class="{{selected "new_patterns"}}"><a href="{{pathFor route='new_patterns'}}"><span>New patterns</span></a></li>
+{{#if currentUser}} 
+<li class="{{selected "my_patterns"}}"><a href="{{pathFor route='my_patterns'}}"><span>My patterns</span></a></li>
+{{/if}}
+<li class="{{selected "all_patterns"}}"><a href="{{pathFor route='all_patterns'}}"><span>All patterns</span></a></li>
+</ul>
+</div>
+</template>
+
+<template name="home_patterns">
   {{#if currentUser}}
   {{> create_new_pattern}}
   {{else}}
@@ -14,23 +31,49 @@
   <p>Sign in to create and share patterns.</p>
   {{/if}}
 
-{{#with recent_patterns}}{{#if this.length}}
-<h2>Recent patterns</h2>
+{{#with recent_patterns true}}{{#if this.length}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recent</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
 <ul class="patterns">
 {{#each this}}
-{{> pattern_overview}}
+{{> pattern_thumbnail}}
 {{/each}}
 </ul>
+</div>
 {{else}}
 <p>Select a pattern and start weaving.</p>
 {{/if}}{{/with}}
-{{#with not_recent_patterns}}{{#if this.count}}
-<h2>Patterns</h2>
+
+{{#with new_patterns true}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='new_patterns'}}"><span class="text">New patterns</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
 <ul class="patterns">
 {{#each this}}
-{{> pattern_overview}}
+{{> pattern_thumbnail}}
 {{/each}}
-</ul>
+</ul></div>
+{{/if}}{{/with}}
+
+{{#if currentUser}}
+{{#with my_patterns true}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='my_patterns'}}"><span class="text">My patterns</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="patterns">
+{{#each this}}
+{{> pattern_thumbnail}}
+{{/each}}
+</ul></div>
+{{/if}}{{/with}}
+{{/if}}
+
+{{#with not_recent_patterns true}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='all_patterns'}}"><span class="text">All patterns</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="patterns">
+{{#each this}}
+{{> pattern_thumbnail}}
+{{/each}}
+</ul></div>
 {{/if}}{{/with}}
 </template>
 
@@ -48,17 +91,24 @@
 </div>
 </template>
 
-<template name="pattern_overview"><li class="{{#if private}}private{{/if}}"><a href="{{pathFor route='pattern'}}">
-  <span class="header"><img src="{{thumbnail_url}}" class="thumbnail" width="80" height="80"/><span class="name">{{name}}</span></span>
-  <span class="main"><span class="description">{{description}}</span></span></a><div class="buttons"><a href="{{pathFor route='user' _id=created_by}}" class="created_by">{{created_by_username}}</a>{{#if can_edit_pattern _id}}<input type="button" class="delete" value="Delete" />
-<button class="toggle_private">
+<template name="pattern_thumbnail"><li class="pattern_thumbnail {{#if private}}private{{/if}}" style="width: {{width}}; margin-right: {{rmargin}}" >
+<div class="main">
+<a href="{{pathFor route='pattern'}}">
+<h3>{{name}}</h3>
+<div class="description">{{description}}</div>
+<div class="tags">{{#each tags}}<span>{{this}}</span>{{/each}}</div>
+<div class="stats"><span class="number_of_tablets" title="Number of tablets"><span class="icon"></span><span class="text">{{number_of_tablets}}</span></span></div>
+<div class="image"><img src="{{thumbnail_url}}" class="thumbnail" width="232" height="36"/></div>
+</a></div>
+<div class="footer"><a href="{{pathFor route='user' _id=created_by}}" class="created_by">{{created_by_username}}</a>{{#if can_edit_pattern _id}}
+<a href="#" id="delete" title="Delete this pattern"><span></span></a>
 {{#if private}}
-Private
+<a href="#" id="toggle_private" class="private" title="Private: nobody else can see this pattern"><span></span></a>
 {{else}}
-Public
-{{/if}}
-</button>{{/if}}</div>
+<a href="#" id="toggle_private" class="public" title="Public: other people can see this pattern but they can't edit it"><span></span></a>
+{{/if}}{{/if}}</div>
 </li>
 </template>
+
 
 

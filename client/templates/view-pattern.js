@@ -92,7 +92,17 @@ Template.view_pattern.helpers({
 
     if (style.backward_stroke)
         return "on";
-  }
+  },
+
+  //////////////////////////
+  // File upload
+  /*myCallbacks: function() {
+    console.log("someplace");
+    return {
+        formData: function() { console.log("here"); return { id: "232323",  } },
+        finished: function(index, fileInfo, context) { console.log("somewhere") }
+    }
+  }*/
 });
 
 Template.orientation.helpers({
@@ -348,7 +358,8 @@ Template.view_pattern.events({
   'click .tablets li.cell': function(event, template) {
     if (Meteor.my_functions.accept_click())
     {
-      var new_style = Session.get("selected_style");
+      var new_style = Meteor.my_functions.get_selected_style();
+
       var pattern_id = Router.current().params._id;
 
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))

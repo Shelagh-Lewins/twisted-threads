@@ -8,6 +8,10 @@
   margin-bottom: 150px;
 }
 
+.view_pattern h2 {
+  clear: both;
+}
+
 /* *** Pattern Info *** */
 .pattern_info {
   max-width: 600px;
@@ -60,7 +64,8 @@
 }
 
 .pattern_info .tablets_count .icon {
-  background: url("../images/tablets_count.png") transparent no-repeat left top;
+  background: url("../images/tablet_count.svg") transparent no-repeat left top;
+  background-size: 16px 16px;
 }
 
 .pattern_info .created_by .icon {

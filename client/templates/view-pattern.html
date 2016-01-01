@@ -4,7 +4,7 @@
 {{> stroke_svgs}}
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
-
+<!--{{> upload_semanticUI fileTypes='.jpg, .png, .gif' callbacks=myCallbacks}}-->
 {{#if can_edit_pattern _id}}
 {{else}}
 <div class="box summary">
