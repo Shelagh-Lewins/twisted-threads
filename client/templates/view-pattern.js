@@ -52,47 +52,7 @@ Template.view_pattern.helpers({
 
     if (position >= stored_patterns.length)
       return "disabled";
-  },
-  // Edit style controls
-  forward_stroke_on: function() {
-    var selected_style = Session.get("selected_style");
-    var pattern_id = Router.current().params._id;
-
-    if (typeof selected_style === "undefined") // can be undefined at startup
-        return;
-
-    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
-        return;
-
-    var style = current_styles.list()[selected_style-1];
-
-    //var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
-
-    if (typeof style === "undefined")
-        return;
-    
-    if (style.forward_stroke)
-        return "on";
-  },
-  backward_stroke_on: function() {
-    var selected_style = Session.get("selected_style");
-    var pattern_id = Router.current().params._id;
-
-    if (typeof selected_style === "undefined") // can be undefined at startup
-        return;
-
-    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
-        return;
-
-    //var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
-    var style = current_styles.list()[selected_style-1];
-
-    if (typeof style === "undefined")
-        return;
-
-    if (style.backward_stroke)
-        return "on";
-  },
+  }
 
   //////////////////////////
   // File upload
@@ -237,6 +197,45 @@ Template.styles_palette.helpers({
   show_special_styles: function(){
     if (Session.equals('show_special_styles', true))
       return "show_special_styles";
+  },
+  // Edit style controls
+  forward_stroke_on: function() {
+    var selected_style = Session.get("selected_style");
+    var pattern_id = Router.current().params._id;
+
+    if (typeof selected_style === "undefined") // can be undefined at startup
+        return;
+
+    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+        return;
+
+    var style = current_styles.list()[selected_style-1];
+
+
+    if (typeof style === "undefined")
+        return;
+
+    if (style.forward_stroke)
+        return "on";
+  },
+  backward_stroke_on: function() {
+    var selected_style = Session.get("selected_style");
+    var pattern_id = Router.current().params._id;
+
+    if (typeof selected_style === "undefined") // can be undefined at startup
+        return;
+
+    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+        return;
+
+    //var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
+    var style = current_styles.list()[selected_style-1];
+
+    if (typeof style === "undefined")
+        return;
+
+    if (style.backward_stroke)
+        return "on";
   }
 });
 
