@@ -7,7 +7,12 @@ this.AllPatterns = new Meteor.Pagination(Patterns, {
   perPage: 12,
   sort: {
     name: 1
-  }
+  },
+  availableSettings: {
+    filters: true,
+    sort: true
+  },
+  filters: {}
 });
 
 this.NewPatterns = new Meteor.Pagination(Patterns, {
