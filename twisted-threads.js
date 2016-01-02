@@ -195,7 +195,7 @@ default_special_styles = [
 ];
 
 if (Meteor.isClient) {
-  // default accounts-ui package
+  // configure the default accounts-ui package
   
   Accounts.ui.config({
     passwordSignupFields: "USERNAME_AND_EMAIL"
@@ -215,11 +215,9 @@ if (Meteor.isClient) {
       Session.set('window_height', $(window).height());
       Session.set('patterns_in_row', Meteor.my_functions.patterns_in_row());
     });
-
-    Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
-    reactive_recent_patterns = new ReactiveArray();
-
   });
+
+  reactive_recent_patterns = new ReactiveArray();
 
   //////////////////////////////
   // Helpers for templates that may be used on multiple pages
@@ -238,7 +236,7 @@ if (Meteor.isClient) {
 
      $("#width").on('scroll', function(e) {
       Meteor.my_functions.resize_page();  
-    });
+    }); 
    }
 
   Template.main_layout.helpers({
@@ -422,7 +420,6 @@ if (Meteor.isClient) {
 
   Template.left_column.helpers({
     selected: function(item) {
-      //console.log("Route " + Router.current().route.getName());
       var route = Router.current().route.getName();
       switch(item)
       {
@@ -440,9 +437,18 @@ if (Meteor.isClient) {
 
   ////////////////////////////////////
   Template.header.onCreated(function() {
-    this.subscribe('patterns');
+    this.subscribe('patterns', {
+        onReady: function () { 
+          console.log("Patterns ready. Patterns count " + Patterns.find().count());
+          Session.set('patterns_ready', true);
+        }
+      });
     this.subscribe('weaving'); // TODO remove
-    this.subscribe('recent_patterns');
+    this.subscribe('recent_patterns', {
+      onReady: function() {
+        Session.set('recents_ready', true);
+      }
+    });
   });
 
   Template.header.events({
@@ -818,27 +824,15 @@ if (Meteor.isClient) {
     
     // The publish functions don't automatically update queries to other collections. So the client resubscribes to pattern-related collections whenever the list of patterns that the user can see changes.
     // my_pattern_ids detects that Patterns has changed. Math.random triggers the re-subscription, otherwise Meteor refuses to run it.
-    /*var my_pattern_ids = Patterns.find({
-      $or: [
-        { private: {$ne: true} },
-        { created_by: this.userId }
-      ]
-    }, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
 
-    if (my_pattern_ids)
-    {
-      console.log("resubscribe");
-      Meteor.subscribe('recent_patterns', Math.random());
-    }*/
-    //console.log("autorun");
     var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
     if (my_pattern_ids)
     {
-      //console.log("Patterns autorun");
-      //Meteor.subscribe('recent_patterns');
       Meteor.subscribe('recent_patterns', Math.random());
     }
     
+    if (Session.equals('patterns_ready', true) && Session.equals('recents_ready', true))
+      Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
 
     // detect login / logout
     var currentUser=Meteor.user();

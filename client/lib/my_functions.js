@@ -763,6 +763,7 @@ Meteor.my_functions = {
       
       // and add the pattern as the most recent i.e. first element
       recent_patterns.unshift(pattern_id);
+      console.log("add to recents");
       window.localStorage.setItem('recent_patterns', JSON.stringify(recent_patterns));
 
       if (recent_patterns.length > 50) // don't store too many patterns
@@ -783,11 +784,12 @@ Meteor.my_functions = {
 
       for(var i = recent_patterns.length-1; i>=0; i--)
       {
-        var pattern_id = recent_patterns[i]
+        var pattern_id = recent_patterns[i];
         if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
-            recent_patterns.splice(i, 1);
+        {
+          recent_patterns.splice(i, 1);
+        }
       }
-
       window.localStorage.setItem('recent_patterns', JSON.stringify(recent_patterns));
     }
   },
@@ -1629,6 +1631,7 @@ Meteor.my_functions = {
   },
   set_pattern_data_from_local_storage: function(pattern_id, data)
   {
+    console.log("set pattern data")
     localStorage.setItem("pattern_" + pattern_id, JSON.stringify(data));
   },
   validate_row_number_input: function(index)
