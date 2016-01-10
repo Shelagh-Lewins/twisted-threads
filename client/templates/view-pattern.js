@@ -198,8 +198,7 @@ Template.styles_palette.helpers({
     if (Session.equals('show_special_styles', true))
       return "show_special_styles";
   },
-  // Edit style controls
-  forward_stroke_on: function() {
+  stroke: function() {
     var selected_style = Session.get("selected_style");
     var pattern_id = Router.current().params._id;
 
@@ -211,31 +210,10 @@ Template.styles_palette.helpers({
 
     var style = current_styles.list()[selected_style-1];
 
-
     if (typeof style === "undefined")
         return;
 
-    if (style.forward_stroke)
-        return "on";
-  },
-  backward_stroke_on: function() {
-    var selected_style = Session.get("selected_style");
-    var pattern_id = Router.current().params._id;
-
-    if (typeof selected_style === "undefined") // can be undefined at startup
-        return;
-
-    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
-        return;
-
-    //var style = Styles.findOne({$and: [{ pattern_id: pattern_id}, {style: selected_style}]});
-    var style = current_styles.list()[selected_style-1];
-
-    if (typeof style === "undefined")
-        return;
-
-    if (style.backward_stroke)
-        return "on";
+    return style.stroke;
   }
 });
 
@@ -433,52 +411,19 @@ Template.styles_palette.events({
     Session.set('styles_palette', "special");
     Session.set('show_special_styles', true);
   },
-  'click .edit_style .forward_stroke': function () {
-    var selected_style = Session.get("selected_style");
-    var pattern_id = Router.current().params._id;
-
-    var style = current_styles[selected_style-1];
-    var forward_stroke = !style.forward_stroke;
-
-    var options = { forward_stroke: forward_stroke };
-    var pattern_id = Router.current().params._id;
-
-    // update local reactiveArray
-    var obj = current_styles[style.style-1];
-    if (forward_stroke)
-      obj.forward_stroke = "forward_stroke";
-
-    else
-      obj.forward_stroke = null;
-
-    current_styles.splice(style.style-1, 1, obj);
-
-    // update database
-    Meteor.my_functions.save_styles_as_text(pattern_id);
-    Meteor.my_functions.store_pattern(pattern_id);
+  'click .edit_style .strokes .forward': function() {
+    Meteor.my_functions.edit_style_stroke("forward");
   },
-  'click .edit_style .backward_stroke': function () {
-    var selected_style = Session.get("selected_style");
-    var pattern_id = Router.current().params._id;
-
-    var style = current_styles[selected_style-1];
-    var backward_stroke = !style.backward_stroke;
-
-    var options = { backward_stroke: backward_stroke };
-    var pattern_id = Router.current().params._id;
-
-    // update local reactiveArray
-    var obj = current_styles[style.style-1];
-    if (backward_stroke)
-      obj.backward_stroke = "backward_stroke";
-
-    else
-      obj.backward_stroke = null;
-
-    current_styles.splice(style.style-1, 1, obj);
-
-    // update database
-    Meteor.my_functions.save_styles_as_text(pattern_id);
-    Meteor.my_functions.store_pattern(pattern_id);
+  'click .edit_style .strokes .backward': function() {
+    Meteor.my_functions.edit_style_stroke("backward");
+  },
+  'click .edit_style .strokes .v_left': function() {
+    Meteor.my_functions.edit_style_stroke("v_left");
+  },
+  'click .edit_style .strokes .v_center': function() {
+    Meteor.my_functions.edit_style_stroke("v_center");
+  },
+  'click .edit_style .strokes .v_right': function() {
+    Meteor.my_functions.edit_style_stroke("v_right");
   }
  });

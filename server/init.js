@@ -77,6 +77,32 @@ Meteor.startup(function () {
     if (myDoc.name == Meteor.my_params.default_pattern_name)
       Patterns.update({_id: myDoc._id}, { $set: {private: true}});
   });*/
+
+  // data migration from forward_stroke, backward_stroke to new stroke with exclusive values
+  /*Patterns.find().forEach( function(myDoc) {
+    // pull out styles
+    // for each style set stroke for b, f, none
+    // resave
+    var styles_data = JSON.parse(myDoc.styles);
+    for (var i=0; i< styles_data.length; i++)
+    {
+      if (styles_data[i].forward_stroke == true)
+        styles_data[i].stroke = "forward";
+
+      else if (styles_data[i].backward_stroke == true)
+        styles_data[i].stroke = "backward";
+
+      else
+        styles_data[i].stroke = "none";
+
+      delete styles_data[i].forward_stroke;
+      delete styles_data[i].backward_stroke;
+    }
+    //console.log("test " + JSON.stringify(styles_data[0]));
+
+    var text = JSON.stringify(styles_data);
+    Patterns.update({_id: myDoc._id}, {$set: { styles: text}});
+  });*/
 });
 
 Accounts.onCreateUser(function(options, user) {

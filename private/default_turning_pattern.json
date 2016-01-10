@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "2.1",
   "name": "New pattern",
   "description": "A pattern woven by forward and backward turning of the tablets.",
   "weaving_notes": "White background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread",
@@ -9,194 +9,164 @@
     {
       "background_color": "#000000",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": false
+      "stroke": "none"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": false
+      "stroke": "none"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": false
+      "stroke": "none"
     },
     {
       "background_color": "#674ea7",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": false
+      "stroke": "none"
     },
     {
       "background_color": "#FFFFFF",
       "line_color": "#ffffff",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#ffffff",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#000000",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#cc0000",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": false
+      "stroke": "none"
     },
     {
       "background_color": "#ffd966",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": false
+      "stroke": "none"
     },
     {
       "background_color": "#6aa84f",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": false
+      "stroke": "none"
     },
     {
       "background_color": "#1c4587",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": false
+      "stroke": "none"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffffff",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffffff",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#000000",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#000000",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#cc0000",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#cc0000",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#ffd966",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#ffd966",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#6aa84f",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#6aa84f",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#1c4587",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#ffffff",
       "line_color": "#1c4587",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#cc0000",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#cc0000",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
+
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffd966",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffd966",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#6aa84f",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#6aa84f",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
+
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#1c4587",
-      "forward_stroke": false,
-      "backward_stroke": true
+      "stroke": "backward"
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#1c4587",
-      "forward_stroke": true,
-      "backward_stroke": false
+      "stroke": "forward"
     }
   ],
   "orientation": ["S","S","S","S","S","S","S","S"],

@@ -337,7 +337,7 @@
   position: absolute;
   right: 8px;
   padding: 0 8px 8px 8px;
-  width: 140px;
+  width: 280px;
   border: 1px solid #7580AC;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -355,8 +355,7 @@
   margin-right: 4px;
 }
 
-.edit_style .forward_stroke,
-.edit_style .backward_stroke {
+.edit_style .strokes div {
   float: left;
   position: relative;
   width: 32px;
@@ -367,8 +366,8 @@
   cursor: pointer;
 }
 
-.edit_style .forward_stroke:before,
-.edit_style .backward_stroke:before {
+.edit_style .forward:before,
+.edit_style .backward:before  {
   position: absolute;
   content: "";
   width: 147%;
@@ -379,15 +378,15 @@
   border-color: #444444;
 }
 
-.edit_style .forward_stroke:before {
-  -webkit-transform:rotate(-54deg);
+.edit_style .forward:before {
+  -webkit-transform:rotate(-45deg);
   -moz-transform:rotate(-45deg);
   -ms-transform:rotate(-45deg);
   -o-transform:rotate(-45deg);
   transform:rotate(-45deg);
 }
 
-.edit_style .backward_stroke:before {
+.edit_style .backward:before {
   -webkit-transform:rotate(45deg);
   -moz-transform:rotate(45deg);
   -ms-transform:rotate(45deg);
@@ -395,8 +394,33 @@
   transform:rotate(45deg);
 }
 
-.edit_style .forward_stroke.on:before,
-.edit_style .backward_stroke.on:before {
+.edit_style .v_left:before,
+.edit_style .v_center:before,
+.edit_style .v_right:before {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  border-left: 1px dotted #FFFFFF;
+  border-color: #444444;
+}
+
+.edit_style .v_left:before {
+  left: 4px;
+}
+
+.edit_style .v_center:before {
+  left: 16px;
+}
+
+.edit_style .v_right:before {
+  left: 28px;
+}
+
+.edit_style .forward.on:before,
+.edit_style .backward.on:before {
   border-top: 1px solid #000000;
 }
 

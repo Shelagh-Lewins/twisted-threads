@@ -33,18 +33,52 @@
       <g><ellipse rx="140.42" transform="matrix(-.70711 -.70711 -.70711 .70711 0 0)" ry="70.214" cy=".33336" cx="-180.72" stroke-width="9.9099" /></g>
   </symbol>
 </svg>
+
+<svg class="v_left_stroke">
+  <symbol id="v_left_stroke_symbol">
+      <g> <ellipse rx="116.44" ry="70.643" stroke="#000" transform="matrix(0,-1,-1,0,0,0)" cy="-82.313" cx="-127.41" stroke-width="9.0518" /></g>
+  </symbol>
+</svg>
+
+<svg class="v_center_stroke">
+  <symbol id="v_center_stroke_symbol">
+      <g><ellipse rx="116.44" ry="70.643" stroke="#000" transform="matrix(0,-1,-1,0,0,0)" cy="-126.31" cx="-127.41" stroke-width="9.0518" /></g>
+  </symbol>
+</svg>
+
+<svg class="v_right_stroke">
+  <symbol id="v_right_stroke_symbol">
+      <g><ellipse rx="116.44" ry="70.643" stroke="#000" transform="matrix(0,-1,-1,0,0,0)" cy="-174.31" cx="-127.41" stroke-width="9.0518" /></g>
+  </symbol>
+</svg>
+
 </template>
 
 <template name="pattern_cell">
 <li class="cell no_select" style="background-color: {{background_color}}; background-image: url('{{image}}')">
-{{#if equals forward_stroke "forward_stroke"}}
+{{#if equals stroke "forward"}}
 <svg viewBox="0 0 256 256">
     <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_stroke_symbol" x="0" y="0"/>
 </svg>
 {{else}}
-{{#if equals backward_stroke "backward_stroke"}}
+{{#if equals stroke "backward"}}
 <svg viewBox="0 0 256 256">
     <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_stroke_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals stroke "v_left"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_left_stroke_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals stroke "v_center"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_center_stroke_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals stroke "v_right"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_right_stroke_symbol" x="0" y="0"/>
 </svg>
 {{/if}}
 {{/if}}

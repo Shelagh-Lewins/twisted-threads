@@ -103,13 +103,18 @@
 <template name="styles_palette">{{#if can_edit_pattern _id}}
 <div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}} {{show_special_styles}}">
 <div class="styles">
-  <div class="edit_style {{editing_style}}">
- <h2>Background</h2>
+<div class="edit_style {{editing_style}}">
+<h2>Background</h2>
 <div class="colorpicker_holder"><input type="text" id="background_colorpicker"></div>
 <h2>Thread</h2>
 <div class="colorpicker_holder"><input type="text" id="line_colorpicker"></div>
-<div class="forward_stroke {{forward_stroke_on}}"></div>
-<div class="backward_stroke {{backward_stroke_on}}"></div>
+<div class="strokes">
+  <div class="forward {{#if equals stroke "forward"}}on{{/if}}"></div>
+  <div class="backward {{#if equals stroke "backward"}}on{{/if}}"></div>
+  <div class="v_left {{#if equals stroke "v_left"}}on{{/if}}"></div>
+  <div class="v_center {{#if equals stroke "v_center"}}on{{/if}}"></div>
+  <div class="v_right {{#if equals stroke "v_right"}}on{{/if}}"></div>
+</div>
 </div>
 <div class="pagination"><ul>
 {{#if single_column}}
@@ -128,14 +133,29 @@
 
 <template name="style_cell">
 <li class="cell no_select {{is_selected_style style}}" style="background-color: {{background_color}}; background-image: url('{{image}}')">
-{{#if equals forward_stroke "forward_stroke"}}
+{{#if equals stroke "forward"}}
 <svg viewBox="0 0 256 256">
     <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_stroke_symbol" x="0" y="0"/>
 </svg>
 {{else}}
-{{#if equals backward_stroke "backward_stroke"}}
+{{#if equals stroke "backward"}}
 <svg viewBox="0 0 256 256">
     <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_stroke_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals stroke "v_left"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_left_stroke_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals stroke "v_center"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_center_stroke_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals stroke "v_right"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_right_stroke_symbol" x="0" y="0"/>
 </svg>
 {{/if}}
 {{/if}}

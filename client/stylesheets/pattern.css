@@ -122,7 +122,10 @@
 
 /* *** SVG stroke *** */
 svg.forward_stroke,
-svg.backward_stroke {
+svg.backward_stroke,
+svg.v_left_stroke,
+svg.v_center_stroke,
+svg.v_right_stroke {
   display: none;
 }
 

@@ -35,79 +35,80 @@ UI.registerHelper('hole_label', function(hole) {
 });
 
 ///////////////////////////
-  // Helpers for styles
-  UI.registerHelper('style_orientation', function(orientation) {
-    if (orientation == "Z")
-        return "orientation_z";
+// Helpers for styles
+UI.registerHelper('style_orientation', function(orientation) {
+  if (orientation == "Z")
+      return "orientation_z";
 
-    else
-        return "orientation_s";
-  });
+  else
+      return "orientation_s";
+});
 
-  UI.registerHelper('is_selected_style', function() {
-    var special = false;
+UI.registerHelper('is_selected_style', function() {
+  var special = false;
 
-    if (typeof this.style === "string")
-      if (this.style.charAt(0) == "S")
-        special = true;
+  if (typeof this.style === "string")
+    if (this.style.charAt(0) == "S")
+      special = true;
 
-    if (special)
+  if (special)
+  {
+    if (Session.equals('selected_special_style', this.style))
+      return "selected";
+  }
+  else
+  {
+    if (Session.equals('selected_style', this.style))
+      return "selected";
+  }
+});
+
+UI.registerHelper('cell_style', function(row, tablet) {
+  if (typeof this.style == "string")
+  {
+    if (this.style.charAt(0) == "S")
     {
-      if (Session.equals('selected_special_style', this.style))
-        return "selected";
-    }
-    else
-    {
-      if (Session.equals('selected_style', this.style))
-        return "selected";
-    }
-  });
-
-  UI.registerHelper('cell_style', function(row, tablet) {
-    if (typeof this.style == "string")
-    {
-      if (this.style.charAt(0) == "S")
-      {
-        var style_number = parseInt(this.style.substring(1));
-        var style = current_special_styles.list()[style_number-1];
-        if (typeof style === "undefined")
-            return;
-
-        // Important! update this if style defs change
-        // could use a clone but it's cleaner to control the properties directly
-
-        var cell_style = {
-          background_color: style.background_color,
-          image: style.image,
-          style: style.style
-        }
-      }
-    }
-    else
-    {
-      var style = current_styles.list()[this.style-1];
+      var style_number = parseInt(this.style.substring(1));
+      var style = current_special_styles.list()[style_number-1];
       if (typeof style === "undefined")
-            return;
+          return;
 
       // Important! update this if style defs change
       // could use a clone but it's cleaner to control the properties directly
+
       var cell_style = {
         background_color: style.background_color,
-        backward_stroke: style.backward_stroke,
-        forward_stroke: style.forward_stroke,
-        line_color: style.line_color,
+        image: style.image,
         style: style.style
       }
     }
-    if (typeof this.row !== "undefined")
-      cell_style.row =  this.row;
+  }
+  else
+  {
+    var style = current_styles.list()[this.style-1];
+    if (typeof style === "undefined")
+          return;
 
-    if (typeof this.tablet !== "undefined")
-      cell_style.tablet = this.tablet;
+    // Important! update this if style defs change
+    // could use a clone but it's cleaner to control the properties directly
+    var cell_style = {
+      background_color: style.background_color,
+      stroke: style.stroke,
+      line_color: style.line_color,
+      style: style.style
+    }
+  }
+  if (typeof this.row !== "undefined")
+    cell_style.row =  this.row;
 
-    if (typeof this.hole !== "undefined")
-      cell_style.hole = this.hole;
+  if (typeof this.tablet !== "undefined")
+    cell_style.tablet = this.tablet;
 
-    return cell_style;
-  });
+  if (typeof this.hole !== "undefined")
+    cell_style.hole = this.hole;
+
+  return cell_style;
+});
+
+
 

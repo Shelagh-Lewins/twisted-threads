@@ -23,6 +23,8 @@ Meteor.methods({
       filename: Match.Optional(String) 
     });
 
+    console.log("version " + options.data);
+
     if (!Meteor.isServer) // minimongo cannot simulate loading data with Assets
         return;
 
@@ -50,6 +52,22 @@ Meteor.methods({
     {
       //return -1;
       throw new Meteor.Error("file-load-failed", "File load error in new_pattern_from_json");
+    }
+
+    // check version
+    var version = [0,0];
+    if (typeof data.version !== "undefined")
+    {
+      var split_version = data.version.split("."); // [main, subsidiary] e.g. 2.1
+      if (typeof split_version[0] !== "undefined")
+      {
+        version[0] = parseInt(split_version[0]);
+
+        if (typeof split_version[1] !== "undefined")
+        {
+          version[1] = parseInt(split_version[1]);
+        }
+      } 
     }
 
     // Numbers of rows and tablets
@@ -167,6 +185,22 @@ Meteor.methods({
     for (var i=0; i<32; i++) // create 32 styles
     {
       styles_array[i] = data.styles[i];
+
+      // version 1 has style.backward_stroke, style.forward_stroke
+      // convert to 2+
+      // style.stroke "forward" "backward" "none (other values possible in 2+)
+      
+      if (data.styles[i].backward_stroke)
+        data.styles[i].stroke = "backward";
+        
+      if (data.styles[i].forward_stroke) // if both defined, choose forward
+        data.styles[i].stroke = "forward";
+        
+      delete data.styles[i].backward_stroke;
+      delete data.styles[i].forward_stroke;
+      //console.log("style " + JSON.stringify(data.styles[i]));
+      if (typeof data.styles[i].stroke === "undefined")
+        data.styles[i].stroke = "none";
     }
     Patterns.update({_id: pattern_id}, {$set: {styles: JSON.stringify(styles_array)}});
 
