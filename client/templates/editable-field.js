@@ -44,6 +44,7 @@ Template.editable_field.onCreated(function() {
           break;
 
         case "account_settings":
+        case "my_patterns":
           var object_id = Meteor.userId();
           break;
       }

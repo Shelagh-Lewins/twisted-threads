@@ -13,26 +13,33 @@
 <div id="left_column">
 <ul class="left_menu">
 <li class="{{selected "home"}}"><a href="{{pathFor route='home'}}"><span>Home</span></a></li>
-<li class="{{selected "recent_patterns"}}"><a href="{{pathFor route='recent_patterns'}}"><span>Recent patterns</span></a></li>
+{{#with recent_patterns}}{{#if this.length}}
+<li class="{{selected "recent_patterns"}}"><a href="{{pathFor route='recent_patterns'}}"><span>Recently viewed</span></a></li>
+{{/if}}{{/with}}
 <li class="{{selected "new_patterns"}}"><a href="{{pathFor route='new_patterns'}}"><span>New patterns</span></a></li>
 {{#if currentUser}} 
 <li class="{{selected "my_patterns"}}"><a href="{{pathFor route='my_patterns'}}"><span>My patterns</span></a></li>
 {{/if}}
 <li class="{{selected "all_patterns"}}"><a href="{{pathFor route='all_patterns'}}"><span>All patterns</span></a></li>
+<li class="{{selected "users"}}"><a href="{{pathFor route='users'}}"><span>People</span></a></li>
 </ul>
 </div>
 </template>
 
 <template name="home_patterns">
+  <div class="introduction">
+  <p>Welcome to Twisted Threads, the online app for tablet weaving. You can use Twisted Threads to design, weave and share patterns.</p>
+  <p>Tablet weaving is an ancient craft known around the world by different names including card weaving, brettchen weberei, brikvævning and tissage &agrave; carton.</p>
+  <p>Join our <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss Twisted Threads with other users or share feedback with the app developer.</p>
+</div>
   {{#if currentUser}}
   {{> create_new_pattern}}
   {{else}}
-  <p>Welcome to Twisted Threads, the online app for tablet weaving patterns.</p>
   <p>Sign in to create and share patterns.</p>
   {{/if}}
 
 {{#with recent_patterns true}}{{#if this.length}}
-<h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recent</span><span class="more">See more</span></a></h2>
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="patterns">
 {{#each this}}
@@ -75,6 +82,16 @@
 {{/each}}
 </ul></div>
 {{/if}}{{/with}}
+
+{{#with users true}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='users'}}"><span class="text">People</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="users">
+{{#each this}}
+{{> user_thumbnail}}
+{{/each}}
+</ul></div>
+{{/if}}{{/with}}
 </template>
 
 <template name="create_new_pattern">
@@ -110,5 +127,28 @@
 </li>
 </template>
 
+
+<template name="user_thumbnail"><li class="user_thumbnail" style="width: {{width}}; margin-right: {{rmargin}}" >
+<div class="main">
+<a href="{{pathFor route='user' _id=_id}}">
+<h3>{{username}}</h3>
+<div class="description">{{profile.description}}</div>
+<div class="stats">
+<span class="number_of_patterns" title="Number of patterns"><span class="icon"></span><span class="text">{{number_of_patterns}}</span></span>
+</div>
+<div class="image"><img src="{{thumbnail_url}}" class="thumbnail" width="108" height="108" style="background-color:{{background _id}};" /></div>
+
+</a>
+</div>
+</li>
+</template>
+
+<template name="filter_on_tablets">
+<div class="filter"><p>
+Only show patterns with between
+<input type="number" placeholder="Number" id="min_tablets" min="1" max="500" size="3" value="{{min_tablets}}">and
+<input type="number" placeholder="Number" id="max_tablets" min="1" max="500" size="3" value="{{max_tablets}}">tablets
+</p></div>
+</template>
 
 

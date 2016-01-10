@@ -1,204 +1,3 @@
-Patterns = new Meteor.Collection('patterns');
-
-// https://github.com/alethes/meteor-pages
-this.AllPatterns = new Meteor.Pagination(Patterns, {
-  itemTemplate: "pattern_thumbnail",
-  templateName: "all_patterns",
-  perPage: 12,
-  sort: {
-    name: 1
-  },
-  availableSettings: {
-    filters: true,
-    sort: true
-  },
-  filters: {}
-});
-
-this.NewPatterns = new Meteor.Pagination(Patterns, {
-  itemTemplate: "pattern_thumbnail",
-  templateName: "new_patterns",
-  perPage: 12,
-  sort: {
-    created_at: -1
-  }
-});
-
-this.MyPatterns = new Meteor.Pagination(Patterns, {
-  itemTemplate: "pattern_thumbnail",
-  templateName: "my_patterns",
-  perPage: 12,
-  sort: {
-    name: 1
-  },
-  auth: function(skip, sub){
-    var _filters = {created_by: sub.userId};
-    var _options = {sort: {name: 1}};
-    return [_filters, _options];
-    //return Patterns.find({created_by: sub.userId}); // this ought to work but doesn't
-  }
-});
-
-this.RecentPatterns = new Meteor.Pagination(Patterns, {
-  itemTemplate: "pattern_thumbnail",
-  templateName: "recent_patterns",
-  perPage: 12,
-  sort: {
-    name: 1
-  },
-  availableSettings: {
-    filters: true,
-    settings: true,
-    sort: true
-  },
-  filters: {}
-});
-
-// tags on patterns
-Tags.TagsMixin(Patterns); // https://atmospherejs.com/patrickleet/tags
-Patterns.allowTags(function (userId) { return true; });
-
-// search patterns
-patternsIndex = new EasySearch.Index({
-  collection: Patterns,
-  fields: ['name', 'tags', 'created_by_username', 'number_of_tablets'],
-  defaultSearchOptions: {
-    limit: 6
-  },
-  engine: new EasySearch.Minimongo() // search only on the client, so only published documents are returned
-  /*engine: new EasySearch.MongoDB({
-    selector: function (searchObject, options, aggregation) {
-      let selector = this.defaultConfiguration().selector(searchObject, options, aggregation);
-
-      selector.createdBy = options.userId;
-      console.log("searchObject " + Object.keys(searchObject));
-      console.log("aggregation " + Object.keys(aggregation));
-      console.log("id " + options.userId);
-
-      return selector;
-    }
-  })*/
-});
-
-usersIndex = new EasySearch.Index({
-  collection: Meteor.users,
-  fields: ['username', 'profile.description'],
-  defaultSearchOptions: {
-    limit: 6
-  },
-  engine: new EasySearch.Minimongo() // search only on the client, so only published documents are returned
-});
-
-
-Recent_Patterns = new Mongo.Collection('recent_patterns'); // records the patterns each user has viewed / woven recently
-
-// Polyfill in case indexOf not supported, not that we are necessarily expecting to support IE8-
-// https://gist.github.com/revolunet/1908355
-// Just being careful
-if (!Array.prototype.indexOf)
-{
-  Array.prototype.indexOf = function(elt /*, from*/)
-  {
-    var len = this.length >>> 0;
-    var from = Number(arguments[1]) || 0;
-    from = (from < 0)
-         ? Math.ceil(from)
-         : Math.floor(from);
-    if (from < 0)
-      from += len;
-
-    for (; from < len; from++)
-    {
-      if (from in this &&
-          this[from] === elt)
-        return from;
-    }
-    return -1;
-  };
-}
-
-////////////////////////
-// extends 'check' functionality
-// check(userId, NonEmptyString);
-NonEmptyString = Match.Where(function (x) {
-  check(x, String);
-  return x.length > 0;
-});
-
-// general parameters
-Meteor.my_params = {}; // namespace for parameters
-Meteor.my_params.undo_stack_length = 10;
-Meteor.my_params.special_styles_number = 16; // currently up to 16 special styles allowing 3 multiple turns and 4 other single styles
-Meteor.my_params.pattern_thumbnail_width = 248; // tiled pattern thumbnails
-Meteor.my_params.pattern_thumbnail_rmargin = 16; // right margin
-
-default_special_styles = [
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_forward_2.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_backward_2.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_forward_3.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_backward_3.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_forward_4.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_backward_4.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_empty.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": ""
-},
-{
-  "background_color": "#BBBBBB",
-  "image": "/images/special_backward_2.svg"
-},
-{
-  "background_color": "#BBBBBB",
-  "image": "/images/special_forward_2.svg"
-},
-{
-  "background_color": "#BBBBBB",
-  "image": "/images/special_backward_3.svg"
-},
-{
-  "background_color": "#BBBBBB",
-  "image": "/images/special_forward_3.svg"
-},
-{
-  "background_color": "#BBBBBB",
-  "image": "/images/special_backward_4.svg"
-},
-{
-  "background_color": "#BBBBBB",
-  "image": "/images/special_forward_4.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_backward_strike.svg"
-},
-{
-  "background_color": "#FFFFFF",
-  "image": "/images/special_forward_strike.svg"
-}
-];
-
 if (Meteor.isClient) {
   // configure the default accounts-ui package
   
@@ -218,8 +17,10 @@ if (Meteor.isClient) {
     window.addEventListener('resize', function(){
       Session.set('window_width', $(window).width());
       Session.set('window_height', $(window).height());
-      Session.set('patterns_in_row', Meteor.my_functions.patterns_in_row());
+      Session.set('thumbnails_in_row', Meteor.my_functions.thumbnails_in_row());
     });
+
+    Session.set('display_min_tablets', 1);
   });
 
   reactive_recent_patterns = new ReactiveArray();
@@ -331,18 +132,9 @@ if (Meteor.isClient) {
     reactive_recent_patterns.clear();
     reactive_recent_patterns = new ReactiveArray(pattern_ids);
 
-    RecentPatterns.set({
-      filters: {
-          _id: {
-            $in: reactive_recent_patterns.array()
-          }
-        }
-    });
-
     // return the patterns in recency order
     var patterns = [];
-    //var max_number = Meteor.my_functions.number_of_pattern_thumbs();
-    //console.log("recents max_number " + Session.get('patterns_in_row'));
+
     for (var i=0; i<pattern_ids.length; i++)
     {
       var id = pattern_ids[i];
@@ -354,7 +146,7 @@ if (Meteor.isClient) {
       if (typeof pattern === "undefined") continue;
 
       if (limit)
-        if (i >= Session.get('patterns_in_row'))
+        if (i >= Session.get('thumbnails_in_row'))
           break;
       
       patterns.push(pattern);
@@ -376,7 +168,7 @@ if (Meteor.isClient) {
     obj["sort"]["name"] = 1;
 
     if (limit)
-      obj["limit"] = Session.get('patterns_in_row');
+      obj["limit"] = Session.get('thumbnails_in_row');
       
     return Patterns.find({_id: {$nin: pattern_ids}}, obj);
     // This is a cursor use use .count in template to find number of items
@@ -392,7 +184,7 @@ if (Meteor.isClient) {
     obj["sort"]["name"] = 1;
 
     if (limit)
-      obj["limit"] = Session.get('patterns_in_row');
+      obj["limit"] = Session.get('thumbnails_in_row');
 
     return Patterns.find({created_by: Meteor.userId()}, obj);
     // This is a cursor use use .count in template to find number of items
@@ -404,22 +196,34 @@ if (Meteor.isClient) {
     obj["sort"]["created_at"] = -1;
 
     if (limit)
-      obj["limit"] = Session.get('patterns_in_row');
+      obj["limit"] = parseInt(Session.get('thumbnails_in_row'));
+    //console.log(Patterns.find({}, obj).map( function(u) { return u.created_at; } ));
 
     return Patterns.find({}, obj);
     // This is a cursor use use .count in template to find number of items
   });
 
   UI.registerHelper('all_patterns', function(limit){
-    //console.log("all " + limit);
     var obj = {};
     obj["sort"] = {};
     obj["sort"]["created_at"] = -1;
 
     if (limit)
-      obj["limit"] = Session.get('patterns_in_row');
+      obj["limit"] = Session.get('thumbnails_in_row');
 
     return Patterns.find({}, obj);
+    // This is a cursor use use .count in template to find number of items
+  });
+
+  UI.registerHelper('users', function(limit){
+    var obj = {};
+    obj["sort"] = {};
+    obj["sort"]["profile.name_sort"] = 1;
+
+    if (limit)
+      obj["limit"] = Session.get('thumbnails_in_row');
+
+    return Meteor.users.find({}, obj);
     // This is a cursor use use .count in template to find number of items
   });
 
@@ -433,6 +237,7 @@ if (Meteor.isClient) {
         case "new_patterns":
         case "my_patterns":
         case "all_patterns":
+        case "users":
           if (route == item)
             return "selected";
           break;
@@ -441,14 +246,14 @@ if (Meteor.isClient) {
   });
 
   ////////////////////////////////////
-  Template.header.onCreated(function() {
+  Template.header.onRendered(function() {
     this.subscribe('patterns', {
         onReady: function () { 
-          console.log("Patterns ready. Patterns count " + Patterns.find().count());
           Session.set('patterns_ready', true);
+          Meteor.subscribe('user_info');
+          //console.log("number of patterns " + Patterns.find().count());
         }
       });
-    this.subscribe('weaving'); // TODO remove
     this.subscribe('recent_patterns', {
       onReady: function() {
         Session.set('recents_ready', true);
@@ -599,6 +404,21 @@ if (Meteor.isClient) {
   UI.registerHelper('pattern_exists', function(pattern_id){
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() != 0)
       return true;
+  });
+
+  UI.registerHelper('app_name_in_header', function(pattern_id){
+    switch (Router.current().route.getName())
+    {
+      case "home":
+      case "recent_patterns":
+      case "new_patterns":
+      case "my_patterns":
+      case "all_patterns":
+      case "users":
+        return true;
+        break;
+    }
+      
   });
 
   ///////////////////////////////
@@ -829,7 +649,7 @@ if (Meteor.isClient) {
     
     // The publish functions don't automatically update queries to other collections. So the client resubscribes to pattern-related collections whenever the list of patterns that the user can see changes.
     // my_pattern_ids detects that Patterns has changed. Math.random triggers the re-subscription, otherwise Meteor refuses to run it.
-
+//console.log(" autorun number of patterns " + Patterns.find().count());
     var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
     if (my_pattern_ids)
     {
@@ -856,6 +676,51 @@ if (Meteor.isClient) {
         Session.set('was_signed_in', false);
         setTimeout(function(){ Meteor.my_functions.resize_page();}, 20);
       }
+    }
+  });
+
+  Tracker.autorun(function (computation) {
+    // Filters
+    var max = Session.get('display_max_tablets');
+    var min = Session.get('display_min_tablets');
+
+    //if (display_max_tablets || display_min_tablets)
+    if (min || max)
+    {
+      // All Patterns
+      var filter = jQuery.extend({}, AllPatterns.filters);
+
+      AllPatterns.set({
+        filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
+      });
+
+      // New Patterns
+      var filter = jQuery.extend({}, NewPatterns.filters);
+
+      NewPatterns.set({
+        filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
+      });
+
+      // My Patterns
+      var filter = jQuery.extend({}, MyPatterns.filters);
+
+      MyPatterns.set({
+        filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
+      });
+
+      // User Patterns
+      var filter = jQuery.extend({}, UserPatterns.filters);
+
+      UserPatterns.set({
+        filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
+      });
+
+      // Users
+      var filter = jQuery.extend({}, Users.filters);
+
+      Users.set({
+        filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
+      });
     }
   });
 }
