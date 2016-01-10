@@ -29,22 +29,22 @@ Meteor.startup(function () {
   // comment out and upload again
   /*Patterns.find().forEach( function(myDoc) {
     var new_val = moment(myDoc.created_at).valueOf();
-    console.log("***")
-    console.log("pattern " + myDoc.name);
-    console.log("old date " + myDoc.created_at);
-    console.log("new time " + new_val);
-    console.log("new as date " + moment(new_val).format());
+    //console.log("***")
+    //console.log("pattern " + myDoc.name);
+    //console.log("old date " + myDoc.created_at);
+    //console.log("new time " + new_val);
+    //console.log("new as date " + moment(new_val).format());
 
     Patterns.update({_id: myDoc._id}, { $set: {created_at: new_val}});
   });
 
   Recent_Patterns.find().forEach( function(myDoc) {
     var new_val = moment(myDoc.accessed_at).valueOf();
-    console.log("***")
-    console.log("pattern " + myDoc.pattern_id);
-    console.log("old date " + myDoc.accessed_at);
-    console.log("new time " + new_val);
-    console.log("new as date " + moment(new_val).format());
+    //console.log("***")
+    //console.log("pattern " + myDoc.pattern_id);
+    //console.log("old date " + myDoc.accessed_at);
+    //console.log("new time " + new_val);
+    //console.log("new as date " + moment(new_val).format());
 
     Recent_Patterns.update({_id: myDoc._id}, { $set: {accessed_at: new_val}});
   });
@@ -62,17 +62,18 @@ Meteor.startup(function () {
   Meteor.users.find().forEach( function(myDoc) {
     var name_sort = myDoc.username.toLowerCase();
 
-    if (typeof myDoc.profile !== "undefined")
-      console.log("profile " + name_sort);
+    //if (typeof myDoc.profile !== "undefined")
+      //console.log("profile " + name_sort);
 
     var profile = myDoc.profile || {};
     profile.name_sort = name_sort;
 
     Meteor.users.update({_id: myDoc._id}, {$set: {profile: profile}});
-  });
+  });*/
 
-// make private all patterns with the default name
-  Patterns.find().forEach( function(myDoc) {
+  // run this as desired
+  // make private all patterns with the default name
+  /*Patterns.find().forEach( function(myDoc) {
     if (myDoc.name == Meteor.my_params.default_pattern_name)
       Patterns.update({_id: myDoc._id}, { $set: {private: true}});
   });*/
