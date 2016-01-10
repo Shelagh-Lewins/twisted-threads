@@ -122,7 +122,7 @@ Meteor.methods({
     var number_of_tablets = data.threading[0].length; // there may be no weaving rows but there must be threading
 
     if(options.name == "")
-      options.name = "New pattern";
+      options.name = Meteor.my_params.default_pattern_name;
 
     data.name = options.name;
 
@@ -152,7 +152,7 @@ Meteor.methods({
       thumbnail_url: "../images/default_pattern_thumbnail.png",
       number_of_rows: number_of_rows,
       number_of_tablets: number_of_tablets,
-      created_at: new Date(),            // current time
+      created_at: moment().valueOf(),            // current time
       created_by: Meteor.userId(),           // _id of logged in user
       created_by_username: Meteor.user().username  // username of logged in user
     });
@@ -166,27 +166,6 @@ Meteor.methods({
     var styles_array = [];
     for (var i=0; i<32; i++) // create 32 styles
     {
-      //var style = data.styles[i];
-
-      /*if (typeof style === "undefined") // use defaults if no data
-      {
-        var options = {
-          background_color: "#FFFFFF",
-          line_color: "#000000",
-          forward_stroke: false,
-          backward_stroke: false
-        };
-      }
-      else
-      {
-        var options = {
-          background_color: style.background_color,
-          line_color: style.line_color,
-          forward_stroke: style.forward_stroke,
-          backward_stroke: style.backward_stroke
-        };
-      }*/
-      //styles_array[i] = style;
       styles_array[i] = data.styles[i];
     }
     Patterns.update({_id: pattern_id}, {$set: {styles: JSON.stringify(styles_array)}});
@@ -452,17 +431,17 @@ Meteor.methods({
       // the pattern is not in the list, so add it
       Recent_Patterns.insert({
         pattern_id: pattern_id,
-        accessed_at: new Date(),            // current time
+        accessed_at: moment().valueOf(),            // current time
         user_id: Meteor.userId()
       });
     }
     else
     {
       // the pattern is already in the list, so update it
-      Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, { $set: {accessed_at: new Date()}});
+      Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, { $set: {accessed_at: moment().valueOf()}});
     }
 
-    if (Recent_Patterns.find().count() > 50) // don't store too many patterns
+    if (Recent_Patterns.find().count() > Meteor.my_params.max_recents) // don't store too many patterns
     {
       var oldest_id = Recent_Patterns.find({}, {sort: {accessed_at: 1}}, {limit: 1}).fetch()[0]._id;
 

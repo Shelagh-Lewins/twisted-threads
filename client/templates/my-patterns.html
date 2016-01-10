@@ -2,15 +2,30 @@
 {{#if Template.subscriptionsReady}}
 {{> left_column}}
 <div id="main_column">
+{{#if currentUser}}
+{{#with currentUser}}
+<div class="user_info">
+{{> editable_field extendContext collection="users" property="description" data=profile.description multiple=true button_text="Edit profile" placeholder_text="Tap \"Edit description\" to enter a description"}}
+</div>
+{{/with}}
 {{#with my_patterns}}{{#if this.count}}
 <h2>My patterns</h2>
+
+
+
+{{> filter_on_tablets}}
+<div class="results">
 <ul class="patterns">
 {{> pages}}
 </ul>
+</div>
 {{> pagesNav}}
 {{else}}
 <p>You have not created any patterns yet</p>
 {{/if}}{{/with}}
+{{else}}
+Sign in or create an account.
+{{/if}}
 </div>
 {{else}}
   Loading...

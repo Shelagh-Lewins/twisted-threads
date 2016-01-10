@@ -70,6 +70,29 @@ body {
   z-index: 2;
 }
 
+/* app name and logo */
+#header .header_left .home_link {
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+#header .header_left .logo {
+  float: left;
+  width: 32px;
+  height: 32px;
+  margin: 8px 8px 0 0;
+  background: url("../images/header_logo.png") transparent no-repeat right 0 top 0;
+  background-size: 32px 32px;
+}
+
+#header .header_left .app_name {
+  float: left;
+  height: 32px;
+  margin: 8px 8px 0 0;
+  font-weight: bold;
+  line-height: 32px;
+}
+
 #header .header_left a {
   color: #FFFFFF;
   margin-right: 8px;

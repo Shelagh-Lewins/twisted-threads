@@ -173,7 +173,7 @@ Meteor.my_functions = {
     Session.set('loading', true);
 
     if ((name=="") || (typeof name === "undefined"))
-      var name="New pattern";
+      var name=Meteor.my_params.default_pattern_name;
 
     var options = {
       number_of_tablets: number_of_tablets, // optional
@@ -721,7 +721,7 @@ Meteor.my_functions = {
   },
   //////////////////////////////////
   // Pattern thumbnails - how many will fit in a single row across the home screen
-  patterns_in_row: function()
+  thumbnails_in_row: function()
   {
     var available_width = $('#main_column').width();
 
@@ -763,10 +763,10 @@ Meteor.my_functions = {
       
       // and add the pattern as the most recent i.e. first element
       recent_patterns.unshift(pattern_id);
-      console.log("add to recents");
+
       window.localStorage.setItem('recent_patterns', JSON.stringify(recent_patterns));
 
-      if (recent_patterns.length > 50) // don't store too many patterns
+      if (recent_patterns.length > Meteor.my_params.max_recents) // don't store too many patterns
         recent_patterns.pop();
     }
   },
@@ -1713,5 +1713,30 @@ Meteor.my_functions = {
   {
     patternsIndex.getComponentMethods().search("");
     usersIndex.getComponentMethods().search("");
+  },
+  ///////////////////////////////////
+  // Pagination
+  // These functions set a filter value without removing an existing filter by a different parameter
+  set_tablets_filter: function(filter, min, max)
+  {
+    // filter must be an object
+    if (max > 1)
+    {
+      filter.number_of_tablets = { "$lt": parseInt(max) + 1 };
+      if (min < max)
+        filter.number_of_tablets["$gt"] = parseInt(min) - 1;
+    }
+    else if (min > 1)
+    {
+      filter.number_of_tablets = { "$gt": parseInt(min) - 1 };
+    }
+
+    return filter;
+  },
+  set_created_by_filter: function(filter, user_id)
+  {
+    // filter must be an object
+    filter.created_by = user_id;
+    return filter;
   }
 }

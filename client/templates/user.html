@@ -9,11 +9,18 @@
 
 {{#if user_patterns_exist _id}}
 <h2>{{username}}'s patterns</h2>
+{{> filter_on_tablets}}
+<div class="results">
 <ul class="patterns">
+{{> pages}}
+</ul>
+</div>
+{{> pagesNav}}
+<!--<ul class="patterns">
 {{#each user_patterns _id}}
 {{> pattern_thumbnail}}
 {{/each}}
-</ul>
+</ul>-->
 {{else}}
 {{username}} has not created any patterns yet.
 {{/if}}

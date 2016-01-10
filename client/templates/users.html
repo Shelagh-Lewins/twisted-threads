@@ -1,22 +1,22 @@
-<template name="all_patterns">
+<template name="users">
 {{#if Template.subscriptionsReady}}
 {{> left_column}}
 <div id="main_column">
-{{#with all_patterns}}{{#if this.count}}
-<h2>All patterns</h2>
-{{> filter_on_tablets}}
+{{#with users}}{{#if this.count}}
+<h2>People</h2>
 <div class="results">
-<ul class="patterns">
+<ul class="users">
 {{> pages}}
 </ul>
 </div>
 {{> pagesNav}}
 {{else}}
-<p>Nobody has created any patterns yet</p>
+<p>There are no people with published patterns</p>
 {{/if}}{{/with}}
 </div>
 {{else}}
   Loading...
 {{/if}}
 </template>
+
 

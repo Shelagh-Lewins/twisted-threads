@@ -28,6 +28,12 @@ Router.route('/all-patterns', {
   template: 'all_patterns'
 });
 
+Router.route('/users', {
+  name: 'users',
+  template: 'users'
+});
+
+
 Router.route('/pattern/:_id/:mode?', {
   name: 'pattern',
   data: function(){

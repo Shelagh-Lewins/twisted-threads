@@ -2,11 +2,15 @@
 {{#if Template.subscriptionsReady}}
 {{> left_column}}
 <div id="main_column">
+<h2>Recently viewed patterns</h2>
 {{#with recent_patterns}}{{#if this.length}}
-<h2>Recent patterns</h2>
+<div class="results">
 <ul class="patterns">
-{{> pages}}
+{{#each this}}
+{{> pattern_thumbnail}}
+{{/each}}
 </ul>
+</div>
 {{> pagesNav}}
 {{else}}
 <p>You havent yet viewed any patterns</p>

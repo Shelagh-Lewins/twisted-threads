@@ -19,7 +19,7 @@
 }
 
 .pattern_info .box {
-  clear: both;
+  /*clear: both;*/
   margin: 0 0 16px 0;
 }
 
@@ -223,13 +223,13 @@
   float: left;
   width: 352px;
 }
-
+/*
 #styles_palette .styles .box {
   clear: both;
   height: 90px;
   overflow: hidden;
   position: relative;
-}
+}*/
 
 #styles_palette .styles .box {
   clear: both;
