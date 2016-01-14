@@ -18,37 +18,34 @@
 <span class="row_number">{{this}}</span>
 </template>
 
-<!--<li class="cell no_select {{forward_stroke}} {{backward_stroke}}" style="background-color: {{background_color}}; background-image: url('{{image}}')"><span class="line_forward" style="background-color: {{line_color}}"></span><span class="line_backward" style="background-color: {{line_color}}"></span></li>
-</template>-->
-
-<template name="stroke_svgs">
-<svg class="forward_stroke">
-  <symbol id="forward_stroke_symbol">
+<template name="warp_svgs">
+<svg class="forward_warp">
+  <symbol id="forward_warp_symbol">
       <g><ellipse rx="140.42" transform="rotate(-45)"  ry="70.214" cy="180.72" cx="-.33336" stroke-width="9.9099" /></g>
   </symbol>
 </svg>
 
-<svg class="backward_stroke">
-  <symbol id="backward_stroke_symbol">
+<svg class="backward_warp">
+  <symbol id="backward_warp_symbol">
       <g><ellipse rx="140.42" transform="matrix(-.70711 -.70711 -.70711 .70711 0 0)" ry="70.214" cy=".33336" cx="-180.72" stroke-width="9.9099" /></g>
   </symbol>
 </svg>
 
-<svg class="v_left_stroke">
-  <symbol id="v_left_stroke_symbol">
-      <g> <ellipse rx="116.44" ry="70.643" stroke="#000" transform="matrix(0,-1,-1,0,0,0)" cy="-82.313" cx="-127.41" stroke-width="9.0518" /></g>
+<svg class="v_left_warp">
+  <symbol id="v_left_warp_symbol">
+      <g> <ellipse rx="116.44" ry="70.643" transform="matrix(0,-1,-1,0,0,0)" cy="-82.313" cx="-127.41" stroke-width="9.0518" /></g>
   </symbol>
 </svg>
 
-<svg class="v_center_stroke">
-  <symbol id="v_center_stroke_symbol">
-      <g><ellipse rx="116.44" ry="70.643" stroke="#000" transform="matrix(0,-1,-1,0,0,0)" cy="-126.31" cx="-127.41" stroke-width="9.0518" /></g>
+<svg class="v_center_warp">
+  <symbol id="v_center_warp_symbol">
+      <g><ellipse rx="116.44" ry="70.643" transform="matrix(0,-1,-1,0,0,0)" cy="-126.31" cx="-127.41" stroke-width="9.0518" /></g>
   </symbol>
 </svg>
 
-<svg class="v_right_stroke">
-  <symbol id="v_right_stroke_symbol">
-      <g><ellipse rx="116.44" ry="70.643" stroke="#000" transform="matrix(0,-1,-1,0,0,0)" cy="-174.31" cx="-127.41" stroke-width="9.0518" /></g>
+<svg class="v_right_warp">
+  <symbol id="v_right_warp_symbol">
+      <g><ellipse rx="116.44" ry="70.643" transform="matrix(0,-1,-1,0,0,0)" cy="-174.31" cx="-127.41" stroke-width="9.0518" /></g>
   </symbol>
 </svg>
 
@@ -56,29 +53,29 @@
 
 <template name="pattern_cell">
 <li class="cell no_select" style="background-color: {{background_color}}; background-image: url('{{image}}')">
-{{#if equals stroke "forward"}}
+{{#if equals warp "forward"}}
 <svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_stroke_symbol" x="0" y="0"/>
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
 </svg>
 {{else}}
-{{#if equals stroke "backward"}}
+{{#if equals warp "backward"}}
 <svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_stroke_symbol" x="0" y="0"/>
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
 </svg>
 {{/if}}
-{{#if equals stroke "v_left"}}
+{{#if equals warp "v_left"}}
 <svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_left_stroke_symbol" x="0" y="0"/>
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_left_warp_symbol" x="0" y="0"/>
 </svg>
 {{/if}}
-{{#if equals stroke "v_center"}}
+{{#if equals warp "v_center"}}
 <svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_center_stroke_symbol" x="0" y="0"/>
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_center_warp_symbol" x="0" y="0"/>
 </svg>
 {{/if}}
-{{#if equals stroke "v_right"}}
+{{#if equals warp "v_right"}}
 <svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_right_stroke_symbol" x="0" y="0"/>
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
 </svg>
 {{/if}}
 {{/if}}

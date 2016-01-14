@@ -93,7 +93,7 @@ UI.registerHelper('cell_style', function(row, tablet) {
     // could use a clone but it's cleaner to control the properties directly
     var cell_style = {
       background_color: style.background_color,
-      stroke: style.stroke,
+      warp: style.warp,
       line_color: style.line_color,
       style: style.style
     }

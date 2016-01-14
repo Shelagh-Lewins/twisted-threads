@@ -259,7 +259,7 @@
   position: relative;
   width: 32px;
   height: 32px;
-  border: 2px solid #666666;
+  border: 2px solid #333333;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -273,42 +273,8 @@
   background-size: 32px 32px;
 }
 
-/* http://stackoverflow.com/questions/14593415/how-to-strike-through-obliquely-with-css */
-.styles ul.row li.cell.forward_stroke .line_forward,
-.styles ul.row li.cell.backward_stroke .line_backward {
-  position: absolute;
-  width: 100%;
-  height: 25%;
-  left: -2%;
-  top: 34%;
-  right: 0;
-  border-radius: 8px;
-  border: 1px solid black;
-}
-
-.styles ul.row li.cell.forward_stroke .line_forward {
-  -webkit-transform:rotate(-45deg);
-  -moz-transform:rotate(-45deg);
-  -ms-transform:rotate(-45deg);
-  -o-transform:rotate(-45deg);
-  transform:rotate(-45deg);
-}
-
-.styles ul.row li.cell.backward_stroke .line_backward {
-  -webkit-transform:rotate(45deg);
-  -moz-transform:rotate(45deg);
-  -ms-transform:rotate(45deg);
-  -o-transform:rotate(45deg);
-  transform:rotate(45deg);
-}
-/*
-.styles ul.row li.cell.forward_stroke.is_dark .line_before,
-.styles ul.row li.cell.backward_stroke.is_dark .line_after {
-  border-color: #DDDDFF;
-}*/
-
 .styles ul.row li.cell.selected {
-  border-color: #4444EE;
+  border-color: #5555FF;
 }
 
 /* Special styles */
@@ -352,76 +318,52 @@
 
 .edit_style .colorpicker_holder {
   float: left;
-  margin-right: 4px;
 }
 
-.edit_style .strokes div {
+.edit_style .warps {
+  float: left;
+  overflow: hidden;
+  margin-left: 8px;
+  border: 1px solid black;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.edit_style .warps li {
   float: left;
   position: relative;
   width: 32px;
   height: 32px;
-  border: 1px solid black;
-  margin-right: 4px;
+  border-left: 1px solid black;
   background-color: #FFFFFF;
   cursor: pointer;
 }
 
-.edit_style .forward:before,
-.edit_style .backward:before  {
-  position: absolute;
-  content: "";
-  width: 147%;
-  left: -23%;
-  top: 46%;
-  right: 0;
-  border-top: 1px dotted #FFFFFF;
-  border-color: #444444;
+.edit_style .warps li:first-child {
+  border: none;
 }
 
-.edit_style .forward:before {
-  -webkit-transform:rotate(-45deg);
-  -moz-transform:rotate(-45deg);
-  -ms-transform:rotate(-45deg);
-  -o-transform:rotate(-45deg);
-  transform:rotate(-45deg);
+.edit_style .warps li svg {
+  width: 32px;
+  height: 32px;
 }
 
-.edit_style .backward:before {
-  -webkit-transform:rotate(45deg);
-  -moz-transform:rotate(45deg);
-  -ms-transform:rotate(45deg);
-  -o-transform:rotate(45deg);
-  transform:rotate(45deg);
-}
-
-.edit_style .v_left:before,
-.edit_style .v_center:before,
-.edit_style .v_right:before {
-  position: absolute;
-  content: "";
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  border-left: 1px dotted #FFFFFF;
-  border-color: #444444;
-}
-
-.edit_style .v_left:before {
-  left: 4px;
-}
-
-.edit_style .v_center:before {
-  left: 16px;
-}
-
-.edit_style .v_right:before {
-  left: 28px;
+.edit_style .forward.on,
+.edit_style .backward.on,
+.edit_style .v_left.on,
+.edit_style .v_center.on,
+.edit_style .v_right.on {
+  background-color: #424A6C;
 }
 
 .edit_style .forward.on:before,
 .edit_style .backward.on:before {
-  border-top: 1px solid #000000;
+  border-top: 2px solid #FFFFFF;
 }
 
-
+.edit_style .v_left.on:before,
+.edit_style .v_center.on:before,
+.edit_style .v_right.on:before {
+  border-left: 2px solid #FFFFFF;
+}

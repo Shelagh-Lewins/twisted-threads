@@ -23,8 +23,6 @@ Meteor.methods({
       filename: Match.Optional(String) 
     });
 
-    console.log("version " + options.data);
-
     if (!Meteor.isServer) // minimongo cannot simulate loading data with Assets
         return;
 
@@ -191,16 +189,16 @@ Meteor.methods({
       // style.stroke "forward" "backward" "none (other values possible in 2+)
       
       if (data.styles[i].backward_stroke)
-        data.styles[i].stroke = "backward";
+        data.styles[i].warp = "backward";
         
       if (data.styles[i].forward_stroke) // if both defined, choose forward
-        data.styles[i].stroke = "forward";
+        data.styles[i].warp = "forward";
         
       delete data.styles[i].backward_stroke;
       delete data.styles[i].forward_stroke;
       //console.log("style " + JSON.stringify(data.styles[i]));
-      if (typeof data.styles[i].stroke === "undefined")
-        data.styles[i].stroke = "none";
+      if (typeof data.styles[i].warp === "undefined")
+        data.styles[i].warp = "none";
     }
     Patterns.update({_id: pattern_id}, {$set: {styles: JSON.stringify(styles_array)}});
 

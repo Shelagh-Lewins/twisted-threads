@@ -31,7 +31,7 @@ Meteor.my_functions = {
       1.11 added tags
       1.12 added weaving notes, threading notes
       1.13 added special styles
-      2 replaced style.forward_stroke, style.backward_stroke with style.stroke to allow more, mutually exclusive thread types
+      2 replaced style.forward_stroke, style.backward_stroke with style.warp to allow more, mutually exclusive thread types
     */
     pattern_obj.version = "1.13";
 
@@ -134,7 +134,7 @@ Meteor.my_functions = {
       {
         background_color: "#FFFFFF",
         line_color: "#000000",
-        stroke: "forward" // "backward", "v_left", "v_center", "v_right", "none"
+        warp: "forward" // "backward", "v_left", "v_center", "v_right", "none"
       }
       // more styles
     ]
@@ -390,7 +390,7 @@ Meteor.my_functions = {
       pattern_obj.styles.push({
         background_color: "#FFFFFF",
         line_color: "#000000",
-        stroke: "none"
+        warp: "none"
       });
     }
 
@@ -473,40 +473,32 @@ Meteor.my_functions = {
         }
       }
 
-      // S, turn forwards = forward stroke, white bg
+      // S, turn forwards = forward warp, white bg
       pattern_obj.styles[style_start] = {
         background_color: "#FFFFFF",
         line_color: line_color,
-        //forward_stroke: true,
-        //backward_stroke: false
-        stroke: "forward"
+        warp: "forward"
       };
 
-      // Z, turn forwards = backward stroke, white bg
+      // Z, turn forwards = backward warp, white bg
       pattern_obj.styles[style_start + 1] = {
         background_color: "#FFFFFF",
         line_color: line_color,
-        //forward_stroke: false,
-        //backward_stroke: true
-        stroke: "backward"
+        warp: "backward"
       };
 
-      // S, turn backwards = backward stroke, grey bg
+      // S, turn backwards = backward warp, grey bg
       pattern_obj.styles[style_start + 8] = {
         background_color: "#666666",
         line_color: line_color,
-        //forward_stroke: false,
-        //backward_stroke: true
-        stroke: "backward"
+        warp: "backward"
       };
 
-      // Z, turn backwards = forward stroke, grey bg
+      // Z, turn backwards = forward warp, grey bg
       pattern_obj.styles[style_start + 9] = {
         background_color: "#666666",
         line_color: line_color,
-        //forward_stroke: true,
-        //backward_stroke: false
-        stroke: "forward"
+        warp: "forward"
       };
     }
 
@@ -755,7 +747,6 @@ Meteor.my_functions = {
 
     if (Meteor.userId()) // the user is signed in
     {
-      
       Meteor.call('add_to_recent_patterns', pattern_id);
     }
     else
@@ -1004,8 +995,8 @@ Meteor.my_functions = {
       if (typeof styles_array[i].line_color === "undefined")
         styles_array[i].line_color = "#000000";
 
-      if (typeof styles_array[i].stroke === "undefined")
-        styles_array[i].stroke = "none";
+      if (typeof styles_array[i].warp === "undefined")
+        styles_array[i].warp = "none";
     }
 
     // if rebuilding, clearing the array forces helpers to rerun
@@ -1470,7 +1461,7 @@ Meteor.my_functions = {
   },
   ///////////////////////////////
   // Edit style
-  edit_style_stroke: function(stroke) {
+  edit_style_warp: function(warp) {
    var selected_style = Session.get("selected_style");
     var pattern_id = Router.current().params._id;
 
@@ -1478,11 +1469,11 @@ Meteor.my_functions = {
 
     // update local reactiveArray
     var obj = current_styles[style.style-1];
-    if (style.stroke === stroke)
-      obj.stroke = "none";
+    if (style.warp === warp)
+      obj.warp = "none";
 
     else
-      obj.stroke = stroke;
+      obj.warp = warp;
 
     current_styles.splice(style.style-1, 1, obj);
 

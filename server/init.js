@@ -71,13 +71,6 @@ Meteor.startup(function () {
     Meteor.users.update({_id: myDoc._id}, {$set: {profile: profile}});
   });*/
 
-  // run this as desired
-  // make private all patterns with the default name
-  /*Patterns.find().forEach( function(myDoc) {
-    if (myDoc.name == Meteor.my_params.default_pattern_name)
-      Patterns.update({_id: myDoc._id}, { $set: {private: true}});
-  });*/
-
   // data migration from forward_stroke, backward_stroke to new stroke with exclusive values
   /*Patterns.find().forEach( function(myDoc) {
     // pull out styles
@@ -86,22 +79,30 @@ Meteor.startup(function () {
     var styles_data = JSON.parse(myDoc.styles);
     for (var i=0; i< styles_data.length; i++)
     {
-      if (styles_data[i].forward_stroke == true)
-        styles_data[i].stroke = "forward";
+      // disturbingly there seem to be two old forms of this, so convert both
+      if ((styles_data[i].forward_stroke == true) || (styles_data[i].forward_stroke == "forward_stroke"))
+        styles_data[i].warp = "forward";
 
-      else if (styles_data[i].backward_stroke == true)
-        styles_data[i].stroke = "backward";
+      else if ((styles_data[i].backward_stroke == true) || (styles_data[i].backward_stroke == "backward_stroke"))
+        styles_data[i].warp = "backward";
 
       else
-        styles_data[i].stroke = "none";
+        styles_data[i].warp = "none";
 
       delete styles_data[i].forward_stroke;
       delete styles_data[i].backward_stroke;
     }
-    //console.log("test " + JSON.stringify(styles_data[0]));
 
     var text = JSON.stringify(styles_data);
     Patterns.update({_id: myDoc._id}, {$set: { styles: text}});
+  });*/
+
+  ///////////////////////////////
+  // run this as desired
+  // make private all patterns with the default name
+  /*Patterns.find().forEach( function(myDoc) {
+    if (myDoc.name == Meteor.my_params.default_pattern_name)
+      Patterns.update({_id: myDoc._id}, { $set: {private: true}});
   });*/
 });
 
