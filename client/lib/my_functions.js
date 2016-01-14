@@ -31,6 +31,7 @@ Meteor.my_functions = {
       1.11 added tags
       1.12 added weaving notes, threading notes
       1.13 added special styles
+      2 replaced style.forward_stroke, style.backward_stroke with style.warp to allow more, mutually exclusive thread types
     */
     pattern_obj.version = "1.13";
 
@@ -128,6 +129,17 @@ Meteor.my_functions = {
     ],
     // columns are tablets starting with tablet #1
 
+    // v 2+
+    styles: [
+      {
+        background_color: "#FFFFFF",
+        line_color: "#000000",
+        warp: "forward" // "backward", "v_left", "v_center", "v_right", "none"
+      }
+      // more styles
+    ]
+
+    // v 1
     styles: [
       {
         background_color: "#FFFFFF",
@@ -378,8 +390,7 @@ Meteor.my_functions = {
       pattern_obj.styles.push({
         background_color: "#FFFFFF",
         line_color: "#000000",
-        forward_stroke: false,
-        backward_stroke: false
+        warp: "none"
       });
     }
 
@@ -462,36 +473,32 @@ Meteor.my_functions = {
         }
       }
 
-      // S, turn forwards = forward stroke, white bg
+      // S, turn forwards = forward warp, white bg
       pattern_obj.styles[style_start] = {
         background_color: "#FFFFFF",
         line_color: line_color,
-        forward_stroke: true,
-        backward_stroke: false
+        warp: "forward"
       };
 
-      // Z, turn forwards = backward stroke, white bg
+      // Z, turn forwards = backward warp, white bg
       pattern_obj.styles[style_start + 1] = {
         background_color: "#FFFFFF",
         line_color: line_color,
-        forward_stroke: false,
-        backward_stroke: true
+        warp: "backward"
       };
 
-      // S, turn backwards = backward stroke, grey bg
+      // S, turn backwards = backward warp, grey bg
       pattern_obj.styles[style_start + 8] = {
         background_color: "#666666",
         line_color: line_color,
-        forward_stroke: false,
-        backward_stroke: true
+        warp: "backward"
       };
 
-      // Z, turn backwards = forward stroke, grey bg
+      // Z, turn backwards = forward warp, grey bg
       pattern_obj.styles[style_start + 9] = {
         background_color: "#666666",
         line_color: line_color,
-        forward_stroke: true,
-        backward_stroke: false
+        warp: "forward"
       };
     }
 
@@ -740,7 +747,6 @@ Meteor.my_functions = {
 
     if (Meteor.userId()) // the user is signed in
     {
-      
       Meteor.call('add_to_recent_patterns', pattern_id);
     }
     else
@@ -905,7 +911,7 @@ Meteor.my_functions = {
 
     // put the weaving data into the array of arrays
     var weaving_data = JSON.parse(pattern.weaving);
-    test = weaving_data;
+    //test = weaving_data;
 
     for (var i=0; i<number_of_rows; i++)
     {
@@ -989,17 +995,8 @@ Meteor.my_functions = {
       if (typeof styles_array[i].line_color === "undefined")
         styles_array[i].line_color = "#000000";
 
-      if (styles_array[i].forward_stroke)
-        styles_array[i].forward_stroke = "forward_stroke";
-
-      else
-        styles_array[i].forward_stroke = null;
-
-      if (styles_array[i].backward_stroke)
-        styles_array[i].backward_stroke = "backward_stroke";
-
-      else
-        styles_array[i].backward_stroke = null;
+      if (typeof styles_array[i].warp === "undefined")
+        styles_array[i].warp = "none";
     }
 
     // if rebuilding, clearing the array forces helpers to rerun
@@ -1461,6 +1458,28 @@ Meteor.my_functions = {
 
     $("#line_colorpicker").spectrum("set", selected_line_color);
     $("#line_colorpicker").spectrum("set", selected_line_color);
+  },
+  ///////////////////////////////
+  // Edit style
+  edit_style_warp: function(warp) {
+   var selected_style = Session.get("selected_style");
+    var pattern_id = Router.current().params._id;
+
+    var style = current_styles[selected_style-1];
+
+    // update local reactiveArray
+    var obj = current_styles[style.style-1];
+    if (style.warp === warp)
+      obj.warp = "none";
+
+    else
+      obj.warp = warp;
+
+    current_styles.splice(style.style-1, 1, obj);
+
+    // update database
+    Meteor.my_functions.save_styles_as_text(pattern_id);
+    Meteor.my_functions.store_pattern(pattern_id);
   },
   //////////////////////////////////
   // sizing and scrolling, to keep header and styles_palette in correct positions

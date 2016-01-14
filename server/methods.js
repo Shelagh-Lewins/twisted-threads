@@ -52,6 +52,22 @@ Meteor.methods({
       throw new Meteor.Error("file-load-failed", "File load error in new_pattern_from_json");
     }
 
+    // check version
+    var version = [0,0];
+    if (typeof data.version !== "undefined")
+    {
+      var split_version = data.version.split("."); // [main, subsidiary] e.g. 2.1
+      if (typeof split_version[0] !== "undefined")
+      {
+        version[0] = parseInt(split_version[0]);
+
+        if (typeof split_version[1] !== "undefined")
+        {
+          version[1] = parseInt(split_version[1]);
+        }
+      } 
+    }
+
     // Numbers of rows and tablets
     // have both rows and tablets been specified as positive integers less than 100?
     var build_new = true; // whether to build a blank pattern using a specified number of tablets and rows
@@ -167,6 +183,22 @@ Meteor.methods({
     for (var i=0; i<32; i++) // create 32 styles
     {
       styles_array[i] = data.styles[i];
+
+      // version 1 has style.backward_stroke, style.forward_stroke
+      // convert to 2+
+      // style.stroke "forward" "backward" "none (other values possible in 2+)
+      
+      if (data.styles[i].backward_stroke)
+        data.styles[i].warp = "backward";
+        
+      if (data.styles[i].forward_stroke) // if both defined, choose forward
+        data.styles[i].warp = "forward";
+        
+      delete data.styles[i].backward_stroke;
+      delete data.styles[i].forward_stroke;
+      //console.log("style " + JSON.stringify(data.styles[i]));
+      if (typeof data.styles[i].warp === "undefined")
+        data.styles[i].warp = "none";
     }
     Patterns.update({_id: pattern_id}, {$set: {styles: JSON.stringify(styles_array)}});
 

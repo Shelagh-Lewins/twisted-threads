@@ -1,7 +1,7 @@
 <template name="view_pattern">
 {{#if Template.subscriptionsReady}}
 {{> pattern_as_text}}
-{{> stroke_svgs}}
+{{> warp_svgs}}
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
 <!--{{> upload_semanticUI fileTypes='.jpg, .png, .gif' callbacks=myCallbacks}}-->
@@ -103,13 +103,68 @@
 <template name="styles_palette">{{#if can_edit_pattern _id}}
 <div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}} {{show_special_styles}}">
 <div class="styles">
-  <div class="edit_style {{editing_style}}">
- <h2>Background</h2>
+<div class="edit_style {{editing_style}}">
+<h2>Background</h2>
 <div class="colorpicker_holder"><input type="text" id="background_colorpicker"></div>
-<h2>Thread</h2>
+<h2>Warp thread</h2>
 <div class="colorpicker_holder"><input type="text" id="line_colorpicker"></div>
-<div class="forward_stroke {{forward_stroke_on}}"></div>
-<div class="backward_stroke {{backward_stroke_on}}"></div>
+<ul class="warps">
+  <li class="forward {{#if equals warp "forward"}}on{{/if}}" title="Forward sloping warp thread">
+    {{#if equals warp "forward"}}
+    <svg viewBox="0 0 256 256">
+        <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
+    </svg>
+    {{else}}
+    <svg viewBox="0 0 256 256">
+        <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
+    </svg>
+    {{/if}}
+  </li>
+  <li class="backward {{#if equals warp "backward"}}on{{/if}}" title="Backward sloping warp thread">
+    {{#if equals warp "backward"}}
+    <svg viewBox="0 0 256 256">
+        <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
+    </svg>
+    {{else}}
+    <svg viewBox="0 0 256 256">
+        <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
+    </svg>
+    {{/if}}
+  </li>
+  <li class="v_left {{#if equals warp "v_left"}}on{{/if}}" title="Vertical warp thread at left">
+  {{#if equals warp "v_left"}}
+  <svg viewBox="0 0 256 256">
+      <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#v_left_warp_symbol" x="0" y="0"/>
+  </svg>
+  {{else}}
+  <svg viewBox="0 0 256 256">
+      <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#v_left_warp_symbol" x="0" y="0"/>
+  </svg>
+  {{/if}}
+  </li>
+  <li class="v_center {{#if equals warp "v_center"}}on{{/if}}" title="Vertical warp thread at center">
+  {{#if equals warp "v_center"}}
+  <svg viewBox="0 0 256 256">
+      <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#v_center_warp_symbol" x="0" y="0"/>
+  </svg>
+  {{else}}
+  <svg viewBox="0 0 256 256">
+      <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#v_center_warp_symbol" x="0" y="0"/>
+  </svg>
+  {{/if}}
+  </li>
+  <li class="v_right {{#if equals warp "v_right"}}on{{/if}}" title="Vertical warp thread at right">
+  {{#if equals warp "v_right"}}
+  <svg viewBox="0 0 256 256">
+      <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
+  </svg>
+  {{else}}
+  <svg viewBox="0 0 256 256">
+      <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
+  </svg>
+  {{/if}}
+  </li>
+</ul>
 </div>
 <div class="pagination"><ul>
 {{#if single_column}}
@@ -128,14 +183,29 @@
 
 <template name="style_cell">
 <li class="cell no_select {{is_selected_style style}}" style="background-color: {{background_color}}; background-image: url('{{image}}')">
-{{#if equals forward_stroke "forward_stroke"}}
+{{#if equals warp "forward"}}
 <svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_stroke_symbol" x="0" y="0"/>
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
 </svg>
 {{else}}
-{{#if equals backward_stroke "backward_stroke"}}
+{{#if equals warp "backward"}}
 <svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_stroke_symbol" x="0" y="0"/>
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals warp "v_left"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_left_warp_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals warp "v_center"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_center_warp_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals warp "v_right"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
 </svg>
 {{/if}}
 {{/if}}

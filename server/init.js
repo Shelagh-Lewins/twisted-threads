@@ -71,6 +71,33 @@ Meteor.startup(function () {
     Meteor.users.update({_id: myDoc._id}, {$set: {profile: profile}});
   });*/
 
+  // data migration from forward_stroke, backward_stroke to new stroke with exclusive values
+  /*Patterns.find().forEach( function(myDoc) {
+    // pull out styles
+    // for each style set stroke for b, f, none
+    // resave
+    var styles_data = JSON.parse(myDoc.styles);
+    for (var i=0; i< styles_data.length; i++)
+    {
+      // disturbingly there seem to be two old forms of this, so convert both
+      if ((styles_data[i].forward_stroke == true) || (styles_data[i].forward_stroke == "forward_stroke"))
+        styles_data[i].warp = "forward";
+
+      else if ((styles_data[i].backward_stroke == true) || (styles_data[i].backward_stroke == "backward_stroke"))
+        styles_data[i].warp = "backward";
+
+      else
+        styles_data[i].warp = "none";
+
+      delete styles_data[i].forward_stroke;
+      delete styles_data[i].backward_stroke;
+    }
+
+    var text = JSON.stringify(styles_data);
+    Patterns.update({_id: myDoc._id}, {$set: { styles: text}});
+  });*/
+
+  ///////////////////////////////
   // run this as desired
   // make private all patterns with the default name
   /*Patterns.find().forEach( function(myDoc) {
