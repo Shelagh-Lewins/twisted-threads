@@ -1,8 +1,8 @@
 /* *** Left column *** */
 #left_column {
   position: relative;
-left: -16px;
-top: -16px;
+  left: -16px;
+  top: -16px;
   float: left;
   width: 200px;
   background-color: #FFFFFF;
@@ -15,6 +15,12 @@ top: -16px;
 .home .introduction {
   width: 600px;
   margin: 0 0 16px 0;
+}
+
+.home .warning {
+  width: 600px;
+  margin: 0 0 16px 0;
+  color: #FF3333;
 }
 
 /* *** New Pattern form *** */

@@ -4,6 +4,8 @@ Template.view_pattern.rendered = function() {
   Meteor.my_functions.add_to_recent_patterns(pattern_id);
   Meteor.my_functions.view_pattern_render(pattern_id);
   Meteor.my_functions.initialize_route();
+
+
 }
 
 Template.view_pattern.onCreated(function(){
@@ -59,6 +61,21 @@ Template.view_pattern.helpers({
 
     if (position >= stored_patterns.length)
       return "disabled";
+  },
+  hole_handedness: function() {
+    // are the tablet holes labelled clockwise or anticlockwise?
+    // default is clockwise if not otherwise specified
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { hole_handedness: 1}});
+
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
+
+    if (pattern.hole_handedness == "anticlockwise")
+      return "anticlockwise";
+
+    else
+      return "clockwise";
   }
 
   //////////////////////////
@@ -90,10 +107,11 @@ Template.orientation.helpers({
 Template.styles_palette.onRendered(function(){
   var pattern_id = Router.current().params._id;
 
-  if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
-        return;
+  // avoids error when pattern is private and user doesn't have permission to see it
 
-  Meteor.my_functions.initialize_line_color_picker();
+  if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+        return;
+  Meteor.my_functions.initialize_warp_color_picker();
   Meteor.my_functions.initialize_background_color_picker();
 
   // correctly position the Edit Style panel
@@ -217,9 +235,9 @@ Template.styles_palette.helpers({
 
     var pattern_id = Router.current().params._id;
 
-     if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
-        return;
-
+ //    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    //    return;
+//
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
 
@@ -387,6 +405,15 @@ Template.view_pattern.events({
       Meteor.my_functions.save_orientation_as_text(pattern_id);
       Meteor.my_functions.store_pattern(pattern_id);
     }
+  },
+  'click #change_handedness': function()
+  {
+    var pattern_id = Router.current().params._id;
+
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
+    Meteor.call('toggle_hole_handedness', pattern_id);
   }
 });
 

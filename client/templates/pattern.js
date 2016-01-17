@@ -27,7 +27,7 @@ UI.registerHelper('threading_hole', function(hole) {
 });
 
 UI.registerHelper('hole_label', function(hole) {
-    var pattern_id = Router.current().params._id;
+    //var pattern_id = Router.current().params._id;
 
     // holes are numbered 1, 2, 3, 4
     var labels = ["A", "B", "C", "D"];

@@ -398,6 +398,26 @@ Meteor.methods({
     return
   },
   ///////////////////////////////
+  // Edit other pattern properties
+  toggle_hole_handedness: function(pattern_id)
+  {
+    check(pattern_id, String);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, hole_handedness: 1}});
+
+    if (pattern.created_by != Meteor.userId())
+      // Only the owner can edit a pattern
+      throw new Meteor.Error("not-authorized", "You can only edit hole handedness for a pattern you created");
+
+    // default is clockwise if not otherwise specified
+    var new_value = "anticlockwise";
+    if (pattern.hole_handedness == "anticlockwise")
+      new_value = "clockwise";
+
+    Patterns.update({_id: pattern_id}, {$set: {hole_handedness: new_value}});
+;
+  },
+  ///////////////////////////////
   // Edit styles
   set_pattern_cell_style: function(pattern_id, row, tablet, new_style)
   {

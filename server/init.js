@@ -95,14 +95,21 @@ Meteor.startup(function () {
 
     var text = JSON.stringify(styles_data);
     Patterns.update({_id: myDoc._id}, {$set: { styles: text}});
-  });*/
-
+  });/
+ 
   ///////////////////////////////
   // run this as desired
   // make private all patterns with the default name
   /*Patterns.find().forEach( function(myDoc) {
     if (myDoc.name == Meteor.my_params.default_pattern_name)
       Patterns.update({_id: myDoc._id}, { $set: {private: true}});
+  });*/
+
+  // remove all patterns because something has gone wrong
+  /*Patterns.find().forEach( function(myDoc) {
+    //if (myDoc.name == Meteor.my_params.default_pattern_name)
+
+    Patterns.remove(myDoc._id);
   });*/
 });
 

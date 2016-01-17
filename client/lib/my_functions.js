@@ -698,7 +698,7 @@ Meteor.my_functions = {
     Meteor.call('restore_pattern', data, function(){
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.initialize_background_color_picker();
-      Meteor.my_functions.initialize_line_color_picker()
+      Meteor.my_functions.initialize_warp_color_picker()
     });
   },
   undo: function(pattern_id)
@@ -1367,7 +1367,7 @@ Meteor.my_functions = {
       });
     }
   },
-  initialize_line_color_picker: function()
+  initialize_warp_color_picker: function()
   {
     // Set the #line_colorpicker to the selected style's background colour
     var selected_style = Session.get("selected_style");
@@ -1496,6 +1496,7 @@ Meteor.my_functions = {
     // make sure scroll is top left
     $('#width').scrollLeft(0);
     $('#width').scrollTop(0);
+
   },
   //////////////////////////////////
   // set up and draw the view pattern. This must be refreshed if the user switches pattern without switching view: e.g. using copy, import
@@ -1507,6 +1508,9 @@ Meteor.my_functions = {
     stored_patterns = [];
     Session.set('undo_stack_position', -1);
     Meteor.my_functions.store_pattern(pattern_id);
+
+    //Meteor.my_functions.initialize_background_color_picker();
+    //Meteor.my_functions.initialize_warp_color_picker();
   },
   view_pattern_render: function(pattern_id) {
     if (Meteor.my_functions.can_edit_pattern(pattern_id))
