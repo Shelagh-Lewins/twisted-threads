@@ -198,6 +198,11 @@ ul.patterns .pattern_thumbnail .number_of_tablets .text {
 ul.patterns .pattern_thumbnail .image {
   position: absolute;
   bottom: 2px;
+  width:232px;
+  height:36px;
+  background-size:cover; 
+  background-position:center center; 
+  background-repeat:no-repeat; 
 }
 
 ul.patterns li .footer {

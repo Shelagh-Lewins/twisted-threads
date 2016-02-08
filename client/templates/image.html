@@ -1,0 +1,26 @@
+<template name="image">
+  <div class="image_holder">
+    <!-- image info -->
+    <div class="image_info">
+      {{#if own_image}}
+      <input type="button" class="delete_image" value="Delete" />
+      {{#unless equals role "preview"}}
+      <input type="button" class="make_preview" value="Use as preview" />
+      {{/unless}}
+      {{/if}}
+    </div>
+
+    <!-- the image -->
+    <div class="thumbnail">
+      <input type="button" class="close" value="Close" />
+       <div class="image" style="background-image: url('{{url}}'); width: {{width}}px; height: {{height}}px"></div>
+    </div>
+
+    <div class="full_image">
+      <input type="button" class="close" value="Close" />
+      <div class="wrapper" style="width: {{width}}px; height: {{height}}px">
+        <div class="image" style="background-image: url('{{url}}'); width: {{width}}px; height: {{height}}px"></div>
+      </div>
+    </div>
+  </div>
+</template>

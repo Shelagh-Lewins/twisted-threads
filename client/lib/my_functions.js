@@ -1017,7 +1017,7 @@ Meteor.my_functions = {
     for (var i=0; i<Meteor.my_params.special_styles_number; i++)
     {
       if ((typeof special_styles_data[i] === "undefined") || (special_styles_data[i] == null))
-        special_styles_array[i] = default_special_styles[i];
+        special_styles_array[i] = Meteor.my_params.default_special_styles[i];
 
       else 
         special_styles_array[i] = special_styles_data[i];
@@ -1496,7 +1496,6 @@ Meteor.my_functions = {
     // make sure scroll is top left
     $('#width').scrollLeft(0);
     $('#width').scrollTop(0);
-
   },
   //////////////////////////////////
   // set up and draw the view pattern. This must be refreshed if the user switches pattern without switching view: e.g. using copy, import
@@ -1513,8 +1512,8 @@ Meteor.my_functions = {
     //Meteor.my_functions.initialize_warp_color_picker();
   },
   view_pattern_render: function(pattern_id) {
-    if (Meteor.my_functions.can_edit_pattern(pattern_id))
-    $('body').addClass('editable');
+    //if (Meteor.my_functions.can_edit_pattern(pattern_id))
+      //$('body').addClass('editable');
 
     Session.set('edit_style', false);
 
@@ -1761,5 +1760,50 @@ Meteor.my_functions = {
     // filter must be an object
     filter.created_by = user_id;
     return filter;
+  },
+  ///////////////////////////////////
+  // File uploads
+  upload_pattern_image: function(file, pattern_id)
+  {
+    var context = {pattern_id: pattern_id};
+    var upload = new Slingshot.Upload("myImageUploads", context);
+
+    var timeStamp = Math.floor(Date.now());                 
+    {
+      Session.set('upload_status', 'uploading');
+      upload.send(file, function (error, downloadUrl) {
+        uploader.set();
+        if (error) {
+          toastr.error("Upload failed. " + error.message);
+        }
+        else
+        {
+          toastr.success("File uploaded");
+
+          //var img = document.createElement("img");
+          var img = $('.image_uploader .preview img.hidden')[0];
+          var sizeKB = file.size / 1024;
+          img.onload = function() {
+            //console.log("Size: " + sizeKB + "KB\nWidth: " + img.naturalWidth + "\nHeight: " + img.naturalHeight);
+
+              var role = "image";
+              if (Images.find({$and: [
+                { used_by: context.pattern_id },
+                { role: "preview"}]
+              }).count() == 0)
+              {
+                role = "preview";
+              }
+
+              Meteor.call('upload_pattern_image', downloadUrl, pattern_id, role, img.naturalWidth, img.naturalHeight);
+            }
+            $('.image_uploader .preview img').attr("src", downloadUrl);
+            //img.src = downloadUrl;
+            //$('.image_uploader .preview').append(img);
+       
+        }
+      });
+      uploader.set(upload);
+    }
   }
 }

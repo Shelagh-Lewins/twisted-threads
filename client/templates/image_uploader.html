@@ -1,0 +1,29 @@
+<template name="image_uploader">
+<div class="container image_uploader">
+    <div class="form-group">
+      <span class="input_holder">
+        <label for="selectFile">Choose a picture: </label>
+        <input type="file" class="uploadFile" id="uploadFile">
+      </span>
+      <button class="close">Close</button>
+    </div>
+    <div class="dropzone_holder">
+      {{#unless is_cordova}}
+        {{> dropzone}}
+      {{/unless}}
+      
+    </div>
+    <div class="progress_holder">
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%;">
+        </div>
+    </div><br>
+    <!--{{#if progress}}
+      {{progress}}%
+    {{else}}
+      &nbsp;
+    {{/if}}-->
+  </div>
+  <div class="preview"><img><img class="hidden"></div>
+</div>
+</template>

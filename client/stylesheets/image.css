@@ -1,0 +1,98 @@
+#pattern_preview .image_holder,
+#pattern_images .image_holder {
+  position: relative;
+  float:left;
+  margin: 0 8px 8px 0;
+  border: 1px solid #7580ac;
+  background: #FFFFFF;
+  cursor: pointer;
+}
+
+.editable #pattern_preview .image_holder,
+.editable #pattern_images .image_holder {
+  position: relative;
+  float:left;
+  min-width: 130px;
+  min-height: 100px;
+}
+
+#pattern_preview .close,
+#pattern_images .close {
+  display: none;
+}
+
+#pattern_preview .image_info,
+#pattern_images .image_info {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  color: #888888;
+  background-color: transparent;
+  display: block;
+  border-radius: 4px;
+}
+
+#pattern_preview .thumbnail,
+#pattern_images .thumbnail {
+  float: left;
+  font-size: 0;
+  width:100%;
+}
+
+#pattern_preview .image_holder .thumbnail .image,
+#pattern_images .image_holder .thumbnail .image {
+  display:block;
+  margin: 8px auto;
+  max-width: 130px;
+  max-height: 100px;;
+  background-size:contain; 
+  background-position:center center; 
+  background-repeat:no-repeat;
+}
+
+#pattern_preview .image_holder .full_image,
+#pattern_images .image_holder .full_image {
+  display: none;
+}
+
+#pattern_preview .image_holder.full-size .full_image .wrapper,
+#pattern_images .image_holder.full-size .full_image .wrapper {
+  position: relative;
+  margin: 0 auto;
+  display: block;
+  max-width: 95%;
+  max-height:95%;
+  top: 50%;
+}
+
+#pattern_preview .image_holder .full_image .image,
+#pattern_images .image_holder .full_image .image {
+  position: relative;
+  background-size:contain; 
+  background-position:center center; 
+  background-repeat:no-repeat;
+  max-width: 100%!important;
+  max-height:100%!important;
+  top: -50%;
+}
+
+#pattern_preview .image_holder.full-size .full_image,
+#pattern_images .image_holder.full-size .full_image {
+  display: block;
+  position: fixed;
+  top:0;
+  left:0;
+  width: 100vw;
+  height:100vh;
+  font-size: 0;
+  z-index: 201;
+  background: rgba(0,0,0,0.9);
+}
+
+#pattern_preview .image_holder.full-size .close,
+#pattern_images .image_holder.full-size .close {
+  display: inline;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}

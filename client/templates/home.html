@@ -118,7 +118,7 @@
 <div class="description">{{description}}</div>
 <div class="tags">{{#each tags}}<span>{{this}}</span>{{/each}}</div>
 <div class="stats"><span class="number_of_tablets" title="Number of tablets"><span class="icon"></span><span class="text">{{number_of_tablets}}</span></span></div>
-<div class="image"><img src="{{thumbnail_url}}" class="thumbnail" width="232" height="36"/></div>
+<div class="image" style="background-image: url('{{preview_url}}')"></div>
 </a></div>
 <div class="footer"><a href="{{pathFor route='user' _id=created_by}}" class="created_by">{{created_by_username}}</a>{{#if can_edit_pattern _id}}
 <a href="#" id="delete" title="Delete this pattern"><span></span></a>

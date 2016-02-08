@@ -21,7 +21,9 @@ caching-compiler@1.0.0
 caching-html-compiler@1.0.2
 callback-hook@1.0.4
 check@1.1.0
+chrismbeckett:toastr@2.1.2_1
 coffeescript@1.0.11
+dburles:mongo-collection-instances@0.3.4
 ddp@1.2.2
 ddp-client@1.2.1
 ddp-common@1.2.2
@@ -34,6 +36,7 @@ easysearch:components@2.0.4
 easysearch:core@2.0.3
 ecmascript@0.1.6
 ecmascript-runtime@0.2.6
+edgee:slingshot@0.7.1
 ejson@1.0.7
 email@1.0.8
 es5-shim@4.1.14
@@ -54,6 +57,7 @@ iron:router@1.0.12
 iron:url@1.0.11
 jeremy:selectize@0.12.1_4
 jquery@1.11.4
+lai:collection-extensions@0.1.4
 launch-screen@1.0.4
 less@2.5.1
 livedata@1.0.15
@@ -65,6 +69,7 @@ mdg:validation-error@0.2.0
 meteor@1.1.10
 meteor-base@1.0.1
 meteor-platform@1.2.3
+meteortoys:toykit@2.2.1
 minifiers@1.1.7
 minimongo@1.0.10
 mobile-experience@1.0.1
@@ -73,18 +78,22 @@ momentjs:moment@2.11.0
 mongo@1.1.3
 mongo-id@1.0.1
 mongo-livedata@1.0.9
+msavin:mongol@1.6.2
 npm-bcrypt@0.7.8_2
+npm-container@1.2.0
 npm-mongo@1.4.39_1
 observe-sequence@1.0.7
 ordered-dict@1.0.4
 patrickleet:tags@1.2.0
 peerlibrary:assert@0.2.5
+peerlibrary:aws-sdk@2.2.6_1
 peerlibrary:base-component@0.10.0
 peerlibrary:blaze-components@0.13.0
 peerlibrary:blocking@0.5.2
 peerlibrary:xml2js@0.4.8_1
 promise@0.5.1
 raix:eventemitter@0.1.3
+raix:ui-dropped-event@0.0.7
 random@1.0.5
 rate-limit@1.0.0
 reactive-dict@1.1.3

@@ -19,6 +19,11 @@ Meteor.publish('patterns', function(created_by){
     });
 });
 
+// Publish images uploaded by the user
+Meteor.publish('images', function() {
+  return Images.find();
+});
+
 Meteor.publish('tags', function(){
   // The collection is readonly and all tags should be public
   return Meteor.tags.find();
@@ -55,4 +60,13 @@ Meteor.publish('user_info', function(trigger){
   // the user's emails will be returned but for other users, only public information should be shown.
   return Meteor.users.find({ $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}});
 });
+/*
+Meteor.publish('images', function(limit) {
+  check(limit, Number);
+
+  return Images.find({}, {
+    limit: limit
+  });
+});*/
+
 

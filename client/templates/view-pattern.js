@@ -5,12 +5,30 @@ Template.view_pattern.rendered = function() {
   Meteor.my_functions.view_pattern_render(pattern_id);
   Meteor.my_functions.initialize_route();
 
+  Session.set('show_image_uploader', false);
+  Session.set('upload_status', 'not started');
 
+  /////////
+  // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
+  // but nice reference for infinite scroll
+  /*var self = this;
+  // is triggered every time we scroll
+  $(window).scroll(function() {
+    if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+      incrementLimit(self);
+    }
+  });*/
 }
 
 Template.view_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
   Meteor.my_functions.view_pattern_created(pattern_id);
+
+  /////////
+  // Images
+  Tracker.autorun(function() {
+    Meteor.subscribe('images');
+  });
 });
 
 Template.pattern_not_found.helpers({
@@ -76,17 +94,34 @@ Template.view_pattern.helpers({
 
     else
       return "clockwise";
-  }
-
+  },
   //////////////////////////
-  // File upload
-  /*myCallbacks: function() {
-    console.log("someplace");
-    return {
-        formData: function() { console.log("here"); return { id: "232323",  } },
-        finished: function(index, fileInfo, context) { console.log("somewhere") }
-    }
-  }*/
+  // Image uploads
+  'show_image_uploader': function() {
+    if (Session.equals('show_image_uploader', true))
+      return true;
+  },
+  'image_limit_reached': function() {
+    var pattern_id = Router.current().params._id;
+    if (Images.find({ used_by: pattern_id }).count() >= Meteor.settings.public.max_images_per_pattern)
+      return true;
+  },
+  // pattern preview, if any
+  'pattern_preview': function() {
+    var pattern_id = Router.current().params._id;
+    return Images.find({$and: [
+      { used_by: pattern_id },
+      { role: "preview"}]
+    });
+  },
+  // other pattern images, if any
+  'pattern_image': function() {
+    var pattern_id = Router.current().params._id;
+    return Images.find({$and: [
+      { used_by: pattern_id },
+      { role: "image"}]
+    });
+  }
 });
 
 Template.orientation.helpers({
@@ -254,6 +289,11 @@ Template.view_pattern.events({
   // Make pattern private / public
   "click .toggle_private": function () {
       Meteor.call("set_private", this._id, !this.private);
+  },
+  // Show image uploader
+  "click .show_image_uploader": function () {
+      Session.set('upload_status', 'not started');
+      Session.set('show_image_uploader', true);
   },
   'click #undo': function() {
     if (Meteor.my_functions.accept_click())
@@ -470,3 +510,4 @@ Template.styles_palette.events({
     Meteor.my_functions.edit_style_warp("v_right");
   }
  });
+

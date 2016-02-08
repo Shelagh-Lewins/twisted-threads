@@ -16,86 +16,11 @@ Meteor.startup(function () {
        + url;
   };
 
-  // Image upload
-  /*UploadServer.init({
-    tmpDir: process.env.PWD + '/.uploads/tmp',
-    uploadDir: process.env.PWD + '/.uploads/',
-    checkCreateDirectories: true //create the directories for you
+  // data migration to remove thumbnail_url
+ /* Patterns.find().forEach( function(myDoc) {
+    Patterns.update({_id: myDoc._id}, {$unset: { thumbnail_url: "text"}});
   });*/
-
-  // run exactly once to convert dates to numbers so they can be sorted
-  // TODO recheck this on freshly downloaded database
-  // upload to site
-  // comment out and upload again
-  /*Patterns.find().forEach( function(myDoc) {
-    var new_val = moment(myDoc.created_at).valueOf();
-    //console.log("***")
-    //console.log("pattern " + myDoc.name);
-    //console.log("old date " + myDoc.created_at);
-    //console.log("new time " + new_val);
-    //console.log("new as date " + moment(new_val).format());
-
-    Patterns.update({_id: myDoc._id}, { $set: {created_at: new_val}});
-  });
-
-  Recent_Patterns.find().forEach( function(myDoc) {
-    var new_val = moment(myDoc.accessed_at).valueOf();
-    //console.log("***")
-    //console.log("pattern " + myDoc.pattern_id);
-    //console.log("old date " + myDoc.accessed_at);
-    //console.log("new time " + new_val);
-    //console.log("new as date " + moment(new_val).format());
-
-    Recent_Patterns.update({_id: myDoc._id}, { $set: {accessed_at: new_val}});
-  });
-//console.log("number of patterns " + Patterns.find().count());
-
-  // run exactly once to add name_sort to enable case-insensitive sorting
-  // just setting the name to its current value triggers the schema to add the autovalue name_sort, which is the lower-case version of the name
-  Patterns.find().forEach( function(myDoc) {
-    var new_val = myDoc.name;
-
-    Patterns.update({_id: myDoc._id}, { $set: {name: new_val}});
-  });
-
-  // run exactly once to add name_sort to users, again for case-insensitive sorting. Must add explicitly because profile may be undefined.
-  Meteor.users.find().forEach( function(myDoc) {
-    var name_sort = myDoc.username.toLowerCase();
-
-    //if (typeof myDoc.profile !== "undefined")
-      //console.log("profile " + name_sort);
-
-    var profile = myDoc.profile || {};
-    profile.name_sort = name_sort;
-
-    Meteor.users.update({_id: myDoc._id}, {$set: {profile: profile}});
-  });*/
-
-  // data migration from forward_stroke, backward_stroke to new stroke with exclusive values
-  /*Patterns.find().forEach( function(myDoc) {
-    // pull out styles
-    // for each style set stroke for b, f, none
-    // resave
-    var styles_data = JSON.parse(myDoc.styles);
-    for (var i=0; i< styles_data.length; i++)
-    {
-      // disturbingly there seem to be two old forms of this, so convert both
-      if ((styles_data[i].forward_stroke == true) || (styles_data[i].forward_stroke == "forward_stroke"))
-        styles_data[i].warp = "forward";
-
-      else if ((styles_data[i].backward_stroke == true) || (styles_data[i].backward_stroke == "backward_stroke"))
-        styles_data[i].warp = "backward";
-
-      else
-        styles_data[i].warp = "none";
-
-      delete styles_data[i].forward_stroke;
-      delete styles_data[i].backward_stroke;
-    }
-
-    var text = JSON.stringify(styles_data);
-    Patterns.update({_id: myDoc._id}, {$set: { styles: text}});
-  });/
+  // after running this, remove thumbnail_url from schema
  
   ///////////////////////////////
   // run this as desired

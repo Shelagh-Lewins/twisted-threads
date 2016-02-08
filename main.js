@@ -54,13 +54,13 @@ if (Meteor.isClient) {
 
   /* *** Helper functions that may be used by more than one template *** */
   // Allows a template to check whether a helper value equals a string
-  UI.registerHelper('signed_in', function () {
-    if (Meteor.userId())
-      return "signed_in";
-  });
-
   UI.registerHelper('equals', function (a, b) {
     return a === b;
+  });
+
+  UI.registerHelper('is_cordova', function () {
+    if(Meteor.isCordova)
+      return true;
   });
 
   // used by connection_status template and also to apply class to div#width
@@ -432,7 +432,10 @@ if (Meteor.isClient) {
 
 
   UI.registerHelper('can_edit_pattern', function(pattern_id) {
-      return Meteor.my_functions.can_edit_pattern(pattern_id);
+    if ((typeof pattern_id === "undefined") && (Router.current().route.getName() == "pattern"))
+      var pattern_id = Router.current().params._id;
+
+    return Meteor.my_functions.can_edit_pattern(pattern_id);
   });
 
   ///////////////////////////////////
@@ -660,7 +663,7 @@ if (Meteor.isClient) {
       Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
 
     // detect login / logout
-    var currentUser=Meteor.user();
+    var currentUser = Meteor.user();
     if(currentUser){
       
       if (!Session.equals('was_signed_in', true))

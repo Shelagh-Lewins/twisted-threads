@@ -165,7 +165,6 @@ Meteor.methods({
       threading_notes: threading_notes,
       private: true, // patterns are private by default so the user can edit them before revealing them to the world
       // TODO add specific thumbnails for patterns
-      thumbnail_url: "../images/default_pattern_thumbnail.png",
       number_of_rows: number_of_rows,
       number_of_tablets: number_of_tablets,
       created_at: moment().valueOf(),            // current time
@@ -300,7 +299,6 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized", "You can only remove patterns that you created");
 
     Patterns.remove(pattern_id);
-    //Styles.remove({pattern_id: pattern_id});
     Recent_Patterns.remove({pattern_id: pattern_id});
   },
   set_private: function (pattern_id, set_to_private) {
@@ -415,7 +413,11 @@ Meteor.methods({
       new_value = "clockwise";
 
     Patterns.update({_id: pattern_id}, {$set: {hole_handedness: new_value}});
-;
+  },
+  add_pattern_thumbnail: function(pattern_id, fileObj)
+  {
+    console.log("add_pattern_thumbnail");
+    console.log("fileObj keys " + Object.keys(fileObj));
   },
   ///////////////////////////////
   // Edit styles
@@ -538,6 +540,193 @@ Meteor.methods({
     return;
   },
   ///////////////////////////////
+  // uploaded images
+  // Is there already an image with this key?
+  does_image_exist: function(key, cb) {
+    console.log("checking for image");
+     // check if the image already exists in the S3 bucket
+    var s3 = new AWS.S3({
+      accessKeyId: Meteor.settings.private.AWSAccessKeyId,
+      secretAccessKey: Meteor.settings.private.AWSSecretAccessKey//,
+    });
+
+    var params = {
+      Bucket: Meteor.settings.private.AWSBucket, // 'mybucket'
+      Key: key // 'images/myimage.jpg'
+    };
+
+    var my_fn = Meteor.wrapAsync(s3.headObject, s3);
+    var results = my_fn(params, function(err, data) {
+
+      if (err)
+      {
+       throw new Meteor.Error("object does not exist with key " + key);
+
+      } else
+      {
+        console.log("have object with key " + key);
+        console.log("data " + data);
+        console.log("keys " + Object.keys(data));
+        console.log("metadata " + JSON.stringify(data.Metadata));
+        return data;
+      }
+    });
+    console.log("results " + Object.keys(results));
+    return results;
+    // callback doesn't seem to work, results has no data and appears before callback
+  },
+  // Slingshot has added a new image to Amazon S3. Now log in it the Images collection.
+  upload_pattern_image: function(downloadUrl, pattern_id, role, width, height){
+    check(downloadUrl, NonEmptyString);
+    check(pattern_id, NonEmptyString);
+    check(role, NonEmptyString);
+    check(width, Number);
+    check(height, Number);
+//console.log("width " + width);
+//console.log("height " + height);
+    var user = Meteor.user();
+    if (!Meteor.userId())
+      return;
+
+    if (!user.emails[0].verified)
+      throw new Meteor.Error("not-authorized", "You can only upload images if you have a verified email address");
+
+    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
+
+    if (pattern.created_by != Meteor.userId())
+      throw new Meteor.Error("not-authorized", "You can only upload images for patterns you created"); 
+
+    if (Images.find({ used_by: pattern_id }).count() >= Meteor.settings.public.max_images_per_pattern)
+      throw new Meteor.Error("limit-reached", "You cannot upload any more images for this pattern");
+
+    var bucket = Meteor.settings.private.AWSBucket;
+    var region = Meteor.settings.public.AWSRegion;
+
+    // Find the key by stripping out the first part of the image url
+    var key = downloadUrl.replace('https://' + bucket + ".s3-" + region + '.amazonaws.com/', ''); // used to delete the object from AWS
+//console.log("key " + key);
+    if (Images.find({key:key}).count() == 0)
+    {
+      // add the new object to the Images collection
+      var image_id = Images.insert({
+          url: downloadUrl,
+          key: key,
+          created_at: moment().valueOf(),            // current time
+          created_by: Meteor.userId(),           // _id of logged in user
+          created_by_username: Meteor.user().username,  // username of logged in user
+          used_by: pattern_id,
+          role: role,
+          width: width,
+          height: height
+       });
+      return image_id;
+    }
+    else
+    {
+      //Meteor.call('does_image_exist', key);
+      // uploading a new version of an existing file, just update "created_at"
+      var image_id = Images.findOne({key:key}, {fields: {_id:1}});
+      Images.update({_id: image_id}, {$set:
+        {
+          created_at: moment().valueOf()
+        }});
+    }
+  },
+  make_preview: function(image_id) {
+    check(image_id, NonEmptyString);
+
+    // Does the user have permission to remove this image?
+    var image = Images.findOne({ '_id': image_id });
+
+    if (typeof image === "undefined")
+      throw new Meteor.Error("not-found", "Image not found: " + image_id);
+
+    if (image.created_by != Meteor.userId())
+      throw new Meteor.Error("not-authorized", "You can only remove an image you uploaded");
+
+    if (image.role == "preview")
+      return true;
+
+    else
+    {
+      var pattern_id = image.used_by;
+      try {
+        var current_preview_id = Images.findOne({used_by:pattern_id, role:"preview"})._id; // remove any existing preview image
+        Images.update({_id:current_preview_id}, {$set: {role:"image"}});
+      }
+      catch(err) {
+        // no existing preview, nothing to do here
+      }
+
+      Images.update({_id:image_id}, {$set: {role:"preview"}});
+    }
+  },
+  set_image_dimensions: function(image_id, width, height) {
+    check(image_id, NonEmptyString);
+    check(width, Number);
+    check(height, Number);
+
+    // Does the user have permission to edit this image?
+    var image = Images.findOne({ '_id': image_id });
+
+    if (typeof image === "undefined")
+      throw new Meteor.Error("not-found", "Image not found: " + image_id);
+
+    if (image.created_by != Meteor.userId())
+      throw new Meteor.Error("not-authorized", "You can only edit an image you uploaded");
+
+    // landscape or portrait
+
+    // constrain size
+
+    var new_width = width;
+    var new_height = height;
+
+    Images.update({_id: image_id}, {$set: {width: new_width, height: new_height}});
+
+  },
+  remove_image: function(image_id) {
+    check(image_id, NonEmptyString);
+
+    // Does the user have permission to remove this image?
+    var image = Images.findOne({ '_id': image_id });
+
+    if (typeof image === "undefined")
+      throw new Meteor.Error("not-found", "Image not found: " + image_id);
+
+    if (image.created_by != Meteor.userId())
+      throw new Meteor.Error("not-authorized", "You can only remove an image you uploaded");
+
+    var s3 = new AWS.S3({
+      accessKeyId: Meteor.settings.private.AWSAccessKeyId,
+      secretAccessKey: Meteor.settings.private.AWSSecretAccessKey//,
+    });
+
+    var params = {
+      Bucket: Meteor.settings.private.AWSBucket, // 'mybucket'
+      Key: image.key // 'images/myimage.jpg'
+    };
+    
+    s3.deleteObject(params, Meteor.bindEnvironment(function (error, data){
+      if (!error) {
+        var new_preview_needed = false;
+        if (image.role == "preview")
+        {
+          new_preview_needed = true;
+          var pattern_id = image.used_by;
+        }
+
+        Images.remove({_id: image_id});
+
+        if (new_preview_needed)
+        {
+          var new_preview_id = Images.findOne({used_by:pattern_id})._id;
+          Meteor.call("make_preview", new_preview_id);
+        }
+      }
+    }));
+  },
+  ///////////////////////////////
   // Edit pattern properties
   update_text_property: function(collection, object_id, property, value)
   {
@@ -642,5 +831,12 @@ Meteor.methods({
 
     else
       Accounts.sendVerificationEmail(Meteor.userId());
+  }
+  ///////////////////////////////
+  // IMPORTANT!! Comment this out of deployed code
+  // Meteor.call("debug_validate_email", Meteor.userId())
+  ,debug_validate_email(user_id)
+  {
+    Meteor.users.update(user_id, {$set: {"emails.0.verified" :true}});
   }
 });

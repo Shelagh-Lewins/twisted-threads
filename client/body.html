@@ -3,7 +3,7 @@
 </template>
 
 <template name="main_layout">
-<div id="width" class="{{signed_in}} {{connection_status}} ">
+<div id="width" class="{{#if currentUser }}signed_in{{/if}} {{#if can_edit_pattern}}editable{{/if}} {{connection_status}} ">
 {{#if loading}}
 <div id="spinner_box"><div class="inner_tube">
 <p>Loading...</p>

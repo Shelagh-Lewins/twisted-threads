@@ -12,6 +12,12 @@
   clear: both;
 }
 
+#pattern_preview,
+#pattern_images {
+  width:100%;
+  float:left;
+}
+
 /* *** Pattern Info *** */
 .pattern_info {
   max-width: 600px;

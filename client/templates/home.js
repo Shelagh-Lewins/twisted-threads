@@ -62,6 +62,15 @@ Template.pattern_thumbnail.helpers({
   },
   created_by_current_user: function () {
     return this.created_by === Meteor.userId();
+  },
+  preview_url: function () {
+    var pattern_id = this._id;
+    var preview_url = "../images/default_pattern_thumbnail.png";
+
+    if (Images.find({used_by:pattern_id, role:"preview"}).count() > 0)
+      var preview_url = Images.findOne({used_by:pattern_id, role:"preview"}).url;
+
+    return preview_url;
   }
 });
 
