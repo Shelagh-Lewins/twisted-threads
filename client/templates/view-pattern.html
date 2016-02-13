@@ -3,6 +3,15 @@
 {{> pattern_as_text}}
 {{> warp_svgs}}
 <div class="pattern_info">
+<div class="name">
+{{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
+</div>
+{{#unless can_edit_pattern _id}}
+<div class="box summary">
+<span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
+</div>
+{{/unless}}
+
 {{#if can_edit_pattern _id}}
   {{#if image_limit_reached}}
     You have added the maximum allowed number of pictures to this pattern.
@@ -25,14 +34,6 @@
 {{/each}}
 </div>
 <div class="clearing"></div>
-{{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
-<!--{{> upload_semanticUI fileTypes='.jpg, .png, .gif' callbacks=myCallbacks}}-->
-{{#if can_edit_pattern _id}}
-{{else}}
-<div class="box summary">
-<span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
-</div>
-{{/if}}
 
 {{#if can_edit_pattern _id}}<div class="box private">
 <div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
@@ -48,6 +49,7 @@
 {{/if}}
 </div>
 
+{{#if view_full_pattern}}
 <h2>Weaving Chart</h2>
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
@@ -93,8 +95,12 @@
 <img src="{{#if equals hole_handedness "clockwise"}}../images/tablet_labels.png{{else}}../images/tablet_labels_rev.png{{/if}}" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
 </div>
 <button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
-
-{{/if}}
+{{else}}
+<div id="view_full_pattern">
+  <button title="Showl pattern">Show pattern</button>
+  <p><br>Large patterns may take several seconds to load</p>
+</div>
+{{/if}}{{/if}}
 </template>
 
 <template name="pattern_row">

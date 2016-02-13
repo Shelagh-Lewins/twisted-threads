@@ -737,6 +737,11 @@ Meteor.methods({
     check(property, NonEmptyString);
     check(value, String);
 
+    if (value.length > 300)
+      throw new Meteor.Error("not-authorized", "Value is too long");
+
+    //console.log("method to update " + object_id);
+
     if (collection == "patterns")
     {
       var pattern = Patterns.findOne({_id: object_id}, { fields: {created_by: 1}});
@@ -756,6 +761,25 @@ Meteor.methods({
           var update = {};
           update[property] = value; // this construction is necessary to handle a variable property name
           Patterns.update({_id: object_id}, {$set: update});
+          return;
+      }
+    }
+
+    if (collection == "images")
+    {
+      var image = Images.findOne({_id: object_id});
+      var pattern = Patterns.findOne({_id: image.used_by})
+
+      if (pattern.created_by != Meteor.userId())
+        throw new Meteor.Error("not-authorized", "You can only update patterns you created");
+      // *** TODO check user can edit pattern
+      switch (property)
+      {
+        case "caption":
+          //console.log("edit caption ");
+          var update = {};
+          update[property] = value; // this construction is necessary to handle a variable property name
+          Images.update({_id: object_id}, {$set: update});
           return;
       }
     }

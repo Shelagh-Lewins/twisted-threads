@@ -1,5 +1,6 @@
 <template name="editable_field">
 <div class="box editable_field">
+
 {{#if can_edit _id}}
   <div class="controls">
      <button class="edit">
@@ -10,8 +11,9 @@
 {{/if}}
 <div class="content">
 {{#if editing}}
+<!--{{#if true}}-->
   {{#if multiple}}
-  <textarea class="text_input">{{data}}</textarea>
+  <textarea class="text_input" maxlength="300">{{data}}</textarea>
   <span class="hint">You can use <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> to format text. For example: <ul>
     <li>*italic*</li>
     <li>**bold**</li>
@@ -20,7 +22,7 @@
     <li>1. numbered list.</li>
   </ul></span>
   {{else}}
-  <input type="text" class="text_input" value="{{data}}">
+  <input type="text" class="text_input" value="{{data}}" maxlength="300">
   {{/if}}
 {{else}}
   {{#if data}}

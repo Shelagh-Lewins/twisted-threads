@@ -7,6 +7,11 @@ Template.view_pattern.rendered = function() {
 
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
+  //console.log("going " + Router.current().params.mode);
+  if (Router.current().params.mode == "full")
+    Session.set('view_full_pattern', true);
+  else
+    Session.set('view_full_pattern', false);
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -56,6 +61,13 @@ Template.remove_row.helpers({
 Template.view_pattern.helpers({
   /////////////////////
   // pattern
+  view_full_pattern: function() {
+    if (Session.equals('view_full_pattern', true))
+      return true;
+
+    else
+      return false;
+  },
   can_remove_tablets: function() {
     // is there more than 1 tablet?
     var pattern_id = Router.current().params._id;
@@ -294,6 +306,12 @@ Template.view_pattern.events({
   "click .show_image_uploader": function () {
       Session.set('upload_status', 'not started');
       Session.set('show_image_uploader', true);
+  },
+  "click #view_full_pattern": function () {
+      Session.set('view_full_pattern', true);
+
+      var pattern_id = Router.current().params._id;
+      //Router.go('pattern', { _id: pattern_id, mode: "full" }); // this doesn't re-render but prevents refresh from hiding the pattern
   },
   'click #undo': function() {
     if (Meteor.my_functions.accept_click())

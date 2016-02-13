@@ -4,6 +4,23 @@ Template.image.helpers({
   },
   own_image: function() {
     return (this.created_by == Meteor.userId());
+  },
+  scaled_width: function(role) {
+    var max_width = 150;
+
+    if (role == "preview")
+      var max_width = 600;
+
+    return Math.min(max_width, this.width);
+    
+  },
+  scaled_height: function(role) {
+    var max_height = 150;
+    
+    if (role == "preview")
+      var max_height = 200;
+
+    return Math.min(max_height, this.height * this.width/600);
   }
 });
 

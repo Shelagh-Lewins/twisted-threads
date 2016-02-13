@@ -19,11 +19,12 @@ Template.editable_field.onCreated(function() {
   this.editing = new ReactiveVar(false);
   this.error = new ReactiveVar();
   
-  this.toggle_edit = function(template, collection, property){
+  this.toggle_edit = function(template){
+    //this.toggle_edit = function(template, collection, property){
     var editing = !template.editing.get();
     template.editing.set(editing);
     template.error.set("");
-
+// ******** TODO remove collection, get it and property from data!!!
     if (editing)
     {
       Session.set("editing_text", true);
@@ -34,11 +35,20 @@ Template.editable_field.onCreated(function() {
     {
       var new_value = $('.text_input').val();
       Session.set("editing_text", false);
-
-      var route_name = Router.current().route.getName();
-      switch (route_name)
+//console.log("editing " + Object.keys(this.data));
+//console.log("collection " + this.data.collection);
+//console.log("id " + this.data._id);
+      //var route_name = Router.current().route.getName();
+      /*switch (route_name)
       {
         case "pattern":
+          if (this.data.collection == "images")
+          {
+            console.log("editing an image");
+          }
+          var object_id = this.data._id;
+          break;
+
         case "user":
           var object_id = Router.current().params._id;
           break;
@@ -47,9 +57,9 @@ Template.editable_field.onCreated(function() {
         case "my_patterns":
           var object_id = Meteor.userId();
           break;
-      }
+      }*/
       var template = template;
-      Meteor.call('update_text_property', collection, object_id, property, new_value, function (error, result){
+      Meteor.call('update_text_property', this.data.collection, this.data._id, this.data.property, new_value, function (error, result){
         
         if(error)
         {
@@ -75,6 +85,9 @@ Template.editable_field.helpers({
   can_edit: function(_id){
     switch(Template.instance().data.collection)
     {
+      case "images":
+        return Meteor.my_functions.can_edit_pattern(Images.findOne({_id: _id}).used_by);
+
       case "patterns":
         return Meteor.my_functions.can_edit_pattern(_id);
 
@@ -95,7 +108,8 @@ Template.editable_field.events({
     event.preventDefault();
 
     if (!template.down)
-      template.toggle_edit(template, this.collection, this.property);
+      //template.toggle_edit(template, this.collection, this.property);
+    template.toggle_edit(template);
   },
   'mousedown button.edit': function(event, template) {
     template.down = true;
@@ -104,7 +118,8 @@ Template.editable_field.events({
     event.preventDefault();
 
     if (template.down && !template.blur)
-      template.toggle_edit(template, this.collection, this.property);
+      template.toggle_edit(template);
+    //template.toggle_edit(template, this.collection, this.property);
     
     var that = template;
     setTimeout(function(){
@@ -125,7 +140,8 @@ Template.editable_field.events({
       if (template.down)
         template.blur = true;
 
-      template.toggle_edit(template, this.collection, this.property);
+      template.toggle_edit(template);
+      //template.toggle_edit(template, this.collection, this.property);
       var that = template;
       setTimeout(function(){ that.change_latch = false}, 20);
     }

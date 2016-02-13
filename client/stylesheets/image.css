@@ -2,18 +2,19 @@
 #pattern_images .image_holder {
   position: relative;
   float:left;
-  margin: 0 8px 8px 0;
-  border: 1px solid #7580ac;
+  margin: 0 0 0 0;
+  /*border: 1px solid #7580ac;*/
   background: #FFFFFF;
   cursor: pointer;
 }
 
-.editable #pattern_preview .image_holder,
-.editable #pattern_images .image_holder {
-  position: relative;
-  float:left;
-  min-width: 130px;
-  min-height: 100px;
+#pattern_preview .image_holder {
+  width: 600px;
+}
+
+#pattern_images .image_holder {
+  width: 150px;
+  height: 150px;
 }
 
 #pattern_preview .close,
@@ -39,12 +40,21 @@
   width:100%;
 }
 
-#pattern_preview .image_holder .thumbnail .image,
+#pattern_preview .image_holder .thumbnail .image {
+  display:block;
+  margin: 0 auto;
+  max-width: 600px;
+  max-height: 200px;
+  background-size:contain; 
+  background-position:center center; 
+  background-repeat:no-repeat;
+}
+
 #pattern_images .image_holder .thumbnail .image {
   display:block;
-  margin: 8px auto;
-  max-width: 130px;
-  max-height: 100px;;
+  margin: 0 auto;
+  max-width: 150px;
+  max-height: 150px;;
   background-size:contain; 
   background-position:center center; 
   background-repeat:no-repeat;
@@ -95,4 +105,119 @@
   position: absolute;
   top: 16px;
   right: 16px;
+}
+
+/* caption */
+#pattern_preview .image_holder.full-size .caption,
+#pattern_images .image_holder.full-size .caption {
+  position: relative;
+  top: -50%;
+  width: 60vh;
+  left: 50%;
+  margin-top: 8px;
+  color: #FFFFFF;
+}
+
+#pattern_preview .image_holder.full-size .box.editable_field,
+#pattern_images .image_holder.full-size .box.editable_field {
+  position: relative;
+  width: 60vh;
+  margin-left: -50%;
+}
+
+#pattern_preview .image_holder.full-size .editable_field .controls,
+#pattern_images .image_holder.full-size .editable_field .controls {
+  border-bottom: none;
+  float: right;
+  width: auto;
+}
+
+#pattern_preview .image_holder.full-size .editable_field .controls button,
+#pattern_images .image_holder.full-size .editable_field .controls button {
+  float: right;
+  background-color: transparent;
+  border: 1px solid #FFFFFF;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  color: #FFFFFF;
+  cursor: pointer;
+  padding: 0 8px;
+  margin: 0 0 0 8px;
+  line-height: 1.5;
+  font-size: 100%;
+}
+
+#pattern_preview .image_holder.full-size .editable_field textarea.text_input,
+#pattern_images .image_holder.full-size .editable_field textarea.text_input {
+  height: 2em;
+  line-height: 1;
+  width: 100%;
+  margin-top: 0;
+}
+
+#pattern_preview .image_holder.full-size .editable_field input.text_input,
+#pattern_images .image_holder.full-size .editable_field input.text_input {
+  width: 100%;
+}
+
+#pattern_preview .image_holder.full-size .editable_field .content,
+#pattern_images .image_holder.full-size .editable_field .content {
+  display: block;
+  margin: 0
+}
+
+.editable #pattern_preview .image_holder.full-size .editable_field .content,
+.editable #pattern_images .image_holder.full-size .editable_field .content {
+  margin-right: 150px;
+}
+
+#pattern_preview .image_holder.full-size .editable_field .content .text,
+#pattern_images .image_holder.full-size .editable_field .content .text {
+  display: block;
+  width: 100%;
+  white-space: pre-line;
+}
+
+
+#pattern_preview .image_holder.full-size .editable_field .content p,
+#pattern_images .image_holder.full-size .editable_field .content .p {
+  text-align: center;
+}
+
+#pattern_preview .image_holder.full-size .editable_field .content .text a,
+#pattern_images .image_holder.full-size .editable_field .content .text a {
+  text-decoration: underline;
+}
+
+.editable_field .error p {
+  color: #FF3333;
+  font-size: 90%;
+}
+
+#pattern_preview .image_holder.full-size  .editable_field .hint,
+#pattern_images .image_holder.full-size  .editable_field .hint {
+  display:none;
+}
+
+.editable_field .hint a {
+  font-size: 100%;
+  color: #666666;
+}
+
+.editable_field .hint ul
+{
+  list-style: none;
+}
+
+.editable_field ul {
+  list-style: disc;
+  margin-left: 1em;
+  padding-left: 1em;
+}
+
+.editable_field ol {
+  list-style: decimal;
+  margin-left: 1em;
+  padding-left: 1em;
 }
