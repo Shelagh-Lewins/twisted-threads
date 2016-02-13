@@ -740,8 +740,6 @@ Meteor.methods({
     if (value.length > 300)
       throw new Meteor.Error("not-authorized", "Value is too long");
 
-    //console.log("method to update " + object_id);
-
     if (collection == "patterns")
     {
       var pattern = Patterns.findOne({_id: object_id}, { fields: {created_by: 1}});
@@ -762,6 +760,9 @@ Meteor.methods({
           update[property] = value; // this construction is necessary to handle a variable property name
           Patterns.update({_id: object_id}, {$set: update});
           return;
+
+          default:
+            throw new Meteor.Error("not-authorized", "Unknown property");
       }
     }
 
@@ -781,6 +782,9 @@ Meteor.methods({
           update[property] = value; // this construction is necessary to handle a variable property name
           Images.update({_id: object_id}, {$set: update});
           return;
+
+        default:
+          throw new Meteor.Error("not-authorized", "Unknown property");
       }
     }
 
@@ -835,6 +839,9 @@ Meteor.methods({
           }
 
           return;
+
+        default:
+          throw new Meteor.Error("not-authorized", "Unknown property");
       }
     }
   },
