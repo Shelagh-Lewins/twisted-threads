@@ -227,6 +227,12 @@ if (Meteor.isClient) {
     // This is a cursor use use .count in template to find number of items
   });
 
+  // *** has the user permission to create a new pattern? *** //
+  UI.registerHelper('can_create_pattern', function(){
+
+    return Meteor.my_functions.can_create_pattern();
+  });
+
   Template.left_column.helpers({
     selected: function(item) {
       var route = Router.current().route.getName();
@@ -442,18 +448,29 @@ if (Meteor.isClient) {
   // Menu - options for selected pattern
   Template.menu.helpers({
     show_menu: function(subscriptionsReady, route_name, pattern_id){
-      // show the menu if either
+      if (Meteor.userId()) // account settings is available to any signed in user
+        return true;
+
+      if (subscriptionsReady && (route_name == "pattern") && (Patterns.find({ _id: pattern_id}).count() != 0)) // printer friendly view is available
+        return true;
+
+      else
+        return false;
+            /* show the menu if:
+        * the user is signed in (Account settings)
+
       // file loading is supported by the browser and the user is signed in,
       // OR the user is viewing a specific pattern
       // if the user is not signed in, the only available menu option is to view the printer-friendly pattern
-      // import, copy and export pattern are only available to signed in users
+      // import, copy and export pattern are only available to users who can create patterns
+      */
 
-      if ((Meteor.my_functions.is_file_loading_supported() && Meteor.userId()) || (subscriptionsReady && (route_name == "pattern") && (Patterns.find({ _id: pattern_id}).count() != 0)))
-        return true;
+      /*if ((Meteor.my_functions.is_file_loading_supported() && Meteor.my_functions.can_create_pattern()) || (subscriptionsReady && (route_name == "pattern") && (Patterns.find({ _id: pattern_id}).count() != 0)))
+        return true;*/
     },
     is_file_loading_supported: function()
     {
-      if (Meteor.my_functions.is_file_loading_supported())
+      if (Meteor.my_functions.is_file_loading_supported() && Meteor.my_functions.can_create_pattern())
         return true;
 
       else

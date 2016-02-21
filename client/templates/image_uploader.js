@@ -1,14 +1,17 @@
-Template.image_uploader.helpers({
+Template.image_uploader.onCreated(function(){
+    uploading = new ReactiveVar(false);
+});
 
+Template.image_uploader.helpers({
   isUploading: function () {
     return Boolean(uploader.get());
   },
-
   progress: function () {
     if (Session.equals('upload_status', 'not started'))
       return 0;
     
     var upload = uploader.get();
+    uploading.set(Boolean(uploader.get())); // for Dropzone
 
     if (Session.equals('upload_status', 'complete'))
     {
@@ -27,9 +30,8 @@ Template.image_uploader.helpers({
 
       return Math.round(progress * 100);
     }
-    
+   
   },
-
   url: function () {
     var currentUserId = Meteor.userId();
     return Images.findOne({uploadedBy: currentUserId},{sort:{ time : -1 } });

@@ -29,7 +29,6 @@ Template.all_patterns.rendered = function() {
   Session.set('thumbnails_in_row', Meteor.my_functions.thumbnails_in_row());
 }
 
-// *** create_new_pattern *** //
 Template.create_new_pattern.events({
   'submit form': function(event){
     event.preventDefault();

@@ -16,13 +16,30 @@ Meteor.startup(function () {
        + url;
   };
 
-  // data migration to remove thumbnail_url
+  // make sure the current user has correct role based on whether their email address is verified
+  Meteor.users.find().observeChanges({
+    changed: function(id, fields) {
+      //console.log("changed ");
+      //console.log("fields " + JSON.stringify(fields));
+      Meteor.call('update_user_roles', id);
+    }
+  });
+
+  // data migration to remove thumbnail_url // DO THIS WHEN MIGRATING TO HAVING IMAGES FOR PATTERNS
  /* Patterns.find().forEach( function(myDoc) {
     Patterns.update({_id: myDoc._id}, {$unset: { thumbnail_url: "text"}});
   });*/
   // after running this, remove thumbnail_url from schema
+
+  // data migration to set role 'verified' for users who have a verified email address
+  // shouldn't do any harm but wastes cycles to rerun
+  /*Meteor.users.find().forEach( function(myDoc) {
+    Meteor.call('update_user_roles', myDoc._id);
+    // !important! at the end of methods.js, comment out the debug fn to set a user's email address to verified, this is just for testing and should not be released
+  });*/
  
   ///////////////////////////////
+  // Ongoing database updates
   // run this as desired
   // make private all patterns with the default name
   /*Patterns.find().forEach( function(myDoc) {
@@ -44,3 +61,4 @@ Accounts.onCreateUser(function(options, user) {
   user.profile.name_sort = user.username.toLowerCase();
   return user;
 });
+

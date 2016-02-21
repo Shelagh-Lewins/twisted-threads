@@ -20,11 +20,11 @@ Template.editable_field.onCreated(function() {
   this.error = new ReactiveVar();
   
   this.toggle_edit = function(template){
-    //this.toggle_edit = function(template, collection, property){
+
     var editing = !template.editing.get();
     template.editing.set(editing);
     template.error.set("");
-// ******** TODO remove collection, get it and property from data!!!
+
     if (editing)
     {
       Session.set("editing_text", true);
@@ -35,29 +35,7 @@ Template.editable_field.onCreated(function() {
     {
       var new_value = $('.text_input').val();
       Session.set("editing_text", false);
-//console.log("editing " + Object.keys(this.data));
-//console.log("collection " + this.data.collection);
-//console.log("id " + this.data._id);
-      //var route_name = Router.current().route.getName();
-      /*switch (route_name)
-      {
-        case "pattern":
-          if (this.data.collection == "images")
-          {
-            console.log("editing an image");
-          }
-          var object_id = this.data._id;
-          break;
 
-        case "user":
-          var object_id = Router.current().params._id;
-          break;
-
-        case "account_settings":
-        case "my_patterns":
-          var object_id = Meteor.userId();
-          break;
-      }*/
       var template = template;
       Meteor.call('update_text_property', this.data.collection, this.data._id, this.data.property, new_value, function (error, result){
         

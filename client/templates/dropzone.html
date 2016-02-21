@@ -1,7 +1,11 @@
 <template name="dropzone">
   <div id="dropzone" class="dropzone">
     <div class="well">
+      {{#if uploading}}
+      Uploading...
+      {{else}}
       or drag and drop a picture file here
+      {{/if}}
     </div>
   </div>
 </template>

@@ -102,8 +102,8 @@
 </ul>{{/if}}
 {{#if Template.subscriptionsReady}}{{#if equals route_name "pattern"}}{{#if pattern_exists _id}}<ul>
 <li><a href="{{pathFor route='pattern' mode='print'}}" target="_blank" id="print_pattern" >Printer-friendly pattern</a></li>
-{{#if currentUser }}<li><a href="#" id="copy_pattern" >Copy pattern</a></li>
-<li><a href="#" id="export_pattern" >Export pattern to JSON</a></li>{{/if}}
+{{#if currentUser}}{{#if can_create_pattern}}<li><a href="#" id="copy_pattern" >Copy pattern</a></li>
+<li><a href="#" id="export_pattern" >Export pattern to JSON</a></li>{{/if}}{{/if}}
 </ul>
 {{/if}}{{/if}}{{/if}}
 </div></div>{{/if}}

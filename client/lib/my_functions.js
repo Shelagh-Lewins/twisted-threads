@@ -16,6 +16,41 @@ Meteor.my_functions = {
   },
   ///////////////////////
   // creating patterns
+  can_create_pattern: function() {
+    if (!Meteor.userId()) // must be signed in
+      return false;
+
+    var count = Patterns.find({created_by: Meteor.userId()}).count();
+ 
+    if (Roles.userIsInRole( Meteor.userId(), 'verified', 'users' ))
+    {
+      if (Roles.userIsInRole( Meteor.userId(), 'premium', 'users' ))
+      {
+        if (count < Meteor.settings.public.max_patterns_per_user.premium)
+          return true;
+
+        else
+          return false;
+      }
+      else
+      {
+        if (count < Meteor.settings.public.max_patterns_per_user.verified)
+          return true;
+
+        else
+          return false;
+      }
+    }
+    // if the user's email address is not verified, they can only create 1 pattern
+    else
+    {
+      if (count < Meteor.settings.public.max_patterns_per_user.default)
+        return true;
+
+      else 
+        return false;
+    }
+  },
   export_pattern_to_json: function(pattern_id) {
 
     // retrieve the pattern data from the database
@@ -788,6 +823,9 @@ Meteor.my_functions = {
     else
     {
       var recent_patterns = JSON.parse(window.localStorage.getItem('recent_patterns'));
+
+      if (recent_patterns == null)
+        return;
 
       for(var i = recent_patterns.length-1; i>=0; i--)
       {

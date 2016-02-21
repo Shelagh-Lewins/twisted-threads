@@ -5,6 +5,41 @@ Meteor.methods({
     // for internal use only
     console.log("All tags " + Meteor.tags.find().fetch().map(function(tag) {return tag.name}));
   },
+  can_create_pattern: function() {
+    if (!Meteor.userId())
+      return false;
+
+    var count = Patterns.find({created_by: Meteor.userId()}).count();
+
+    if (Roles.userIsInRole( Meteor.userId(), 'verified', 'users' ))
+    {
+      if (Roles.userIsInRole( Meteor.userId(), 'premium', 'users' ))
+      {
+        if (count < Meteor.settings.public.max_patterns_per_user.premium)
+          return true;
+
+        else
+          return false;
+      }
+      else
+      {
+        if (count < Meteor.settings.public.max_patterns_per_user.verified)
+          return true;
+
+        else
+          return false;
+      }
+    }
+    // if the user's email address is not verified, they can only create 1 pattern
+    else
+    {
+      if (count < Meteor.settings.public.max_patterns_per_user.default)
+        return true;
+
+      else 
+        return false;
+    }
+  },
   new_pattern_from_json: function(options) {
     // options
     /* {
@@ -30,6 +65,10 @@ Meteor.methods({
       // Only logged in users can create patterns
       throw new Meteor.Error("not-authorized", "You must be signed in to create a new pattern");
     }
+
+    var result = Meteor.call('can_create_pattern');
+    if (!result)
+      throw new Meteor.Error("not-authorized", "You may not create any more patterns");
 
     if (typeof options.data !== "undefined")
     {
@@ -472,13 +511,14 @@ Meteor.methods({
     // If it's already in the collection, update the accessed_at time
     // Recent patterns are stored for each user separately
     check(pattern_id, String);
+    //console.log("add " + pattern_id);
     //console.log("adding to recent patterns " +pattern_id)
     if (!Meteor.userId()) // user is not signed in
       return;
 
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
       return; // the pattern doesn't exist
-
+//console.log("it exists");
     if (Recent_Patterns.find({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
     {
       //console.log("adding to recent patterns " +pattern_id);
@@ -492,13 +532,14 @@ Meteor.methods({
     else
     {
       // the pattern is already in the list, so update it
+      //console.log("updating recent patterns " +pattern_id);
       Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, { $set: {accessed_at: moment().valueOf()}});
     }
 
-    if (Recent_Patterns.find().count() > Meteor.my_params.max_recents) // don't store too many patterns
+    if (Recent_Patterns.find({user_id: Meteor.userId()}).count() > Meteor.my_params.max_recents) // don't store too many patterns for any one user
     {
-      var oldest_id = Recent_Patterns.find({}, {sort: {accessed_at: 1}}, {limit: 1}).fetch()[0]._id;
-
+      var oldest_id = Recent_Patterns.find({user_id: Meteor.userId()}, {sort: {accessed_at: 1}}, {limit: 1}).fetch()[0]._id;
+//console.log("removing " + oldest_id);
       Recent_Patterns.remove({_id: oldest_id});
     }
   },
@@ -737,7 +778,7 @@ Meteor.methods({
     check(property, NonEmptyString);
     check(value, String);
 
-    if (value.length > 300)
+    if (value.length > 3000)
       throw new Meteor.Error("not-authorized", "Value is too long");
 
     if (collection == "patterns")
@@ -862,12 +903,42 @@ Meteor.methods({
 
     else
       Accounts.sendVerificationEmail(Meteor.userId());
+  },
+  // make sure the user has the correct role depending on whether their email address is verified
+  update_user_roles(id)
+  {
+    if (Meteor.users.find({_id: id}).count() == 0)
+      throw new Meteor.Error("not-found", "User width id " + id + "not found");
+    var user = Meteor.users.findOne({_id: id});
+
+    try {
+      if (user.emails[0].verified)
+      {
+        Roles.addUsersToRoles(id, ['verified'], 'users');
+      }
+      else
+      {
+        Roles.removeUsersFromRoles(id, ['verified'], 'users');
+      }
+        
+    }
+    catch(err) {
+
+    }
   }
   ///////////////////////////////
   // IMPORTANT!! Comment this out of deployed code
-  // Meteor.call("debug_validate_email", Meteor.userId())
-  ,debug_validate_email(user_id)
+  // Meteor.call("debug_validate_email", Meteor.userId(), true)
+  /*,debug_validate_email(user_id, validated)
   {
-    Meteor.users.update(user_id, {$set: {"emails.0.verified" :true}});
-  }
+    if (validated === false)
+    {
+      Meteor.users.update(user_id, {$set: {"emails.0.verified" :false}});
+    }
+    else
+    {
+      Meteor.users.update(user_id, {$set: {"emails.0.verified" :true}});
+    }
+    
+  }*/
 });

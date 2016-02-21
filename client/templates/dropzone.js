@@ -1,3 +1,9 @@
+Template.dropzone.helpers({
+  uploading: function () {
+    return uploading.get();
+  }
+});
+
 Template.dropzone.events({
   'dropped #dropzone': function(e, test) {
     e.preventDefault();

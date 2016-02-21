@@ -98,6 +98,7 @@
 </template>
 
 <template name="create_new_pattern">
+{{#if can_create_pattern}}
 <div id="new_pattern">
   <form>
     <label for="num_tablets">Tablets:</label>
@@ -109,6 +110,13 @@
     <input type="submit" value="Create a new pattern">
   </form>
 </div>
+{{else}}
+  {{#if isInRole 'verified' 'users'}}
+    You have created the maximum allowed number of patterns.  
+  {{else}}
+    In order to create more patterns, please verify your email address.
+  {{/if}}
+{{/if}}
 </template>
 
 <template name="pattern_thumbnail"><li class="pattern_thumbnail {{#if private}}private{{/if}}" style="width: {{width}}; margin-right: {{rmargin}}" >
