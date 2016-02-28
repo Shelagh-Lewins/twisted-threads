@@ -518,10 +518,9 @@ Meteor.methods({
 
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
       return; // the pattern doesn't exist
-//console.log("it exists");
+
     if (Recent_Patterns.find({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
     {
-      //console.log("adding to recent patterns " +pattern_id);
       // the pattern is not in the list, so add it
       Recent_Patterns.insert({
         pattern_id: pattern_id,
@@ -532,14 +531,14 @@ Meteor.methods({
     else
     {
       // the pattern is already in the list, so update it
-      //console.log("updating recent patterns " +pattern_id);
+;
       Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, { $set: {accessed_at: moment().valueOf()}});
     }
 
     if (Recent_Patterns.find({user_id: Meteor.userId()}).count() > Meteor.my_params.max_recents) // don't store too many patterns for any one user
     {
       var oldest_id = Recent_Patterns.find({user_id: Meteor.userId()}, {sort: {accessed_at: 1}}, {limit: 1}).fetch()[0]._id;
-//console.log("removing " + oldest_id);
+
       Recent_Patterns.remove({_id: oldest_id});
     }
   },
@@ -548,10 +547,7 @@ Meteor.methods({
 
     // Publish only returns the patterns the user has permission to see
     var my_patterns = Patterns.find({
-      /*$or: [
-        { private: {$ne: true} },
-        { created_by: Meteor.userId() }
-      ]*/
+
     }).map(function(pattern) {return pattern._id});
 
     Recent_Patterns.remove({pattern_id: {$nin:my_patterns}});
@@ -584,7 +580,7 @@ Meteor.methods({
   // uploaded images
   // Is there already an image with this key?
   does_image_exist: function(key, cb) {
-    console.log("checking for image");
+
      // check if the image already exists in the S3 bucket
     var s3 = new AWS.S3({
       accessKeyId: Meteor.settings.private.AWSAccessKeyId,
@@ -605,14 +601,10 @@ Meteor.methods({
 
       } else
       {
-        console.log("have object with key " + key);
-        console.log("data " + data);
-        console.log("keys " + Object.keys(data));
-        console.log("metadata " + JSON.stringify(data.Metadata));
         return data;
       }
     });
-    console.log("results " + Object.keys(results));
+
     return results;
     // callback doesn't seem to work, results has no data and appears before callback
   },
@@ -623,8 +615,7 @@ Meteor.methods({
     check(role, NonEmptyString);
     check(width, Number);
     check(height, Number);
-//console.log("width " + width);
-//console.log("height " + height);
+
     var user = Meteor.user();
     if (!Meteor.userId())
       return;
@@ -645,7 +636,7 @@ Meteor.methods({
 
     // Find the key by stripping out the first part of the image url
     var key = downloadUrl.replace('https://' + bucket + ".s3-" + region + '.amazonaws.com/', ''); // used to delete the object from AWS
-//console.log("key " + key);
+
     if (Images.find({key:key}).count() == 0)
     {
       // add the new object to the Images collection
@@ -664,7 +655,6 @@ Meteor.methods({
     }
     else
     {
-      //Meteor.call('does_image_exist', key);
       // uploading a new version of an existing file, just update "created_at"
       var image_id = Images.findOne({key:key}, {fields: {_id:1}});
       Images.update({_id: image_id}, {$set:
@@ -927,10 +917,13 @@ Meteor.methods({
     }
   }
   ///////////////////////////////
-  // IMPORTANT!! Comment this out of deployed code
+  // IMPORTANT!! Only works if "debug"
   // Meteor.call("debug_validate_email", Meteor.userId(), true)
-  /*,debug_validate_email(user_id, validated)
+  ,debug_validate_email(user_id, validated)
   {
+    if (!Meteor.settings.private.debug)
+      return;
+
     if (validated === false)
     {
       Meteor.users.update(user_id, {$set: {"emails.0.verified" :false}});
@@ -939,6 +932,5 @@ Meteor.methods({
     {
       Meteor.users.update(user_id, {$set: {"emails.0.verified" :true}});
     }
-    
-  }*/
+  }
 });
