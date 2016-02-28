@@ -1692,7 +1692,6 @@ Meteor.my_functions = {
   },
   set_pattern_data_from_local_storage: function(pattern_id, data)
   {
-    console.log("set pattern data")
     localStorage.setItem("pattern_" + pattern_id, JSON.stringify(data));
   },
   validate_row_number_input: function(index)

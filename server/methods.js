@@ -176,6 +176,13 @@ Meteor.methods({
     var number_of_rows = data.weaving.length;
     var number_of_tablets = data.threading[0].length; // there may be no weaving rows but there must be threading
 
+    // try to prevent huge patterns that would fill up the database
+    if (number_of_rows > Meteor.settings.private.max_pattern_rows)
+      throw new Meteor.Error("too-many-rows", "error creating pattern from JSON. Too many rows.");
+
+    if (number_of_rows > Meteor.settings.private.max_pattern_tablets)
+      throw new Meteor.Error("too-many-tablets", "error creating pattern from JSON. Too many tablets.");
+
     if(options.name == "")
       options.name = Meteor.my_params.default_pattern_name;
 
@@ -339,6 +346,7 @@ Meteor.methods({
 
     Patterns.remove(pattern_id);
     Recent_Patterns.remove({pattern_id: pattern_id});
+    Images.remove({used_by: pattern_id});
   },
   set_private: function (pattern_id, set_to_private) {
     check(pattern_id, String);
@@ -366,6 +374,13 @@ Meteor.methods({
         // Only the owner can edit a pattern
         throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
 
+    // try to prevent huge patterns that would fill up the database
+    if (number_of_rows > Meteor.settings.private.max_pattern_rows)
+      throw new Meteor.Error("too-many-rows", "error saving pattern. Too many rows.");
+
+    if (number_of_rows > Meteor.settings.private.max_pattern_tablets)
+      throw new Meteor.Error("too-many-tablets", "error saving pattern. Too many tablets.");
+
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { weaving: text}});
 
@@ -374,6 +389,9 @@ Meteor.methods({
 
     // Record the number of tablets
     Patterns.update({_id: pattern_id}, {$set: {number_of_tablets: number_of_tablets}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   save_threading_as_text: function(pattern_id, text)
   {
@@ -388,6 +406,9 @@ Meteor.methods({
 
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { threading: text}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   save_orientation_as_text: function(pattern_id, text)
   {
@@ -402,6 +423,9 @@ Meteor.methods({
 
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { orientation: text}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   save_styles_as_text: function(pattern_id, text)
   {
@@ -416,6 +440,9 @@ Meteor.methods({
 
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { styles: text}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   restore_pattern: function(data)
   {
@@ -432,7 +459,12 @@ Meteor.methods({
     Meteor.call('save_threading_as_text', data._id, JSON.stringify(data.threading));
     Meteor.call('save_orientation_as_text', data._id, JSON.stringify(data.orientation));
     Meteor.call('save_styles_as_text', data._id, JSON.stringify(data.styles)); 
-    return
+    return;
+  },
+  save_pattern_edit_time: function(pattern_id)
+  {
+    check(pattern_id, String);
+    Patterns.update({_id: pattern_id}, {$set: {pattern_edited_at: moment().valueOf()}});
   },
   ///////////////////////////////
   // Edit other pattern properties
@@ -728,6 +760,61 @@ Meteor.methods({
     if (image.created_by != Meteor.userId())
       throw new Meteor.Error("not-authorized", "You can only remove an image you uploaded");
 
+    // check for too many image removals too fast
+    var document_id = Meteor.call('get_actions_log');
+
+    var db_document = ActionsLog.findOne({_id: document_id}, {fields: { image_removed: 1, locked: 1 }} );
+
+    var event_log = db_document.image_removed;
+
+    if (db_document.locked)
+    throw new Meteor.Error("account-locked", "Your account has been locked, please contact an administrator");
+  
+    var number_of_entries = event_log.length;
+    var time_since_last_action = moment().valueOf() - event_log[0];
+
+    // try to detect automated image removes
+    // A human shouldn't be able to removes 10 images in 2 seconds
+    var last_10_actions_in = event_log[0] - event_log[9];
+    if (last_10_actions_in < 2000)
+    {
+      ActionsLog.update( {_id: document_id}, { locked: true } );
+      throw new Meteor.Error("account-locked", "Your account has been locked, please contact an administrator");
+    }
+
+    var last_5_actions_in = event_log[0] - event_log[4];
+      if (last_5_actions_in < 2000)
+      {
+        // Don't allow another attempt for 5 minutes
+        if (time_since_last_action < (60 * 1000 * 5))
+          throw new Meteor.Error("too-many-requests", "Please wait 5 mins before retrying");
+
+        // it's been at least 5 mins so consider allowing another image upload
+        else
+        {
+          var previous_5_actions_in = event_log[4] - event_log[9];
+          if (previous_5_actions_in < 2000)
+          {
+            // if the 5 previous actions were in 2 seconds, wait 30 minutes
+            // this looks like an automatic process that has tried continually
+            if (time_since_last_action < (60 * 1000 * 30 + 4000))
+              throw new Meteor.Error("too-many-requests", "Please wait 30 mins before retrying");
+          }
+        }
+      }
+
+      // record the action in the log
+      ActionsLog.update( {_id: document_id}, { $push: { image_removed: {
+        $each: [moment().valueOf()],
+        $position: 0 
+      }}} );
+  ;
+      // remove the oldest log entry if too many stored
+      if (number_of_entries > Meteor.settings.private.image_remove_num_to_log)
+      {
+        ActionsLog.update( {_id: document_id}, { $pop: { image_removed: 1 }} );
+      }
+
     var s3 = new AWS.S3({
       accessKeyId: Meteor.settings.private.AWSAccessKeyId,
       secretAccessKey: Meteor.settings.private.AWSSecretAccessKey//,
@@ -790,6 +877,9 @@ Meteor.methods({
           var update = {};
           update[property] = value; // this construction is necessary to handle a variable property name
           Patterns.update({_id: object_id}, {$set: update});
+          
+          // Record the edit time
+          Meteor.call("save_text_edit_time", object_id);
           return;
 
           default:
@@ -877,6 +967,11 @@ Meteor.methods({
       }
     }
   },
+  save_text_edit_time: function(pattern_id)
+  {
+    check(pattern_id, String);
+    Patterns.update({_id: pattern_id}, {$set: {text_edited_at: moment().valueOf()}});
+  },
 
   ///////////////////////////////
   // user account management
@@ -892,15 +987,7 @@ Meteor.methods({
     // check for the user having requested too many emails in too short a time
     var document_id = Meteor.call('get_actions_log');
 
-    ActionsLog.update( {_id: document_id}, { $push: { verification_email_sent: {
-      $each: [moment().valueOf()],
-      $position: 0 
-    }
-    }} );
-
-    var number_of_entries = 0;
-
-    var db_document = ActionsLog.findOne({_id: document_id}, {fields: { verification_email_sent: 1, locked: 1 }} )
+    var db_document = ActionsLog.findOne({_id: document_id}, {fields: { verification_email_sent: 1, locked: 1 }} );
 
     var event_log = db_document.verification_email_sent;
 
@@ -908,11 +995,6 @@ Meteor.methods({
       throw new Meteor.Error("account-locked", "Your account has been locked, please contact an administrator");
     
     var number_of_entries = event_log.length;
-
-    // remove the oldest entry if too many stored
-    if (number_of_entries > Meteor.settings.private.verification_emails_num_to_log)
-        ActionsLog.update( {_id: document_id}, { $pop: { verification_email_sent: 1 }} );
-
     var time_since_last_action = moment().valueOf() - event_log[0];
     
     // try to detect automated email send
@@ -957,6 +1039,16 @@ Meteor.methods({
     }
 
     // send the email
+    // record the action in the log
+    ActionsLog.update( {_id: document_id}, { $push: { verification_email_sent: {
+      $each: [moment().valueOf()],
+      $position: 0 
+    }}} );
+
+    // remove the oldest log entry if too many stored
+    if (number_of_entries > Meteor.settings.private.verification_emails_num_to_log)
+        ActionsLog.update( {_id: document_id}, { $pop: { verification_email_sent: 1 }} );
+
     if (typeof email !== "string")
       Accounts.sendVerificationEmail(Meteor.userId(), email);
 
@@ -966,6 +1058,8 @@ Meteor.methods({
   // make sure the user has the correct role depending on whether their email address is verified
   update_user_roles(id)
   {
+    check(id, String);
+
     if (Meteor.users.find({_id: id}).count() == 0)
       throw new Meteor.Error("not-found", "User width id " + id + "not found");
     var user = Meteor.users.findOne({_id: id});

@@ -478,7 +478,7 @@ Template.view_pattern.events({
 Template.styles_palette.events({
  'click .styles .row.style .cell': function () {
     Session.set("selected_style", this.style);
-    console.log("select style " + this.style);
+
     Meteor.my_functions.update_color_pickers();
   },
   'click .styles .row.special .cell': function () {
