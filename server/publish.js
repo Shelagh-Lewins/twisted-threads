@@ -60,13 +60,16 @@ Meteor.publish('user_info', function(trigger){
   // the user's emails will be returned but for other users, only public information should be shown.
   return Meteor.users.find({ $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}});
 });
-/*
-Meteor.publish('images', function(limit) {
-  check(limit, Number);
 
-  return Images.find({}, {
-    limit: limit
-  });
-});*/
+// Debug only - show log of user actions
+// to access this, subscribe in the client with:
+// Meteor.subscribe('actions_log')
+Meteor.publish('actions_log', function() {
+
+  if (!Meteor.settings.private.debug)
+      return;
+
+  return ActionsLog.find();
+});
 
 

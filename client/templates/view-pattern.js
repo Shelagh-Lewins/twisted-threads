@@ -7,7 +7,7 @@ Template.view_pattern.rendered = function() {
 
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
-  //console.log("going " + Router.current().params.mode);
+
   if (Router.current().params.mode == "full")
     Session.set('view_full_pattern', true);
   else

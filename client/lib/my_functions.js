@@ -1823,7 +1823,6 @@ Meteor.my_functions = {
           var img = $('.image_uploader .preview img.hidden')[0];
           var sizeKB = file.size / 1024;
           img.onload = function() {
-            //console.log("Size: " + sizeKB + "KB\nWidth: " + img.naturalWidth + "\nHeight: " + img.naturalHeight);
 
               var role = "image";
               if (Images.find({$and: [
@@ -1837,9 +1836,6 @@ Meteor.my_functions = {
               Meteor.call('upload_pattern_image', downloadUrl, pattern_id, role, img.naturalWidth, img.naturalHeight);
             }
             $('.image_uploader .preview img').attr("src", downloadUrl);
-            //img.src = downloadUrl;
-            //$('.image_uploader .preview').append(img);
-       
         }
       });
       uploader.set(upload);

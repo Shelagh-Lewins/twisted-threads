@@ -30,10 +30,10 @@
     <div class="introduction">
   <p>Welcome to Twisted Threads, the online app for tablet weaving. You can use Twisted Threads to design, weave and share patterns.</p>
   <p>Tablet weaving is an ancient craft known around the world by different names including card weaving, brettchen weberei, brikvævning and tissage &agrave; carton.</p>
-  <p>Join our <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss Twisted Threads with other users or share feedback with the app developer.</p>
+  <p>Join our <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss Twisted Threads with other users, request new features or share feedback with the app developer.</p>
 </div>
 <div class="warning">
-    This is a beta version hosted on free webspace, which means that data may be lost unexpectedly. Please save local copies of your patterns using the menu option "Export pattern to JSON". 
+    This website is still under development and it's possible your data might be lost. Please save local copies of your patterns using the menu option "Export pattern to JSON".
 </div>
   {{#if currentUser}}
   {{> create_new_pattern}}
@@ -114,7 +114,7 @@
   {{#if isInRole 'verified' 'users'}}
     You have created the maximum allowed number of patterns.  
   {{else}}
-    In order to create more patterns, please verify your email address.
+    In order to create more patterns, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a>
   {{/if}}
 {{/if}}
 </template>

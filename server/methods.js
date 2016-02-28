@@ -866,7 +866,8 @@ Meteor.methods({
               if (new_emails[i].address != value)
                 Accounts.removeEmail(object_id, new_emails[i].address);
             }
-            Accounts.sendVerificationEmail(object_id);
+            //Accounts.sendVerificationEmail(object_id);
+            Meteor.call('sendVerificationEmail', object_id);
           }
 
           return;
@@ -888,6 +889,74 @@ Meteor.methods({
       // Only the owner can request a verification email
       throw new Meteor.Error("not-authorized", "You can only request verification emails for your own email addresses");
 
+    // check for the user having requested too many emails in too short a time
+    var document_id = Meteor.call('get_actions_log');
+
+    ActionsLog.update( {_id: document_id}, { $push: { verification_email_sent: {
+      $each: [moment().valueOf()],
+      $position: 0 
+    }
+    }} );
+
+    var number_of_entries = 0;
+
+    var db_document = ActionsLog.findOne({_id: document_id}, {fields: { verification_email_sent: 1, locked: 1 }} )
+
+    var event_log = db_document.verification_email_sent;
+
+    if (db_document.locked)
+      throw new Meteor.Error("account-locked", "Your account has been locked, please contact an administrator");
+    
+    var number_of_entries = event_log.length;
+
+    // remove the oldest entry if too many stored
+    if (number_of_entries > Meteor.settings.private.verification_emails_num_to_log)
+        ActionsLog.update( {_id: document_id}, { $pop: { verification_email_sent: 1 }} );
+
+    var time_since_last_action = moment().valueOf() - event_log[0];
+    
+    // try to detect automated email send
+    // If the last 5 actions in a space of 1 second
+    var last_5_actions_in = event_log[0] - event_log[4];
+    if (last_5_actions_in < 2000)
+    {
+      // Don't allow another attempt for 5 minutes
+      if (time_since_last_action < (60 * 1000 * 5))
+        throw new Meteor.Error("too-many-requests", "Please wait 5 mins before retrying");
+
+      // it's been at least 5 mins so consider allowing another email
+      else
+      {
+        var last_10_actions_in = event_log[0] - event_log[9];
+        if (last_10_actions_in < (60 * 1000 * 5))
+        {
+          // if the last 10 actions in 5 minutes 4 seconds, wait 30 minutes
+          // this looks like an automatic process that has tried continually
+          if (time_since_last_action < (60 * 1000 * 30 + 4000))
+            throw new Meteor.Error("too-many-requests", "Please wait 30 mins before retrying");
+        }
+      }
+    }
+
+    // try to prevent sending too many emails if the user hits the button repeatedly
+    // If the last 3 actions in a space of 1 minute, wait 5 minutes
+    var last_3_actions_in = event_log[0] - event_log[2];
+    if (last_3_actions_in < 60000)
+    {
+      // Don't allow another attempt for 5 minutes
+      if (time_since_last_action < (60 * 1000 * 5))
+        throw new Meteor.Error("too-many-requests", "Please wait 5 mins before retrying");
+    }
+
+    // Lock the user's account if 20 emails requested in 30 minutes
+    var last_20_actions_in = event_log[0] - event_log[29];
+    if (last_20_actions_in < 60 * 1000 * 30)
+    {
+      ActionsLog.update( {_id: document_id}, { locked: true } );
+      throw new Meteor.Error("account-locked", "Your account has been locked, please contact an administrator");
+    }
+
+    // send the email
     if (typeof email !== "string")
       Accounts.sendVerificationEmail(Meteor.userId(), email);
 
@@ -910,16 +979,31 @@ Meteor.methods({
       {
         Roles.removeUsersFromRoles(id, ['verified'], 'users');
       }
-        
     }
     catch(err) {
 
     }
-  }
+  },
+  // return the action log for the current user
+  // add a blank if none exists
+  get_actions_log()
+  {
+    if (ActionsLog.find( {user_id: Meteor.userId()} ).count() == 0)
+      return ActionsLog.insert({
+        user_id: Meteor.userId(),
+        username: Meteor.user().username,
+        verification_email_sent: [],
+        image_uploaded: [],
+        image_removed: []
+      });
+    
+    else
+      return ActionsLog.findOne( {user_id: Meteor.userId()} )._id;
+  },
   ///////////////////////////////
   // IMPORTANT!! Only works if "debug"
   // Meteor.call("debug_validate_email", Meteor.userId(), true)
-  ,debug_validate_email(user_id, validated)
+  debug_validate_email(user_id, validated)
   {
     if (!Meteor.settings.private.debug)
       return;
