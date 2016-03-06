@@ -24,6 +24,7 @@ html {
 body {
   position: relative;
   background-color: #EEEEEE;
+  color: #424A6C;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -469,8 +470,9 @@ body {
 h2 {
   /*clear: both;*/
   font-weight: bold;
-  font-size: 100%;
+  font-size: 24px;
   margin-top: 16px;
+  margin-bottom: 8px;
 }
 
 /* *** Connection status *** */
@@ -666,3 +668,7 @@ body.loading {
   background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
 }
 
+/* general content */
+p {
+  margin-bottom: 4px;
+}

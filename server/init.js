@@ -28,9 +28,9 @@ Meteor.startup(function () {
   });
 
   // data migration to remove thumbnail_url // DO THIS WHEN MIGRATING TO HAVING IMAGES FOR PATTERNS
- /* Patterns.find().forEach( function(myDoc) {
+  /*Patterns.find().forEach( function(myDoc) {
     Patterns.update({_id: myDoc._id}, {$unset: { thumbnail_url: "text"}});
-  });*/
+  }); */
   // after running this, remove thumbnail_url from schema
 
   // data migration to set role 'verified' for users who have a verified email address

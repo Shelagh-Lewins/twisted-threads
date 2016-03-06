@@ -8,6 +8,11 @@ Router.route('/', {
   template: 'home'
 });
 
+Router.route('/about', {
+  name: 'about',
+  template: 'about'
+});
+
 Router.route('/recent-patterns', {
   name: 'recent_patterns',
   template: 'recent_patterns'

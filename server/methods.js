@@ -1102,13 +1102,10 @@ Meteor.methods({
     if (!Meteor.settings.private.debug)
       return;
 
-    if (validated === false)
-    {
-      Meteor.users.update(user_id, {$set: {"emails.0.verified" :false}});
-    }
-    else
-    {
-      Meteor.users.update(user_id, {$set: {"emails.0.verified" :true}});
-    }
+    var emails = Meteor.users.findOne({ _id: user_id}).emails;
+    emails[0]["verified"] = validated;
+    var update = {};
+    update["emails"] = emails;
+    Meteor.users.update({_id: user_id}, {$set: update});
   }
 });

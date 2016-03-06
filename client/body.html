@@ -35,6 +35,8 @@
 
       {{#if equals route_name "pattern"}}
       <a href="{{pathFor route='home'}}">Home</a>{{/if}}
+
+      {{#if equals route_name "about"}}<a href="{{pathFor route='home'}}">Home</a>{{/if}}
       
       {{#if pattern_exists _id}}
         {{#if is_weaving}}
@@ -106,6 +108,9 @@
 <li><a href="#" id="export_pattern" >Export pattern to JSON</a></li>{{/if}}{{/if}}
 </ul>
 {{/if}}{{/if}}{{/if}}
+<ul>
+  <li><a href="{{pathFor route='about'}}" >About Twisted Threads</a></li>
+</ul>
 </div></div>{{/if}}
 </template>
 

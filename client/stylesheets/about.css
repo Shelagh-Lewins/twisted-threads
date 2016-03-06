@@ -1,0 +1,36 @@
+.about .container {
+  margin: 0 0 0 8px;
+}
+
+.about .section {
+  float: left;
+  max-width: 600px;
+  margin-right: 16px;
+}
+
+.about .section:last-child {
+  margin-right: 0;
+}
+
+.about .donate_paypal {
+  text-align: center;
+  margin: 32px 0;
+}
+
+.about .contact_info {
+  width: 400px;
+  background-color: #FFFFFF;
+  color: #111111;
+  border: 1px solid #7580ac;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  min-height: 50px;
+  padding: 16px;
+  text-align: center;
+  margin: 0 auto 32px auto;
+}
+
+.about .contact_info p {
+  margin-bottom: 0;
+}

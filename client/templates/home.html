@@ -27,13 +27,11 @@
 </template>
 
 <template name="home_patterns">
-    <div class="introduction">
-  <p>Welcome to Twisted Threads, the online app for tablet weaving. You can use Twisted Threads to design, weave and share patterns.</p>
+  <div class="introduction">
+  <p><strong>Welcome to Twisted Threads, the online app for tablet weaving.<br>You can use this site to design, weave and share patterns.</strong></p>
   <p>Tablet weaving is an ancient craft known around the world by different names including card weaving, brettchen weberei, brikvævning and tissage &agrave; carton.</p>
-  <p>Join our <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss Twisted Threads with other users, request new features or share feedback with the app developer.</p>
-</div>
-<div class="warning">
-    This website is still under development and it's possible your data might be lost. Please save local copies of your patterns using the menu option "Export pattern to JSON".
+  {{> donate_paypal}}
+  <p>Join our <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss Twisted Threads with other users, request new features or share feedback with the app developer. <a href="{{pathFor route='about'}}" >More information</a></p>
 </div>
   {{#if currentUser}}
   {{> create_new_pattern}}
@@ -122,9 +120,9 @@
 <template name="pattern_thumbnail"><li class="pattern_thumbnail {{#if private}}private{{/if}}" style="width: {{width}}; margin-right: {{rmargin}}" >
 <div class="main">
 <a href="{{pathFor route='pattern'}}">
-<h3>{{name}}</h3>
+<h3 title="{{name}}">{{name}}</h3>
 <div class="description">{{description}}</div>
-<div class="tags">{{#each tags}}<span>{{this}}</span>{{/each}}</div>
+<div class="tags" title="{{tags}}">{{#each tags}}<span>{{this}}</span>{{/each}}</div>
 <div class="stats"><span class="number_of_tablets" title="Number of tablets"><span class="icon"></span><span class="text">{{number_of_tablets}}</span></span></div>
 <div class="image" style="background-image: url('{{preview_url}}')"></div>
 </a></div>
@@ -160,6 +158,20 @@ Only show patterns with between
 <input type="number" placeholder="Number" id="min_tablets" min="1" max="500" size="3" value="{{min_tablets}}">and
 <input type="number" placeholder="Number" id="max_tablets" min="1" max="500" size="3" value="{{max_tablets}}">tablets
 </p></div>
+</template>
+
+<template name="donate_paypal">
+  
+  <div class="donate_paypal">
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+">
+<input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online.">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1">
+</form>
+
+</div>
 </template>
 
 

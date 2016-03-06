@@ -13,7 +13,7 @@
 }
 
 .home .introduction {
-  width: 600px;
+  max-width: 660px;
   margin: 0 0 16px 0;
 }
 
@@ -21,6 +21,11 @@
   width: 600px;
   margin: 0 0 16px 0;
   color: #FF3333;
+}
+
+.home .donate_paypal {
+  float: right;
+  margin-top: 16px;
 }
 
 /* *** New Pattern form *** */
@@ -165,9 +170,13 @@ ul.patterns .pattern_thumbnail .tags {
   cursor: pointer;
 }
 
+ul.patterns .pattern_thumbnail .tags span::after {
+  content: " ";
+}
+
 ul.patterns .pattern_thumbnail .tags span {
   color: #666666;
-  padding-right: 8px;
+  padding-right: 4px;
   font-size: 14px;
 }
 

@@ -448,6 +448,7 @@ if (Meteor.isClient) {
   // Menu - options for selected pattern
   Template.menu.helpers({
     show_menu: function(subscriptionsReady, route_name, pattern_id){
+      return true;
       if (Meteor.userId()) // account settings is available to any signed in user
         return true;
 
