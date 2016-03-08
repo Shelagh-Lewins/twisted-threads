@@ -8,11 +8,6 @@ Template.view_pattern.rendered = function() {
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
 
-  if (Router.current().params.mode == "full")
-    Session.set('view_full_pattern', true);
-  else
-    Session.set('view_full_pattern', false);
-
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll
@@ -34,6 +29,11 @@ Template.view_pattern.onCreated(function(){
   Tracker.autorun(function() {
     Meteor.subscribe('images');
   });
+
+  if (Router.current().params.mode == "full")
+    Session.set('view_full_pattern', true);
+  else
+    Session.set('view_full_pattern', false);
 });
 
 Template.pattern_not_found.helpers({
@@ -115,8 +115,17 @@ Template.view_pattern.helpers({
   },
   'image_limit_reached': function() {
     var pattern_id = Router.current().params._id;
-    if (Images.find({ used_by: pattern_id }).count() >= Meteor.settings.public.max_images_per_pattern)
+
+    var max_images = Meteor.settings.public.max_images_per_pattern.verified;
+
+    if (Roles.userIsInRole( Meteor.userId(), 'premium', 'users' ))
+      max_images = Meteor.settings.public.max_images_per_pattern.premium;
+    
+    if (Images.find({ used_by: pattern_id }).count() >= max_images)
       return true;
+
+    else
+      return false;
   },
   // pattern preview, if any
   'pattern_preview': function() {
@@ -478,7 +487,7 @@ Template.view_pattern.events({
 Template.styles_palette.events({
  'click .styles .row.style .cell': function () {
     Session.set("selected_style", this.style);
-
+//console.log("clicked");
     Meteor.my_functions.update_color_pickers();
   },
   'click .styles .row.special .cell': function () {

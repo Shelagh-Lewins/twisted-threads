@@ -63,7 +63,7 @@ UI.registerHelper('is_selected_style', function() {
   }
 });
 
-UI.registerHelper('cell_style', function(row, tablet) {
+UI.registerHelper('cell_style', function() {
   if (typeof this.style == "string")
   {
     if (this.style.charAt(0) == "S")

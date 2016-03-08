@@ -1,0 +1,52 @@
+<template name="auto_preview">
+<div class="auto_preview">
+
+<svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{viewbox_width}} {{viewbox_height}}"  shape-rendering="geometricPrecision" width="{{total_width}}">
+
+{{#each row_indexes}}
+  {{#each weaving_row this}}
+  {{#with cell_style this}}
+    {{#if equals shape "forward"}}
+    <g transform="translate({{translate_x "forward"}} {{translate_y "forward"}})">
+      <path d="m0.51 111.54 40.545-55v-55l-40.545 55z" stroke="#000" stroke-width="1.015" fill="{{line_color}}"/>
+    </g>
+    {{else}}
+      {{#if equals shape "backward"}}
+      <g transform="translate({{translate_x "forward"}} {{translate_y "forward"}})">
+        <path id="rect4136-2-91" d="m41.05 111.54-40.545-55v-55l40.545 55z" stroke="#000" stroke-width="1.015" fill="{{line_color}}"/>
+      </g>
+      {{else}}
+        {{#if equals shape "triangle_right"}}
+          <g transform="translate({{translate_x "forward"}} {{translate_y "forward"}})">
+            <path d="m0.51 1.54-0.0006 110 40.545-55z" stroke="#000" stroke-width="1.015" fill="{{line_color}}"/>
+          </g>
+        {{else}}
+          {{#if equals shape "triangle_left"}}
+            <g transform="translate({{translate_x "forward"}} {{translate_y "forward"}})">
+              <path id="rect4136-2-9" d="m41.18 1.54 0.0006 110-40.545-55z" stroke="#000" stroke-width="1.015" fill="{{line_color}}"/>
+            </g>
+          {{else}}
+
+          {{/if}}
+        {{/if}}
+      {{/if}}
+    {{/if}}
+  {{/with}}
+  {{/each}}
+{{/each}}
+</svg>
+
+</div>
+</template>
+
+<template name="auto_preview1">
+<div class="auto_preview">
+
+<svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="31.916mm" width="11.729mm" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{unit_width}} {{unit_height}}"  style="width: {{total_width}}px;">
+   <g id="layer1" transform="translate(-379.22 -415.82)">
+    <path id="rect4136-2-91" d="m379.73 527.36 40.545-55v-55l-40.545 55z" stroke="#000" stroke-width="1.015" fill="{{fill}}"/>
+   </g>
+</svg>
+
+</div>
+</template>

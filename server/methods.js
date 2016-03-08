@@ -660,8 +660,24 @@ Meteor.methods({
     if (pattern.created_by != Meteor.userId())
       throw new Meteor.Error("not-authorized", "You can only upload images for patterns you created"); 
 
-    if (Images.find({ used_by: pattern_id }).count() >= Meteor.settings.public.max_images_per_pattern)
-      throw new Meteor.Error("limit-reached", "You cannot upload any more images for this pattern");
+    //if (Images.find({ used_by: pattern_id }).count() >= Meteor.settings.public.max_images_per_pattern)
+      //throw new Meteor.Error("limit-reached", "You cannot upload any more images for this pattern");
+
+    
+    var count = Images.find({ used_by: pattern_id }).count();
+
+    if (Roles.userIsInRole( Meteor.userId(), 'premium', 'users' ))
+    {
+      if (count >= Meteor.settings.public.max_images_per_pattern.premium)
+        throw new Meteor.Error("limit-reached", "You cannot upload any more images for this pattern");
+    }
+    else
+    {
+      if (count >= Meteor.settings.public.max_images_per_pattern.verified)
+        throw new Meteor.Error("limit-reached", "You cannot upload any more images for this pattern");
+    }
+
+
 
     var bucket = Meteor.settings.private.AWSBucket;
     var region = Meteor.settings.public.AWSRegion;

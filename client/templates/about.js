@@ -6,8 +6,6 @@ Template.about.rendered = function() {
 }
 
 Template.contact_info.helpers({
-  /////////////////////
-  // pattern
   show_contact_info: function() {
     if (Session.equals('show_contact_info', true))
       return true;
