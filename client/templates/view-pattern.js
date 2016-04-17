@@ -7,6 +7,7 @@ Template.view_pattern.rendered = function() {
 
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
+  Session.set('edited_pattern', false);
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -424,6 +425,9 @@ Template.view_pattern.events({
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
 
+
+      Meteor.call("set_weaving_cell_style", pattern_id, this.row, this.tablet, new_style);
+
       var obj = current_weaving_cells[this.row-1][this.tablet-1];
       obj.style = new_style;
       current_weaving_cells[this.row-1].splice(this.tablet-1, 1, obj);
@@ -485,9 +489,11 @@ Template.view_pattern.events({
 });
 
 Template.styles_palette.events({
- 'click .styles .row.style .cell': function () {
+ 'click .styles .cell': function () {
+  console.log("clicked a style");
+console.log("this.style " + this.style);
     Session.set("selected_style", this.style);
-//console.log("clicked");
+console.log("after setting style");
     Meteor.my_functions.update_color_pickers();
   },
   'click .styles .row.special .cell': function () {

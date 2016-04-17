@@ -297,7 +297,66 @@ Meteor.methods({
 
     Patterns.update({_id: pattern_id}, {$set: {orientation: JSON.stringify(orientation)}});
 
+    ///////////////////////////////////
+    // New: cells in collection to support pattern auto preview
+    // Row and tablet start at 1
+    ///////////////////////////////////
+    for (var i=1; i<=number_of_rows; i++)
+    {
+      for (var j=1; j<=number_of_tablets; j++)
+      {
+        WeavingCells.insert({
+          pattern_id: pattern_id,
+          row: i,
+          tablet: j,
+          style: data.weaving[i-1][j-1] // existing data structure starts at 0
+        })
+      }
+    }
+    ///////////////////////////////////
+    //
+    ///////////////////////////////////
+
+
     return pattern_id;
+  },
+  /////////////////////////////////////
+  // New: create collection data from an existing dynamic arrays
+  /////////////////////////////////////
+  create_new_data_from_arrays: function(pattern_id, weaving_data) {
+    check(pattern_id, String);
+    check(weaving_data, Array);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1}});
+
+    if (pattern.created_by != Meteor.userId())
+      throw new Meteor.Error("not-authorized", "You can only create data for patterns that you created");
+
+    //// TODO!!! Check user owns pattern
+    // check if data exists
+    if (WeavingCells.find({pattern_id: pattern_id}).count() != 0)
+      return;
+    
+    var number_of_rows = weaving_data.length;
+    var number_of_tablets = weaving_data[0].length;
+
+    console.log("rows " + number_of_rows);
+    console.log("tablets " + number_of_tablets);
+
+    for (var i=0; i<number_of_rows; i++)
+    {
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        WeavingCells.insert({
+          pattern_id: pattern_id,
+          row: weaving_data[i][j].row,
+          tablet: weaving_data[i][j].tablet,
+          style: weaving_data[i][j].style // existing data structure starts at 0
+        });
+      }
+    }
+
+//    console.log("create data from " + weaving_data);
   },
   xml2js: function(data) {
     // use xml2js package to convert XML to JSON
@@ -392,6 +451,30 @@ Meteor.methods({
 
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);
+  },
+  save_preview_as_text: function(pattern_id, data)
+  {
+    check(pattern_id, String);
+    check(data, String);
+
+    Patterns.update({_id: pattern_id}, {$set: {auto_preview: data}});
+  },
+  rotate_preview: function(pattern_id)
+  {
+    check(pattern_id, String);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, preview_rotation: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit a pattern you created");
+
+    if (pattern.preview_rotation == "anticlockwise")
+      Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "clockwise"}});
+
+    else
+      Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "anticlockwise"}});
+
   },
   save_threading_as_text: function(pattern_id, text)
   {
@@ -1109,6 +1192,24 @@ Meteor.methods({
     
     else
       return ActionsLog.findOne( {user_id: Meteor.userId()} )._id;
+  },
+  ///////////////////////////////
+  // Methods for new weaving data in collection
+  set_weaving_cell_style(pattern_id, row, tablet, style)
+  {
+    check(pattern_id, String);
+    check(row, Number);
+    check(tablet, Number);
+    check(style, Match.OneOf(String, Number));
+//console.log("pattern_id" + pattern_id);
+//console.log("style " + style);
+//console.log("row " + row);
+//console.log("tablet " + tablet);
+  var id = WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet})._id;
+  //console.log("setting for id " + id);
+    WeavingCells.update({_id: id}, {$set: {style: style}});
+    //console.log("new style " + WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet}).style);
+      //console.log("new style id " + WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet})._id);
   },
   ///////////////////////////////
   // IMPORTANT!! Only works if "debug"

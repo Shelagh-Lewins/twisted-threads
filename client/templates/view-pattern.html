@@ -3,9 +3,9 @@
 {{> pattern_as_text}}
 {{> warp_svgs}}
 
-
-<!--{{> auto_preview}}-->
-
+{{#unless view_full_pattern}}
+{{> auto_preview}}
+{{/unless}}
 
 <div class="pattern_info">
 <div class="name">
@@ -62,6 +62,9 @@
 <div class="pattern_info">
 {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
 </div>
+
+{{> auto_preview}}
+
 {{#if can_edit_pattern _id}}
 <div id="toolbar" ><div class="inner_tube">
 <button id="undo" disabled="{{undo_disabled}}" title="Undo">

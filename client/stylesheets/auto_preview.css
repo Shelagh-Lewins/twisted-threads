@@ -1,0 +1,24 @@
+.auto_preview svg { 
+    -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+
+    -webkit-transform-origin: 0 0;
+    -moz-transform-origin: 0 0;
+    -o-transform-origin: 0 0;
+    transform-origin: 0 0;
+
+    max-width: 600px;
+}
+
+.auto_preview .anticlockwise svg { 
+    -ms-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+
+.auto_preview .spinner_outer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}

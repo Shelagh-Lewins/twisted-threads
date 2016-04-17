@@ -368,6 +368,13 @@ Meteor.my_functions = {
             case "Threaded": // GTT v1.05
               if (typeof pattern_obj.description === "undefined")
                 pattern_obj.description = "A threaded-in pattern imported from Guntram's Tabletweaving Thingy (GTT)";
+
+              if (typeof pattern_obj.weaving_notes === "undefined")
+                pattern_obj.weaving_notes = "White background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread";
+
+              if (typeof pattern_obj.threading_notes === "undefined")
+                pattern_obj.threading_notes = "Cell colour = thread colour for that hole\nThe angled lines below the threading chart show how to orient the tablets.";
+
                 var result = Meteor.my_functions.convert_gtt_threaded_in_pattern_to_json(pattern_data, pattern_obj); // split analysis of different pattern types off for readability
                 if (result.error)
                   local_error = "Error converting pattern " + result.error;
@@ -1069,6 +1076,30 @@ Meteor.my_functions = {
       current_special_styles.clear();
 
     current_special_styles = new ReactiveArray(special_styles_array);
+
+    if (WeavingCells.find({pattern_id: pattern_id}).count() == 0)
+      Meteor.my_functions.create_new_data_from_arrays(pattern_id);
+  },
+  create_new_data_from_arrays: function(pattern_id)
+  {
+    console.log("create new data");
+    var weaving_data = new Array();
+
+    var pattern = Patterns.findOne({_id: pattern_id});
+
+    var number_of_tablets = pattern.number_of_tablets;
+    var number_of_rows = pattern.number_of_rows;
+
+    for (var i=0; i<number_of_rows; i++)
+    {
+      weaving_data.push(new Array());
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        weaving_data[i][j] = current_weaving_cells.list()[i].list()[j];
+      }
+    }
+
+    Meteor.call("create_new_data_from_arrays", pattern_id, weaving_data);
   },
   add_weaving_row: function(pattern_id, position, style)
   {
@@ -1233,6 +1264,16 @@ Meteor.my_functions = {
     Meteor.my_functions.save_threading_as_text(pattern_id);
     Meteor.my_functions.save_orientation_as_text(pattern_id);
   },
+  set_updating_pattern: function(set_updating_pattern)
+  {
+    if (typeof updating_pattern_timeout !== "undefined")
+      clearTimeout(updating_pattern_timeout);
+
+    Session.set("updating_pattern", true);
+    updating_pattern_timeout = setTimeout(function(){
+        Session.set("updating_pattern", false);
+      }, 2000);
+  },
   get_weaving_as_text: function(pattern_id)
   {
     var number_of_rows = current_weaving_cells.length;
@@ -1262,6 +1303,8 @@ Meteor.my_functions = {
     var weaving_array = Meteor.my_functions.get_weaving_as_text(pattern_id);
 
     Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets);
+    
+    Session.set('edited_pattern', true);
   },
   get_threading_as_text: function(pattern_id)
   {
@@ -1304,7 +1347,8 @@ Meteor.my_functions = {
   {
     var orientation_array = Meteor.my_functions.get_orientation_as_text(pattern_id);
 
-    Meteor.call('save_orientation_as_text', pattern_id, JSON.stringify(orientation_array));   
+    Meteor.call('save_orientation_as_text', pattern_id, JSON.stringify(orientation_array)); 
+
   },
   get_styles_as_text: function(pattern_id)
   {
@@ -1320,7 +1364,20 @@ Meteor.my_functions = {
   {
     var styles_array = Meteor.my_functions.get_styles_as_text(pattern_id);
 
-    Meteor.call('save_styles_as_text', pattern_id, JSON.stringify(styles_array)); 
+    Meteor.call('save_styles_as_text', pattern_id, JSON.stringify(styles_array));
+    Session.set('edited_pattern', true);
+  },
+  save_preview_as_text: function(pattern_id)
+  {
+    // save the auto-generated preview to the database as a string
+    // delay to allow the last cell to be rendered
+    setTimeout( function(){
+      //console.log("save preview");
+      var data = $('.auto_preview .holder')[0].innerHTML;
+      Meteor.call('save_preview_as_text', pattern_id, data);
+      //Session.set('edited_pattern', true);
+    }, 1000);
+    
   },
   ///////////////////////////////
   // Color pickers 
