@@ -166,7 +166,7 @@ Template.auto_preview.helpers({
   },
   data: function() {
     var data = {};
-//console.log("running data");
+
     // position of element
     data.x_offset = ((this.tablet - 1) * Template.instance().unit_width);
     var number_of_rows = current_weaving_cells.length;
@@ -180,7 +180,7 @@ Template.auto_preview.helpers({
     var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
 
     var previous_style = Template.instance().previous_style(this);
-//console.log("running data 2");
+
     // shape
     if (this.style.charAt(0) == "S")
     {

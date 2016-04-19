@@ -1082,7 +1082,12 @@ Meteor.my_functions = {
   },
   create_new_data_from_arrays: function(pattern_id)
   {
-    console.log("create new data");
+    // TODO
+    // we currently assume that once the new collection data are set up, they will be correctly maintained.
+    // add / remove row / tablet: update - add row seems to work, next is remove row
+    // undo / redo
+    // delete pattern
+    // draw weaving chart from collection?
     var weaving_data = new Array();
 
     var pattern = Patterns.findOne({_id: pattern_id});
@@ -1120,7 +1125,16 @@ Meteor.my_functions = {
     {
       for (var j=0; j<number_of_tablets; j++)
       {
-        current_weaving_cells[i][j].row += 1;
+        var current_row = current_weaving_cells[i][j].row;
+        var current_tablet = current_weaving_cells[i][j].tablet;
+        var new_row = current_weaving_cells[i][j].row + 1;
+
+        current_weaving_cells[i][j].row = new_row;
+        var data = {
+          row: new_row
+        };
+
+        Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
       }
     }
 
@@ -1133,6 +1147,8 @@ Meteor.my_functions = {
         style: style
       }
       new_row[i] = obj;
+
+      Meteor.call("create_weaving_cell", pattern_id, position, i+1, style);
     }
 
     var reactive_row = new ReactiveArray(new_row);
