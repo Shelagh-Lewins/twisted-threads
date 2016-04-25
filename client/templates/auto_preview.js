@@ -3,65 +3,50 @@ Template.auto_preview.onCreated(function() {
   this.unit_height = 113.08752;
   this.cell_width = 10;
   this.cell_height = 27; // this is made up
-  //this.max_image_height = 200;
   this.max_image_width = 300;
 
   var pattern_id = Router.current().params._id;
   this.pattern_id = pattern_id;
 
   this.viewbox_width = function(){
-    var pattern_id = Router.current().params._id;
-    var number_of_tablets = Patterns.findOne({_id: pattern_id}, {fields: {number_of_tablets: 1}}).number_of_tablets;
-
-    //var number_of_tablets = current_weaving_cells[0].length;
-    return this.unit_width * number_of_tablets;
+    return this.unit_width * Session.get("number_of_tablets");
   };
 
   this.viewbox_height = function(){
-    var number_of_rows = current_weaving_cells.length;
-    return this.unit_height * (1 + number_of_rows / 2);
+    return this.unit_height * (1 + Session.get("number_of_rows") / 2);
   };
 
   this.image_width = function(){
-    var number_of_tablets = current_weaving_cells[0].length;
-    return this.cell_width * number_of_tablets;
-    //return Math.min(width, this.max_image_width);
+    return this.cell_width * Session.get("number_of_tablets");
   };
 
   this.image_height = function(){
     // elements overlap by half their height
     // so total height is half their height * number of rows
     // plus another half height that sticks out the top
-    var height = (1 + current_weaving_cells.length) * this.cell_height / 2;
+    var height = (1 + Session.get("number_of_rows")) * this.cell_height / 2;
     return height;
   };
-
+/*
   this.previous_style = function(scope){
     if (scope.row > 1)
     {
-      var tablet = scope.tablet;
-      var previous_row = scope.row - 1;
-      var previous_cell = current_weaving_cells.list()[previous_row -1].list()[tablet-1];
+      var previous_cell = WeavingCells.findOne({ pattern_id: Template.instance().pattern_id, row: scope.row-1, tablet: scope.tablet}, { fields: {style: 1}});
+
+      if (typeof previous_cell === "undefined")
+        return; // can happen during update after deleting a tablet
+
       return current_styles.list()[previous_cell.style-1];
     }
-    else
-    {
-      if (scope.row > 2)
-      {
-        var tablet = scope.tablet;
-        var previous_row = scope.row - 2;
-        var previous_cell = current_weaving_cells.list()[previous_row -1].list()[tablet-1];
-        return current_styles.list()[previous_cell.style-1];
-      }
-      return;
-    }
-  };
+
+    // TODO consider missed hole where the previous cell may not have a warp
+  };*/
 });
 
 // extendContext is used in the template to supply the helper values to the child template.
 Template.auto_preview.helpers({
   updating_pattern: function() {
-    //return true;
+
     if (Session.equals("updating_pattern", true))
       return true;
 
@@ -152,7 +137,6 @@ Template.auto_preview.helpers({
     return Template.instance().viewbox_height();
   },
   total_width: function() {
-    //console.log("width is " + Template.instance().image_width());
     return Math.min(Template.instance().image_width(), Template.instance().max_image_width);
   },
   total_height: function() {
@@ -164,16 +148,30 @@ Template.auto_preview.helpers({
     var pattern_id = Router.current().params._id;
     return WeavingCells.find({pattern_id: pattern_id});
   },
+  row: function() {
+    return [1,2,3,4];
+  },
   data: function() {
+    console.log("getting data for row " + this.row + ", tablet " + this.tablet);
+    //return;
+
+    // temp remove
+    /*return {
+      shape: "m0.51 111.54 40.545-55v-55l-40.545 55z",
+      x_offset: 2,
+      y_offset: 1,
+      color: "#000000"
+    }*/
+
+
     var data = {};
 
     // position of element
     data.x_offset = ((this.tablet - 1) * Template.instance().unit_width);
-    var number_of_rows = current_weaving_cells.length;
-    var row_up = number_of_rows - this.row;
+
+    var row_up = Session.get("number_of_rows") - this.row;
     data.y_offset = ((row_up) * Template.instance().unit_height/2);
  
-
     var forward = "m0.51 111.54 40.545-55v-55l-40.545 55z";
     var backward = "m41.05 111.54-40.545-55v-55l40.545 55z";
     var triangle_right = "m0.51 1.54-0.0006 110 40.545-55z";
@@ -242,9 +240,9 @@ Template.auto_preview.helpers({
 
           default:
             if (!previous_style)
-            return data;
+              return data;
 
-            // regular style with no warp is assumed to be a fload
+            // regular style with no warp is assumed to be a float
             // repeat previous 
             if (previous_style.warp == "backward")
               data.shape = backward;
@@ -252,7 +250,6 @@ Template.auto_preview.helpers({
             if (previous_style.warp == "forward")
               data.shape = forward;
             // go back to the most recent cell that has a thread and draw that
-            
       }
     }
 
@@ -290,3 +287,128 @@ save as png? Only regenerate when pattern edited
 add svg for vertical weft * 3?
 Use auto preview as Home page preview if no photo chosen
   */
+
+Template.auto_preview_element.helpers({
+  data: function(row, tablet) {
+    console.log("getting data for row " + row + ", tablet " + tablet);
+    var pattern_id = Router.current().params._id;
+    
+    var cell = WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet});
+
+    if (typeof cell === "undefined")
+      return; // may happen when rows or tablets are added or removed
+
+    var unit_width = 41.560534;
+    var unit_height = 113.08752;
+
+    var data = {};
+
+    // position of element
+    data.x_offset = ((tablet - 1) * unit_width);
+
+    var row_up = Session.get("number_of_rows") - row;
+    data.y_offset = ((row_up) * unit_height/2);
+ 
+    var forward = "m0.51 111.54 40.545-55v-55l-40.545 55z";
+    var backward = "m41.05 111.54-40.545-55v-55l40.545 55z";
+    var triangle_right = "m0.51 1.54-0.0006 110 40.545-55z";
+    var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
+
+    var previous_style;
+
+    if (row > 1)
+    {
+      var previous_cell = WeavingCells.findOne({ pattern_id: pattern_id, row: row-1, tablet: tablet}, { fields: {style: 1}});
+
+      if (typeof previous_cell !== "undefined")
+        previous_style = current_styles.list()[previous_cell.style-1];
+    }
+
+    // shape
+    if (cell.style.charAt(0) == "S")
+    {
+      console.log("special style");
+
+        var style_number = parseInt(cell.style.substring(1));
+        var style = current_special_styles.list()[style_number-1];
+
+        if (typeof style === "undefined")
+            return data;
+
+        var cell_style = {
+          background_color: style.background_color,
+          image: style.image,
+          style: style.style
+        }
+     //  TODO implement special styles
+    }
+    else // regular style
+    {
+      var style_number = parseInt(cell.style);
+      var style = current_styles.list()[style_number-1];
+
+      switch(style.warp)
+      {
+        case "forward":
+          if (!previous_style)
+          {
+            data.shape = forward;
+          }
+          else
+          {
+            // if previous style has no warp, go back until you find one
+            // same for 'backward'
+            // if no warp ever found, use current
+            if (previous_style.warp == "backward")
+              data.shape = triangle_left;
+
+
+            else
+              data.shape = forward;
+          }
+          break;
+
+        case "backward":
+          if (!previous_style)
+            data.shape = backward;
+
+          else {
+            if (previous_style.warp == "forward")
+              data.shape = triangle_right;
+
+            else
+              data.shape = backward;
+          }
+          break;
+
+          default:
+            if (!previous_style)
+              return data;
+
+            // regular style with no warp is assumed to be a float
+            // repeat previous 
+            if (previous_style.warp == "backward")
+              data.shape = backward;
+
+            if (previous_style.warp == "forward")
+              data.shape = forward;
+            // go back to the most recent cell that has a thread and draw that
+      }
+    }
+
+    // colour
+    if ((style.warp == "forward") || (style.warp == "backward"))
+    {
+      data.color = style.line_color;
+    }
+
+    else if (typeof previous_style !== "undefined")
+    {
+      if ((previous_style.warp == "forward") || (previous_style.warp == "backward"))
+        data.color = previous_style.line_color;
+    }
+
+    return data;
+  }
+});
+

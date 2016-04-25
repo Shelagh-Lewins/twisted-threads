@@ -21,6 +21,7 @@ Meteor.publish('patterns', function(created_by){
 
 // Publish weaving cell data, checking that the user has permission to view the pattern
 Meteor.publish('weaving_cells', function(trigger){
+  console.log("publish");
   check(trigger, Match.Optional(trigger));
 
   var my_patterns = Patterns.find({

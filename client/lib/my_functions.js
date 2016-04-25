@@ -910,6 +910,8 @@ Meteor.my_functions = {
 
     number_of_tablets = pattern.number_of_tablets;
     number_of_rows = pattern.number_of_rows;
+    Session.set("number_of_rows", number_of_rows);
+    Session.set("number_of_tablets", number_of_tablets);
 
     //////////////////////////////
     // tablet numbers (tablet_indexes)
@@ -1084,9 +1086,9 @@ Meteor.my_functions = {
   {
     // TODO
     // we currently assume that once the new collection data are set up, they will be correctly maintained.
-    // add / remove row / tablet: update - add row seems to work, next is remove row
+    // add / remove row / tablet: update - and, remove row seem to work, next is add / remove tablet
     // undo / redo
-    // delete pattern
+    // delete pattern - done, needs testing
     // draw weaving chart from collection?
     var weaving_data = new Array();
 
@@ -1154,6 +1156,7 @@ Meteor.my_functions = {
     var reactive_row = new ReactiveArray(new_row);
     current_weaving_cells.splice(position-1, 0, reactive_row);
     current_row_indexes.unshift(number_of_rows+1); //  rows are reversed
+    Session.set("number_of_rows", number_of_rows + 1);
 
     Meteor.my_functions.save_weaving_as_text(pattern_id);
   },
@@ -1169,13 +1172,30 @@ Meteor.my_functions = {
     {
       for (var j=0; j<number_of_tablets; j++)
       {
-        current_weaving_cells[i][j].row -= 1;
+        var current_row = current_weaving_cells[i][j].row;
+        var current_tablet = current_weaving_cells[i][j].tablet;
+        var new_row = current_row - 1;
+
+        current_weaving_cells[i][j].row = new_row;
+
+        var data = {
+          row: new_row
+        };
+
+        Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
       }
+    }
+
+    // delete all cells in the row
+    for (var i=1; i<=number_of_tablets; i++)
+    {
+      Meteor.call("remove_weaving_cell", pattern_id, position, i);
     }
 
     current_weaving_cells.splice(position-1, 1);
     current_row_indexes.shift(); // rows are reversed
     Meteor.my_functions.save_weaving_as_text(pattern_id);
+    Session.set("number_of_rows", number_of_rows - 1);
   },
   add_tablet: function(pattern_id, position, style)
   {
@@ -1188,9 +1208,19 @@ Meteor.my_functions = {
     // weaving
     for (var i=0; i<number_of_rows; i++)
     {
+      var current_row = i+1;
+
       for (var j=number_of_tablets-1; j>= position-1; j--)
       {
-        current_weaving_cells[i][j].tablet += 1;
+        var current_tablet = j+1;
+        var new_tablet = current_weaving_cells[i][j].tablet + 1;
+
+        current_weaving_cells[i][j].tablet = new_tablet;
+        var data = {
+          tablet: new_tablet
+        };
+
+        Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
       }
 
       var obj = {
@@ -1199,6 +1229,8 @@ Meteor.my_functions = {
         style: style
       }
       current_weaving_cells[i].splice(position-1, 0, obj);
+
+      Meteor.call("create_weaving_cell", pattern_id, current_row, position, style);
     }
 
     // threading
@@ -1236,6 +1268,7 @@ Meteor.my_functions = {
     Meteor.my_functions.save_weaving_as_text(pattern_id);
     Meteor.my_functions.save_threading_as_text(pattern_id);
     Meteor.my_functions.save_orientation_as_text(pattern_id);
+    Session.set("number_of_tablets", number_of_tablets + 1);
   },
   remove_tablet: function(pattern_id, position)
   {
@@ -1244,15 +1277,41 @@ Meteor.my_functions = {
 
     if ((number_of_tablets <= 1) || (position < 1) || (position > (number_of_tablets)))
       return;
-
+//console.log("pattern_id" + pattern_id);
+//console.log("Position " + position);
     // weaving
     for (var i=0; i<number_of_rows; i++)
     {
-      for (var j=number_of_tablets-1; j>= position-1; j--)
+        
+        var current_row = i+1;
+        //console.log("row " + current_row);
+
+      Meteor.call("remove_weaving_cell", pattern_id, current_row, position);
+
+      for (var j=number_of_tablets-1; j>= position; j--)
       {
-        current_weaving_cells[i][j].tablet -= 1;
+        //console.log("j " + j);
+        var current_tablet = current_weaving_cells[i][j].tablet;
+        var new_tablet = current_tablet - 1;
+
+
+        current_weaving_cells[i][j].tablet = new_tablet;
+
+        var data = {
+
+          tablet: new_tablet
+        };
+        
+
+
+  //console.log("tablet " + current_tablet);
+
+
+
+        Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
       }
       current_weaving_cells[i].splice(position-1, 1);
+
     }
 
     // threading
@@ -1268,7 +1327,8 @@ Meteor.my_functions = {
     // orientation
     for (var j=number_of_tablets-1; j>= position-1; j--)
     {
-      current_orientation[i].tablet -= 1;
+      //console.log("orientation for " + j)
+      current_orientation[j].tablet -= 1;
     }
     current_orientation.splice(position-1, 1);
 
@@ -1279,6 +1339,8 @@ Meteor.my_functions = {
     Meteor.my_functions.save_weaving_as_text(pattern_id);
     Meteor.my_functions.save_threading_as_text(pattern_id);
     Meteor.my_functions.save_orientation_as_text(pattern_id);
+
+    Session.set("number_of_tablets", number_of_tablets - 1);
   },
   set_updating_pattern: function(set_updating_pattern)
   {

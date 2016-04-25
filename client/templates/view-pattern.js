@@ -418,6 +418,7 @@ Template.view_pattern.events({
   'click .pattern li.cell': function(event, template){
     if (Meteor.my_functions.accept_click())
     {
+      
       var new_style = Meteor.my_functions.get_selected_style();
 
       var pattern_id = Router.current().params._id;
@@ -431,7 +432,7 @@ Template.view_pattern.events({
       var obj = current_weaving_cells[this.row-1][this.tablet-1];
       obj.style = new_style;
       current_weaving_cells[this.row-1].splice(this.tablet-1, 1, obj);
-      
+     
       Meteor.my_functions.save_weaving_as_text(pattern_id);
       Meteor.my_functions.store_pattern(pattern_id);
     }

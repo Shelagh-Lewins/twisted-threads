@@ -15,11 +15,17 @@
 
   <svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{viewbox_width}} {{viewbox_height}}"  shape-rendering="geometricPrecision" width="{{total_width}}">
 
-  {{#unless updating_pattern}}
-    {{#each preview_cell}}{{#with data}}
+  <!--{{#unless updating_pattern}}
+    {{#each preview_cell}}
+    {{#with data}}
       {{> auto_preview_element}}
-    {{/with}}{{/each}}
-  {{/unless}}
+    {{/with}}
+  {{/each}}
+  {{/unless}}-->
+
+  {{#each row_indexes}}
+    {{> auto_preview_row}}
+  {{/each}}
   </svg>
   <!--{{/if}}-->
 
@@ -28,4 +34,21 @@
 </div>
 </template>
 
-<template name="auto_preview_element"><g transform="translate({{x_offset}} {{y_offset}})"><path d="{{shape}}" stroke="#000" stroke-width="1.015" fill="{{color}}"/></g></template>
+<template name="auto_preview_row">
+{{#each tablet_indexes}}
+  {{#with row=.. tablet=this}}
+    {{> auto_preview_element}}
+  {{/with}}
+{{/each}}
+</template>
+
+<template name="auto_preview_element">
+{{#with data row tablet}}
+  {{> test}}
+{{/with}}
+</template>
+
+
+<template name="test">
+<g transform="translate({{x_offset}} {{y_offset}})"><path d="{{shape}}" stroke="#000" stroke-width="1.015" fill="{{color}}"/></g>
+</template>

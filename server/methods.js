@@ -443,7 +443,7 @@ Meteor.methods({
 
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { weaving: text}});
-
+//return;
     // Record the number of rows
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_rows}});
 
@@ -1219,10 +1219,18 @@ Meteor.methods({
   {
     // update the row and/ or tablet of a weaving cell
     // because rows or tablets have been added or removed
+    // row, tablet are the current row and tablet
+    // data.row and data.tablet are new row and / or tablet
     check(pattern_id, String);
     check(row, Number);
     check(tablet, Number);
     check(data, Object);
+
+    /*console.log("update cell with row " + row);
+    console.log("tablet " + tablet);
+    console.log("pattern " + pattern_id);
+    console.log("typeof row " + typeof row);
+    console.log("typeof tablet " + typeof tablet);*/
 
     var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
 
@@ -1230,6 +1238,7 @@ Meteor.methods({
         throw new Meteor.Error("not-authorized", "You can only update patterns you created");
 
     var cell_id = WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet})._id;
+    //console.log("cell_id " + cell_id);
 
     if ((typeof data.row === "undefined") && (typeof data.tablet === "undefined"))
       throw new Meteor.Error("no-data", "You must update at least one of row and tablet");
@@ -1240,17 +1249,19 @@ Meteor.methods({
     if (typeof data.row !== "undefined")
       update["row"] = data.row;
       
-    if (typeof data.row !== "undefined")
+    if (typeof data.tablet !== "undefined")
       update["tablet"] = data.tablet;
 
     WeavingCells.update({_id: cell_id}, {$set: update});
   },
   create_weaving_cell(pattern_id, row, tablet, style)
-  {
+  {    
     check(pattern_id, String);
     check(row, Number);
     check(tablet, Number);
     check(style, Match.OneOf(String, Number));
+
+
 
     var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
 
@@ -1264,11 +1275,17 @@ Meteor.methods({
       style: style
     });
   },
-  remove_weaving_cell(pattern_id, row, tablet, style)
+  remove_weaving_cell(pattern_id, row, tablet)
   {
     check(pattern_id, String);
     check(row, Number);
     check(tablet, Number);
+
+            //console.log("remove cell with row " + row);
+    //console.log("tablet " + tablet);
+    //console.log("pattern " + pattern_id);
+    //console.log("typeof row " + typeof row);
+    //console.log("typeof tablet " + typeof tablet);
 
     var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
 
@@ -1276,6 +1293,7 @@ Meteor.methods({
         throw new Meteor.Error("not-authorized", "You can only update patterns you created");
 
     var cell_id = WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet})._id;
+    //console.log("cell_id " + cell_id);
 
     WeavingCells.remove({_id: cell_id});
   },
