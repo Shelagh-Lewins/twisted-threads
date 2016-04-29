@@ -741,7 +741,7 @@ Meteor.my_functions = {
     Meteor.call('restore_pattern', data, function(){
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.initialize_background_color_picker();
-      Meteor.my_functions.initialize_warp_color_picker()
+      Meteor.my_functions.initialize_warp_color_picker();
     });
   },
   undo: function(pattern_id)
@@ -1079,10 +1079,10 @@ Meteor.my_functions = {
 
     current_special_styles = new ReactiveArray(special_styles_array);
 
-    if (WeavingCells.find({pattern_id: pattern_id}).count() == 0)
-      Meteor.my_functions.create_new_data_from_arrays(pattern_id);
+      Meteor.my_functions.create_new_data_from_arrays(weaving_data);
   },
-  create_new_data_from_arrays: function(pattern_id)
+  create_new_data_from_arrays: function()
+  //create_new_data_from_arrays: function(weaving_data)
   {
     // TODO
     // we currently assume that once the new collection data are set up, they will be correctly maintained.
@@ -1090,23 +1090,97 @@ Meteor.my_functions = {
     // undo / redo
     // delete pattern - done, needs testing
     // draw weaving chart from collection?
-    var weaving_data = new Array();
+    //var weaving_data = new Array();
 
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var number_of_rows = current_weaving_cells.length;
+    var number_of_tablets = current_weaving_cells[0].length;
 
-    var number_of_tablets = pattern.number_of_tablets;
-    var number_of_rows = pattern.number_of_rows;
+    /////////////////////////
+    // Another attempt to get preview to load and update at acceptable speeds: a client-side object instead of a collection
+    preview_data = {};
 
     for (var i=0; i<number_of_rows; i++)
     {
-      weaving_data.push(new Array());
       for (var j=0; j<number_of_tablets; j++)
       {
-        weaving_data[i][j] = current_weaving_cells.list()[i].list()[j];
+        preview_data[(i + 1) + "_" + (j + 1)] = new ReactiveVar(current_weaving_cells[i][j].style);
+      }
+    }
+  },
+  update_after_tablet_change: function()
+  {
+    var data = stored_patterns[stored_patterns.length-2];
+
+    number_of_tablets = data.number_of_tablets;
+    number_of_rows = data.number_of_rows;
+
+    //////////////////////////////
+    // tablet numbers (tablet_indexes)
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_tablet_indexes !== "undefined")
+      current_tablet_indexes.clear();
+
+    var indexes = new Array(number_of_tablets);
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      indexes[i] = i+1; // row 1 at bottom
+    }
+    current_tablet_indexes = new ReactiveArray(indexes);
+
+    //////////////////////////////
+    // row numbers (row_indexes)
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_row_indexes !== "undefined")
+      current_row_indexes.clear();
+
+    var indexes = new Array(number_of_rows);
+    for (var i=0; i<number_of_rows; i++)
+    {
+      indexes[i] = number_of_rows-i; // row 1 at bottom
+    }
+    current_row_indexes = new ReactiveArray(indexes);
+
+    //////////////////////////////
+    // build the weaving chart data
+
+    // assign array of arrays to hold data
+    var rows = new Array(number_of_rows);
+
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_weaving_cells !== "undefined")
+      current_weaving_cells.clear();
+
+    current_weaving_cells = new ReactiveArray(rows);
+
+    for (var i=0; i<number_of_rows; i++)
+    {
+      var row = new Array(number_of_tablets);
+      current_weaving_cells[i] = new ReactiveArray(row);
+    }
+
+    // put the weaving data into the array of arrays
+    var weaving_data = data.weaving;
+
+    for (var i=0; i<number_of_rows; i++)
+    {
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        var obj = {
+          row: i+1,
+          tablet: j+1,
+          style: weaving_data[i][j]
+        }
+        current_weaving_cells[i][j] = obj;
       }
     }
 
-    Meteor.call("create_new_data_from_arrays", pattern_id, weaving_data);
+    // restore
+    var data = stored_patterns[stored_patterns.length-1];
+
+    Meteor.call('update_after_tablet_change', data, function(){
+      var pattern_id = Router.current().params._id;
+      Meteor.my_functions.build_pattern_display_data(pattern_id);
+    });
   },
   add_weaving_row: function(pattern_id, position, style)
   {
@@ -1136,7 +1210,8 @@ Meteor.my_functions = {
           row: new_row
         };
 
-        Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
+        //Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
+        //Meteor.my_functions.replace_preview_cell(current_row, current_tablet, new_row, current_tablet);
       }
     }
 
@@ -1150,7 +1225,8 @@ Meteor.my_functions = {
       }
       new_row[i] = obj;
 
-      Meteor.call("create_weaving_cell", pattern_id, position, i+1, style);
+      //Meteor.my_functions.create_preview_cell(position, i+1, style);
+      //Meteor.call("create_weaving_cell", pattern_id, position, i+1, style);
     }
 
     var reactive_row = new ReactiveArray(new_row);
@@ -1159,6 +1235,16 @@ Meteor.my_functions = {
     Session.set("number_of_rows", number_of_rows + 1);
 
     Meteor.my_functions.save_weaving_as_text(pattern_id);
+//console.log("saving pattern id " + pattern_id);
+    //var pattern = Patterns.findOne({_id: pattern_id});
+    //var weaving_data = JSON.parse(pattern.weaving);
+    //Meteor.my_functions.create_new_data_from_arrays(pattern_id);
+
+    //var data = Meteor.my_functions.get_weaving_as_text(pattern_id);
+    Meteor.my_functions.create_new_data_from_arrays();
+    // TODO pass in the weaving data array directly, to avoid any database discontinuity. 
+    // TODO maintain simple data array, doesn't need to be reactive array any more
+
   },
   remove_weaving_row: function(pattern_id, position){
     var number_of_tablets = current_weaving_cells[0].length;
@@ -1182,20 +1268,26 @@ Meteor.my_functions = {
           row: new_row
         };
 
-        Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
+        //Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
+        //Meteor.my_functions.replace_preview_cell(current_row, current_tablet, new_row, current_tablet);
       }
     }
 
     // delete all cells in the row
-    for (var i=1; i<=number_of_tablets; i++)
+    /*for (var i=1; i<=number_of_tablets; i++)
     {
-      Meteor.call("remove_weaving_cell", pattern_id, position, i);
-    }
+      Meteor.my_functions.remove_preview_cell(position, i);
+      //Meteor.call("remove_weaving_cell", pattern_id, position, i);
+    }*/
 
     current_weaving_cells.splice(position-1, 1);
     current_row_indexes.shift(); // rows are reversed
     Meteor.my_functions.save_weaving_as_text(pattern_id);
+    //var data = Meteor.my_functions.get_weaving_as_text(pattern_id);
+    
+    
     Session.set("number_of_rows", number_of_rows - 1);
+    Meteor.my_functions.create_new_data_from_arrays();
   },
   add_tablet: function(pattern_id, position, style)
   {
@@ -1220,7 +1312,15 @@ Meteor.my_functions = {
           tablet: new_tablet
         };
 
-        Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
+        //Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
+        //Meteor.my_functions.replace_preview_cell(current_row, current_tablet, current_row, new_tablet);
+        var current_style = Meteor.my_functions.get_preview_cell_style(current_row, current_tablet);
+        //Meteor.my_functions.replace_preview_cell(current_row, current_tablet, current_row, new_tablet);
+//console.log("j " + j);
+       /* if (j == number_of_tablets-1)
+          Meteor.my_functions.create_preview_cell(current_row, current_tablet + 1, current_style);
+        else
+          Meteor.my_functions.set_preview_cell_style(current_row, current_tablet + 1, current_style);*/
       }
 
       var obj = {
@@ -1230,7 +1330,9 @@ Meteor.my_functions = {
       }
       current_weaving_cells[i].splice(position-1, 0, obj);
 
-      Meteor.call("create_weaving_cell", pattern_id, current_row, position, style);
+      //Meteor.call("create_weaving_cell", pattern_id, current_row, position, style);
+      //console.log("create cell at " + current_row + " " + position);
+      //Meteor.my_functions.create_preview_cell(current_row, position, style);
     }
 
     // threading
@@ -1268,7 +1370,13 @@ Meteor.my_functions = {
     Meteor.my_functions.save_weaving_as_text(pattern_id);
     Meteor.my_functions.save_threading_as_text(pattern_id);
     Meteor.my_functions.save_orientation_as_text(pattern_id);
+
     Session.set("number_of_tablets", number_of_tablets + 1);
+    Meteor.my_functions.store_pattern(pattern_id);
+    Meteor.my_functions.update_after_tablet_change();
+    //console.log("number of stored patterns " + stored_patterns.length);
+    //Meteor.my_functions.restore_pattern(stored_patterns.length, pattern_id);
+    
   },
   remove_tablet: function(pattern_id, position)
   {
@@ -1277,16 +1385,15 @@ Meteor.my_functions = {
 
     if ((number_of_tablets <= 1) || (position < 1) || (position > (number_of_tablets)))
       return;
-//console.log("pattern_id" + pattern_id);
-//console.log("Position " + position);
+
     // weaving
     for (var i=0; i<number_of_rows; i++)
     {
         
         var current_row = i+1;
         //console.log("row " + current_row);
-
-      Meteor.call("remove_weaving_cell", pattern_id, current_row, position);
+      //Meteor.my_functions.remove_preview_cell(current_row, position);
+//      Meteor.call("remove_weaving_cell", pattern_id, current_row, position);
 
       for (var j=number_of_tablets-1; j>= position; j--)
       {
@@ -1301,14 +1408,6 @@ Meteor.my_functions = {
 
           tablet: new_tablet
         };
-        
-
-
-  //console.log("tablet " + current_tablet);
-
-
-
-        Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
       }
       current_weaving_cells[i].splice(position-1, 1);
 
@@ -1341,6 +1440,10 @@ Meteor.my_functions = {
     Meteor.my_functions.save_orientation_as_text(pattern_id);
 
     Session.set("number_of_tablets", number_of_tablets - 1);
+    Meteor.my_functions.store_pattern(pattern_id);
+    Meteor.my_functions.update_after_tablet_change();
+    //Meteor.my_functions.update_after_tablet_change();
+    //Meteor.my_functions.create_new_data_from_arrays();
   },
   set_updating_pattern: function(set_updating_pattern)
   {
@@ -1372,7 +1475,6 @@ Meteor.my_functions = {
 
     return weaving_array;
   },
-  //save_weaving_as_text: function(pattern_id)
   save_weaving_as_text: function(pattern_id)
   {
     var number_of_rows = current_weaving_cells.length;
@@ -1974,5 +2076,30 @@ Meteor.my_functions = {
       });
       uploader.set(upload);
     }
-  }
+  },
+  //////////////////////////////////////////
+  // Preview data as client-side object
+  get_preview_cell_style: function(row, tablet)
+  {
+    return preview_data[(row) + "_" + (tablet)].get();
+  },
+  set_preview_cell_style: function(row, tablet, style)
+  {
+    preview_data[(row) + "_" + (tablet)].set(style);
+  },
+  /*create_preview_cell: function(row, tablet, style)
+  {
+    preview_data[(row) + "_" + (tablet)] = new ReactiveVar(style);
+  },
+  remove_preview_cell: function(row, tablet)
+  {
+    delete preview_data[(row) + "_" + (tablet)];
+  },
+  replace_preview_cell: function(row, tablet, new_row, new_tablet, style)
+  {
+    //console.log("remove cell at " + row + ", " + tablet);
+    var style = Meteor.my_functions.get_preview_cell_style(row, tablet);
+    Meteor.my_functions.remove_preview_cell(row, tablet);
+    Meteor.my_functions.create_preview_cell(new_row, new_tablet, style);
+  }*/
 }

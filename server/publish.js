@@ -20,7 +20,7 @@ Meteor.publish('patterns', function(created_by){
 });
 
 // Publish weaving cell data, checking that the user has permission to view the pattern
-Meteor.publish('weaving_cells', function(trigger){
+/*Meteor.publish('weaving_cells', function(trigger){
   console.log("publish");
   check(trigger, Match.Optional(trigger));
 
@@ -32,7 +32,7 @@ Meteor.publish('weaving_cells', function(trigger){
   }).map(function(pattern) {return pattern._id});
 
   return WeavingCells.find({ pattern_id: {$in:my_patterns}});
-});
+});*/
 
 // Publish images uploaded by the user
 Meteor.publish('images', function() {

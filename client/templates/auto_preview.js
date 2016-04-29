@@ -290,10 +290,10 @@ Use auto preview as Home page preview if no photo chosen
 
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
-    console.log("getting data for row " + row + ", tablet " + tablet);
-    var pattern_id = Router.current().params._id;
+    //console.log("getting data for row " + row + ", tablet " + tablet);
+    //var pattern_id = Router.current().params._id;
     
-    var cell = WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet});
+    var cell = preview_data[(row) + "_" + (tablet)];
 
     if (typeof cell === "undefined")
       return; // may happen when rows or tablets are added or removed
@@ -315,17 +315,22 @@ Template.auto_preview_element.helpers({
     var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
 
     var previous_style;
-
+//console.log("row " + row);
     if (row > 1)
     {
-      var previous_cell = WeavingCells.findOne({ pattern_id: pattern_id, row: row-1, tablet: tablet}, { fields: {style: 1}});
-
-      if (typeof previous_cell !== "undefined")
-        previous_style = current_styles.list()[previous_cell.style-1];
+      //var previous_cell = WeavingCells.findOne({ pattern_id: pattern_id, row: row-1, tablet: tablet}, { fields: {style: 1}});
+      //console.log("row is > 1");
+      var previous_style_number = preview_data[(row-1) + "_" + (tablet)].get();
+//console.log("preview style number " + previous_style_number);
+      if (typeof previous_style_number !== "undefined")
+         //if (typeof previous_cell !== "undefined")
+        //previous_style = current_styles.list()[previous_cell.style-1];
+        previous_style = current_styles.list()[previous_style_number-1];
     }
 
     // shape
-    if (cell.style.charAt(0) == "S")
+    //if (cell.style.charAt(0) == "S")
+    if (cell.get().toString().charAt(0) == "S")
     {
       console.log("special style");
 
@@ -344,7 +349,8 @@ Template.auto_preview_element.helpers({
     }
     else // regular style
     {
-      var style_number = parseInt(cell.style);
+      //var style_number = parseInt(cell.style);
+      var style_number = cell.get();
       var style = current_styles.list()[style_number-1];
 
       switch(style.warp)

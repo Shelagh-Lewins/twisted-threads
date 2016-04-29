@@ -389,7 +389,6 @@ Template.view_pattern.events({
       var style = Meteor.my_functions.get_selected_style();
 
       Meteor.my_functions.add_tablet(pattern_id, 1, style);
-      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click #add_tablet_at_end': function () {
@@ -403,7 +402,6 @@ Template.view_pattern.events({
       var style = Meteor.my_functions.get_selected_style();
 
       Meteor.my_functions.add_tablet(pattern_id, -1, style);
-      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .pattern .remove_tablet': function () {
@@ -412,7 +410,6 @@ Template.view_pattern.events({
       var pattern_id = Router.current().params._id;
 
       Meteor.my_functions.remove_tablet(pattern_id, parseInt(this));
-      Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .pattern li.cell': function(event, template){
@@ -426,8 +423,8 @@ Template.view_pattern.events({
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
 
-
-      Meteor.call("set_weaving_cell_style", pattern_id, this.row, this.tablet, new_style);
+      // then rename preview_data to weaving_data
+      Meteor.my_functions.set_preview_cell_style(this.row, this.tablet, new_style);
 
       var obj = current_weaving_cells[this.row-1][this.tablet-1];
       obj.style = new_style;
@@ -496,6 +493,9 @@ console.log("this.style " + this.style);
     Session.set("selected_style", this.style);
 console.log("after setting style");
     Meteor.my_functions.update_color_pickers();
+  },
+  'click .styles svg': function() {
+    console.log("clicked svg");
   },
   'click .styles .row.special .cell': function () {
     Session.set("selected_special_style", this.style);

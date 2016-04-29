@@ -545,6 +545,20 @@ Meteor.methods({
     Meteor.call('save_styles_as_text', data._id, JSON.stringify(data.styles)); 
     return;
   },
+  update_after_tablet_change: function(data) // required to restore reactivity after tablets have been added or removed
+  // it seems to be necessary to change the database
+  {
+    check(data, Object);
+    Meteor.call('save_weaving_as_text', data._id, JSON.stringify(data.weaving), data.number_of_rows, data.number_of_tablets);
+
+    var pattern = Patterns.findOne({_id: data._id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only restore a pattern you created");
+
+    return;
+  },
   save_pattern_edit_time: function(pattern_id)
   {
     check(pattern_id, String);
@@ -1196,7 +1210,7 @@ Meteor.methods({
   },
   ///////////////////////////////
   // Methods for new weaving data in collection
-  set_weaving_cell_style(pattern_id, row, tablet, style)
+  /*set_weaving_cell_style(pattern_id, row, tablet, style)
   {
     check(pattern_id, String);
     check(row, Number);
@@ -1224,7 +1238,7 @@ Meteor.methods({
     check(pattern_id, String);
     check(row, Number);
     check(tablet, Number);
-    check(data, Object);
+    check(data, Object);*/
 
     /*console.log("update cell with row " + row);
     console.log("tablet " + tablet);
@@ -1232,7 +1246,7 @@ Meteor.methods({
     console.log("typeof row " + typeof row);
     console.log("typeof tablet " + typeof tablet);*/
 
-    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
+    /*var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
 
     if (pattern.created_by != Meteor.userId())
         throw new Meteor.Error("not-authorized", "You can only update patterns you created");
@@ -1296,7 +1310,7 @@ Meteor.methods({
     //console.log("cell_id " + cell_id);
 
     WeavingCells.remove({_id: cell_id});
-  },
+  },*/
   ///////////////////////////////
   // IMPORTANT!! Only works if "debug"
   // Meteor.call("debug_validate_email", Meteor.userId(), true)
