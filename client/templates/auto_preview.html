@@ -3,9 +3,6 @@
 <button class="rotate_preview">Rotate preview</button>
 
 <div class="holder {{preview_rotation}}" style="{{rotation_correction}}">
-<!--  {{#if use_stored_preview}}
-    {{{stored_preview}}}
-  {{else}}-->
 
   {{#if updating_pattern}}
   <div class="spinner_outer" style="{{spinner_style}}">
@@ -27,7 +24,6 @@
     {{> auto_preview_row}}
   {{/each}}
   </svg>
-  <!--{{/if}}-->
 
 </div>
 

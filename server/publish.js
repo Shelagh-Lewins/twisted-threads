@@ -19,21 +19,6 @@ Meteor.publish('patterns', function(created_by){
     });
 });
 
-// Publish weaving cell data, checking that the user has permission to view the pattern
-/*Meteor.publish('weaving_cells', function(trigger){
-  console.log("publish");
-  check(trigger, Match.Optional(trigger));
-
-  var my_patterns = Patterns.find({
-    $or: [
-      { private: {$ne: true} },
-      { created_by: this.userId }
-    ]
-  }).map(function(pattern) {return pattern._id});
-
-  return WeavingCells.find({ pattern_id: {$in:my_patterns}});
-});*/
-
 // Publish images uploaded by the user
 Meteor.publish('images', function() {
   return Images.find();

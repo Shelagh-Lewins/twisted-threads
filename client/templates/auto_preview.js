@@ -27,20 +27,6 @@ Template.auto_preview.onCreated(function() {
     var height = (1 + Session.get("number_of_rows")) * this.cell_height / 2;
     return height;
   };
-/*
-  this.previous_style = function(scope){
-    if (scope.row > 1)
-    {
-      var previous_cell = WeavingCells.findOne({ pattern_id: Template.instance().pattern_id, row: scope.row-1, tablet: scope.tablet}, { fields: {style: 1}});
-
-      if (typeof previous_cell === "undefined")
-        return; // can happen during update after deleting a tablet
-
-      return current_styles.list()[previous_cell.style-1];
-    }
-
-    // TODO consider missed hole where the previous cell may not have a warp
-  };*/
 });
 
 // extendContext is used in the template to supply the helper values to the child template.
@@ -144,25 +130,11 @@ Template.auto_preview.helpers({
   },
   ////////////////////////
   // New Thing
-  preview_cell: function() {
-    var pattern_id = Router.current().params._id;
-    return WeavingCells.find({pattern_id: pattern_id});
-  },
   row: function() {
     return [1,2,3,4];
   },
   data: function() {
     console.log("getting data for row " + this.row + ", tablet " + this.tablet);
-    //return;
-
-    // temp remove
-    /*return {
-      shape: "m0.51 111.54 40.545-55v-55l-40.545 55z",
-      x_offset: 2,
-      y_offset: 1,
-      color: "#000000"
-    }*/
-
 
     var data = {};
 
@@ -205,7 +177,6 @@ Template.auto_preview.helpers({
       switch(style.warp)
       {
         case "forward":
-        //console.log("here forward");
           if (!previous_style)
           {
             data.shape = forward;
@@ -276,8 +247,6 @@ Template.auto_preview.events({
 });
 
 /* next
-Investigate issue with delete tablet
-Consider position of preview - hard to see and edit at present
 use if in template to choose which svg graphic based on thread, next and previous
 max width, max length
 repeat if short pattern
@@ -290,9 +259,6 @@ Use auto preview as Home page preview if no photo chosen
 
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
-    //console.log("getting data for row " + row + ", tablet " + tablet);
-    //var pattern_id = Router.current().params._id;
-    
     var cell = preview_data[(row) + "_" + (tablet)];
 
     if (typeof cell === "undefined")
@@ -315,21 +281,16 @@ Template.auto_preview_element.helpers({
     var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
 
     var previous_style;
-//console.log("row " + row);
+
     if (row > 1)
     {
-      //var previous_cell = WeavingCells.findOne({ pattern_id: pattern_id, row: row-1, tablet: tablet}, { fields: {style: 1}});
-      //console.log("row is > 1");
       var previous_style_number = preview_data[(row-1) + "_" + (tablet)].get();
-//console.log("preview style number " + previous_style_number);
+
       if (typeof previous_style_number !== "undefined")
-         //if (typeof previous_cell !== "undefined")
-        //previous_style = current_styles.list()[previous_cell.style-1];
         previous_style = current_styles.list()[previous_style_number-1];
     }
 
     // shape
-    //if (cell.style.charAt(0) == "S")
     if (cell.get().toString().charAt(0) == "S")
     {
       console.log("special style");
@@ -349,7 +310,6 @@ Template.auto_preview_element.helpers({
     }
     else // regular style
     {
-      //var style_number = parseInt(cell.style);
       var style_number = cell.get();
       var style = current_styles.list()[style_number-1];
 

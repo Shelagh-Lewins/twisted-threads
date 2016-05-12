@@ -298,22 +298,6 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {orientation: JSON.stringify(orientation)}});
 
     ///////////////////////////////////
-    // New: cells in collection to support pattern auto preview
-    // Row and tablet start at 1
-    ///////////////////////////////////
-    for (var i=1; i<=number_of_rows; i++)
-    {
-      for (var j=1; j<=number_of_tablets; j++)
-      {
-        WeavingCells.insert({
-          pattern_id: pattern_id,
-          row: i,
-          tablet: j,
-          style: data.weaving[i-1][j-1] // existing data structure starts at 0
-        })
-      }
-    }
-    ///////////////////////////////////
     //
     ///////////////////////////////////
 
@@ -331,32 +315,6 @@ Meteor.methods({
 
     if (pattern.created_by != Meteor.userId())
       throw new Meteor.Error("not-authorized", "You can only create data for patterns that you created");
-
-    //// TODO!!! Check user owns pattern
-    // check if data exists
-    if (WeavingCells.find({pattern_id: pattern_id}).count() != 0)
-      return;
-    
-    var number_of_rows = weaving_data.length;
-    var number_of_tablets = weaving_data[0].length;
-
-    console.log("rows " + number_of_rows);
-    console.log("tablets " + number_of_tablets);
-
-    for (var i=0; i<number_of_rows; i++)
-    {
-      for (var j=0; j<number_of_tablets; j++)
-      {
-        WeavingCells.insert({
-          pattern_id: pattern_id,
-          row: weaving_data[i][j].row,
-          tablet: weaving_data[i][j].tablet,
-          style: weaving_data[i][j].style // existing data structure starts at 0
-        });
-      }
-    }
-
-//    console.log("create data from " + weaving_data);
   },
   xml2js: function(data) {
     // use xml2js package to convert XML to JSON
@@ -405,7 +363,6 @@ Meteor.methods({
 
     Patterns.remove(pattern_id);
     Recent_Patterns.remove({pattern_id: pattern_id});
-    WeavingCells.remove({pattern_id: pattern_id});
     Images.remove({used_by: pattern_id});
   },
   set_private: function (pattern_id, set_to_private) {
@@ -1208,109 +1165,7 @@ Meteor.methods({
     else
       return ActionsLog.findOne( {user_id: Meteor.userId()} )._id;
   },
-  ///////////////////////////////
-  // Methods for new weaving data in collection
-  /*set_weaving_cell_style(pattern_id, row, tablet, style)
-  {
-    check(pattern_id, String);
-    check(row, Number);
-    check(tablet, Number);
-    check(style, Match.OneOf(String, Number));
-
-    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
-
-    if (pattern.created_by != Meteor.userId())
-        throw new Meteor.Error("not-authorized", "You can only update patterns you created");
-//console.log("pattern_id" + pattern_id);
-//console.log("style " + style);
-//console.log("row " + row);
-//console.log("tablet " + tablet);
-    var cell_id = WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet})._id;
-
-    WeavingCells.update({_id: cell_id}, {$set: {style: style}});
-  },
-  update_weaving_cell_position(pattern_id, row, tablet, data)
-  {
-    // update the row and/ or tablet of a weaving cell
-    // because rows or tablets have been added or removed
-    // row, tablet are the current row and tablet
-    // data.row and data.tablet are new row and / or tablet
-    check(pattern_id, String);
-    check(row, Number);
-    check(tablet, Number);
-    check(data, Object);*/
-
-    /*console.log("update cell with row " + row);
-    console.log("tablet " + tablet);
-    console.log("pattern " + pattern_id);
-    console.log("typeof row " + typeof row);
-    console.log("typeof tablet " + typeof tablet);*/
-
-    /*var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
-
-    if (pattern.created_by != Meteor.userId())
-        throw new Meteor.Error("not-authorized", "You can only update patterns you created");
-
-    var cell_id = WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet})._id;
-    //console.log("cell_id " + cell_id);
-
-    if ((typeof data.row === "undefined") && (typeof data.tablet === "undefined"))
-      throw new Meteor.Error("no-data", "You must update at least one of row and tablet");
-
-    var cell = WeavingCells.findOne({_id: cell_id});
-
-    var update = {};
-    if (typeof data.row !== "undefined")
-      update["row"] = data.row;
-      
-    if (typeof data.tablet !== "undefined")
-      update["tablet"] = data.tablet;
-
-    WeavingCells.update({_id: cell_id}, {$set: update});
-  },
-  create_weaving_cell(pattern_id, row, tablet, style)
-  {    
-    check(pattern_id, String);
-    check(row, Number);
-    check(tablet, Number);
-    check(style, Match.OneOf(String, Number));
-
-
-
-    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
-
-    if (pattern.created_by != Meteor.userId())
-        throw new Meteor.Error("not-authorized", "You can only update patterns you created");
-
-    WeavingCells.insert({
-      pattern_id: pattern_id,
-      row: row,
-      tablet: tablet,
-      style: style
-    });
-  },
-  remove_weaving_cell(pattern_id, row, tablet)
-  {
-    check(pattern_id, String);
-    check(row, Number);
-    check(tablet, Number);
-
-            //console.log("remove cell with row " + row);
-    //console.log("tablet " + tablet);
-    //console.log("pattern " + pattern_id);
-    //console.log("typeof row " + typeof row);
-    //console.log("typeof tablet " + typeof tablet);
-
-    var pattern = Patterns.findOne({_id: pattern_id}, { fields: {created_by: 1}});
-
-    if (pattern.created_by != Meteor.userId())
-        throw new Meteor.Error("not-authorized", "You can only update patterns you created");
-
-    var cell_id = WeavingCells.findOne({pattern_id: pattern_id, row: row, tablet: tablet})._id;
-    //console.log("cell_id " + cell_id);
-
-    WeavingCells.remove({_id: cell_id});
-  },*/
+  
   ///////////////////////////////
   // IMPORTANT!! Only works if "debug"
   // Meteor.call("debug_validate_email", Meteor.userId(), true)

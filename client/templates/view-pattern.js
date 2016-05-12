@@ -292,9 +292,6 @@ Template.styles_palette.helpers({
 
     var pattern_id = Router.current().params._id;
 
- //    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
-    //    return;
-//
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
 

@@ -720,6 +720,7 @@ Meteor.my_functions = {
       var position = parseInt(Session.get('undo_stack_position'));
       Session.set('undo_stack_position', position + 1);
     }
+    Meteor.my_functions.save_preview_as_text(pattern_id);
   },
   restore_pattern: function(index, pattern_id)
   {
@@ -1209,9 +1210,6 @@ Meteor.my_functions = {
         var data = {
           row: new_row
         };
-
-        //Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
-        //Meteor.my_functions.replace_preview_cell(current_row, current_tablet, new_row, current_tablet);
       }
     }
 
@@ -1224,9 +1222,6 @@ Meteor.my_functions = {
         style: style
       }
       new_row[i] = obj;
-
-      //Meteor.my_functions.create_preview_cell(position, i+1, style);
-      //Meteor.call("create_weaving_cell", pattern_id, position, i+1, style);
     }
 
     var reactive_row = new ReactiveArray(new_row);
@@ -1235,16 +1230,7 @@ Meteor.my_functions = {
     Session.set("number_of_rows", number_of_rows + 1);
 
     Meteor.my_functions.save_weaving_as_text(pattern_id);
-//console.log("saving pattern id " + pattern_id);
-    //var pattern = Patterns.findOne({_id: pattern_id});
-    //var weaving_data = JSON.parse(pattern.weaving);
-    //Meteor.my_functions.create_new_data_from_arrays(pattern_id);
-
-    //var data = Meteor.my_functions.get_weaving_as_text(pattern_id);
     Meteor.my_functions.create_new_data_from_arrays();
-    // TODO pass in the weaving data array directly, to avoid any database discontinuity. 
-    // TODO maintain simple data array, doesn't need to be reactive array any more
-
   },
   remove_weaving_row: function(pattern_id, position){
     var number_of_tablets = current_weaving_cells[0].length;
@@ -1267,24 +1253,12 @@ Meteor.my_functions = {
         var data = {
           row: new_row
         };
-
-        //Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
-        //Meteor.my_functions.replace_preview_cell(current_row, current_tablet, new_row, current_tablet);
       }
     }
-
-    // delete all cells in the row
-    /*for (var i=1; i<=number_of_tablets; i++)
-    {
-      Meteor.my_functions.remove_preview_cell(position, i);
-      //Meteor.call("remove_weaving_cell", pattern_id, position, i);
-    }*/
 
     current_weaving_cells.splice(position-1, 1);
     current_row_indexes.shift(); // rows are reversed
     Meteor.my_functions.save_weaving_as_text(pattern_id);
-    //var data = Meteor.my_functions.get_weaving_as_text(pattern_id);
-    
     
     Session.set("number_of_rows", number_of_rows - 1);
     Meteor.my_functions.create_new_data_from_arrays();
@@ -1312,15 +1286,7 @@ Meteor.my_functions = {
           tablet: new_tablet
         };
 
-        //Meteor.call("update_weaving_cell_position", pattern_id, current_row, current_tablet, data);
-        //Meteor.my_functions.replace_preview_cell(current_row, current_tablet, current_row, new_tablet);
         var current_style = Meteor.my_functions.get_preview_cell_style(current_row, current_tablet);
-        //Meteor.my_functions.replace_preview_cell(current_row, current_tablet, current_row, new_tablet);
-//console.log("j " + j);
-       /* if (j == number_of_tablets-1)
-          Meteor.my_functions.create_preview_cell(current_row, current_tablet + 1, current_style);
-        else
-          Meteor.my_functions.set_preview_cell_style(current_row, current_tablet + 1, current_style);*/
       }
 
       var obj = {
@@ -1329,10 +1295,6 @@ Meteor.my_functions = {
         style: style
       }
       current_weaving_cells[i].splice(position-1, 0, obj);
-
-      //Meteor.call("create_weaving_cell", pattern_id, current_row, position, style);
-      //console.log("create cell at " + current_row + " " + position);
-      //Meteor.my_functions.create_preview_cell(current_row, position, style);
     }
 
     // threading
@@ -1374,9 +1336,6 @@ Meteor.my_functions = {
     Session.set("number_of_tablets", number_of_tablets + 1);
     Meteor.my_functions.store_pattern(pattern_id);
     Meteor.my_functions.update_after_tablet_change();
-    //console.log("number of stored patterns " + stored_patterns.length);
-    //Meteor.my_functions.restore_pattern(stored_patterns.length, pattern_id);
-    
   },
   remove_tablet: function(pattern_id, position)
   {
@@ -1390,14 +1349,10 @@ Meteor.my_functions = {
     for (var i=0; i<number_of_rows; i++)
     {
         
-        var current_row = i+1;
-        //console.log("row " + current_row);
-      //Meteor.my_functions.remove_preview_cell(current_row, position);
-//      Meteor.call("remove_weaving_cell", pattern_id, current_row, position);
+      var current_row = i+1;
 
       for (var j=number_of_tablets-1; j>= position; j--)
       {
-        //console.log("j " + j);
         var current_tablet = current_weaving_cells[i][j].tablet;
         var new_tablet = current_tablet - 1;
 
@@ -1426,7 +1381,6 @@ Meteor.my_functions = {
     // orientation
     for (var j=number_of_tablets-1; j>= position-1; j--)
     {
-      //console.log("orientation for " + j)
       current_orientation[j].tablet -= 1;
     }
     current_orientation.splice(position-1, 1);
@@ -1442,10 +1396,8 @@ Meteor.my_functions = {
     Session.set("number_of_tablets", number_of_tablets - 1);
     Meteor.my_functions.store_pattern(pattern_id);
     Meteor.my_functions.update_after_tablet_change();
-    //Meteor.my_functions.update_after_tablet_change();
-    //Meteor.my_functions.create_new_data_from_arrays();
   },
-  set_updating_pattern: function(set_updating_pattern)
+  /*set_updating_pattern: function(set_updating_pattern)
   {
     if (typeof updating_pattern_timeout !== "undefined")
       clearTimeout(updating_pattern_timeout);
@@ -1454,7 +1406,7 @@ Meteor.my_functions = {
     updating_pattern_timeout = setTimeout(function(){
         Session.set("updating_pattern", false);
       }, 2000);
-  },
+  },*/
   get_weaving_as_text: function(pattern_id)
   {
     var number_of_rows = current_weaving_cells.length;
@@ -1551,11 +1503,11 @@ Meteor.my_functions = {
   {
     // save the auto-generated preview to the database as a string
     // delay to allow the last cell to be rendered
+    // It doesn't seem to be worth drawing this when patterns load, it's no quicker. and the whole thing has to be redrawn if you start editing. But it can be used outside the pattern view.
     setTimeout( function(){
-      //console.log("save preview");
       var data = $('.auto_preview .holder')[0].innerHTML;
       Meteor.call('save_preview_as_text', pattern_id, data);
-      //Session.set('edited_pattern', true);
+;
     }, 1000);
     
   },
@@ -2087,19 +2039,4 @@ Meteor.my_functions = {
   {
     preview_data[(row) + "_" + (tablet)].set(style);
   },
-  /*create_preview_cell: function(row, tablet, style)
-  {
-    preview_data[(row) + "_" + (tablet)] = new ReactiveVar(style);
-  },
-  remove_preview_cell: function(row, tablet)
-  {
-    delete preview_data[(row) + "_" + (tablet)];
-  },
-  replace_preview_cell: function(row, tablet, new_row, new_tablet, style)
-  {
-    //console.log("remove cell at " + row + ", " + tablet);
-    var style = Meteor.my_functions.get_preview_cell_style(row, tablet);
-    Meteor.my_functions.remove_preview_cell(row, tablet);
-    Meteor.my_functions.create_preview_cell(new_row, new_tablet, style);
-  }*/
 }
