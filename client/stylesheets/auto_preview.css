@@ -17,8 +17,3 @@
     transform: rotate(-90deg);
 }
 
-.auto_preview .spinner_outer {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}

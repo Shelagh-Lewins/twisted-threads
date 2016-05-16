@@ -62,7 +62,7 @@ UI.registerHelper('is_selected_style', function() {
       return "selected";
   }
 });
-
+/*
 UI.registerHelper('cell_style', function() {
   if (typeof this.style == "string")
   {
@@ -108,7 +108,43 @@ UI.registerHelper('cell_style', function() {
     cell_style.hole = this.hole;
 
   return cell_style;
+});*/
+
+UI.registerHelper('weaving_cell_data', function(row, tablet) {
+  var cell = preview_data[(row) + "_" + (tablet)];
+//console.log("weaving cell data for row " + row + ", " + "tablet "+ tablet);
+  var data = {};
+
+  if (cell.get().toString().charAt(0) == "S")
+    {
+      console.log("weaving cell, special style");
+
+        var style_number = parseInt(cell.style.substring(1));
+        var style = current_special_styles.list()[style_number-1];
+
+        if (typeof style === "undefined")
+            return data;
+
+        var data = {
+          background_color: style.background_color,
+          image: style.image,
+          style: style.style
+        }
+     //  TODO implement special styles
+    }
+    else // regular style
+    {
+      var style_number = cell.get();
+      var style = current_styles.list()[style_number-1];
+
+      data.warp = style.warp;
+      data.line_color = style.line_color;
+      data.background_color = style.background_color;
+    }
+
+  return data;
 });
+
 
 
 

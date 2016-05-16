@@ -14,7 +14,7 @@
 {{/if}}
 </template>
 
-<template name="weave_row">
+<!--<template name="weave_row">
 <div class="row {{selected_class this}}">{{> row_number}}
 <ul>{{#each weaving_row this}}
 {{#with cell_style}}
@@ -22,6 +22,19 @@
 {{/with}}
 {{/each}}</ul>
 {{> weave_row_buttons}}</div>
+</template>-->
+
+<template name="weave_row">
+  <div class="row {{selected_class this}}">{{> row_number}}
+    <ul>
+  {{#each tablet_indexes}}
+    {{#with row=.. tablet=this}}
+      {{> pattern_cell}}
+    {{/with}}
+  {{/each}}
+  </ul>
+  {{> weave_row_buttons}}
+  </div>
 </template>
 
 <template name="weave_row_buttons">

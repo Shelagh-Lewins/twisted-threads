@@ -51,6 +51,7 @@
 
 </template>
 
+<!--
 <template name="pattern_cell">
 <li class="cell no_select" style="background-color: {{background_color}}; background-image: url('{{image}}')">
 {{#if equals warp "forward"}}
@@ -80,6 +81,39 @@
 {{/if}}
 {{/if}}
 </li>
+</template>-->
+
+<template name="pattern_cell">
+{{#with weaving_cell_data row tablet}}
+<li class="cell no_select" style="background-color: {{background_color}}; background-image: url('{{image}}')">
+{{#if equals warp "forward"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
+</svg>
+{{else}}
+{{#if equals warp "backward"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals warp "v_left"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_left_warp_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals warp "v_center"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_center_warp_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{#if equals warp "v_right"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
+{{/if}}
+</li>
+{{/with}}
 </template>
 
 <template name="column_numbers">

@@ -31,15 +31,7 @@ Template.auto_preview.onCreated(function() {
 
 // extendContext is used in the template to supply the helper values to the child template.
 Template.auto_preview.helpers({
-  updating_pattern: function() {
-
-    if (Session.equals("updating_pattern", true))
-      return true;
-
-    else
-      return false;
-  },
-  use_stored_preview: function() {
+  /*use_stored_preview: function() {
     if (Session.equals('edited_pattern', true))
     {
       return false;
@@ -57,7 +49,7 @@ Template.auto_preview.helpers({
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {auto_preview: 1}});
     if (typeof pattern.auto_preview === "string")
       return pattern.auto_preview;
-  },
+  },*/
   preview_rotation: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 

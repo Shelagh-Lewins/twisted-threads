@@ -93,7 +93,8 @@
   {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
 </div>
 <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
-{{#each hole_indexes}}{{> threading_row}}
+{{#each hole_indexes}}
+  {{> threading_row}}
 {{/each}}
 {{> orientation}}
 </div>
@@ -112,6 +113,7 @@
 {{/if}}{{/if}}
 </template>
 
+<!--
 <template name="pattern_row">
 <div class="row">{{> row_number}}<ul>
 {{#each weaving_row this}}
@@ -121,6 +123,19 @@
 {{/each}}
 {{> remove_row}}
 </ul></div>
+</template>-->
+
+<template name="pattern_row">
+  <div class="row">{{> row_number}}
+    <ul>
+{{#each tablet_indexes}}
+  {{#with row=.. tablet=this}}
+    {{> pattern_cell}}
+  {{/with}}
+{{/each}}
+{{> remove_row}}
+    </ul>
+  </div>
 </template>
 
 <template name="remove_row">
@@ -131,11 +146,19 @@
 <li class="no_select remove_tablet" title="Delete this tablet" >X</li>
 </template>
 
-<template name="threading_row">
+<!--<template name="threading_row">
 <div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}
 {{#with cell_style}}
 {{> pattern_cell}}
-{{/with}}-->
+{{/with}}
+{{/each}}</ul></div>
+</template>-->
+
+<template name="threading_row">
+<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each hole_indexes this}}
+  {{#with row=.. tablet=this}}
+    {{> pattern_cell}}
+  {{/with}}
 {{/each}}</ul></div>
 </template>
 
@@ -262,3 +285,7 @@
 <template name="pattern_not_found">
 <h2>Pattern not found: {{id}}</h2>
 </template>
+
+
+
+
