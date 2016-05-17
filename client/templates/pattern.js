@@ -110,14 +110,40 @@ UI.registerHelper('cell_style', function() {
   return cell_style;
 });*/
 
-UI.registerHelper('weaving_cell_data', function(row, tablet) {
-  var cell = preview_data[(row) + "_" + (tablet)];
-//console.log("weaving cell data for row " + row + ", " + "tablet "+ tablet);
-  var data = {};
+UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
 
-  if (cell.get().toString().charAt(0) == "S")
+  var data = {};
+  var style_ref;
+
+  if (type == "styles")
+  {
+    //console.log("style " + JSON.stringify(this));
+    //console.log("typeof " + typeof JSON.stringify(this));
+    style_ref = this.style;
+    data.style = style_ref
+  }
+
+  else if (type == "threading")
     {
-      console.log("weaving cell, special style");
+      var cell = o_threading_data[(row) + "_" + (tablet)];
+      data.tablet = tablet;
+      data.hole = row;
+      style_ref = cell.get();
+    }
+
+  else
+  {
+    var cell = preview_data[(row) + "_" + (tablet)];
+    data.tablet = tablet;
+    data.row = row;
+    style_ref = cell.get();
+  }
+//console.log("weaving cell data for row " + row + ", " + "tablet "+ tablet);
+  
+
+  if (style_ref.toString().charAt(0) == "S")
+    {
+      console.log("weaving cell, special style " + style_ref);
 
         var style_number = parseInt(cell.style.substring(1));
         var style = current_special_styles.list()[style_number-1];
@@ -134,9 +160,10 @@ UI.registerHelper('weaving_cell_data', function(row, tablet) {
     }
     else // regular style
     {
-      var style_number = cell.get();
+      var style_number = parseInt(style_ref);
+      //console.log("Style no " + style_number);
       var style = current_styles.list()[style_number-1];
-
+//console.log("Style " + style);
       data.warp = style.warp;
       data.line_color = style.line_color;
       data.background_color = style.background_color;

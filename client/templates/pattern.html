@@ -84,7 +84,7 @@
 </template>-->
 
 <template name="pattern_cell">
-{{#with weaving_cell_data row tablet}}
+{{#with weaving_cell_data row tablet type}}
 <li class="cell no_select" style="background-color: {{background_color}}; background-image: url('{{image}}')">
 {{#if equals warp "forward"}}
 <svg viewBox="0 0 256 256">

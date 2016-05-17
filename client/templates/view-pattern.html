@@ -155,8 +155,8 @@
 </template>-->
 
 <template name="threading_row">
-<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each hole_indexes this}}
-  {{#with row=.. tablet=this}}
+<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each tablet_indexes this}}
+  {{#with row=.. tablet=this type="threading"}}
     {{> pattern_cell}}
   {{/with}}
 {{/each}}</ul></div>
@@ -239,7 +239,7 @@
 </ul></div>
 
 <input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style">
-<div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
+<div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
 <div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
 

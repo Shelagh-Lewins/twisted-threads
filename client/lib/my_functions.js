@@ -1083,21 +1083,12 @@ Meteor.my_functions = {
       Meteor.my_functions.create_new_data_from_arrays(weaving_data);
   },
   create_new_data_from_arrays: function()
-  //create_new_data_from_arrays: function(weaving_data)
   {
-    // TODO
-    // we currently assume that once the new collection data are set up, they will be correctly maintained.
-    // add / remove row / tablet: update - and, remove row seem to work, next is add / remove tablet
-    // undo / redo
-    // delete pattern - done, needs testing
-    // draw weaving chart from collection?
-    //var weaving_data = new Array();
-
     var number_of_rows = current_weaving_cells.length;
     var number_of_tablets = current_weaving_cells[0].length;
 
     /////////////////////////
-    // Another attempt to get preview to load and update at acceptable speeds: a client-side object instead of a collection
+    // Client-side data as an object which references a ReactiveVar for each cell data point
     preview_data = {};
 
     for (var i=0; i<number_of_rows; i++)
@@ -1105,6 +1096,19 @@ Meteor.my_functions = {
       for (var j=0; j<number_of_tablets; j++)
       {
         preview_data[(i + 1) + "_" + (j + 1)] = new ReactiveVar(current_weaving_cells[i][j].style);
+      }
+    }
+
+    o_threading_data = {}; // new object format
+
+//console.log("threading data ");
+    for (var i=0; i<4; i++)
+    {
+      //console.log("i " + i);
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        //console.log("j " + j);
+        o_threading_data[(i + 1) + "_" + (j + 1)] = new ReactiveVar(current_threading_cells[i][j].style);
       }
     }
   },
@@ -1286,7 +1290,7 @@ Meteor.my_functions = {
           tablet: new_tablet
         };
 
-        var current_style = Meteor.my_functions.get_preview_cell_style(current_row, current_tablet);
+        //var current_style = Meteor.my_functions.get_preview_cell_style(current_row, current_tablet);
       }
 
       var obj = {
@@ -2031,12 +2035,17 @@ Meteor.my_functions = {
   },
   //////////////////////////////////////////
   // Preview data as client-side object
-  get_preview_cell_style: function(row, tablet)
+  /*get_preview_cell_style: function(row, tablet)
   {
     return preview_data[(row) + "_" + (tablet)].get();
-  },
+  },*/
   set_preview_cell_style: function(row, tablet, style)
   {
     preview_data[(row) + "_" + (tablet)].set(style);
   },
+  // threading data as client-side object
+  set_threading_cell_style: function(hole, tablet, style)
+  {
+    o_threading_data[(hole) + "_" + (tablet)].set(style);
+  }
 }

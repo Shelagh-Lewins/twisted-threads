@@ -440,6 +440,9 @@ Template.view_pattern.events({
 
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
+      //console.log("this " + JSON.stringify(this));
+
+      Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
 
       var obj = current_threading_cells[this.hole-1][this.tablet-1];
       obj.style = new_style;
