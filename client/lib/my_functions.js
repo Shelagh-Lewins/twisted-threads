@@ -1234,7 +1234,10 @@ Meteor.my_functions = {
     Session.set("number_of_rows", number_of_rows + 1);
 
     Meteor.my_functions.save_weaving_as_text(pattern_id);
-    Meteor.my_functions.create_new_data_from_arrays();
+    //Meteor.my_functions.create_new_data_from_arrays();
+
+    Meteor.my_functions.store_pattern(pattern_id);
+    Meteor.my_functions.update_after_tablet_change();
   },
   remove_weaving_row: function(pattern_id, position){
     var number_of_tablets = current_weaving_cells[0].length;
@@ -1265,7 +1268,9 @@ Meteor.my_functions = {
     Meteor.my_functions.save_weaving_as_text(pattern_id);
     
     Session.set("number_of_rows", number_of_rows - 1);
-    Meteor.my_functions.create_new_data_from_arrays();
+    //Meteor.my_functions.create_new_data_from_arrays();
+    Meteor.my_functions.store_pattern(pattern_id);
+    Meteor.my_functions.update_after_tablet_change();
   },
   add_tablet: function(pattern_id, position, style)
   {

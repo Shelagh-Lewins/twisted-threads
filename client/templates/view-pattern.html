@@ -240,7 +240,7 @@
 
 <input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style">
 <div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
-<div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with cell_style}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
+<div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with weaving_cell_data 0 0 "special_styles"}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
 
 <template name="style_cell">

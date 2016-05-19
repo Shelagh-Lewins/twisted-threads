@@ -270,7 +270,6 @@ Template.styles_palette.helpers({
         return "selected";
   },
   special_styles: function(){
-    //var pattern_id = Router.current().params._id;
 
     var special_styles_array = [];
     for (var i=0; i<current_special_styles.length; i++)
@@ -346,7 +345,7 @@ Template.view_pattern.events({
       var style = Meteor.my_functions.get_selected_style();
       
       Meteor.my_functions.add_weaving_row(pattern_id, 1, style);
-      Meteor.my_functions.store_pattern(pattern_id);
+      //Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click #add_row_at_end': function () {
@@ -360,7 +359,7 @@ Template.view_pattern.events({
       var style = Meteor.my_functions.get_selected_style();
 
       Meteor.my_functions.add_weaving_row(pattern_id, -1, style);
-      Meteor.my_functions.store_pattern(pattern_id);
+      
     }
   },
   'click .pattern .remove_row': function () {
@@ -372,7 +371,7 @@ Template.view_pattern.events({
         return;
 
       Meteor.my_functions.remove_weaving_row(pattern_id, parseInt(this));
-      Meteor.my_functions.store_pattern(pattern_id);
+      //Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click #add_tablet_at_start': function () {
@@ -487,6 +486,9 @@ Template.view_pattern.events({
 });
 
 Template.styles_palette.events({
+  'click .styles': function() {
+    console.log("clicked styles");
+  },
  'click .styles .cell': function () {
   console.log("clicked a style");
 console.log("this.style " + this.style);
