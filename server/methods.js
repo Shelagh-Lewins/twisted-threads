@@ -380,6 +380,8 @@ Meteor.methods({
   // Stringify pattern data and save it
   save_weaving_as_text: function(pattern_id, text, number_of_rows, number_of_tablets)
   {
+    //console.log("save_weaving_as_text " + number_of_rows);
+
     check(pattern_id, String);
     check(text, String);
     check(number_of_rows, Number);
@@ -506,6 +508,7 @@ Meteor.methods({
   // it seems to be necessary to change the database
   {
     check(data, Object);
+
     Meteor.call('save_weaving_as_text', data._id, JSON.stringify(data.weaving), data.number_of_rows, data.number_of_tablets);
 
     var pattern = Patterns.findOne({_id: data._id}, {fields: {created_by: 1 }});
@@ -598,8 +601,7 @@ Meteor.methods({
     // If it's already in the collection, update the accessed_at time
     // Recent patterns are stored for each user separately
     check(pattern_id, String);
-    //console.log("add " + pattern_id);
-    //console.log("adding to recent patterns " +pattern_id)
+
     if (!Meteor.userId()) // user is not signed in
       return;
 
@@ -618,7 +620,7 @@ Meteor.methods({
     else
     {
       // the pattern is already in the list, so update it
-;
+
       Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, { $set: {accessed_at: moment().valueOf()}});
     }
 
@@ -714,10 +716,6 @@ Meteor.methods({
 
     if (pattern.created_by != Meteor.userId())
       throw new Meteor.Error("not-authorized", "You can only upload images for patterns you created"); 
-
-    //if (Images.find({ used_by: pattern_id }).count() >= Meteor.settings.public.max_images_per_pattern)
-      //throw new Meteor.Error("limit-reached", "You cannot upload any more images for this pattern");
-
     
     var count = Images.find({ used_by: pattern_id }).count();
 

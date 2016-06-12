@@ -113,18 +113,6 @@
 {{/if}}{{/if}}
 </template>
 
-<!--
-<template name="pattern_row">
-<div class="row">{{> row_number}}<ul>
-{{#each weaving_row this}}
-{{#with cell_style this}}
-{{> pattern_cell}}
-{{/with}}
-{{/each}}
-{{> remove_row}}
-</ul></div>
-</template>-->
-
 <template name="pattern_row">
   <div class="row">{{> row_number}}
     <ul>
@@ -145,14 +133,6 @@
 <template name="remove_tablet">
 <li class="no_select remove_tablet" title="Delete this tablet" >X</li>
 </template>
-
-<!--<template name="threading_row">
-<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}
-{{#with cell_style}}
-{{> pattern_cell}}
-{{/with}}
-{{/each}}</ul></div>
-</template>-->
 
 <template name="threading_row">
 <div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each tablet_indexes this}}
@@ -230,21 +210,21 @@
 </div>
 <div class="pagination"><ul>
 {{#if single_column}}
-<li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a href="#">Styles 1</a></li>
-<li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a href="#">Styles 2</a></li>
+<li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a href="#" onclick="Meteor.my_functions.styles_pagination_clicked('styles_1');">Styles 1</a></li>
+<li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a href="#" onclick="Meteor.my_functions.styles_pagination_clicked('styles_2');">Styles 2</a></li>
 {{else}}
-<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a href="#">Styles</a></li>
+<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a href="#" onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">Styles</a></li>
 {{/if}}
-<li class="special no_select {{is_selected_style_palette "special"}}"><a href="#">Special</a></li>
+<li class="special no_select {{is_selected_style_palette "special"}}"><a href="#" onclick="Meteor.my_functions.styles_pagination_clicked('special');">Special</a></li>
 </ul></div>
 
-<input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style">
+<input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style" onclick="Meteor.my_functions.edit_style_clicked();">
 <div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
 <div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with weaving_cell_data 0 0 "special_styles"}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
 
 <template name="style_cell">
-<li class="cell no_select {{is_selected_style style}}" style="background-color: {{background_color}}; background-image: url('{{image}}')">
+<li class="cell no_select {{is_selected_style style}}" style="background-color: {{background_color}}; background-image: url('{{image}}')" onclick="Meteor.my_functions.style_cell_clicked('{{style}}', '{{special_style}}');">
 {{#if equals warp "forward"}}
 <svg viewBox="0 0 256 256">
     <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_warp_symbol" x="0" y="0"/>

@@ -12,22 +12,25 @@
 <p class="created_by">Created by {{created_by}}</p>
 <div class="pattern view">{{> column_numbers}}
 {{#each row_indexes}}
-<div class="row"><span class="row_number">{{this}}</span><ul>{{#each weaving_row this}}
-{{#with cell_style}}
-{{> pattern_cell}}
-{{/with}}
-{{/each}}</ul></div>
+<div class="row"><span class="row_number">{{this}}</span><ul>
+
+{{#each tablet_indexes}}
+    {{#with row=.. tablet=this}}
+      {{> pattern_cell}}
+    {{/with}}
+  {{/each}}
+
+</ul></div>
 {{/each}}
+
 </div>
 
 <div class="tablets">{{> column_numbers}}
 {{#each hole_indexes}}
-<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each threading_hole this}}
-{{#with cell_style}}
-{{> pattern_cell}}
-{{/with}}
-{{/each}}</ul></div>
+  {{> threading_row}}
 {{/each}}
+{{> orientation}}
+
 {{> orientation}}
 </div>
 <br/>

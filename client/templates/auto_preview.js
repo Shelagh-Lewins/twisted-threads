@@ -122,114 +122,10 @@ Template.auto_preview.helpers({
   },
   ////////////////////////
   // New Thing
-  row: function() {
+ /* row: function() {
+    console.log("here");
     return [1,2,3,4];
-  },
-  data: function() {
-    console.log("getting data for row " + this.row + ", tablet " + this.tablet);
-
-    var data = {};
-
-    // position of element
-    data.x_offset = ((this.tablet - 1) * Template.instance().unit_width);
-
-    var row_up = Session.get("number_of_rows") - this.row;
-    data.y_offset = ((row_up) * Template.instance().unit_height/2);
- 
-    var forward = "m0.51 111.54 40.545-55v-55l-40.545 55z";
-    var backward = "m41.05 111.54-40.545-55v-55l40.545 55z";
-    var triangle_right = "m0.51 1.54-0.0006 110 40.545-55z";
-    var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
-
-    var previous_style = Template.instance().previous_style(this);
-
-    // shape
-    if (this.style.charAt(0) == "S")
-    {
-      console.log("special style");
-
-        var style_number = parseInt(this.style.substring(1));
-        var style = current_special_styles.list()[style_number-1];
-
-        if (typeof style === "undefined")
-            return data;
-
-        var cell_style = {
-          background_color: style.background_color,
-          image: style.image,
-          style: style.style
-        }
-     //  TODO implement special styles
-    }
-    else // regular style
-    {
-      var style_number = parseInt(this.style);
-      var style = current_styles.list()[style_number-1];
-
-      switch(style.warp)
-      {
-        case "forward":
-          if (!previous_style)
-          {
-            data.shape = forward;
-          }
-          else
-          {
-            // if previous style has no warp, go back until you find one
-            // same for 'backward'
-            // if no warp ever found, use current
-            if (previous_style.warp == "backward")
-              data.shape = triangle_left;
-
-
-            else
-              data.shape = forward;
-          }
-          
-          break;
-
-        case "backward":
-          if (!previous_style)
-            data.shape = backward;
-
-          else {
-            if (previous_style.warp == "forward")
-              data.shape = triangle_right;
-
-            else
-              data.shape = backward;
-          }
-          break;
-
-          default:
-            if (!previous_style)
-              return data;
-
-            // regular style with no warp is assumed to be a float
-            // repeat previous 
-            if (previous_style.warp == "backward")
-              data.shape = backward;
-
-            if (previous_style.warp == "forward")
-              data.shape = forward;
-            // go back to the most recent cell that has a thread and draw that
-      }
-    }
-
-    // colour
-    if ((style.warp == "forward") || (style.warp == "backward"))
-    {
-      data.color = style.line_color;
-    }
-
-    else if (typeof previous_style !== "undefined")
-    {
-      if ((previous_style.warp == "forward") || (previous_style.warp == "backward"))
-        data.color = previous_style.line_color;
-    }
-
-    return data;
-  }
+  }*/
  });
 
 Template.auto_preview.events({
@@ -239,8 +135,6 @@ Template.auto_preview.events({
 });
 
 /* next
-use if in template to choose which svg graphic based on thread, next and previous
-max width, max length
 repeat if short pattern
 specials
 if no thread show weft
@@ -252,6 +146,11 @@ Use auto preview as Home page preview if no photo chosen
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
     var cell = preview_data[(row) + "_" + (tablet)];
+
+    if (typeof cell === "undefined")
+      return;
+
+    var style_value = cell.get();
 
     if (typeof cell === "undefined")
       return; // may happen when rows or tablets are added or removed
@@ -283,26 +182,26 @@ Template.auto_preview_element.helpers({
     }
 
     // shape
-    if (cell.get().toString().charAt(0) == "S")
+    if (style_value.toString().charAt(0) == "S")
     {
-      console.log("special style");
+      //console.log("special style" + style_value);
 
-        var style_number = parseInt(cell.style.substring(1));
-        var style = current_special_styles.list()[style_number-1];
+      var style_number = parseInt(style_value.substring(1));
+      var style = current_special_styles.list()[style_number-1];
 
-        if (typeof style === "undefined")
-            return data;
+      if (typeof style === "undefined")
+          return data;
 
-        var cell_style = {
-          background_color: style.background_color,
-          image: style.image,
-          style: style.style
-        }
+      var cell_style = {
+        background_color: style.background_color,
+        image: style.image,
+        style: style.style
+      }
      //  TODO implement special styles
     }
     else // regular style
     {
-      var style_number = cell.get();
+      var style_number = style_value;
       var style = current_styles.list()[style_number-1];
 
       switch(style.warp)
