@@ -53,11 +53,27 @@ Template.auto_preview.helpers({
   preview_rotation: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 
-    if (pattern.preview_rotation == "anticlockwise")
-      return "anticlockwise";
+    switch(pattern.preview_rotation)
+    {
+      case "left":
+        return "left";
+        break;
 
-    else
-      return "clockwise";
+      case "up":
+        return "up";
+        break;
+
+      case "right":
+        return "right";
+        break;
+
+      case "down":
+        return "down";
+        break;
+
+      default:
+        return "left";
+    }
   },
   rotation_correction: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
@@ -72,7 +88,7 @@ Template.auto_preview.helpers({
       total_width = max_width;
     }
 
-    if (pattern.preview_rotation == "anticlockwise")
+    /*if (pattern.preview_rotation == "anticlockwise")
     {
       return "margin-top: " + total_width + "px; height: 0;";
     }
@@ -81,6 +97,28 @@ Template.auto_preview.helpers({
     {
       var total_height = Template.instance().image_height() * scaling;
       return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
+    }*/
+
+    switch(pattern.preview_rotation)
+    {
+      case "left":
+        return "margin-top: " + total_width + "px; height: 0;";
+
+      case "up":
+        return;
+
+      case "right":
+        var total_height = Template.instance().image_height() * scaling;
+        return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
+
+      case "down":
+        var total_height = Template.instance().image_height() * scaling;
+        //return "margin-left: " + total_width + "px; height: 0; margin-top: " + total_height + "px; ";
+
+        return "width: " + total_width + "px; position: relative; height: " + total_height + "px; ";
+
+      default:
+        return ;
     }
   },
   spinner_style: function() {
@@ -119,17 +157,12 @@ Template.auto_preview.helpers({
   },
   total_height: function() {
     return Template.instance().image_height();
-  },
-  ////////////////////////
-  // New Thing
- /* row: function() {
-    console.log("here");
-    return [1,2,3,4];
-  }*/
+  }
  });
 
 Template.auto_preview.events({
   "click .rotate_preview": function () {
+    console.log("clicked");
       Meteor.call("rotate_preview", this._id);
   }
 });
@@ -145,7 +178,7 @@ Use auto preview as Home page preview if no photo chosen
 
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
-    var cell = preview_data[(row) + "_" + (tablet)];
+    var cell = current_weaving_data[(row) + "_" + (tablet)];
 
     if (typeof cell === "undefined")
       return;
@@ -175,7 +208,7 @@ Template.auto_preview_element.helpers({
 
     if (row > 1)
     {
-      var previous_style_number = preview_data[(row-1) + "_" + (tablet)].get();
+      var previous_style_number = current_weaving_data[(row-1) + "_" + (tablet)].get();
 
       if (typeof previous_style_number !== "undefined")
         previous_style = current_styles.list()[previous_style_number-1];
@@ -184,8 +217,6 @@ Template.auto_preview_element.helpers({
     // shape
     if (style_value.toString().charAt(0) == "S")
     {
-      //console.log("special style" + style_value);
-
       var style_number = parseInt(style_value.substring(1));
       var style = current_special_styles.list()[style_number-1];
 

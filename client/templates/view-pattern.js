@@ -317,7 +317,6 @@ Template.view_pattern.events({
       Session.set('view_full_pattern', true);
 
       var pattern_id = Router.current().params._id;
-      //Router.go('pattern', { _id: pattern_id, mode: "full" }); // this doesn't re-render but prevents refresh from hiding the pattern
   },
   'click #undo': function() {
     if (Meteor.my_functions.accept_click())
@@ -345,7 +344,7 @@ Template.view_pattern.events({
       var style = Meteor.my_functions.get_selected_style();
       
       Meteor.my_functions.add_weaving_row(pattern_id, 1, style);
-      //Meteor.my_functions.store_pattern(pattern_id);
+
     }
   },
   'click #add_row_at_end': function () {
@@ -371,7 +370,6 @@ Template.view_pattern.events({
         return;
 
       Meteor.my_functions.remove_weaving_row(pattern_id, parseInt(this));
-      //Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click #add_tablet_at_start': function () {
@@ -427,15 +425,9 @@ Template.view_pattern.events({
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
 
-      // then rename preview_data to weaving_data
       Meteor.my_functions.set_preview_cell_style(this.row, this.tablet, new_style);
-/*
-      var obj = current_weaving_cells[this.row-1][this.tablet-1];
-      obj.style = new_style;
-      current_weaving_cells[this.row-1].splice(this.tablet-1, 1, obj);*/
      
       Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets);
-      //Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .tablets li.cell': function(event, template) {
@@ -449,10 +441,6 @@ Template.view_pattern.events({
         return;
 
       Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
-
-      //var obj = current_threading_cells[this.hole-1][this.tablet-1];
-      //obj.style = new_style;
-      //current_threading_cells[this.hole-1].splice(this.tablet-1, 1, obj);
 
       Meteor.my_functions.save_threading_as_text(pattern_id);
       Meteor.my_functions.store_pattern(pattern_id);
@@ -493,53 +481,6 @@ Template.view_pattern.events({
 });
 
 Template.styles_palette.events({
-  /*'click #styles_palette': function() {
-    console.log("clicked styles palette");
-  },
-  'click .styles': function() {
-    console.log("clicked styles");
-  },
- 'click .styles .cell': function () {
-  // This event often fails to fire and the page must be refreshed until it works, for reasons I have not understood. Clicks on even the parent #styles_palette are not registered when it fails. I have for the time being replaced this event with an 'onclick' on the style element, which calls style_cell_clicked in my_functions.js 
-
-    //Session.set("selected_style", this.style);
-
-    //Meteor.my_functions.update_color_pickers();
-  },
-  'click .styles svg': function() {
-    console.log("clicked svg");
-  },
-  'click .styles .row.special .cell': function () {
-    Session.set("selected_special_style", this.style);
-    //Meteor.my_functions.update_color_pickers();
-  },*/
-  /*'click #edit_style_button': function() {
-    if (Session.equals('edit_style', true))
-      Session.set('edit_style', false);
-
-    else
-      Session.set('edit_style', true);  
-  },*/
-  /*'click #styles_palette .pagination li.styles_1 a': function(event, template) {
-    event.preventDefault();
-    Session.set('styles_palette', "styles_1");
-    Session.set('show_special_styles', false);
-  },
-  'click #styles_palette .pagination li.styles_2 a': function(event, template) {
-    event.preventDefault();
-    Session.set('styles_palette', "styles_2");
-    Session.set('show_special_styles', false);
-  },
-  'click #styles_palette .pagination li.all_styles a': function(event, template) {
-    event.preventDefault();
-    Session.set('styles_palette', "all_styles");
-    Session.set('show_special_styles', false);
-  },
-  'click #styles_palette .pagination li.special a': function(event, template) {
-    event.preventDefault();
-    Session.set('styles_palette', "special");
-    Session.set('show_special_styles', true);
-  },*/
   'click .edit_style .warps .forward': function() {
     Meteor.my_functions.edit_style_warp("forward");
   },

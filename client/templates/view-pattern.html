@@ -39,6 +39,8 @@
 </div>
 <div class="clearing"></div>
 
+{{> auto_preview}}
+
 {{#if can_edit_pattern _id}}<div class="box private">
 <div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
 <div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
@@ -52,8 +54,6 @@
 <div class="box tags">{{> tags}}</div>
 {{/if}}
 </div>
-
-{{> auto_preview}}
 
 {{#if view_full_pattern}}
 <h2>Weaving Chart</h2>

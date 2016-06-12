@@ -1,3 +1,8 @@
+.auto_preview.down,
+.auto_preview.up {
+    float:right;
+}
+
 .auto_preview svg { 
     -ms-transform: rotate(90deg);
     -webkit-transform: rotate(90deg);
@@ -11,9 +16,25 @@
     max-width: 600px;
 }
 
-.auto_preview .anticlockwise svg { 
+.auto_preview.left svg { 
     -ms-transform: rotate(-90deg);
     -webkit-transform: rotate(-90deg);
     transform: rotate(-90deg);
+}
+
+.auto_preview.up svg { 
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+
+.auto_preview.down svg { 
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    
+    left: 100%;
+    position: relative;
+    top: 100%;
 }
 

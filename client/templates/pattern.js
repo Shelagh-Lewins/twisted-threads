@@ -11,12 +11,6 @@ UI.registerHelper('row_indexes', function() {
 UI.registerHelper('hole_indexes', function() {
   return [4,3,2,1]; // row 1 at bottom of page
 });
-/*
-UI.registerHelper('threading_hole', function(hole) {
-  if (typeof current_threading_cells !== "undefined")
-      if (typeof current_threading_cells.list()[hole-1] !== "undefined")
-        return current_threading_cells.list()[hole-1].list(); 
-});*/
 
 UI.registerHelper('hole_label', function(hole) {
     //var pattern_id = Router.current().params._id;
@@ -71,10 +65,9 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   }
   else if (type == "threading")
   {
-    var cell = o_threading_data[(row) + "_" + (tablet)];
+    var cell = current_threading_data[(row) + "_" + (tablet)];
     if (typeof cell === "undefined")
     {
-      //console.log("threading. not found: tablet " + tablet + ", " + "row " + row);
       return;
     }
     data.tablet = tablet;
@@ -83,20 +76,15 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   }
   else // weaving cell
   {
-    var cell = preview_data[(row) + "_" + (tablet)];
+    var cell = current_weaving_data[(row) + "_" + (tablet)];
     if (typeof cell === "undefined")
     {
-      //console.log("weaving. not found: tablet " + tablet + ", " + "row  " + row);
       return;
     }
-    //console.log("*")
-    //console.log("row " + row);
 
-    //console.log("tablet " + tablet);
     data.tablet = tablet;
     data.row = row;
     style_ref = cell.get();
-    //console.log("style_ref " + style_ref);
   }
 
   if (style_ref.toString().charAt(0) == "S") // special style

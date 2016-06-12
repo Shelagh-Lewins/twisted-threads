@@ -380,8 +380,6 @@ Meteor.methods({
   // Stringify pattern data and save it
   save_weaving_as_text: function(pattern_id, text, number_of_rows, number_of_tablets)
   {
-    //console.log("save_weaving_as_text " + number_of_rows);
-
     check(pattern_id, String);
     check(text, String);
     check(number_of_rows, Number);
@@ -402,7 +400,7 @@ Meteor.methods({
 
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { weaving: text}});
-//return;
+
     // Record the number of rows
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_rows}});
 
@@ -429,12 +427,29 @@ Meteor.methods({
         // Only the owner can edit a pattern
         throw new Meteor.Error("not-authorized", "You can only edit a pattern you created");
 
-    if (pattern.preview_rotation == "anticlockwise")
-      Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "clockwise"}});
+    switch(pattern.preview_rotation)
+    {
+      case "left":
+        Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "right"}});
+        break;
 
-    else
-      Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "anticlockwise"}});
+      /*case "up":
+        Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "right"}});
+        break;*/
 
+        // It'd be nice to have a floating vertical preview for some patterns, at the user's choice. But so far I haven't made the styles work: pattern info would need to be adjusted to fit round it. But the styles are partly done, in case I come back to this.
+
+      case "right":
+        Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
+        break;
+
+      /*case "down":
+        Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
+        break;*/
+
+      default:
+          Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
+    }
   },
   save_threading_as_text: function(pattern_id, text)
   {
