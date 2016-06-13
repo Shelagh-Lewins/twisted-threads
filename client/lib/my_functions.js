@@ -52,6 +52,14 @@ Meteor.my_functions = {
     }
   },
   export_pattern_to_json: function(pattern_id) {
+    // retrieve the pattern data from the database
+    var pattern = Patterns.findOne({_id: pattern_id});
+    if (typeof pattern === "undefined")
+        return;
+
+    var pattern_obj = {}; // JSON object to hold pattern
+
+    pattern_obj.version = "1.13";
     // version number
     /*
       1.1 first ever
@@ -60,14 +68,6 @@ Meteor.my_functions = {
       1.13 added special styles
       2 replaced style.forward_stroke, style.backward_stroke with style.warp to allow more, mutually exclusive thread types
     */
-    pattern_obj.version = "1.13";
-
-    // retrieve the pattern data from the database
-    var pattern = Patterns.findOne({_id: pattern_id});
-    if (typeof pattern === "undefined")
-        return;
-
-    var pattern_obj = {}; // JSON object to hold pattern
 
     var number_of_rows = pattern.number_of_rows;
     var number_of_tablets = pattern.number_of_tablets;
@@ -120,7 +120,7 @@ Meteor.my_functions = {
 
       for (var j=0; j<number_of_tablets; j++)
       {
-        pattern_obj.weaving[i][j] = current_threading_data[(i+1) + "_" + (j+1)].get();
+        pattern_obj.threading[i][j] = current_threading_data[(i+1) + "_" + (j+1)].get();
       }
     }
 

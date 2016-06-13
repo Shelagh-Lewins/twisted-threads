@@ -88,17 +88,6 @@ Template.auto_preview.helpers({
       total_width = max_width;
     }
 
-    /*if (pattern.preview_rotation == "anticlockwise")
-    {
-      return "margin-top: " + total_width + "px; height: 0;";
-    }
-
-    else
-    {
-      var total_height = Template.instance().image_height() * scaling;
-      return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
-    }*/
-
     switch(pattern.preview_rotation)
     {
       case "left":
@@ -118,7 +107,7 @@ Template.auto_preview.helpers({
         return "width: " + total_width + "px; position: relative; height: " + total_height + "px; ";
 
       default:
-        return ;
+        return "margin-top: " + total_width + "px; height: 0;"; // left
     }
   },
   spinner_style: function() {
@@ -167,15 +156,6 @@ Template.auto_preview.events({
   }
 });
 
-/* next
-repeat if short pattern
-specials
-if no thread show weft
-save as png? Only regenerate when pattern edited
-add svg for vertical weft * 3?
-Use auto preview as Home page preview if no photo chosen
-  */
-
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
     var cell = current_weaving_data[(row) + "_" + (tablet)];
@@ -203,6 +183,7 @@ Template.auto_preview_element.helpers({
     var backward = "m41.05 111.54-40.545-55v-55l40.545 55z";
     var triangle_right = "m0.51 1.54-0.0006 110 40.545-55z";
     var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
+    var block = "m41.05 85.54h-40.545v-54.999h40.545z";
 
     var previous_style;
 
@@ -269,18 +250,24 @@ Template.auto_preview_element.helpers({
           }
           break;
 
-          default:
-            if (!previous_style)
-              return data;
+        case "none": // a regular style with no warp is assumed to be a brocade pattern
+          data.shape = block;
+          data.color = style.background_color;
+          break;
 
-            // regular style with no warp is assumed to be a float
-            // repeat previous 
-            if (previous_style.warp == "backward")
-              data.shape = backward;
 
-            if (previous_style.warp == "forward")
-              data.shape = forward;
-            // go back to the most recent cell that has a thread and draw that
+        default:
+          if (!previous_style)
+            return data;
+
+          // regular style with no warp is assumed to be a float
+          // repeat previous 
+          if (previous_style.warp == "backward")
+            data.shape = backward;
+
+          if (previous_style.warp == "forward")
+            data.shape = forward;
+          // go back to the most recent cell that has a thread and draw that
       }
     }
 
