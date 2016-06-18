@@ -19,6 +19,7 @@
 </template>
 
 <template name="warp_svgs">
+<div id="template_warp_svgs">
 <svg class="forward_warp">
   <symbol id="forward_warp_symbol">
       <g><ellipse rx="140.42" transform="rotate(-45)"  ry="70.214" cy="180.72" cx="-.33336" stroke-width="9.9099" /></g>
@@ -49,16 +50,35 @@
   </symbol>
 </svg>
 
+<svg class="forward_empty">
+  <symbol id="forward_empty_symbol">
+      <g><path stroke-width="10" d="m254.43 2.803-252.55 250.71h-0.62053"/></g>
+  </symbol>
+</svg>
+
+<svg class="backward_empty">
+  <symbol id="backward_empty_symbol">
+      <g><path stroke-width="10" d="m2.4708 2.7978 252.56 250.71h0.62053"/></g>
+  </symbol>
+</svg>
+</div>
+
 </template>
 
 <template name="pattern_cell">
 {{#with weaving_cell_data row tablet type}}
 <li class="cell no_select" style="background-color: {{background_color}}; background-image: url('{{image}}')">
+  {{> pattern_cell_svg}}
+</li>
+{{/with}}
+</template>
+
+<template name="pattern_cell_svg">
 {{#if equals warp "forward"}}
 <svg viewBox="0 0 256 256">
     <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
 </svg>
-{{else}}
+{{/if}}
 {{#if equals warp "backward"}}
 <svg viewBox="0 0 256 256">
     <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
@@ -79,9 +99,17 @@
     <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
 </svg>
 {{/if}}
+
+{{#if equals warp "forward_empty"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_empty_symbol" x="0" y="0"/>
+</svg>
 {{/if}}
-</li>
-{{/with}}
+{{#if equals warp "backward_empty"}}
+<svg viewBox="0 0 256 256">
+    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_empty_symbol" x="0" y="0"/>
+</svg>
+{{/if}}
 </template>
 
 <template name="column_numbers">

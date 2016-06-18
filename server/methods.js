@@ -144,7 +144,7 @@ Meteor.methods({
         data.weaving[i] = new Array(options.number_of_tablets);
         for (var j=0; j<options.number_of_tablets; j++)
         {
-          data.weaving[i][j] = 3; // plain white in default pattern
+          data.weaving[i][j] = (j >= options.number_of_tablets/2) ? 19 :20; // warp twined
         }
       }
 
@@ -156,7 +156,7 @@ Meteor.methods({
         data.threading[i] = new Array(options.number_of_tablets);
         for (var j=0; j<options.number_of_tablets; j++)
         {
-          data.threading[i][j] = 3; // plain white in default pattern
+          data.threading[i][j] = 10; // plain yellow in default pattern
         }
       }
 
@@ -164,7 +164,7 @@ Meteor.methods({
       data.orientation = new Array(number_of_tablets);
       for (var i=0; i<options.number_of_tablets; i++)
       {
-        data.orientation[i] = "S";
+        data.orientation[i] = (i >= (options.number_of_tablets/2)) ? "S" : "Z";
 
       }
     }
@@ -200,6 +200,10 @@ Meteor.methods({
     if (typeof data.weaving_notes !== "undefined")
       weaving_notes = data.weaving_notes;
 
+    var weft_color = "#76a5af";
+    if (typeof data.weft_color !== "undefined")
+      weft_color = data.weft_color;
+
     var threading_notes = "";
     if (typeof data.threading_notes !== "undefined")
       threading_notes = data.threading_notes;
@@ -208,6 +212,7 @@ Meteor.methods({
       name: data.name,
       description: description,
       weaving_notes: weaving_notes,
+      weft_color: weft_color,
       threading_notes: threading_notes,
       private: true, // patterns are private by default so the user can edit them before revealing them to the world
       // TODO add specific thumbnails for patterns
@@ -464,6 +469,23 @@ Meteor.methods({
 
     // Save the individual cell data
     Patterns.update({_id: pattern_id}, {$set: { threading: text}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
+  },
+  save_weft_color_as_text: function(pattern_id, text)
+  {
+    check(pattern_id, String);
+    check(text, String);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
+
+    // Save the individual cell data
+    Patterns.update({_id: pattern_id}, {$set: { weft_color: text}});
 
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);

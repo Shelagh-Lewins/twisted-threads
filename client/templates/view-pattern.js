@@ -168,6 +168,7 @@ Template.styles_palette.onRendered(function(){
 
   if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
+  Meteor.my_functions.initialize_weft_color_picker();
   Meteor.my_functions.initialize_warp_color_picker();
   Meteor.my_functions.initialize_background_color_picker();
 
@@ -300,6 +301,61 @@ Template.styles_palette.helpers({
         return;
 
     return style.warp;
+  },
+  edit_style_warp: function(current_warp) {
+    //console.log("warp " + current_warp);
+    var warps = [
+      {
+        new_warp: "forward",
+        symbol: "#forward_warp_symbol",
+        title: "Forward sloping warp thread",
+        selected_stroke: "#000000"
+      },
+      {
+        new_warp: "backward",
+        symbol: "#backward_warp_symbol",
+        title: "Backward sloping warp thread",
+        selected_stroke: "#000000"
+      },
+      {
+        new_warp: "v_left",
+        symbol: "#v_left_warp_symbol",
+        title: "Vertical warp thread at left",
+        selected_stroke: "#000000"
+      },
+      {
+        new_warp: "v_center",
+        symbol: "#v_center_warp_symbol",
+        title: "Vertical warp thread at right",
+        selected_stroke: "#000000"
+      },
+      {
+        new_warp: "v_right",
+        symbol: "#v_right_warp_symbol",
+        title: "Vertical warp thread at right",
+        selected_stroke: "#000000"
+      },
+      {
+        new_warp: "forward_empty",
+        symbol: "#forward_empty_symbol",
+        title: "Forward sloping empty hole",
+        selected_stroke: "#FFFFFF"
+      },
+      {
+        new_warp: "backward_empty",
+        symbol: "#backward_empty_symbol",
+        title: "Backward sloping empty hole",
+        selected_stroke: "#FFFFFF"
+      }
+
+    ];
+
+    for (var i=0; i<warps.length; i++)
+    {
+      warps[i].on = (current_warp ==  warps[i].new_warp) ? true: false
+    }
+
+    return warps;
   }
 });
 
@@ -436,13 +492,16 @@ Template.view_pattern.events({
       var new_style = Meteor.my_functions.get_selected_style();
 
       var pattern_id = Router.current().params._id;
+      var pattern = Patterns.findOne({_id: pattern_id});
 
-      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      if (typeof pattern === "undefined")
         return;
+
+      var number_of_tablets = pattern.number_of_tablets;
 
       Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
 
-      Meteor.my_functions.save_threading_as_text(pattern_id);
+      Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
       Meteor.my_functions.store_pattern(pattern_id);
     }
   },
@@ -479,7 +538,7 @@ Template.view_pattern.events({
     Meteor.call('toggle_hole_handedness', pattern_id);
   }
 });
-
+/*
 Template.styles_palette.events({
   'click .edit_style .warps .forward': function() {
     Meteor.my_functions.edit_style_warp("forward");
@@ -495,6 +554,12 @@ Template.styles_palette.events({
   },
   'click .edit_style .warps .v_right': function() {
     Meteor.my_functions.edit_style_warp("v_right");
+  },
+  'click .edit_style .warps .forward_empty': function() {
+    Meteor.my_functions.edit_style_warp("forward_empty");
+  },
+  'click .edit_style .warps .backward_empty': function() {
+    Meteor.my_functions.edit_style_warp("backward_empty");
   }
- });
+ });*/
 

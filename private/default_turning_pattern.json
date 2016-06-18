@@ -1,5 +1,5 @@
 {
-  "version": "2.1",
+  "version": "2.01",
   "name": "New pattern",
   "description": "A pattern woven by forward and backward turning of the tablets.",
   "weaving_notes": "White background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread",
@@ -7,185 +7,296 @@
   "tags": [],
   "styles": [
     {
-      "background_color": "#000000",
+      "background_color": "#ffffff",
       "line_color": "#000000",
-      "warp": "none"
+      "warp": "none",
+      "style": 1
     },
     {
-      "background_color": "#BBBBBB",
-      "line_color": "#000000",
-      "warp": "none"
+      "background_color": "#1c4587",
+      "line_color": "#1c4587",
+      "warp": "none",
+      "style": 2
     },
     {
       "background_color": "#ffffff",
-      "line_color": "#000000",
-      "warp": "none"
+      "line_color": "#3c78d8",
+      "warp": "forward_empty",
+      "style": 3
     },
     {
-      "background_color": "#674ea7",
-      "line_color": "#000000",
-      "warp": "none"
+      "background_color": "#ffffff",
+      "line_color": "#cc0000",
+      "warp": "backward_empty",
+      "style": 4
     },
     {
       "background_color": "#FFFFFF",
       "line_color": "#ffffff",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 5
     },
     {
       "background_color": "#ffffff",
       "line_color": "#ffffff",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 6
     },
     {
       "background_color": "#ffffff",
       "line_color": "#000000",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 7
     },
     {
       "background_color": "#ffffff",
       "line_color": "#000000",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 8
     },
     {
       "background_color": "#cc0000",
       "line_color": "#000000",
-      "warp": "none"
+      "warp": "none",
+      "style": 9
     },
     {
       "background_color": "#ffd966",
       "line_color": "#000000",
-      "warp": "none"
+      "warp": "none",
+      "style": 10
     },
     {
-      "background_color": "#6aa84f",
-      "line_color": "#000000",
-      "warp": "none"
+      "background_color": "#bbbbbb",
+      "line_color": "#cc0000",
+      "warp": "backward_empty",
+      "style": 11
     },
     {
-      "background_color": "#1c4587",
-      "line_color": "#000000",
-      "warp": "none"
+      "background_color": "#bbbbbb",
+      "line_color": "#cc0000",
+      "warp": "forward_empty",
+      "style": 12
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffffff",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 13
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffffff",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 14
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#000000",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 15
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#000000",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 16
     },
     {
       "background_color": "#ffffff",
       "line_color": "#cc0000",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 17
     },
     {
       "background_color": "#ffffff",
       "line_color": "#cc0000",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 18
     },
     {
       "background_color": "#ffffff",
       "line_color": "#ffd966",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 19
     },
     {
       "background_color": "#ffffff",
       "line_color": "#ffd966",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 20
     },
     {
       "background_color": "#ffffff",
       "line_color": "#6aa84f",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 21
     },
     {
       "background_color": "#ffffff",
       "line_color": "#6aa84f",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 22
     },
     {
       "background_color": "#ffffff",
       "line_color": "#1c4587",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 23
     },
     {
       "background_color": "#ffffff",
       "line_color": "#1c4587",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 24
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#cc0000",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 25
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#cc0000",
-      "warp": "forward"
-
+      "warp": "forward",
+      "style": 26
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffd966",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 27
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#ffd966",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 28
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#6aa84f",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 29
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#6aa84f",
-      "warp": "forward"
-
+      "warp": "forward",
+      "style": 30
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#1c4587",
-      "warp": "backward"
+      "warp": "backward",
+      "style": 31
     },
     {
       "background_color": "#BBBBBB",
       "line_color": "#1c4587",
-      "warp": "forward"
+      "warp": "forward",
+      "style": 32
     }
   ],
-  "orientation": ["S","S","S","S","S","S","S","S"],
+  "special_styles": [
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_forward_2.svg",
+      "style": "S1"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_backward_2.svg",
+      "style": "S2"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_forward_3.svg",
+      "style": "S3"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_backward_3.svg",
+      "style": "S4"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_forward_4.svg",
+      "style": "S5"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_backward_4.svg",
+      "style": "S6"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_empty.svg",
+      "style": "S7"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "",
+      "style": "S8"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_backward_2.svg",
+      "style": "S9"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_forward_2.svg",
+      "style": "S10"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_backward_3.svg",
+      "style": "S11"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_forward_3.svg",
+      "style": "S12"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_backward_4.svg",
+      "style": "S13"
+    },
+    {
+      "background_color": "#BBBBBB",
+      "image": "/images/special_forward_4.svg",
+      "style": "S14"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_backward_strike.svg",
+      "style": "S15"
+    },
+    {
+      "background_color": "#FFFFFF",
+      "image": "/images/special_forward_strike.svg",
+      "style": "S16"
+    }
+  ],
+  "orientation": ["S","Z","S","Z","S","Z","S","Z","S","Z","S","Z"],
   "threading": [
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3]
+    [1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1]
   ],
   "weaving": [
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3]
-  ]
+    [5,6,5,6,5,6,5,6,5,6,5,6],
+    [5,6,5,6,5,6,5,6,5,6,5,6],
+    [5,6,5,6,5,6,5,6,5,6,5,6],
+    [5,6,5,6,5,6,5,6,5,6,5,6],
+    [5,6,5,6,5,6,5,6,5,6,5,6],
+    [5,6,5,6,5,6,5,6,5,6,5,6],
+    [5,6,5,6,5,6,5,6,5,6,5,6],
+    [5,6,5,6,5,6,5,6,5,6,5,6]
+  ],
+  "weft_color": "#76a5af"
 }

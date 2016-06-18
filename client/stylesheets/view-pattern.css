@@ -117,6 +117,19 @@
   display: inline;
 }
 
+/* *** Weft color *** */
+#weft_color {
+  clear: both;
+  width: 200px;
+  margin: 10px 0 0 0;
+}
+
+#weft_color .text {
+  float: left;
+  margin: 0 10px 0 0;
+  line-height: 24px;
+}
+
 /* *** Toolbar *** */
 #toolbar {
   position: relative;
@@ -380,11 +393,7 @@
   height: 32px;
 }
 
-.edit_style .forward.on,
-.edit_style .backward.on,
-.edit_style .v_left.on,
-.edit_style .v_center.on,
-.edit_style .v_right.on {
+.edit_style .warps li.on {
   background-color: #424A6C;
 }
 

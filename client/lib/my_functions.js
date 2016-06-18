@@ -59,7 +59,7 @@ Meteor.my_functions = {
 
     var pattern_obj = {}; // JSON object to hold pattern
 
-    pattern_obj.version = "1.13";
+    pattern_obj.version = "2.01";
     // version number
     /*
       1.1 first ever
@@ -67,6 +67,7 @@ Meteor.my_functions = {
       1.12 added weaving notes, threading notes
       1.13 added special styles
       2 replaced style.forward_stroke, style.backward_stroke with style.warp to allow more, mutually exclusive thread types
+      2.01 added weft_color
     */
 
     var number_of_rows = pattern.number_of_rows;
@@ -137,6 +138,9 @@ Meteor.my_functions = {
       }
     }
 
+    // weft color
+    pattern_obj.weft_color = weft_color.get();
+
     return pattern_obj;
 
     ///////////////////////////
@@ -182,7 +186,8 @@ Meteor.my_functions = {
         backward_stroke: false
       }
       // more styles
-    ]
+    ],
+    weft_color: "#76a5af"
     
     */
   },
@@ -953,6 +958,11 @@ Meteor.my_functions = {
       }
     }
 
+    // client-side weft color is a ReactiveVar
+    //console.log("new pattern " + pattern.weft_color);
+    var color = (typeof pattern.weft_color !== "undefined") ? pattern.weft_color : "#76a5af"; // older version pattern does not have weft_color
+    weft_color = new ReactiveVar(color);
+
     // Client-side threading data is an object which references a ReactiveVar for each cell data point
     current_threading_data = {}; // new object format
 
@@ -1344,7 +1354,13 @@ Meteor.my_functions = {
   save_threading_as_text: function(pattern_id, number_of_tablets)
   {
     var threading_array = Meteor.my_functions.get_threading_as_text(number_of_tablets);
+
     Meteor.call('save_threading_as_text', pattern_id, JSON.stringify(threading_array));
+  },
+  save_weft_color_as_text: function(pattern_id, color)
+  {
+    //console.log("to save color " + color);
+    Meteor.call('save_weft_color_as_text', pattern_id, color);
   },
   get_orientation_as_text: function(pattern_id)
   {
@@ -1396,7 +1412,86 @@ Meteor.my_functions = {
     
   },
   ///////////////////////////////
-  // Color pickers 
+  // Color pickers
+  initialize_weft_color_picker: function()
+  {
+    // Set the #background_colorpicker to the selected style's background colour
+    //var selected_style = Session.get("selected_style");
+
+    //if (!Meteor.my_functions.can_edit_style(selected_style))
+        //return;
+      
+    var pattern_id = Router.current().params._id;
+
+
+    //if (Patterns.findOne({_id: pattern_id}) == null)
+    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+    {
+      setTimeout(function(){Meteor.my_functions.initialize_weft_color_picker(); }, 10);
+    }
+    else
+    {
+      //var pattern = Patterns.find({_id: pattern_id}, {fields: {weft_color: 1}});
+      var pattern = Patterns.findOne({_id:pattern_id}, {fields: {weft_color: 1}})
+      //console.log("id " + pattern_id);
+      var color = pattern.weft_color;
+      //console.log("weft color " + color);
+
+      // Spectrum color picker
+      // https://atmospherejs.com/ryanswapp/spectrum-colorpicker
+      // https://bgrins.github.io/spectrum/
+      $("#weft_colorpicker").spectrum({
+        color: color,
+        showInput: true,
+        className: "full-spectrum",
+        showInitial: true,
+        showPalette: true,
+        hideAfterPaletteSelect:true, // BUG The "change" event is firing incorrectly whenever you select a colour. Closing the palette after selecting a colour is a cheap workaround.
+        showSelectionPalette: true,
+        maxSelectionSize: 10,
+        preferredFormat: "hex",
+        move: function (color) {
+
+        },
+        show: function () {
+
+        },
+        beforeShow: function () {
+
+        },
+        hide: function () {
+
+        },
+        change: function(color) {
+          var pattern_id = Router.current().params._id;
+
+          weft_color.set(color.toHexString());
+
+          // update database
+          Meteor.my_functions.save_weft_color_as_text(pattern_id, color.toHexString());
+
+          // store style for undo stack
+          Meteor.my_functions.store_pattern(pattern_id);
+        },
+        palette: [
+            ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)",
+            "rgb(204, 204, 204)", "rgb(217, 217, 217)","rgb(255, 255, 255)"],
+            ["rgb(152, 0, 0)", "rgb(255, 0, 0)", "rgb(255, 153, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)",
+            "rgb(0, 255, 255)", "rgb(74, 134, 232)", "rgb(0, 0, 255)", "rgb(153, 0, 255)", "rgb(255, 0, 255)"],
+            ["rgb(230, 184, 175)", "rgb(244, 204, 204)", "rgb(252, 229, 205)", "rgb(255, 242, 204)", "rgb(217, 234, 211)",
+            "rgb(208, 224, 227)", "rgb(201, 218, 248)", "rgb(207, 226, 243)", "rgb(217, 210, 233)", "rgb(234, 209, 220)",
+            "rgb(221, 126, 107)", "rgb(234, 153, 153)", "rgb(249, 203, 156)", "rgb(255, 229, 153)", "rgb(182, 215, 168)",
+            "rgb(162, 196, 201)", "rgb(164, 194, 244)", "rgb(159, 197, 232)", "rgb(180, 167, 214)", "rgb(213, 166, 189)",
+            "rgb(204, 65, 37)", "rgb(224, 102, 102)", "rgb(246, 178, 107)", "rgb(255, 217, 102)", "rgb(147, 196, 125)",
+            "rgb(118, 165, 175)", "rgb(109, 158, 235)", "rgb(111, 168, 220)", "rgb(142, 124, 195)", "rgb(194, 123, 160)",
+            "rgb(166, 28, 0)", "rgb(204, 0, 0)", "rgb(230, 145, 56)", "rgb(241, 194, 50)", "rgb(106, 168, 79)",
+            "rgb(69, 129, 142)", "rgb(60, 120, 216)", "rgb(61, 133, 198)", "rgb(103, 78, 167)", "rgb(166, 77, 121)",
+            "rgb(91, 15, 0)", "rgb(102, 0, 0)", "rgb(120, 63, 4)", "rgb(127, 96, 0)", "rgb(39, 78, 19)",
+            "rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
+        ]
+      });
+    }
+  },
   initialize_background_color_picker: function()
   {
     // Set the #background_colorpicker to the selected style's background colour

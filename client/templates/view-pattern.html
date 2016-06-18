@@ -41,6 +41,11 @@
 
 {{> auto_preview}}
 
+<div id="weft_color">
+  <span class="text">Weft color</span>
+<div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
+</div>
+
 {{#if can_edit_pattern _id}}<div class="box private">
 <div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
 <div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
@@ -135,7 +140,7 @@
 </template>
 
 <template name="threading_row">
-<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each tablet_indexes this}}
+<div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each tablet_indexes}}
   {{#with row=.. tablet=this type="threading"}}
     {{> pattern_cell}}
   {{/with}}
@@ -151,61 +156,13 @@
 <h2>Warp thread</h2>
 <div class="colorpicker_holder"><input type="text" id="line_colorpicker"></div>
 <ul class="warps">
-  <li class="forward {{#if equals warp "forward"}}on{{/if}}" title="Forward sloping warp thread">
-    {{#if equals warp "forward"}}
-    <svg viewBox="0 0 256 256">
-        <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
+  {{#each edit_style_warp warp}}
+    <li class="{{#if equals on true}}on{{/if}}" title="{{title}}" onclick="Meteor.my_functions.edit_style_warp('{{new_warp}}');">
+      <svg viewBox="0 0 256 256">
+        <use style="fill: #FFFFFF; stroke: {{#if equals on true}}{{selected_stroke}}{{else}}#666666{{/if}};" xlink:href="{{symbol}}" x="0" y="0"/>
     </svg>
-    {{else}}
-    <svg viewBox="0 0 256 256">
-        <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
-    </svg>
-    {{/if}}
-  </li>
-  <li class="backward {{#if equals warp "backward"}}on{{/if}}" title="Backward sloping warp thread">
-    {{#if equals warp "backward"}}
-    <svg viewBox="0 0 256 256">
-        <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
-    </svg>
-    {{else}}
-    <svg viewBox="0 0 256 256">
-        <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
-    </svg>
-    {{/if}}
-  </li>
-  <li class="v_left {{#if equals warp "v_left"}}on{{/if}}" title="Vertical warp thread at left">
-  {{#if equals warp "v_left"}}
-  <svg viewBox="0 0 256 256">
-      <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#v_left_warp_symbol" x="0" y="0"/>
-  </svg>
-  {{else}}
-  <svg viewBox="0 0 256 256">
-      <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#v_left_warp_symbol" x="0" y="0"/>
-  </svg>
-  {{/if}}
-  </li>
-  <li class="v_center {{#if equals warp "v_center"}}on{{/if}}" title="Vertical warp thread at center">
-  {{#if equals warp "v_center"}}
-  <svg viewBox="0 0 256 256">
-      <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#v_center_warp_symbol" x="0" y="0"/>
-  </svg>
-  {{else}}
-  <svg viewBox="0 0 256 256">
-      <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#v_center_warp_symbol" x="0" y="0"/>
-  </svg>
-  {{/if}}
-  </li>
-  <li class="v_right {{#if equals warp "v_right"}}on{{/if}}" title="Vertical warp thread at right">
-  {{#if equals warp "v_right"}}
-  <svg viewBox="0 0 256 256">
-      <use style="fill: #FFFFFF; stroke: #000000;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
-  </svg>
-  {{else}}
-  <svg viewBox="0 0 256 256">
-      <use style="fill: #FFFFFF; stroke: #666666;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
-  </svg>
-  {{/if}}
-  </li>
+    </li>
+  {{/each}}
 </ul>
 </div>
 <div class="pagination"><ul>
@@ -225,32 +182,7 @@
 
 <template name="style_cell">
 <li class="cell no_select {{is_selected_style style}}" style="background-color: {{background_color}}; background-image: url('{{image}}')" onclick="Meteor.my_functions.style_cell_clicked('{{style}}', '{{special_style}}');">
-{{#if equals warp "forward"}}
-<svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#forward_warp_symbol" x="0" y="0"/>
-</svg>
-{{else}}
-{{#if equals warp "backward"}}
-<svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#backward_warp_symbol" x="0" y="0"/>
-</svg>
-{{/if}}
-{{#if equals warp "v_left"}}
-<svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_left_warp_symbol" x="0" y="0"/>
-</svg>
-{{/if}}
-{{#if equals warp "v_center"}}
-<svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_center_warp_symbol" x="0" y="0"/>
-</svg>
-{{/if}}
-{{#if equals warp "v_right"}}
-<svg viewBox="0 0 256 256">
-    <use style="fill: {{line_color}}; stroke: #000000;" xlink:href="#v_right_warp_symbol" x="0" y="0"/>
-</svg>
-{{/if}}
-{{/if}}
+{{> pattern_cell_svg}}
 </li>
 </template>
 

@@ -121,11 +121,7 @@
 }
 
 /* *** SVG warp *** */
-svg.forward_warp,
-svg.backward_warp,
-svg.v_left_warp,
-svg.v_center_warp,
-svg.v_right_warp {
+#template_warp_svgs {
   display: none;
 }
 

@@ -156,6 +156,31 @@ Template.auto_preview.events({
   }
 });
 
+Template.auto_preview_weft.helpers({
+  data: function(row)
+  {
+    var pattern_id = Router.current().params._id;
+      var pattern = Patterns.findOne({_id: pattern_id});
+
+      if (typeof pattern === "undefined")
+        return;
+
+      var number_of_tablets = pattern.number_of_tablets;
+
+      var data = {};
+//console.log("row " + row);
+    var unit_height = 113.08752;
+
+    var row_up = Session.get("number_of_rows") - row;
+    data.y_offset = ((row_up) * unit_height/2);
+
+    data.color = weft_color.get();
+    data.scale = number_of_tablets;
+
+    return data;
+  }
+})
+
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
     var cell = current_weaving_data[(row) + "_" + (tablet)];
@@ -184,6 +209,8 @@ Template.auto_preview_element.helpers({
     var triangle_right = "m0.51 1.54-0.0006 110 40.545-55z";
     var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
     var block = "m41.05 85.54h-40.545v-54.999h40.545z";
+    //var forward_weft = "m41.049 35.707v20.832l-15.338 20.807h-25.205v-20.807l15.356-20.832h25.187z";
+   // var backward_weft = "m0.50586 35.709v20.832l15.338 20.807h25.205v-20.807l-15.356-20.832h-25.187z";
 
     var previous_style;
 
@@ -255,6 +282,12 @@ Template.auto_preview_element.helpers({
           data.color = style.background_color;
           break;
 
+        case "forward_empty": // leave empty to show weft
+          break;
+
+        case "backward_empty": // leave empty to show weft
+          break;
+
 
         default:
           if (!previous_style)
@@ -268,13 +301,20 @@ Template.auto_preview_element.helpers({
           if (previous_style.warp == "forward")
             data.shape = forward;
           // go back to the most recent cell that has a thread and draw that
+          break;
       }
     }
 
     // colour
     if ((style.warp == "forward") || (style.warp == "backward"))
+      //|| (style.warp == "forward_empty")|| (style.warp == "backward_empty"))
     {
       data.color = style.line_color;
+    }
+
+    else if ((style.warp == "forward_empty") || (style.warp == "backward_empty"))
+    {
+      // leave empty to show weft
     }
 
     else if (typeof previous_style !== "undefined")
@@ -282,7 +322,7 @@ Template.auto_preview_element.helpers({
       if ((previous_style.warp == "forward") || (previous_style.warp == "backward"))
         data.color = previous_style.line_color;
     }
-
+//console.log("color is " + data.color);
     return data;
   }
 });
