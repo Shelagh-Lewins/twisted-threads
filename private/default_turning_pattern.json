@@ -272,12 +272,12 @@
     },
     {
       "background_color": "#FFFFFF",
-      "image": "/images/special_backward_strike.svg",
+      "image": "/images/special_idle.svg",
       "style": "S15"
     },
     {
       "background_color": "#FFFFFF",
-      "image": "/images/special_forward_strike.svg",
+      "image": "",
       "style": "S16"
     }
   ],

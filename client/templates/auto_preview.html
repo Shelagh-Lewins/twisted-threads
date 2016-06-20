@@ -40,6 +40,30 @@
 
 <template name="auto_preview_element">
 {{#with data row tablet}}
+{{#if special}}
+  <g transform="translate({{x_offset}} {{y_offset}})">
+    {{#if equals style "S1"}}
+{{> forward_2_svg}}
+{{/if}}
+{{#if equals style "S2"}}
+{{> backward_2_svg}}
+{{/if}}
+  </g>
+{{else}}
   <g transform="translate({{x_offset}} {{y_offset}})"><path d="{{shape}}" stroke="#000" stroke-width="1.015" fill="{{color}}"/></g>
+  {{/if}}
 {{/with}}
 </template>
+
+<template name="forward_2_svg">
+<path d="m0.36291 112 40.839-54.951v-27.538l-40.839 54.947z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m0.36291 83.917 40.839-54.947v-27.538l-40.839 54.947z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+<template name="backward_2_svg">
+<path d="m41.202 112-40.839-54.951v-27.538l40.839 54.947" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m41.202 83.917-40.839-54.947v-27.538l40.839 54.947z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+
+
