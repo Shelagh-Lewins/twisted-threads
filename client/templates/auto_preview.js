@@ -214,8 +214,8 @@ Template.auto_preview_element.helpers({
     var block = "m41.05 85.54h-40.545v-54.999h40.545z";
 
     // special styles
-    var forward_2 = "<path d=\"m0.36291 112 40.839-54.951v-27.538l-40.839 54.947z\" stroke=\"#000\" stroke-width=\"1.015\" fill=\"#ffffff\"></path> <path d=\"m0.36291 83.917 40.839-54.947v-27.538l-40.839 54.947z\" stroke=\"#000\" stroke-width=\"1.015\" fill=\"#ffffff\"></path>";
-    var backward_2 = "";
+    //var forward_2 = "<path d=\"m0.36291 112 40.839-54.951v-27.538l-40.839 54.947z\" stroke=\"#000\" stroke-width=\"1.015\" fill=\"#ffffff\"></path> <path d=\"m0.36291 83.917 40.839-54.947v-27.538l-40.839 54.947z\" stroke=\"#000\" stroke-width=\"1.015\" fill=\"#ffffff\"></path>";
+    //var backward_2 = "";
     //var forward_weft = "m41.049 35.707v20.832l-15.338 20.807h-25.205v-20.807l15.356-20.832h25.187z";
    // var backward_weft = "m0.50586 35.709v20.832l15.338 20.807h25.205v-20.807l-15.356-20.832h-25.187z";
 
@@ -227,8 +227,37 @@ Template.auto_preview_element.helpers({
 
       if (typeof previous_style_number !== "undefined")
       {
-        previous_style = current_styles.list()[previous_style_number-1];
+        if (previous_style_number.toString().charAt(0) == "S") // previous style is special
+        {
+          previous_style = {};
+//console.log("special previous " + previous_style_number);
+          switch (previous_style_number)
+          {
+            case "S1":
+            case "S10":
+            case "S3":
+            case "S12":
+              previous_style.warp = "forward";
+              break;
 
+            case "S2":
+            case "S9":
+            case "S4":
+            case "S11":
+              previous_style.warp = "backward";
+              break;
+
+            default:
+              console.log("unhandled special style");
+              break;
+          } 
+          //console.log("special previous warp " + previous_style.warp);
+        }
+        else // previous style is regular
+        {
+          previous_style = current_styles.list()[previous_style_number-1];
+        }
+      
         if (style_value == "S15") // idle tablet, use previous row
           style_value = previous_style_number;
       }
@@ -241,92 +270,104 @@ Template.auto_preview_element.helpers({
     if (style_value.toString().charAt(0) == "S")
     {
       //console.log("special style " + row + ", " + tablet);
-      console.log("style is " + style_value.toString());
+      //console.log("style is " + style_value.toString());
       data.special = true;
-      data.style = style_value;
-      data.shape = forward_2;
-      //var style_number = parseInt(style_value.substring(1));
-      //var style = current_special_styles.list()[style_number-1];
+      //data.style = style_value;
+      switch (style_value)
+      {
+        case "S1":
+        case "S10":
+          data.shape = "forward_2";
+          break;
 
-      
+        case "S2":
+        case "S9":
+          data.shape = "backward_2";
+          break;
+
+        case "S3":
+        case "S12":
+          data.shape = "forward_3";
+          break;
+
+        case "S4":
+        case "S11":
+          data.shape = "backward_3";
+          break;
+      }  
 
       return data;
+    }
 
-     /* if (typeof style === "undefined")
+    // regular style
+    var style_number = style_value;
+    var style = current_styles.list()[style_number-1];
+//console.log("current style is " + style_value);
+ /*    if (previous_style)
+   {
+      
+      console.log("previous warp " + previous_style.warp);
+    }*/
+
+    switch(style.warp)
+    {
+      case "forward":
+        if (!previous_style)
+        {
+          data.shape = forward;
+        }
+        else
+        {
+          // if previous style has no warp, go back until you find one
+          // same for 'backward'
+          // if no warp ever found, use current
+          if (previous_style.warp == "backward")
+            data.shape = triangle_left;
+
+
+          else
+            data.shape = forward;
+        }
+        break;
+
+      case "backward":
+        if (!previous_style)
+          data.shape = backward;
+
+        else {
+          if (previous_style.warp == "forward")
+            data.shape = triangle_right;
+
+          else
+            data.shape = backward;
+        }
+        break;
+
+      case "none": // a regular style with no warp is assumed to be a brocade pattern
+        data.shape = block;
+        data.color = style.background_color;
+        break;
+
+      case "forward_empty": // leave empty to show weft
+        break;
+
+      case "backward_empty": // leave empty to show weft
+        break;
+
+      default:
+        if (!previous_style)
           return data;
 
-      var cell_style = {
-        background_color: style.background_color,
-        image: style.image,
-        style: style.style
-      }*/
-     //  TODO implement special styles
+        // regular style with no warp is assumed to be a float
+        // repeat previous 
+        if (previous_style.warp == "backward")
+          data.shape = backward;
+
+        if (previous_style.warp == "forward")
+          data.shape = forward;
+        // go back to the most recent cell that has a thread and draw that
+        break;
     }
-    //else // regular style
-    //{
-      var style_number = style_value;
-      var style = current_styles.list()[style_number-1];
-
-      switch(style.warp)
-      {
-        case "forward":
-          if (!previous_style)
-          {
-            data.shape = forward;
-          }
-          else
-          {
-            // if previous style has no warp, go back until you find one
-            // same for 'backward'
-            // if no warp ever found, use current
-            if (previous_style.warp == "backward")
-              data.shape = triangle_left;
-
-
-            else
-              data.shape = forward;
-          }
-          break;
-
-        case "backward":
-          if (!previous_style)
-            data.shape = backward;
-
-          else {
-            if (previous_style.warp == "forward")
-              data.shape = triangle_right;
-
-            else
-              data.shape = backward;
-          }
-          break;
-
-        case "none": // a regular style with no warp is assumed to be a brocade pattern
-          data.shape = block;
-          data.color = style.background_color;
-          break;
-
-        case "forward_empty": // leave empty to show weft
-          break;
-
-        case "backward_empty": // leave empty to show weft
-          break;
-
-        default:
-          if (!previous_style)
-            return data;
-
-          // regular style with no warp is assumed to be a float
-          // repeat previous 
-          if (previous_style.warp == "backward")
-            data.shape = backward;
-
-          if (previous_style.warp == "forward")
-            data.shape = forward;
-          // go back to the most recent cell that has a thread and draw that
-          break;
-      }
-    //}
 
     // colour
     if ((style.warp == "forward") || (style.warp == "backward"))
