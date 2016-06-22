@@ -2016,6 +2016,40 @@ Meteor.my_functions = {
   {
     current_threading_data[(hole) + "_" + (tablet)].set(style);
   },
+  /*is_style_special: function(style_value)
+  {
+    if (typeof style_value === "undefined")
+      return false;
+
+    if (style_value.toString().charAt(0) == "S")
+      return true;
+
+    else
+      return false;
+  },*/
+  find_style: function(style_value) // e,g, 2, "S1", may be regular or special
+  {
+    if (typeof style_value === "undefined")
+      return {};
+
+    var style;
+    var style_number;
+
+    if (style_value.toString().charAt(0) == "S")
+    {
+      special = true;
+      style_number = parseInt(style_value.slice(1));
+      style = current_special_styles[style_number-1];
+      style.special = true;
+    }
+    else
+    {
+     //style_number = style_value;
+      style = current_styles.list()[style_value-1];
+      style.special = false;
+    }
+    return style; // the style object
+  },
   ////////////////////////////////////////////
   // work around frequent failure of Meteor to register clicks on Styles palette
   style_cell_clicked: function(style, special_style)

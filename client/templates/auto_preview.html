@@ -54,6 +54,19 @@
 {{#if equals shape "backward_3"}}
 {{> backward_3_svg}}
 {{/if}}
+{{#if equals shape "forward_4"}}
+{{> forward_4_svg}}
+{{/if}}
+{{#if equals shape "backward_4"}}
+{{> backward_4_svg}}
+{{/if}}
+
+{{#if equals shape "triangle_left_2"}}
+{{> triangle_left_2_svg}}
+{{/if}}
+{{#if equals shape "triangle_right_2"}}
+{{> triangle_right_2_svg}}
+{{/if}}
   </g>
 {{else}}
   <g transform="translate({{x_offset}} {{y_offset}})"><path d="{{shape}}" stroke="#000" stroke-width="1.015" fill="{{color}}"/></g>
@@ -61,6 +74,7 @@
 {{/with}}
 </template>
 
+<!-- special styles -->
 <template name="forward_2_svg">
 <path d="m0.36291 112 40.839-54.951v-27.538l-40.839 54.947z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
 <path d="m0.36291 83.917 40.839-54.947v-27.538l-40.839 54.947z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
@@ -83,6 +97,54 @@
 <path d="m41.418 75.08-40.961-55.457v-18.957l40.961 55.458z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
 </template>
 
+<template name="forward_4_svg">
+<path d="m0.412 112.45 41.052-55.882v-13.619l-41.052 55.878z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m0.412 98.227 41.052-55.878v-13.619l-41.052 55.878z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m0.412 84.091 41.052-55.878v-13.619l-41.052 55.878z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m0.412 70.221 41.052-55.878v-13.619l-41.052 55.878z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+<template name="backward_4_svg">
+<path d="m41.464 112.45-41.052-55.882v-13.619l41.052 55.878z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m41.464 98.227-41.052-55.878v-13.619l41.052 55.878z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m41.464 84.091-41.052-55.878v-13.619l41.052 55.878z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m41.464 70.221-41.052-55.878v-13.619l41.052 55.878z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+<!-- special style at reversal -->
+<template name="triangle_left_2_svg">
+<path d="m41.341 85.466v-83.399l-30.74 41.699z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m41.189 112.75-40.837-54.951l-0.00044-0.099 10.156-13.777 30.681 41.285v27.537z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+<template name="triangle_right_2_svg">
+<path d="m0.3518 85.621-0.00045-83.399 30.741 41.699z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m0.50225 112.9 40.839-54.947v-0.09961l-10.156-13.777-30.683 41.286v27.538z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+<template name="triangle_left_3_svg">
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+<template name="triangle_right_3_svg">
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+<template name="triangle_left_4_svg">
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
+
+<template name="triangle_right_4_svg">
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+</template>
 
 
 

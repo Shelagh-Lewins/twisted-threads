@@ -196,9 +196,9 @@ Template.auto_preview_element.helpers({
     var unit_width = 41.560534;
     var unit_height = 113.08752;
 
-    var data = {
-      special: false
-    };
+    var style;
+    var previous_style = {};
+    var data = {};
 
     // position of element
     data.x_offset = ((tablet - 1) * unit_width);
@@ -213,134 +213,94 @@ Template.auto_preview_element.helpers({
     var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
     var block = "m41.05 85.54h-40.545v-54.999h40.545z";
 
-    // special styles
-    //var forward_2 = "<path d=\"m0.36291 112 40.839-54.951v-27.538l-40.839 54.947z\" stroke=\"#000\" stroke-width=\"1.015\" fill=\"#ffffff\"></path> <path d=\"m0.36291 83.917 40.839-54.947v-27.538l-40.839 54.947z\" stroke=\"#000\" stroke-width=\"1.015\" fill=\"#ffffff\"></path>";
-    //var backward_2 = "";
-    //var forward_weft = "m41.049 35.707v20.832l-15.338 20.807h-25.205v-20.807l15.356-20.832h25.187z";
-   // var backward_weft = "m0.50586 35.709v20.832l15.338 20.807h25.205v-20.807l-15.356-20.832h-25.187z";
+    style = Meteor.my_functions.find_style(style_value);
 
-    var previous_style;
-
+    // find previous style
     if (row > 1)
     {
-      var previous_style_number = current_weaving_data[(row-1) + "_" + (tablet)].get();
+      var previous_style_value = current_weaving_data[(row-1) + "_" + (tablet)].get();
 
-      if (typeof previous_style_number !== "undefined")
-      {
-        if (previous_style_number.toString().charAt(0) == "S") // previous style is special
-        {
-          previous_style = {};
-//console.log("special previous " + previous_style_number);
-          switch (previous_style_number)
-          {
-            case "S1":
-            case "S10":
-            case "S3":
-            case "S12":
-              previous_style.warp = "forward";
-              break;
-
-            case "S2":
-            case "S9":
-            case "S4":
-            case "S11":
-              previous_style.warp = "backward";
-              break;
-
-            default:
-              console.log("unhandled special style");
-              break;
-          } 
-          //console.log("special previous warp " + previous_style.warp);
-        }
-        else // previous style is regular
-        {
-          previous_style = current_styles.list()[previous_style_number-1];
-        }
+      var previous_style = Meteor.my_functions.find_style(previous_style_value)
       
-        if (style_value == "S15") // idle tablet, use previous row
-          style_value = previous_style_number;
-      }
-        
-
-      // TODO check if previous style is special
+      if (style.name == "idle") // idle tablet, use previous row
+        style = Meteor.my_functions.find_style(previous_style_value);
     }
 
+    data.special = style.special;
+
+    // has the twining direction reversed?
+    var reversal = false;
+    if ((style.warp == "forward") && (previous_style.warp == "backward"))
+      reversal = true;
+
+    if ((style.warp == "backward") && (previous_style.warp == "forward"))
+      reversal = true;
+
     // shape
-    if (style_value.toString().charAt(0) == "S")
+    if (style.special)
     {
-      //console.log("special style " + row + ", " + tablet);
-      //console.log("style is " + style_value.toString());
-      data.special = true;
-      //data.style = style_value;
-      switch (style_value)
+      switch (style.name)
       {
-        case "S1":
-        case "S10":
-          data.shape = "forward_2";
+        case "forward_2":
+        case "forward_2_gray":
+          if(reversal)
+            data.shape = "triangle_left_2";
+          else
+            data.shape = "forward_2";
           break;
 
-        case "S2":
-        case "S9":
-          data.shape = "backward_2";
+        case "backward_2":
+        case "backward_2_gray":
+          if(reversal)
+            data.shape = "triangle_right_2";
+          else
+            data.shape = "backward_2";
           break;
 
-        case "S3":
-        case "S12":
+        case "forward_3":
+        case "forward_3_gray":
           data.shape = "forward_3";
           break;
 
-        case "S4":
-        case "S11":
+        case "backward_3":
+        case "backward_3_gray":
           data.shape = "backward_3";
+          break;
+
+        case "forward_4":
+        case "forward_4_gray":
+          data.shape = "forward_4";
+          break;
+
+        case "backward_4":
+        case "backward_4_gray":
+          data.shape = "backward_4";
           break;
       }  
 
       return data;
     }
 
-    // regular style
-    var style_number = style_value;
-    var style = current_styles.list()[style_number-1];
 //console.log("current style is " + style_value);
- /*    if (previous_style)
-   {
-      
-      console.log("previous warp " + previous_style.warp);
-    }*/
 
     switch(style.warp)
     {
       case "forward":
-        if (!previous_style)
-        {
-          data.shape = forward;
-        }
+        if (reversal)
+          data.shape = triangle_left;
+
         else
-        {
-          // if previous style has no warp, go back until you find one
-          // same for 'backward'
-          // if no warp ever found, use current
-          if (previous_style.warp == "backward")
-            data.shape = triangle_left;
+          data.shape = forward;
 
-
-          else
-            data.shape = forward;
-        }
         break;
 
       case "backward":
-        if (!previous_style)
+        if (reversal)
+          data.shape = triangle_right;
+
+        else
           data.shape = backward;
 
-        else {
-          if (previous_style.warp == "forward")
-            data.shape = triangle_right;
-
-          else
-            data.shape = backward;
-        }
         break;
 
       case "none": // a regular style with no warp is assumed to be a brocade pattern
