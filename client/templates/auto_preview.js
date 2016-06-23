@@ -206,12 +206,15 @@ Template.auto_preview_element.helpers({
     var row_up = Session.get("number_of_rows") - row;
     data.y_offset = ((row_up) * unit_height/2);
  
-    // regular styles
+    // regular styles are a single simple path so can be returned as data
     var forward = "m0.51 111.54 40.545-55v-55l-40.545 55z";
     var backward = "m41.05 111.54-40.545-55v-55l40.545 55z";
     var triangle_right = "m0.51 1.54-0.0006 110 40.545-55z";
     var triangle_left = "m41.18 1.54 0.0006 110-40.545-55z";
     var block = "m41.05 85.54h-40.545v-54.999h40.545z";
+    var v_left = "m29.922 85.614h-29.491v-55.147h29.491z";
+    var v_right = "m41.121 85.614h-29.491v-55.147h29.491z";
+    var v_center = "m35.721 85.614h-29.491v-55.147h29.491z";
 
     style = Meteor.my_functions.find_style(style_value);
 
@@ -259,22 +262,34 @@ Template.auto_preview_element.helpers({
 
         case "forward_3":
         case "forward_3_gray":
-          data.shape = "forward_3";
+          if(reversal)
+            data.shape = "triangle_left_3";
+          else
+            data.shape = "forward_3";
           break;
 
         case "backward_3":
         case "backward_3_gray":
-          data.shape = "backward_3";
+          if(reversal)
+            data.shape = "triangle_right_3";
+          else
+            data.shape = "backward_3";
           break;
 
         case "forward_4":
         case "forward_4_gray":
-          data.shape = "forward_4";
+           if(reversal)
+            data.shape = "triangle_left_4";
+          else
+            data.shape = "forward_4";
           break;
 
         case "backward_4":
         case "backward_4_gray":
-          data.shape = "backward_4";
+          if(reversal)
+            data.shape = "triangle_right_4";
+          else
+            data.shape = "backward_4";
           break;
       }  
 
@@ -314,6 +329,18 @@ Template.auto_preview_element.helpers({
       case "backward_empty": // leave empty to show weft
         break;
 
+      case "v_left": // Laceby style pickup warp at left
+        data.shape = v_left;
+        break;
+
+      case "v_right": // Laceby style pickup warp at right
+        data.shape = v_right;
+        break;
+
+      case "v_center": // Laceby style pickup warp at center
+        data.shape = v_center;
+        break;
+
       default:
         if (!previous_style)
           return data;
@@ -330,8 +357,11 @@ Template.auto_preview_element.helpers({
     }
 
     // colour
-    if ((style.warp == "forward") || (style.warp == "backward"))
-      //|| (style.warp == "forward_empty")|| (style.warp == "backward_empty"))
+    if ((style.warp == "forward")
+      || (style.warp == "backward")
+      || (style.warp == "v_left")
+      || (style.warp == "v_right")
+      || (style.warp == "v_center"))
     {
       data.color = style.line_color;
     }

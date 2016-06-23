@@ -367,7 +367,7 @@
 .edit_style .warps {
   float: left;
   overflow: hidden;
-  margin-left: 8px;
+  margin-top: 4px;
   border: 1px solid black;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;

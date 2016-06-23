@@ -144,7 +144,8 @@ Meteor.methods({
         data.weaving[i] = new Array(options.number_of_tablets);
         for (var j=0; j<options.number_of_tablets; j++)
         {
-          data.weaving[i][j] = (j >= options.number_of_tablets/2) ? 19 :20; // warp twined
+          //data.weaving[i][j] = (j >= options.number_of_tablets/2) ? 19 :20; // warp twined
+          data.weaving[i][j] = ((j % 2) == 0) ? 5 :6;
         }
       }
 
@@ -156,7 +157,7 @@ Meteor.methods({
         data.threading[i] = new Array(options.number_of_tablets);
         for (var j=0; j<options.number_of_tablets; j++)
         {
-          data.threading[i][j] = 10; // plain yellow in default pattern
+          data.threading[i][j] = 2; // plain yellow in default pattern
         }
       }
 
