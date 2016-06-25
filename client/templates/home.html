@@ -122,9 +122,15 @@
 <a href="{{pathFor route='pattern'}}">
 <h3 title="{{name}}">{{name}}</h3>
 <div class="description">{{description}}</div>
+
+{{#if tags.length}}
 <div class="tags" title="{{tags}}">{{#each tags}}<span>{{this}}</span>{{/each}}</div>
+{{/if}}
+
 <div class="stats"><span class="number_of_tablets" title="Number of tablets"><span class="icon"></span><span class="text">{{number_of_tablets}}</span></span></div>
-<div class="image" style="background-image: url('{{preview_url}}')"></div>
+<!--<img src="{{auto_preview_svg}}" />-->
+<div class="image auto_preview {{auto_preview_rotation}}" style="background-image: url('{{auto_preview_svg}}')"></div>
+<!--<div class="image" style="background-image: url('{{preview_url}}')"></div>-->
 </a></div>
 <div class="footer"><a href="{{pathFor route='user' _id=created_by}}" class="created_by">{{created_by_username}}</a>{{#if can_edit_pattern _id}}
 <a href="#" id="delete" title="Delete this pattern"><span></span></a>

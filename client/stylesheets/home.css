@@ -132,6 +132,11 @@ ul.patterns .pattern_thumbnail .main {
   height: 160px;
 }
 
+ul.patterns .pattern_thumbnail .main a {
+  display:block;
+  height: 163px;
+}
+
 ul.patterns .pattern_thumbnail a {
   text-decoration: none;
   color: #333333;
@@ -164,10 +169,14 @@ ul.patterns .pattern_thumbnail .description {
 ul.patterns .pattern_thumbnail .tags {
   overflow: hidden;
   height: 24px;
-  margin: 0 0 8px 0;
+  margin: 0 0 4px 0;
   text-overflow: ellipsis;
   white-space: pre-line;
   cursor: pointer;
+  float: left;
+  background: rgba(51,51,51,0.6);
+  padding: 0 4px 0 4px;
+  border-radius: 4px;
 }
 
 ul.patterns .pattern_thumbnail .tags span::after {
@@ -175,7 +184,7 @@ ul.patterns .pattern_thumbnail .tags span::after {
 }
 
 ul.patterns .pattern_thumbnail .tags span {
-  color: #666666;
+  color: #FFFFFF;
   padding-right: 4px;
   font-size: 14px;
 }
@@ -183,13 +192,18 @@ ul.patterns .pattern_thumbnail .tags span {
 ul.patterns .pattern_thumbnail .stats {
   font-size: 14px;
   line-height: 1.2;
+  clear: both;
+  float: left;
+  background: rgba(51,51,51,0.6);
+  padding: 4px;
+  border-radius: 4px;
 }
 
 ul.patterns .pattern_thumbnail .number_of_tablets .icon {
   float: left;
   width: 16px;
   height: 16px;
-  background: url("../images/tablet_count.svg") #FFFFFF no-repeat right 0 top 0;
+  background: url("../images/tablet_count_white.svg") transparent no-repeat right 0 top 0;
   background-size: 16px 16px;
 }
 
@@ -199,7 +213,7 @@ ul.patterns .pattern_thumbnail .number_of_tablets {
 
 ul.patterns .pattern_thumbnail .number_of_tablets .text {
   padding-left: 4px;
-  color: #5F6A96;
+  color: #FFFFFF;
   font-weight: bold;
   font-size: inherit;
 }
@@ -213,6 +227,40 @@ ul.patterns .pattern_thumbnail .image {
   background-position:center center; 
   background-repeat:no-repeat; 
 }
+
+ul.patterns .pattern_thumbnail .image.auto_preview {
+  position: absolute;
+  bottom: 1px;
+  width:106px;
+  height:248px;
+  margin-left: -114px;
+  background-size:contain; 
+  background-position:center center; 
+  background-repeat:no-repeat;
+  background-color: #333333;
+  z-index:-1;
+
+  -ms-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+
+  -webkit-transform-origin: 100% 100%;
+  -moz-transform-origin: 100% 100%;
+  -o-transform-origin: 100% 100%;
+  transform-origin: 100% 100%;
+}
+
+ul.patterns .pattern_thumbnail .image.auto_preview.left {
+  margin-left: 240px;
+
+  -ms-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+
+  transform-origin: 0 100%;
+}
+
+
 
 ul.patterns li .footer {
   position: absolute;

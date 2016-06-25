@@ -1330,6 +1330,7 @@ Meteor.my_functions = {
         {
           Meteor.my_functions.update_after_tablet_change();
         }
+        Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     
     Session.set('edited_pattern', true);

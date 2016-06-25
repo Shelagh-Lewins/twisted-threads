@@ -72,7 +72,7 @@ Template.auto_preview.helpers({
         break;
 
       default:
-        return "left";
+        return "right";
     }
   },
   rotation_correction: function() {
@@ -107,7 +107,9 @@ Template.auto_preview.helpers({
         return "width: " + total_width + "px; position: relative; height: " + total_height + "px; ";
 
       default:
-        return "margin-top: " + total_width + "px; height: 0;"; // left
+        var total_height = Template.instance().image_height() * scaling;
+        return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
+        //return "margin-top: " + total_width + "px; height: 0;"; // left
     }
   },
   spinner_style: function() {
@@ -184,6 +186,7 @@ Template.auto_preview_weft.helpers({
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
     var cell = current_weaving_data[(row) + "_" + (tablet)];
+    //if (row != 7) return;
 
     if (typeof cell === "undefined")
       return;
@@ -199,6 +202,12 @@ Template.auto_preview_element.helpers({
     var style;
     var previous_style = {};
     var data = {};
+/*if (row == 7)
+{  
+  console.log("***");
+  console.log("row " + 7);
+}*/
+
 
     // position of element
     data.x_offset = ((tablet - 1) * unit_width);
@@ -292,7 +301,10 @@ Template.auto_preview_element.helpers({
             data.shape = "backward_4";
           break;
       }  
-
+/*if (row == 7)
+{  
+  console.log("special");
+}*/
       return data;
     }
 
@@ -377,6 +389,11 @@ Template.auto_preview_element.helpers({
         data.color = previous_style.line_color;
     }
 //console.log("color is " + data.color);
+/*if (row == 7)
+{  
+  console.log("***");
+  console.log("data " + JSON.stringify(data));
+}*/
     return data;
   }
 });
