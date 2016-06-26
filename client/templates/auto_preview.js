@@ -238,6 +238,19 @@ Template.auto_preview_element.helpers({
         style = Meteor.my_functions.find_style(previous_style_value);
     }
 
+    if (row == 1) // idle tablet in first row, try showing next row
+    {
+      var next_style_value = current_weaving_data[(row+1) + "_" + (tablet)].get();
+
+      if (typeof next_style_value !== "undefined")
+      {
+        //var next_style = Meteor.my_functions.find_style(next_style_value)
+        
+        if (style.name == "idle") // idle tablet, use previous row
+          style = Meteor.my_functions.find_style(next_style_value);
+      }
+    }
+
     data.special = style.special;
 
     // has the twining direction reversed?

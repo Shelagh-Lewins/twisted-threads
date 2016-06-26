@@ -1,3 +1,7 @@
+body.view_pattern .auto_preview {
+    margin: 0 0 10px 0;
+}
+
 .auto_preview.down,
 .auto_preview.up {
     float:right;
@@ -36,5 +40,23 @@
     left: 100%;
     position: relative;
     top: 100%;
+}
+
+.auto_preview .holder {
+    clear: both;
+}
+
+/* *** Weft color *** */
+#weft_color {
+  clear: both;
+  width: 160px;
+  margin: 0 0 10px 0;
+  float: left;
+}
+
+#weft_color .text {
+  float: left;
+  margin: 0 10px 0 0;
+  line-height: 24px;
 }
 

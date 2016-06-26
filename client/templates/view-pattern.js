@@ -9,6 +9,12 @@ Template.view_pattern.rendered = function() {
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
 
+  if (Router.current().params.mode)
+    Session.set('view_pattern_mode', Router.current().params.mode);
+
+  else
+    Session.set('view_pattern_mode', "summary");
+
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll
@@ -62,12 +68,25 @@ Template.remove_row.helpers({
 Template.view_pattern.helpers({
   /////////////////////
   // pattern
-  view_full_pattern: function() {
+  /*view_full_pattern: function() {
     if (Session.equals('view_full_pattern', true))
       return true;
 
     else
       return false;
+  },*/
+  mode: function() {
+  if (Router.current().params.mode == "charts")
+    return "charts";
+  else
+    return "summary"; // default if no mode specified
+  },
+  is_selected_main_tab: function(mode) {
+    if (Router.current().params.mode == mode)
+      return "selected";
+
+    if ((typeof Router.current().params.mode === "undefined") && (mode == "summary"))
+      return "selected"; // default if no mode specified
   },
   can_remove_tablets: function() {
     // is there more than 1 tablet?
@@ -131,17 +150,34 @@ Template.view_pattern.helpers({
   // pattern preview, if any
   'pattern_preview': function() {
     var pattern_id = Router.current().params._id;
-    return Images.find({$and: [
-      { used_by: pattern_id },
-      { role: "preview"}]
+    return Images.find({$and:
+      [
+        { used_by: pattern_id },
+        { role: "preview"}
+      ]
     });
   },
-  // other pattern images, if any
-  'pattern_image': function() {
+  // non-preview pattern images, if any
+  /*'pattern_image': function() {
     var pattern_id = Router.current().params._id;
     return Images.find({$and: [
       { used_by: pattern_id },
       { role: "image"}]
+    });
+  },*/
+  // all pattern images, whether preview or not
+  'pattern_image': function() {
+    var pattern_id = Router.current().params._id;
+    return Images.find({$and: 
+      [
+        { used_by: pattern_id },
+        { $or:
+          [
+            { role: "image"},
+            { role: "preview"}
+          ]
+        }
+      ]
     });
   }
 });
@@ -360,6 +396,17 @@ Template.styles_palette.helpers({
 });
 
 Template.view_pattern.events({
+  /*"click #main_tabs .summary": function () {
+      //Session.set('view_pattern_summary', true);
+
+      var pattern_id = Router.current().params._id;
+  },*/
+  "click #main_tabs .summary a": function() {
+    Session.set('view_pattern_mode', "summary");
+  },
+  "click #main_tabs .charts a": function() {
+    Session.set('view_pattern_mode', "charts");
+  },
   // Make pattern private / public
   "click .toggle_private": function () {
       Meteor.call("set_private", this._id, !this.private);
@@ -538,28 +585,5 @@ Template.view_pattern.events({
     Meteor.call('toggle_hole_handedness', pattern_id);
   }
 });
-/*
-Template.styles_palette.events({
-  'click .edit_style .warps .forward': function() {
-    Meteor.my_functions.edit_style_warp("forward");
-  },
-  'click .edit_style .warps .backward': function() {
-    Meteor.my_functions.edit_style_warp("backward");
-  },
-  'click .edit_style .warps .v_left': function() {
-    Meteor.my_functions.edit_style_warp("v_left");
-  },
-  'click .edit_style .warps .v_center': function() {
-    Meteor.my_functions.edit_style_warp("v_center");
-  },
-  'click .edit_style .warps .v_right': function() {
-    Meteor.my_functions.edit_style_warp("v_right");
-  },
-  'click .edit_style .warps .forward_empty': function() {
-    Meteor.my_functions.edit_style_warp("forward_empty");
-  },
-  'click .edit_style .warps .backward_empty': function() {
-    Meteor.my_functions.edit_style_warp("backward_empty");
-  }
- });*/
+
 

@@ -244,7 +244,7 @@ Meteor.my_functions = {
       else
       {
         
-        Router.go('pattern', { _id: result, mode: "full" });
+        Router.go('pattern', { _id: result, mode: "charts" });
       }
     });
   },

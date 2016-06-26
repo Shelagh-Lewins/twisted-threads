@@ -3,119 +3,132 @@
 {{> pattern_as_text}}
 {{> warp_svgs}}
 
-<div class="pattern_info">
-<div class="name">
-{{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
+<div id="main_tabs">
+<ul>
+  <li class="summary {{is_selected_main_tab "summary"}}"><a href="{{pathFor route='pattern' mode="summary"}}">Summary</a></li>
+  <li class="charts {{is_selected_main_tab "charts"}}"><a href="{{pathFor route='pattern' mode="charts"}}">Threading and weaving charts</a></li>
+</ul>
 </div>
 
-<div class="box summary">
-<span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
+<div class="pattern_info">
+  <div class="name">
+  {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
+  </div>
 </div>
-<br>
-{{#if can_edit_pattern _id}}
-  {{#if isInRole 'verified' 'users'}}
-    {{#if image_limit_reached}}
-      You have added the maximum allowed number of pictures to this pattern.
-    {{else}}
-      {{#if show_image_uploader}}
-        {{> image_uploader}}
-      {{else}}
-        <button class="show_image_uploader">Add pictures</button>
-      {{/if}}
-    {{/if}}
-  {{else}}
-    In order to add images, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a>
-  {{/if}}
-{{/if}}
-<div id="pattern_preview">
-{{#each pattern_preview}}
-  {{> image}}
-{{/each}}
-</div>
-<div id="pattern_images">
-{{#each pattern_image}}
-  {{> image}}
-{{/each}}
-</div>
-<div class="clearing"></div>
 
 {{> auto_preview}}
 
-<div id="weft_color">
-  <span class="text">Weft color</span>
-<div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
-</div>
+{{#if equals view_pattern_mode "summary"}}
+  <div class="pattern_info">
+    <div class="box summary">
+  <span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
+  </div>
+  <br>
+  {{#if can_edit_pattern _id}}
+    {{#if isInRole 'verified' 'users'}}
+      {{#if image_limit_reached}}
+        You have added the maximum allowed number of pictures to this pattern.
+      {{else}}
+        {{#if show_image_uploader}}
+          {{> image_uploader}}
+        {{else}}
+          <button class="show_image_uploader">Add pictures</button>
+        {{/if}}
+      {{/if}}
+    {{else}}
+      In order to add images, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a>
+    {{/if}}
+  {{/if}}
+  <!--<div id="pattern_preview">
+  {{#each pattern_preview}}
+    {{> image}}
+  {{/each}}
+  </div>-->
+  <div id="pattern_images">
+  {{#each pattern_image}}
+    {{> image}}
+  {{/each}}
+  </div>
+  <div class="clearing"></div>
 
-{{#if can_edit_pattern _id}}<div class="box private">
-<div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
-<div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
-</div>{{/if}}
 
-{{> editable_field extendContext collection="patterns" property="description" data=description multiple=true button_text="Edit description" placeholder_text="Tap \"Edit description\" to enter a description"}}
 
-{{#if can_edit_pattern _id}}
-<div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
-{{else}}
-<div class="box tags">{{> tags}}</div>
+  {{#if can_edit_pattern _id}}<div class="box private">
+  <div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
+  <div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
+  </div>{{/if}}
+
+  {{> editable_field extendContext collection="patterns" property="description" data=description multiple=true button_text="Edit description" placeholder_text="Tap \"Edit description\" to enter a description"}}
+
+  {{#if can_edit_pattern _id}}
+  <div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
+  {{else}}
+  <div class="box tags">{{> tags}}</div>
+  {{/if}}
+  </div>
+
 {{/if}}
-</div>
 
-{{#if view_full_pattern}}
-<h2>Weaving Chart</h2>
-<div class="pattern_info">
-{{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
-</div>
+{{#if equals view_pattern_mode "charts"}}
+  <h2>Weaving Chart</h2>
 
-{{#if can_edit_pattern _id}}
-<div id="toolbar" ><div class="inner_tube">
-<button id="undo" disabled="{{undo_disabled}}" title="Undo">
-{{#if equals undo_disabled "disabled"}}
-<img src="../images/undo_disabled.svg" onerror="this.src='/images/undo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
-<img src="../images/undo.svg" onerror="this.src='/images/undo.png';this.onerror=null;" width="32" height="32" >
-{{/if}}</button>
-<button id="redo" disabled="{{redo_disabled}}" title="Redo">
-{{#if equals redo_disabled "disabled"}}
-<img src="../images/redo_disabled.svg" onerror="this.src='/images/redo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
-<img src="../images/redo.svg" onerror="this.src='/images/redo.png';this.onerror=null;" width="32" height="32" >
-{{/if}}</button>
-<button id="add_row_at_start" title="Add row at bottom"><img src="/images/row_bottom.svg" onerror="this.src='/images/row_bottom.png';this.onerror=null;" width="32" height="32" ></button>
-<button id="add_row_at_end" title="Add row at top"><img src="/images/row_top.svg" onerror="this.src='/images/row_top.png';this.onerror=null;" width="32" height="32" ></button>
-<button id="add_tablet_at_start" title="Add tablet at left"><img src="/images/tablet_left.svg" onerror="this.src='/images/tablet_left.png';this.onerror=null;" width="32" height="32" ></button>
-<button id="add_tablet_at_end" title="Add tablet at right"><img src="/images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
-</div></div>{{/if}}
-<div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
-{{> column_numbers}}
-{{#each row_indexes}}
-{{> pattern_row}}
-{{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
-{{#each tablet_indexes}}
-{{> remove_tablet}}
-{{/each}}</ul></div>{{/if}}
-</div>
+  <div class="pattern_info">
+  {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
+  </div>
 
-<h2>Tablets</h2>
-<div class="pattern_info">
-  {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
-</div>
-<div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
-{{#each hole_indexes}}
-  {{> threading_row}}
-{{/each}}
-{{> orientation}}
-</div>
-<br/>
-<div class="notation">
-<img src="{{#if equals hole_handedness "clockwise"}}/images/tablet_labels.png{{else}}/images/tablet_labels_rev.png{{/if}}" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
-</div>
-{{#if can_edit_pattern _id}}
-<button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
+  {{#if can_edit_pattern _id}}
+  <div id="toolbar" ><div class="inner_tube">
+  <button id="undo" disabled="{{undo_disabled}}" title="Undo">
+  {{#if equals undo_disabled "disabled"}}
+  <img src="../images/undo_disabled.svg" onerror="this.src='/images/undo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
+  <img src="../images/undo.svg" onerror="this.src='/images/undo.png';this.onerror=null;" width="32" height="32" >
+  {{/if}}</button>
+  <button id="redo" disabled="{{redo_disabled}}" title="Redo">
+  {{#if equals redo_disabled "disabled"}}
+  <img src="../images/redo_disabled.svg" onerror="this.src='/images/redo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
+  <img src="../images/redo.svg" onerror="this.src='/images/redo.png';this.onerror=null;" width="32" height="32" >
+  {{/if}}</button>
+  <button id="add_row_at_start" title="Add row at bottom"><img src="/images/row_bottom.svg" onerror="this.src='/images/row_bottom.png';this.onerror=null;" width="32" height="32" ></button>
+  <button id="add_row_at_end" title="Add row at top"><img src="/images/row_top.svg" onerror="this.src='/images/row_top.png';this.onerror=null;" width="32" height="32" ></button>
+  <button id="add_tablet_at_start" title="Add tablet at left"><img src="/images/tablet_left.svg" onerror="this.src='/images/tablet_left.png';this.onerror=null;" width="32" height="32" ></button>
+  <button id="add_tablet_at_end" title="Add tablet at right"><img src="/images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
+  </div></div>{{/if}}
+  <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
+  {{> column_numbers}}
+  {{#each row_indexes}}
+  {{> pattern_row}}
+  {{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
+  {{#each tablet_indexes}}
+  {{> remove_tablet}}
+  {{/each}}</ul></div>{{/if}}
+  </div>
+
+  <h2>Tablets</h2>
+  <div class="pattern_info">
+    {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
+  </div>
+  <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
+  {{#each hole_indexes}}
+    {{> threading_row}}
+  {{/each}}
+  {{> orientation}}
+  </div>
+  <br/>
+
+  <div class="notation">
+  <img src="{{#if equals hole_handedness "clockwise"}}/images/tablet_labels.png{{else}}/images/tablet_labels_rev.png{{/if}}" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
+  </div>
+  {{#if can_edit_pattern _id}}
+  <button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
+  {{/if}}
+  {{else}}
+  <!--<div id="view_full_pattern">
+    <button title="Show pattern">Show threading and weaving charts</button>
+    <p><br>Large patterns may take several seconds to load</p>
+  </div>-->
 {{/if}}
-{{else}}
-<div id="view_full_pattern">
-  <button title="Show pattern">Show threading and weaving charts</button>
-  <p><br>Large patterns may take several seconds to load</p>
-</div>
-{{/if}}{{/if}}
+
+{{/if}}
 </template>
 
 <template name="pattern_row">

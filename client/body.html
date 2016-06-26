@@ -40,7 +40,11 @@
       
       {{#if pattern_exists _id}}
         {{#if is_weaving}}
-          <a href="{{pathFor route='pattern'}}" id="stop_weaving">Stop weaving</a>
+        {{#if equals view_pattern_mode "charts"}}
+          <a href="{{pathFor route='pattern' mode='charts'}}" id="stop_weaving">Stop weaving</a>
+        {{else}}
+          <a href="{{pathFor route='pattern' mode='summary'}}" id="stop_weaving">Stop weaving</a>
+        {{/if}}
         {{else}}
           <a href="{{pathFor route='pattern' mode="weaving"}}" id="start_weaving">Start weaving</a>
         {{/if}}

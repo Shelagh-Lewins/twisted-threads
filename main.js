@@ -229,8 +229,11 @@ if (Meteor.isClient) {
 
   // *** has the user permission to create a new pattern? *** //
   UI.registerHelper('can_create_pattern', function(){
-
     return Meteor.my_functions.can_create_pattern();
+  });
+
+  UI.registerHelper('view_pattern_mode', function(){
+    return Session.get('view_pattern_mode');
   });
 
   Template.left_column.helpers({

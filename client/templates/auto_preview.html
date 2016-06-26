@@ -1,6 +1,13 @@
 <template name="auto_preview">
 <div class="auto_preview {{preview_rotation}}">
-<button class="rotate_preview">Rotate</button>
+
+
+  <div id="weft_color">
+    <span class="text">Weft color</span>
+    <div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
+  </div>
+
+  <button class="rotate_preview">Rotate preview</button>
 
 <div class="holder" style="{{rotation_correction}}">
 
