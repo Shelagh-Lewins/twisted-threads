@@ -5,7 +5,61 @@
 }
 
 /* Main tabs */
-.view_pattern #main_tabs {
+.view_pattern #main_tabs ul { /* general settings */
+  text-align: left;
+  font-size: 0;
+  margin: 0;
+  padding: 0;
+  padding-left: 20px;
+  list-style-type: none;
+}
+
+.view_pattern #main_tabs ul li { 
+  margin: 0;
+  margin-right: 2px;
+  padding: 0;
+  display: inline;
+}
+
+.view_pattern #main_tabs ul li a { /* settings for all tab links */
+  padding: 0 10px;
+  display: inline-block;
+  font-size: 16px;
+  line-height: 32px;
+  text-decoration: none;
+  color: #666666;
+  background: #DDDDDD;
+  outline: none;
+  border: 1px solid #7580ac;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  position: relative;
+}
+
+.view_pattern #main_tabs ul li.selected a { /* settings for selected tab link */
+  color: #424A6C;
+  border-color: #7580ac;
+  background: #EEEEEE;
+  z-index: 3;
+}
+
+.view_pattern #main_tabs .keyline {
+  border: none;
+  border-top: 1px solid #7580ac;
+  border-radius: 0;
+  background-color: #eeeeee;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  margin-top: -1px;
+  font-size: 1px;
+}
+
+.view_pattern #main_tabs ul li aa:hover { /* settings for hover effect */
+background: #fff; /* set desired hover color */
+}
+/*.view_pattern #main_tabs {
   display: block;
   padding: 0;
   margin: 0 0 8px 0;
@@ -49,10 +103,6 @@
   border-top--leftradius: 12px;
 }
 
-.view_pattern #main_tabs li:last-child a {
-
-}
-
 .view_pattern #main_tabs .selected a {
   background-color: #FFFFFF;
   color: #424A6C;
@@ -60,8 +110,8 @@
   border-top: 1px solid #7580ac;
   border-right: 1px solid #7580ac;
   border-left: 1px solid #7580ac;
-}
-
+}*/
+/*
 .view_pattern #main_tabs .selected a::after {
   content: " ";
   position: absolute;
@@ -69,7 +119,7 @@
   height: 1px;
   width: 100%;
   top: 104%;
-}
+}*/
 
 /* content */
 .view_pattern.editable #content {
