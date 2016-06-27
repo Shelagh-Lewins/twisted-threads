@@ -25,6 +25,13 @@
   <span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
   </div>
   <br>
+
+  {{#if can_edit_pattern _id}}
+  <div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
+  {{else}}
+  <div class="box tags">{{> tags}}</div>
+  {{/if}}
+  <br>
   {{#if can_edit_pattern _id}}
     {{#if isInRole 'verified' 'users'}}
       {{#if image_limit_reached}}
@@ -61,17 +68,17 @@
 
   {{> editable_field extendContext collection="patterns" property="description" data=description multiple=true button_text="Edit description" placeholder_text="Tap \"Edit description\" to enter a description"}}
 
-  {{#if can_edit_pattern _id}}
-  <div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
-  {{else}}
-  <div class="box tags">{{> tags}}</div>
-  {{/if}}
   </div>
 
 {{/if}}
 
 {{#if equals view_pattern_mode "charts"}}
   <h2>Weaving Chart</h2>
+
+  <div class="hint">
+    {{#if can_create_pattern}}Select styles from the palette at the bottom of the screen, then click chart cells to set their style.<br>{{/if}}
+    Select "Start weaving" to step through the pattern rows one by one as you weave.
+  </div>
 
   <div class="pattern_info">
   {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}

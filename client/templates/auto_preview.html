@@ -2,12 +2,7 @@
 <div class="auto_preview {{preview_rotation}}">
 
 
-  <div id="weft_color">
-    <span class="text">Weft color</span>
-    <div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
-  </div>
 
-  <button class="rotate_preview">Rotate preview</button>
 
 <div class="holder" style="{{rotation_correction}}">
 
@@ -23,6 +18,19 @@
   </svg>
 
 </div>
+
+  <div id="weft_color">
+    <span class="text">Weft color</span>
+    {{#if can_edit_pattern _id}}
+    <div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
+    {{else}}
+    <div class="weft_color" style="background-color: {{weft_color}}; float: left; width: 24px; height: 24px; border: 1px solid #7580ac;">&nbsp;</div>
+    {{/if}}
+  </div>
+
+  {{#if can_edit_pattern _id}}
+  <button class="rotate_preview">Rotate preview</button>
+  {{/if}}
 
 </div>
 </template>

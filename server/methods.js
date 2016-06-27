@@ -201,7 +201,7 @@ Meteor.methods({
     if (typeof data.weaving_notes !== "undefined")
       weaving_notes = data.weaving_notes;
 
-    var weft_color = "#76a5af";
+    var weft_color = Meteor.settings.private.default_weft_color;
     if (typeof data.weft_color !== "undefined")
       weft_color = data.weft_color;
 

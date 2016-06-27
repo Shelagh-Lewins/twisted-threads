@@ -50,6 +50,11 @@ Template.auto_preview.helpers({
     if (typeof pattern.auto_preview === "string")
       return pattern.auto_preview;
   },*/
+  weft_color: function() {
+    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {weft_color: 1}});
+
+    return pattern.weft_color;
+  },
   preview_rotation: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 

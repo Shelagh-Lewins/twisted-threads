@@ -749,6 +749,7 @@ Meteor.my_functions = {
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.initialize_background_color_picker();
       Meteor.my_functions.initialize_warp_color_picker();
+      Meteor.my_functions.initialize_weft_color_picker();
     });
   },
   undo: function(pattern_id)
@@ -1436,7 +1437,23 @@ Meteor.my_functions = {
       var pattern = Patterns.findOne({_id:pattern_id}, {fields: {weft_color: 1}})
       //console.log("id " + pattern_id);
       var color = pattern.weft_color;
-      //console.log("weft color " + color);
+      console.log("weft color " + color);
+
+      if (typeof color === "undefined") // pattern was created before weft color was added
+      {
+        color = Meteor.settings.public.default_weft_color; // default for new patterns
+        console.log("weft color now " + color);
+
+        var pattern_id = Router.current().params._id;
+
+        weft_color.set(color);
+
+        // update database
+        Meteor.my_functions.save_weft_color_as_text(pattern_id, color);
+
+        // store style for undo stack
+        Meteor.my_functions.store_pattern(pattern_id);
+      }
 
       // Spectrum color picker
       // https://atmospherejs.com/ryanswapp/spectrum-colorpicker

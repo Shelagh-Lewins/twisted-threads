@@ -5,6 +5,7 @@
 }
 
 /* Main tabs */
+/* http://www.menucool.com/horizontal/tab-menu#view4 */
 .view_pattern #main_tabs ul { /* general settings */
   text-align: left;
   font-size: 0;
@@ -54,6 +55,7 @@
   outline: none;
   margin-top: -1px;
   font-size: 1px;
+  max-width: 600px;
 }
 
 .view_pattern #main_tabs ul li aa:hover { /* settings for hover effect */
@@ -142,17 +144,9 @@ background: #fff; /* set desired hover color */
   margin: 0 0 16px 0;
 }
 
-#view_full_pattern {
-  text-align: center;
+.view_pattern .hint {
   max-width: 600px;
-  width: 100%;
-}
-
-#view_full_pattern button {
-  font-size: 18px;
-  line-height: 32px;
-  font-weight: bold;
-  padding: 0 16px 0 16px;
+  margin-bottom: 8px;
 }
 
 /* *** Pattern Info *** */
@@ -174,7 +168,7 @@ background: #fff; /* set desired hover color */
 
 /* public private */
 .pattern_info .controls {
-  border-bottom: 1px solid #424A6C;
+  border-bottom: 1px solid #7580ac;
   float: left;
   width: 100%;
 }

@@ -53,6 +53,11 @@
   margin-right: 16px;
 }
 
+#new_pattern .hint {
+  padding: 16px 16px 0 16px;
+  color: #424A6C;
+}
+
 /* *** Category header *** */
 .home h2 {
   margin-bottom: 8px;
