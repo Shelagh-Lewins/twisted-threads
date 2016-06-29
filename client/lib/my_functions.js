@@ -707,6 +707,11 @@ Meteor.my_functions = {
     data.threading = Meteor.my_functions.get_threading_as_text(data.number_of_tablets);
     data.orientation = Meteor.my_functions.get_orientation_as_text(pattern_id);
     data.styles = Meteor.my_functions.get_styles_as_text(pattern_id);
+    data.auto_preview = pattern.auto_preview;
+    /*setTimeout(function(){ 
+    data.auto_preview = pattern.auto_preview;
+    console.log("storing pattern " + pattern.auto_preview);
+  }, 2000);*/
 
     // remove any stored states after this point
     var splice_position = Session.get('undo_stack_position') + 1;
@@ -746,11 +751,14 @@ Meteor.my_functions = {
       return;
 
     Meteor.call('restore_pattern', data, function(){
+      //console.log("restore " + data.auto_preview);
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.initialize_background_color_picker();
       Meteor.my_functions.initialize_warp_color_picker();
       Meteor.my_functions.initialize_weft_color_picker();
+      Meteor.my_functions.save_preview_as_text(pattern_id);
     });
+
   },
   undo: function(pattern_id)
   {
@@ -1055,7 +1063,7 @@ Meteor.my_functions = {
   update_after_tablet_change: function()
   {
     var data = stored_patterns[stored_patterns.length-2];
-
+//console.log("change");
     number_of_tablets = data.number_of_tablets;
     number_of_rows = data.number_of_rows;
 
@@ -1403,13 +1411,13 @@ Meteor.my_functions = {
   },
   save_preview_as_text: function(pattern_id)
   {
+    //console.log("saving preview");
     // save the auto-generated preview to the database as a string
     // delay to allow the last cell to be rendered
     // It doesn't seem to be worth drawing this when patterns load, it's no quicker. and the whole thing has to be redrawn if you start editing. But it can be used outside the pattern view.
     setTimeout( function(){
       var data = $('.auto_preview .holder')[0].innerHTML;
       Meteor.call('save_preview_as_text', pattern_id, data);
-;
     }, 1000);
     
   },
@@ -1437,7 +1445,6 @@ Meteor.my_functions = {
       var pattern = Patterns.findOne({_id:pattern_id}, {fields: {weft_color: 1}})
       //console.log("id " + pattern_id);
       var color = pattern.weft_color;
-      console.log("weft color " + color);
 
       if (typeof color === "undefined") // pattern was created before weft color was added
       {

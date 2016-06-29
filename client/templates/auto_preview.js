@@ -31,7 +31,7 @@ Template.auto_preview.onCreated(function() {
 
 // extendContext is used in the template to supply the helper values to the child template.
 Template.auto_preview.helpers({
-  /*use_stored_preview: function() {
+  use_stored_preview: function() {
     if (Session.equals('edited_pattern', true))
     {
       return false;
@@ -49,7 +49,7 @@ Template.auto_preview.helpers({
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {auto_preview: 1}});
     if (typeof pattern.auto_preview === "string")
       return pattern.auto_preview;
-  },*/
+  },
   weft_color: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {weft_color: 1}});
 
@@ -158,7 +158,6 @@ Template.auto_preview.helpers({
 
 Template.auto_preview.events({
   "click .rotate_preview": function () {
-    console.log("clicked");
       Meteor.call("rotate_preview", this._id);
   }
 });
@@ -245,14 +244,17 @@ Template.auto_preview_element.helpers({
 
     if (row == 1) // idle tablet in first row, try showing next row
     {
-      var next_style_value = current_weaving_data[(row+1) + "_" + (tablet)].get();
-
-      if (typeof next_style_value !== "undefined")
+      if (typeof current_weaving_data[(row+1) + "_" + (tablet)] !== "undefined")
       {
-        //var next_style = Meteor.my_functions.find_style(next_style_value)
-        
-        if (style.name == "idle") // idle tablet, use previous row
-          style = Meteor.my_functions.find_style(next_style_value);
+        var next_style_value = current_weaving_data[(row+1) + "_" + (tablet)].get();
+
+        if (typeof next_style_value !== "undefined")
+        {
+          //var next_style = Meteor.my_functions.find_style(next_style_value)
+          
+          if (style.name == "idle") // idle tablet, use previous row
+            style = Meteor.my_functions.find_style(next_style_value);
+        }
       }
     }
 

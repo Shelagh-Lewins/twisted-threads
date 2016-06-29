@@ -1,38 +1,39 @@
 <template name="auto_preview">
+
 <div class="auto_preview {{preview_rotation}}">
 
+  <div class="holder" style="{{rotation_correction}}">
+    {{#if use_stored_preview}}
+    {{{stored_preview}}}
+    {{else}}
+    <svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{viewbox_width}} {{viewbox_height}}"  shape-rendering="geometricPrecision" width="{{total_width}}">
 
+    {{#each row_indexes}}
+      {{> auto_preview_weft_row}}
+    {{/each}}
 
+    {{#each row_indexes}}
+      {{> auto_preview_row}}
+    {{/each}}
+    </svg>
+    {{/if}}
 
-<div class="holder" style="{{rotation_correction}}">
-
-  <svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{viewbox_width}} {{viewbox_height}}"  shape-rendering="geometricPrecision" width="{{total_width}}">
-
-  {{#each row_indexes}}
-    {{> auto_preview_weft_row}}
-  {{/each}}
-
-  {{#each row_indexes}}
-    {{> auto_preview_row}}
-  {{/each}}
-  </svg>
+  </div>
 
 </div>
 
-  <div id="weft_color">
-    <span class="text">Weft color</span>
-    {{#if can_edit_pattern _id}}
-    <div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
-    {{else}}
-    <div class="weft_color" style="background-color: {{weft_color}}; float: left; width: 24px; height: 24px; border: 1px solid #7580ac;">&nbsp;</div>
-    {{/if}}
-  </div>
+<div id="weft_color">
+  <span class="text">Weft color</span>
+  {{#if can_edit_pattern _id}}
+  <div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
+  {{else}}
+  <div class="weft_color" style="background-color: {{weft_color}}; float: left; width: 24px; height: 24px; border: 1px solid #7580ac;">&nbsp;</div>
+  {{/if}}
+</div>
 
   {{#if can_edit_pattern _id}}
   <button class="rotate_preview">Rotate preview</button>
   {{/if}}
-
-</div>
 </template>
 
 <template name="auto_preview_weft_row">

@@ -418,6 +418,7 @@ Meteor.methods({
   },
   save_preview_as_text: function(pattern_id, data)
   {
+    //console.log("save preview as text " + data);
     check(pattern_id, String);
     check(data, String);
 
@@ -539,7 +540,11 @@ Meteor.methods({
     Meteor.call('save_weaving_as_text', data._id, JSON.stringify(data.weaving), data.number_of_rows, data.number_of_tablets);
     Meteor.call('save_threading_as_text', data._id, JSON.stringify(data.threading));
     Meteor.call('save_orientation_as_text', data._id, JSON.stringify(data.orientation));
-    Meteor.call('save_styles_as_text', data._id, JSON.stringify(data.styles)); 
+    Meteor.call('save_styles_as_text', data._id, JSON.stringify(data.styles));
+    Patterns.update({_id: data._id}, {$unset: {auto_preview: ""}}); // preview must be re-read from the HTML after it has been built
+    //Patterns.update({_id: data._id}, {$set: {auto_preview: data.auto_preview}});
+    //console.log("restore pattern " + data.auto_preview);
+   // Meteor.call('save_preview_as_text', data._id, data.auto_preview);
     return;
   },
   update_after_tablet_change: function(data) // required to restore reactivity after tablets have been added or removed

@@ -7,7 +7,15 @@ body.view_pattern .auto_preview {
     float:right;
 }
 
-.auto_preview svg { 
+body.view_pattern .auto_preview {
+  margin-top: -16px; /* I'd like to find out why this is necessary */
+}
+
+body.view_pattern .auto_preview.left {
+  margin-top: 0;
+}
+
+body.view_pattern .auto_preview svg { 
     -ms-transform: rotate(90deg);
     -webkit-transform: rotate(90deg);
     transform: rotate(90deg);
@@ -20,7 +28,7 @@ body.view_pattern .auto_preview {
     max-width: 600px;
 }
 
-.auto_preview.left svg { 
+body.view_pattern .auto_preview.left svg { 
     -ms-transform: rotate(-90deg);
     -webkit-transform: rotate(-90deg);
     transform: rotate(-90deg);
