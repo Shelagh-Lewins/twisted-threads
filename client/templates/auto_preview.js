@@ -32,6 +32,7 @@ Template.auto_preview.onCreated(function() {
 // extendContext is used in the template to supply the helper values to the child template.
 Template.auto_preview.helpers({
   use_stored_preview: function() {
+    console.log("use stored preview " + Session.get("edited_pattern"));
     if (Session.equals('edited_pattern', true))
     {
       return false;

@@ -528,10 +528,15 @@ body.loading {
 
 /* *** overlay spinner for loading template without changing route *** */
 #spinner_box {
+  display: none;
   position: absolute;
   z-index: 1000;
   left: 50%;
   top: 50%;
+}
+
+#spinner_box.loading {
+  display:block;
 }
 
 #spinner_box .inner_tube {

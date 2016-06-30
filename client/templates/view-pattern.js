@@ -8,6 +8,7 @@ Template.view_pattern.rendered = function() {
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
+  Session.set("loading", false);
 
   if (Router.current().params.mode)
     Session.set('view_pattern_mode', Router.current().params.mode);
@@ -68,13 +69,6 @@ Template.remove_row.helpers({
 Template.view_pattern.helpers({
   /////////////////////
   // pattern
-  /*view_full_pattern: function() {
-    if (Session.equals('view_full_pattern', true))
-      return true;
-
-    else
-      return false;
-  },*/
   mode: function() {
   if (Router.current().params.mode == "charts")
     return "charts";
@@ -87,6 +81,11 @@ Template.view_pattern.helpers({
 
     if ((typeof Router.current().params.mode === "undefined") && (mode == "summary"))
       return "selected"; // default if no mode specified
+  },
+  rendered: function() {
+    //console.log("firing");
+    Session.set("loading", false);
+    return true;
   },
   can_remove_tablets: function() {
     // is there more than 1 tablet?
@@ -396,16 +395,32 @@ Template.styles_palette.helpers({
 });
 
 Template.view_pattern.events({
-  /*"click #main_tabs .summary": function () {
-      //Session.set('view_pattern_summary', true);
-
-      var pattern_id = Router.current().params._id;
-  },*/
   "click #main_tabs .summary a": function() {
+
+    Session.set("loading", true);
+    var pattern_id = Router.current().params._id;
+
+    setTimeout(function(){
     Session.set('view_pattern_mode', "summary");
+    
+    Router.go('pattern', { _id: pattern_id, mode: "summary" });
+    //console.log("clicked");
+    }, 10);
+    //setTimeout(function(){Session.set('view_pattern_mode', "summary");}, 500);
+    
   },
   "click #main_tabs .charts a": function() {
-    Session.set('view_pattern_mode', "charts");
+    
+    Session.set("loading", true);
+    
+    var pattern_id = Router.current().params._id;
+    setTimeout(function(){
+      Router.go('pattern', { _id: pattern_id, mode: "charts" });
+      Session.set('view_pattern_mode', "charts");
+  }, 10);
+    
+    //console.log("clicked");
+    //setTimeout(function(){Session.set('view_pattern_mode', "charts");}, 500);
   },
   // Make pattern private / public
   "click .toggle_private": function () {

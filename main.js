@@ -48,7 +48,7 @@ if (Meteor.isClient) {
   Template.main_layout.helpers({
     loading: function(){
       if (Session.equals('loading', true))
-        return true;
+        return "loading";
     }
   });
 

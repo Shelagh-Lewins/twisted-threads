@@ -1733,6 +1733,8 @@ Meteor.my_functions = {
   // set up and draw the view pattern. This must be refreshed if the user switches pattern without switching view: e.g. using copy, import
   view_pattern_created: function(pattern_id) {
     Meteor.my_functions.build_pattern_display_data(pattern_id);
+
+    Session.set('edited_pattern', true);
   
     // intialise the 'undo' stack
     // ideally the undo stack would be maintained over server refreshes but I'm not sure a session var could hold multiple patterns, and nothing else except the database is persistent. Also it doesn't need to be reactive so a session var might be a performance hit.

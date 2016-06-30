@@ -5,8 +5,8 @@
 
 <div id="main_tabs">
 <ul>
-  <li class="summary {{is_selected_main_tab "summary"}}"><a href="{{pathFor route='pattern' mode="summary"}}">Summary</a></li>
-  <li class="charts {{is_selected_main_tab "charts"}}"><a href="{{pathFor route='pattern' mode="charts"}}">Threading and weaving charts</a></li>
+  <li class="summary {{is_selected_main_tab "summary"}}" ><a>Summary</a></li>
+  <li class="charts {{is_selected_main_tab "charts"}}" ><a>Threading and weaving charts</a></li>
 </ul>
 <div class="keyline">&nbsp;</div>
 </div>
@@ -59,8 +59,6 @@
   </div>
   <div class="clearing"></div>
 
-
-
   {{#if can_edit_pattern _id}}<div class="box private">
   <div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
   <div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
@@ -69,6 +67,8 @@
   {{> editable_field extendContext collection="patterns" property="description" data=description multiple=true button_text="Edit description" placeholder_text="Tap \"Edit description\" to enter a description"}}
 
   </div>
+
+  <span class="done_loading {{rendered}}"></span>
 
 {{/if}}
 
@@ -101,7 +101,7 @@
   <button id="add_tablet_at_start" title="Add tablet at left"><img src="/images/tablet_left.svg" onerror="this.src='/images/tablet_left.png';this.onerror=null;" width="32" height="32" ></button>
   <button id="add_tablet_at_end" title="Add tablet at right"><img src="/images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
   </div></div>{{/if}}
-  <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
+  <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}} {{rendered}}">
   {{> column_numbers}}
   {{#each row_indexes}}
   {{> pattern_row}}
@@ -129,11 +129,7 @@
   {{#if can_edit_pattern _id}}
   <button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
   {{/if}}
-  {{else}}
-  <!--<div id="view_full_pattern">
-    <button title="Show pattern">Show threading and weaving charts</button>
-    <p><br>Large patterns may take several seconds to load</p>
-  </div>-->
+  
 {{/if}}
 
 {{/if}}
