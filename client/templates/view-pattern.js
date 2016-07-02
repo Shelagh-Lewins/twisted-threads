@@ -396,31 +396,22 @@ Template.styles_palette.helpers({
 
 Template.view_pattern.events({
   "click #main_tabs .summary a": function() {
-
     Session.set("loading", true);
-    var pattern_id = Router.current().params._id;
 
+    var pattern_id = Router.current().params._id;
     setTimeout(function(){
-    Session.set('view_pattern_mode', "summary");
-    
-    Router.go('pattern', { _id: pattern_id, mode: "summary" });
-    //console.log("clicked");
-    }, 10);
-    //setTimeout(function(){Session.set('view_pattern_mode', "summary");}, 500);
-    
+      Session.set('view_pattern_mode', "summary");
+      Router.go('pattern', { _id: pattern_id, mode: "summary" });
+    }, 10);   
   },
   "click #main_tabs .charts a": function() {
-    
     Session.set("loading", true);
     
     var pattern_id = Router.current().params._id;
     setTimeout(function(){
       Router.go('pattern', { _id: pattern_id, mode: "charts" });
       Session.set('view_pattern_mode', "charts");
-  }, 10);
-    
-    //console.log("clicked");
-    //setTimeout(function(){Session.set('view_pattern_mode', "charts");}, 500);
+    }, 10);
   },
   // Make pattern private / public
   "click .toggle_private": function () {

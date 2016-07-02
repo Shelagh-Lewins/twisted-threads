@@ -103,6 +103,8 @@ body {
 #header .header_left a {
   color: #FFFFFF;
   margin-right: 8px;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 #header h1 {

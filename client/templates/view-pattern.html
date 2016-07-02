@@ -165,7 +165,7 @@
 </template>
 
 <template name="styles_palette">{{#if can_edit_pattern _id}}
-<div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}} {{show_special_styles}}">
+<div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}} {{show_special_styles}} {{#if equals view_session_mode "charts"}}visible{{/if}} ">
 <div class="styles">
 <div class="edit_style {{editing_style}}">
 <h2>Background</h2>

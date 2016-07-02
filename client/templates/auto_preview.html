@@ -1,7 +1,6 @@
 <template name="auto_preview">
-
+<div id="auto_preview_spacer"></div>
 <div class="auto_preview {{preview_rotation}}">
-
   <div class="holder" style="{{rotation_correction}}">
     {{#if use_stored_preview}}
     {{{stored_preview}}}
@@ -17,12 +16,10 @@
     {{/each}}
     </svg>
     {{/if}}
-
   </div>
-
 </div>
 
-<div id="weft_color">
+<div id="weft_color" class="{{#if equals view_pattern_mode "charts"}}visible{{/if}}">
   <span class="text">Weft color</span>
   {{#if can_edit_pattern _id}}
   <div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
@@ -32,7 +29,7 @@
 </div>
 
   {{#if can_edit_pattern _id}}
-  <button class="rotate_preview">Rotate preview</button>
+  <button class="rotate_preview {{#if equals view_pattern_mode "charts"}}visible{{/if}}">Rotate preview</button>
   {{/if}}
 </template>
 

@@ -274,9 +274,25 @@ if (Meteor.isClient) {
     // The router doesn't show the 'loading' template for these actions because only the data changes, not the route. So here we manually trigger a simple "Loading..." display to help the user when switching between view pattern and weave.
     'click #start_weaving': function(){
       Session.set("loading", true);
+
+      var pattern_id = Router.current().params._id;
+      setTimeout(function(){
+        //Session.set('view_pattern_mode', "summary");
+        Router.go('pattern', { _id: pattern_id, mode: "weaving" });
+      }, 10); 
     },
     'click #stop_weaving': function(){
       Session.set("loading", true);
+
+      var pattern_id = Router.current().params._id;
+
+      setTimeout(function(){
+        if (Session.equals("view_pattern_mode", "charts"))
+          Router.go('pattern', { _id: pattern_id, mode: "charts" });
+
+        else
+          Router.go('pattern', { _id: pattern_id, mode: "weaving" });
+      }, 10); 
     }
   });
 

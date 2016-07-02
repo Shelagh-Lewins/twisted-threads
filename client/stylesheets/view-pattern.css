@@ -214,6 +214,11 @@ background: #fff; /* set desired hover color */
   background-color: #CCCCCC;
   z-index: 20;
   padding: 8px 0 8px 0;
+  display: none;
+}
+
+#styles_palette.visible {
+  display:block;
 }
 
 /* On touch devices and short screens, hide the styles palette when editing text to make sure it doesn't interfere with soft keyboard / text area */

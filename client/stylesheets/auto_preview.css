@@ -2,13 +2,18 @@ body.view_pattern .auto_preview {
     margin: 0 0 10px 0;
 }
 
+#auto_preview_spacer {
+  height: 8px;
+}
+
 .auto_preview.down,
 .auto_preview.up {
     float:right;
 }
 
 body.view_pattern .auto_preview {
-  margin-top: -16px; /* I'd like to find out why this is necessary */
+  /*margin-top: -16px;*/ /* Presence of space seems to make this not required */
+  margin-top: 0;
 }
 
 body.view_pattern .auto_preview.left {
@@ -60,11 +65,24 @@ body.view_pattern .auto_preview.left svg {
   width: 160px;
   margin: 0 0 10px 0;
   float: left;
+  display: none;
+}
+
+#weft_color.visible {
+  display: block;
 }
 
 #weft_color .text {
   float: left;
   margin: 0 10px 0 0;
   line-height: 24px;
+}
+
+button.rotate_preview {
+  display: none;
+}
+
+button.rotate_preview.visible {
+  display: block;
 }
 

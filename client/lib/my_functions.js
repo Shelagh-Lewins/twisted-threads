@@ -1425,31 +1425,21 @@ Meteor.my_functions = {
   // Color pickers
   initialize_weft_color_picker: function()
   {
-    // Set the #background_colorpicker to the selected style's background colour
-    //var selected_style = Session.get("selected_style");
-
-    //if (!Meteor.my_functions.can_edit_style(selected_style))
-        //return;
-      
+    // Set the #weft_colorpicker to the selected style's weft colour
     var pattern_id = Router.current().params._id;
 
-
-    //if (Patterns.findOne({_id: pattern_id}) == null)
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
     {
       setTimeout(function(){Meteor.my_functions.initialize_weft_color_picker(); }, 10);
     }
     else
     {
-      //var pattern = Patterns.find({_id: pattern_id}, {fields: {weft_color: 1}});
       var pattern = Patterns.findOne({_id:pattern_id}, {fields: {weft_color: 1}})
-      //console.log("id " + pattern_id);
       var color = pattern.weft_color;
 
       if (typeof color === "undefined") // pattern was created before weft color was added
       {
         color = Meteor.settings.public.default_weft_color; // default for new patterns
-        console.log("weft color now " + color);
 
         var pattern_id = Router.current().params._id;
 
