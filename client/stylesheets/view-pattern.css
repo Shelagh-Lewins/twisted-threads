@@ -295,7 +295,8 @@ background: #fff; /* set desired hover color */
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-  border-right: 1px solid #424A6C
+  border-right: 1px solid #424A6C;
+  pointer: cursor;
 }
 
 .styles .pagination ul li:last-child a {

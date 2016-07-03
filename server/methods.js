@@ -165,8 +165,7 @@ Meteor.methods({
       data.orientation = new Array(number_of_tablets);
       for (var i=0; i<options.number_of_tablets; i++)
       {
-        data.orientation[i] = (i >= (options.number_of_tablets/2)) ? "S" : "Z";
-
+        data.orientation[i] = (i % 2 == 0) ? "S" : "Z";
       }
     }
     else if (typeof data.threading[0] === "undefined") // no rows of threading have been defined

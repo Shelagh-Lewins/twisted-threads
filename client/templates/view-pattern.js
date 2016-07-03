@@ -8,7 +8,6 @@ Template.view_pattern.rendered = function() {
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
-  Session.set("loading", false);
 
   if (Router.current().params.mode)
     Session.set('view_pattern_mode', Router.current().params.mode);
@@ -38,10 +37,6 @@ Template.view_pattern.onCreated(function(){
     Meteor.subscribe('images');
   });
 
-  if (Router.current().params.mode == "full")
-    Session.set('view_full_pattern', true);
-  else
-    Session.set('view_full_pattern', false);
 });
 
 Template.pattern_not_found.helpers({
@@ -83,8 +78,17 @@ Template.view_pattern.helpers({
       return "selected"; // default if no mode specified
   },
   rendered: function() {
-    //console.log("firing");
-    Session.set("loading", false);
+    //console.log("done loading element rendered, loading is " + Session.get("loading"));
+    //console.log("session mode " + Session.get("view_pattern_mode"));
+    //console.log("parameter mode " + mode);
+    // have we changed mode?
+   // if (mode != Session.get("view_pattern_mode"))
+    /*if (Session.equals("loading", false))
+      setTimeout(function(){ Session.set("loading", false); }, 1000); // in case "loading" took too long to appear
+    else*/
+      Session.set("loading", false);
+    //console.log("loading is now " + Session.get("loading"));
+    
     return true;
   },
   can_remove_tablets: function() {
@@ -397,21 +401,21 @@ Template.styles_palette.helpers({
 Template.view_pattern.events({
   "click #main_tabs .summary a": function() {
     Session.set("loading", true);
-
+console.log("clicked summary");
     var pattern_id = Router.current().params._id;
     setTimeout(function(){
       Session.set('view_pattern_mode', "summary");
       Router.go('pattern', { _id: pattern_id, mode: "summary" });
-    }, 10);   
+    }, 100);   
   },
   "click #main_tabs .charts a": function() {
     Session.set("loading", true);
-    
+    console.log("clicked charts");
     var pattern_id = Router.current().params._id;
     setTimeout(function(){
       Router.go('pattern', { _id: pattern_id, mode: "charts" });
       Session.set('view_pattern_mode', "charts");
-    }, 10);
+    }, 100);
   },
   // Make pattern private / public
   "click .toggle_private": function () {
@@ -421,11 +425,6 @@ Template.view_pattern.events({
   "click .show_image_uploader": function () {
       Session.set('upload_status', 'not started');
       Session.set('show_image_uploader', true);
-  },
-  "click #view_full_pattern": function () {
-      Session.set('view_full_pattern', true);
-
-      var pattern_id = Router.current().params._id;
   },
   'click #undo': function() {
     if (Meteor.my_functions.accept_click())

@@ -2092,7 +2092,7 @@ Meteor.my_functions = {
   },
   styles_pagination_clicked: function(page)
   {
-    event.preventDefault();
+    //event.preventDefault();
     Session.set('styles_palette', page);
 
     if (page == "special")

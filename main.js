@@ -279,20 +279,19 @@ if (Meteor.isClient) {
       setTimeout(function(){
         //Session.set('view_pattern_mode', "summary");
         Router.go('pattern', { _id: pattern_id, mode: "weaving" });
-      }, 10); 
+      }, 100); 
     },
     'click #stop_weaving': function(){
       Session.set("loading", true);
 
       var pattern_id = Router.current().params._id;
-
       setTimeout(function(){
         if (Session.equals("view_pattern_mode", "charts"))
           Router.go('pattern', { _id: pattern_id, mode: "charts" });
 
         else
-          Router.go('pattern', { _id: pattern_id, mode: "weaving" });
-      }, 10); 
+          Router.go('pattern', { _id: pattern_id, mode: "summary" });
+      }, 100); 
     }
   });
 
@@ -467,15 +466,15 @@ if (Meteor.isClient) {
   // Menu - options for selected pattern
   Template.menu.helpers({
     show_menu: function(subscriptionsReady, route_name, pattern_id){
-      return true;
-      if (Meteor.userId()) // account settings is available to any signed in user
+      return true; // there is now always at least one menu option
+      /*if (Meteor.userId()) // account settings is available to any signed in user
         return true;
 
       if (subscriptionsReady && (route_name == "pattern") && (Patterns.find({ _id: pattern_id}).count() != 0)) // printer friendly view is available
         return true;
 
       else
-        return false;
+        return false;*/
             /* show the menu if:
         * the user is signed in (Account settings)
 
