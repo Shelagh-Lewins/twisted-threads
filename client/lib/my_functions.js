@@ -2052,6 +2052,12 @@ Meteor.my_functions = {
     var style;
     var style_number;
 
+    if (style_value == null)
+    {
+      // pattern has become corrupted, show a default style so the user can fix it
+      style_value = 1;
+    }
+
     if (style_value.toString().charAt(0) == "S")
     {
       special = true;

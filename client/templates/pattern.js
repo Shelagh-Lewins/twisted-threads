@@ -54,6 +54,8 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   var data = {};
   var style_ref;
 
+
+
   if (type == "styles")
   {
     style_ref = this.style;
@@ -86,6 +88,13 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
     data.row = row;
     style_ref = cell.get();
   }
+
+  if (style_ref == null)
+  {
+    // pattern has become corrupted, show a default style so the user can fix it
+    style_ref = 1;
+  }
+    
 
   if (style_ref.toString().charAt(0) == "S") // special style
   {
