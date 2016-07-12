@@ -21,6 +21,15 @@ Template.image.helpers({
       var max_height = 200;
 
     return Math.floor(Math.min(max_height, this.height * 600/this.width));
+  },
+  full_image_width: function() {
+    //var container_width = $(window.document).width() * 0.95; // 95% max width of wrapper is set in image.css
+    //var container_height = $(window.document).height() * 0.95; // 95% max height of wrapper is set in image.css
+
+    return Meteor.my_functions.full_image_dimensions(this.width, this.height).width;
+  },
+  full_image_height: function() {
+    return Meteor.my_functions.full_image_dimensions(this.width, this.height).height;
   }
 });
 

@@ -2022,6 +2022,30 @@ Meteor.my_functions = {
       uploader.set(upload);
     }
   },
+  full_image_dimensions: function(width, height) {
+    // This is here in case I decide to manually scale the image, so that the caption fits underneath better. But it would need logic to handle portrait and landscape image and container.
+
+    // scale the full image for a pattern to fit nicely
+    var container_width = Session.get('window_width') * 0.95; // 95% max width of wrapper is set in image.css
+    var container_height = Session.get('window_height') * 0.80; // 90% max height of wrapper is set in image.css
+    
+    var dimensions = {
+      width: width,
+      height: height
+    };
+/*
+    if (width > container_width)
+    {
+      console.log("wider");
+    }
+
+    if (height > container_height)
+    {
+      console.log("taller");
+    }*/
+
+    return dimensions;
+  },
   //////////////////////////////////////////
   // Preview data as client-side object
   set_preview_cell_style: function(row, tablet, style)

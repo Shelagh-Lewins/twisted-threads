@@ -20,7 +20,7 @@
       <input type="button" class="close" value="Close" />
       <div class="wrapper" style="width: {{width}}px; height: {{height}}px">
 
-        <div class="image" style="background-image: url('{{url}}'); width: {{width}}px; height: {{height}}px"></div>
+        <div class="image" style="background-image: url('{{url}}'); width: {{full_image_width}}px; height: {{full_image_height}}px"></div>
         <div class="caption">
         {{> editable_field extendContext collection="images" multiple=true property="caption" data=caption button_text="Edit caption" placeholder_text="Tap \"Edit caption\" to enter a caption"}}
       </div>
