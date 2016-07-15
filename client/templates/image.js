@@ -22,10 +22,19 @@ Template.image.helpers({
 
     return Math.floor(Math.min(max_height, this.height * 600/this.width));
   },
+  max_image_width: function() {
+    var container_width = Session.get('window_width') * 0.95;
+    var container_height = Session.get('window_height') * 0.80;
+    var max_width = Math.floor(Math.min(this.width, this.width * (Session.get('window_height')/this.height) * 0.9, container_width));
+    return max_width;
+  },
+  max_image_height: function() {
+    var container_width = Session.get('window_width') * 0.95;
+    var container_height = Session.get('window_height') * 0.80;
+    var max_height = Math.floor(Math.min(this.height, this.height * (Session.get('window_width')/this.width), container_height));
+    return max_height;
+  },
   full_image_width: function() {
-    //var container_width = $(window.document).width() * 0.95; // 95% max width of wrapper is set in image.css
-    //var container_height = $(window.document).height() * 0.95; // 95% max height of wrapper is set in image.css
-
     return Meteor.my_functions.full_image_dimensions(this.width, this.height).width;
   },
   full_image_height: function() {
