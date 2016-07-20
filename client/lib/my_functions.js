@@ -606,7 +606,10 @@ Meteor.my_functions = {
     // method to handle turning a tablet forward or backward
     this.turn_tablet = function(tablet, direction, distance) {
       var position_A_thread = position_A_threads[tablet]; // visible thread for this tablet
-
+      if (typeof position_A_thread === "undefined")
+            return; // in case
+          console.log("tablet " + tablet);
+console.log("A thread " + typeof position_A_thread);
       if (direction == current_turn_direction[tablet])
       {
         // TODO check for distance == 3, 2 or 1
@@ -639,18 +642,19 @@ Meteor.my_functions = {
     };
 
     for (var i=0; i<picks.length; i++) // each weaving row
+    //for (var i=0; i<1; i++)
     {
       var new_row = []; // build a blank row for row styles
       for (var j=0; j<number_of_tablets; j++)
       {
-        new_row.push(1); // placeholder, will be overwritten by pack data
+        new_row.push("S15"); // placeholder, will be overwritten by pack data
       }
       var actions = picks[i].Actions[0].Action;
 
       for (var j=0; j<actions.length; j++)
       {
         var action = actions[j]["$"];
-
+console.log("action " + j);
         if (action.Type == "Turn")
         {
           var distance = parseInt(action.Dist); // usually 1 (quarter turn)
@@ -662,7 +666,7 @@ Meteor.my_functions = {
             var target_pack = packs[action.TargetID];
             if (typeof target_pack === "undefined")
                 return {error: "no pack " + (action.TargetID) + " has been defined"};
-
+console.log("turn pack " + target_pack);
             for (var k=0; k<target_pack.length; k++) // each tablet in pack
             {
               var tablet = target_pack[k];
