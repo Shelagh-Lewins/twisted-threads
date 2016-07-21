@@ -408,6 +408,7 @@ Meteor.my_functions = {
     // Pattern data has been read in from a .gtt file and the header information analysed
     // pattern_data is the file data converted to JSON
     // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
+    //console.log(JSON.stringify(pattern_obj));
     var error;
     pattern_obj.tags.push("threaded-in");
 
@@ -563,6 +564,10 @@ Meteor.my_functions = {
     }
 
     //////////////////////////////////
+    // Use default special styles
+    pattern_obj.special_styles = Meteor.my_params.default_special_styles;
+
+    //////////////////////////////////
     // build weaving chart
 
     // note which thread is in the "A" position of each tablet at the start of weaving
@@ -608,8 +613,8 @@ Meteor.my_functions = {
       var position_A_thread = position_A_threads[tablet]; // visible thread for this tablet
       if (typeof position_A_thread === "undefined")
             return; // in case
-          console.log("tablet " + tablet);
-console.log("A thread " + typeof position_A_thread);
+          //console.log("tablet " + tablet);
+//console.log("A thread " + typeof position_A_thread);
       if (direction == current_turn_direction[tablet])
       {
         // TODO check for distance == 3, 2 or 1
@@ -641,20 +646,34 @@ console.log("A thread " + typeof position_A_thread);
       return;
     };
 
+    // check which Special Style represents 'idle'
+    // each tablet is idle unless turned by an action
+    var idle_style = "S1"; // just so there is some value
+    for (var i=0; i<pattern_obj.special_styles.length; i++)
+    {
+     // console.log("name " + current_special_styles[i].name);
+      if (pattern_obj.special_styles[i].name == "idle")
+      {
+        idle_style = pattern_obj.special_styles[i].style;
+        break;
+      }
+
+    }
+
     for (var i=0; i<picks.length; i++) // each weaving row
     //for (var i=0; i<1; i++)
     {
       var new_row = []; // build a blank row for row styles
       for (var j=0; j<number_of_tablets; j++)
       {
-        new_row.push("S15"); // placeholder, will be overwritten by pack data
+        new_row.push(idle_style); // placeholder, will be overwritten by pack data
       }
       var actions = picks[i].Actions[0].Action;
 
       for (var j=0; j<actions.length; j++)
       {
         var action = actions[j]["$"];
-console.log("action " + j);
+//console.log("action " + j);
         if (action.Type == "Turn")
         {
           var distance = parseInt(action.Dist); // usually 1 (quarter turn)
@@ -666,7 +685,7 @@ console.log("action " + j);
             var target_pack = packs[action.TargetID];
             if (typeof target_pack === "undefined")
                 return {error: "no pack " + (action.TargetID) + " has been defined"};
-console.log("turn pack " + target_pack);
+//console.log("turn pack " + target_pack);
             for (var k=0; k<target_pack.length; k++) // each tablet in pack
             {
               var tablet = target_pack[k];
