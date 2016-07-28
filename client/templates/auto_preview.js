@@ -58,6 +58,9 @@ Template.auto_preview.helpers({
   preview_rotation: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 
+    if (typeof pattern === "undefined")
+        return;
+
     switch(pattern.preview_rotation)
     {
       case "left":
