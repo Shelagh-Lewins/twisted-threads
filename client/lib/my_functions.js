@@ -1796,9 +1796,17 @@ Meteor.my_functions = {
     // keep the toolbar in the viewport
     if ($("#toolbar").length > 0)
     {
-      var toolbar_offset = $("#toolbar").position().top;
-      $("#toolbar .inner_tube").css("top", Math.max(-1 * toolbar_offset, 0));
+      // toolbar stays at top of screen
+      //var toolbar_offset = $("#toolbar").position().top;
+      //$("#toolbar .inner_tube").css("top", Math.max(-1 * toolbar_offset, 0));
 
+      // toolbar stays at bottom of screen, just above styles palette
+      var container_height = $("#width").innerHeight();
+      var scroll_top = $("#width").scrollTop();
+      var toolbar_top = container_height + scroll_top - $("#toolbar").outerHeight(true) - 4; // last item is to give space above styles palette
+      $("#toolbar").css("top", toolbar_top);
+
+      // toolbar stays at left edge of screen
       var left = $("#width").scrollLeft();
       $("#toolbar .inner_tube").css("left", left);
     }    

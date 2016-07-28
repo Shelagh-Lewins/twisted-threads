@@ -171,9 +171,10 @@ background: #fff; /* set desired hover color */
 
 /* *** Toolbar *** */
 #toolbar {
-  position: relative;
+  position: absolute;
   height: 64px; /* reserve space for buttons when window not scrolled */
   z-index: 3;
+  width: 360px;
 }
 
 #toolbar .inner_tube {

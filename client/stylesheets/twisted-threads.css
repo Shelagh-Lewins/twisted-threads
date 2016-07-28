@@ -58,7 +58,7 @@ body {
 
 /* extra div provides padding without forcing horizontal scroll */
 #content > .inner_tube {
-  padding: 16px;
+  padding: 16px 16px 80px 16px;
   margin-top: 48px;
 }
 
