@@ -78,8 +78,23 @@ Template.view_pattern.helpers({
       return "selected"; // default if no mode specified
   },
   rendered: function() {
+    // call this in the template to hide "loading..."
     Session.set("loading", false);
     return true;
+  },
+  edit_mode: function() {
+    // simulation or freehand pattern?
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
+
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
+
+    if (pattern.edit_mode == "freehand")
+      return "freehand";
+
+    else
+      return "simulation";
   },
   can_remove_tablets: function() {
     // is there more than 1 tablet?

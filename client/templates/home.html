@@ -99,18 +99,32 @@
 <template name="create_new_pattern">
 {{#if can_create_pattern}}
 <div id="new_pattern">
-  <div class="hint">Draw a new pattern freehand on virtual graph paper.
-  </div>
-  <form>
-    <label for="num_tablets">Tablets:</label>
-    <input type="number" placeholder="Tablets..." id="num_tablets" min="1" max="100" size="3" value="12" ><br/>
-    <label for="num_rows">Rows:</label>
-    <input type="number" placeholder="Rows..." id="num_rows" min="1" max="100" value="8" ><br/>
+  <h2>Create a new pattern</h2>
+  <form action="">
     <label for="pattern_name">Name:</label>
     <input type="text" placeholder="Pattern name..." id="pattern_name" size="100" ><br/>
-    <input type="submit" value="Create a new pattern">
-  </form>
-  
+
+    <label for="num_tablets">Tablets:</label>
+    <input type="number" placeholder="Tablets..." id="num_tablets" min="1" max="100" size="3" value="12" ><br/>
+
+    <div name="simulation" class="edit_mode {{is_selected_edit_mode "simulation"}}">
+      <div class="top">
+        <h3>Simulation</h3>
+        <div class="hint">Weave your pattern, row by row.</div>
+      </div>
+      <input value="simulation" type="submit">
+    </div>
+
+    <div name="freehand" class="edit_mode {{is_selected_edit_mode "freehand"}}">
+      <div class="top">
+        <h3>Freehand</h3>
+        <div class="hint">Draw your pattern chart on virtual graph paper.</div>
+        <label for="num_rows">Rows:</label>
+        <input type="number" placeholder="Rows..." id="num_rows" min="1" max="100" value="8" ><br/>
+      </div>
+      <input value="freehand" type="submit">
+    </div>
+  </form> 
 </div>
 {{else}}
   {{#if isInRole 'verified' 'users'}}

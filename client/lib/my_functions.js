@@ -59,7 +59,7 @@ Meteor.my_functions = {
 
     var pattern_obj = {}; // JSON object to hold pattern
 
-    pattern_obj.version = "2.01";
+    pattern_obj.version = "2.02";
     // version number
     /*
       1.1 first ever
@@ -68,6 +68,7 @@ Meteor.my_functions = {
       1.13 added special styles
       2 replaced style.forward_stroke, style.backward_stroke with style.warp to allow more, mutually exclusive thread types
       2.01 added weft_color
+      2.02 added edit_mode (simulation, freehand)
     */
 
     var number_of_rows = pattern.number_of_rows;
@@ -75,6 +76,7 @@ Meteor.my_functions = {
 
     // Basic pattern properties
     pattern_obj.name = pattern.name;
+    pattern_obj.edit_mode = pattern.edit_mode || "freehand"; // earlier patterns were freehand only
     pattern_obj.description = pattern.description;
     if (typeof pattern.weaving_notes !== "undefined")
       pattern_obj.weaving_notes = pattern.weaving_notes;
@@ -219,17 +221,20 @@ Meteor.my_functions = {
       }
     });
   },
-  new_pattern: function(name, number_of_tablets, number_of_rows)
+  new_pattern: function(params)
   {
     Session.set('loading', true);
 
-    if ((name=="") || (typeof name === "undefined"))
-      var name=Meteor.my_params.default_pattern_name;
+    var params = params || {};
+
+    if ((params.name=="") || (typeof params.name === "undefined"))
+      params.name=Meteor.my_params.default_pattern_name;
 
     var options = {
-      number_of_tablets: number_of_tablets, // optional
-      number_of_rows: number_of_rows, // optional
-      name: name,
+      edit_mode: params.edit_mode,
+      number_of_tablets: params.number_of_tablets, // optional
+      number_of_rows: params.number_of_rows, // optional
+      name: params.name,
       filename: 'default_turning_pattern.json'
     };
 
@@ -1792,9 +1797,9 @@ Meteor.my_functions = {
     $('#header').css({
         'left': $("#width").scrollLeft() // Always at left edge of window
     });
-
+;
     // keep the toolbar in the viewport
-    if ($("#toolbar").length > 0)
+    if (($("#toolbar").length > 0) && $("#width").hasClass("freehand"))
     {
       // toolbar stays at top of screen
       //var toolbar_offset = $("#toolbar").position().top;

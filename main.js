@@ -58,6 +58,14 @@ if (Meteor.isClient) {
     return a === b;
   });
 
+  // allows a template to check whether a session variable equals a value
+  UI.registerHelper('session_equals', function(session_var, test_value){
+    if (Session.get(session_var) == test_value)
+      return true;
+    else
+      return false;
+  });
+
   UI.registerHelper('is_cordova', function () {
     if(Meteor.isCordova)
       return true;
@@ -460,6 +468,18 @@ if (Meteor.isClient) {
       var pattern_id = Router.current().params._id;
 
     return Meteor.my_functions.can_edit_pattern(pattern_id);
+  });
+
+  UI.registerHelper('edit_mode', function() {
+
+    if (Router.current().route.getName() == "pattern")
+    {
+      var pattern_id = Router.current().params._id;
+      var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
+  
+      if (typeof pattern !== "undefined")
+        return pattern.edit_mode;
+    }
   });
 
   ///////////////////////////////////

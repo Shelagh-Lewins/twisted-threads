@@ -30,17 +30,25 @@
 
 /* *** New Pattern form *** */
 #new_pattern {
-  width: 400px;
-  background-color: #FFFFFF;
-  color: #111111;
+  width: 500px;
+  background-color: #7580ac;
+  color: #FFFFFF;
   border: 1px solid #7580ac;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
 
+#new_pattern h2 {
+  text-align: center;
+  color: #FFFFFF;
+  font-size: 100%;
+  font-weight: bold;
+}
+
 #new_pattern form {
-  padding: 16px;
+  padding: 0 16px 16px 16px;
+  overflow: hidden;
 }
 
 #new_pattern input[type=text] {
@@ -53,9 +61,42 @@
   margin-right: 16px;
 }
 
-#new_pattern .hint {
-  padding: 16px 16px 0 16px;
+/* choose which type of pattern edit mode, simulation or freehand */
+#new_pattern .edit_mode {
+  width: 196px;
+  float: left;
+  border: 1px solid #AAAAAA;
+  padding: 16px;
+  background-color: #FFFFFF;
   color: #424A6C;
+  border-radius: 4px;
+}
+
+#new_pattern .edit_mode:first-of-type {
+  margin-right: 8px;
+}
+
+#new_pattern .edit_mode .top {
+  min-height: 100px;
+}
+
+#new_pattern .edit_mode.selected {
+  /*border: 1px solid #5555FF; */
+  /* uncomment to select edit mode */
+}
+
+#new_pattern .edit_mode h3 {
+  text-align: center;
+  font-weight: bold;
+}
+
+#new_pattern .edit_mode .hint {
+  font-size: 14px;
+  color: #333333;
+}
+
+#new_pattern input[type="submit"] {
+  text-align: center;
 }
 
 /* *** Category header *** */

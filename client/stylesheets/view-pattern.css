@@ -170,14 +170,15 @@ background: #fff; /* set desired hover color */
 }
 
 /* *** Toolbar *** */
-#toolbar {
+/* Freehand pattern */
+.freehand #toolbar {
   position: absolute;
   height: 64px; /* reserve space for buttons when window not scrolled */
   z-index: 3;
   width: 360px;
 }
 
-#toolbar .inner_tube {
+.freehand #toolbar .inner_tube {
   position: absolute;
   padding: 8px;
   background-color: #CCCCCC;
@@ -190,7 +191,7 @@ background: #fff; /* set desired hover color */
   z-index: 3;
 }
 
-#toolbar button {
+.freehand #toolbar button {
   float: left;
   padding: 4px;
   background-color: #EEEEEE;
@@ -201,8 +202,14 @@ background: #fff; /* set desired hover color */
   margin-right: 8px;
 }
 
-#toolbar button:last-child {
+.freehand #toolbar button:last-child {
   margin-right: 0;
+}
+
+/* Simulation pattern */
+
+.simulation #toolbar {
+
 }
 
 /* *** Styles *** */

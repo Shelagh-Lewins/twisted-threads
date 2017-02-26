@@ -2,6 +2,9 @@ Template.home.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();
   Session.set('thumbnails_in_row', Meteor.my_functions.thumbnails_in_row());
+
+  /* currently, there is a button per edit mode. But the code is in place so you can select a mode and then press a single button. */
+  Session.set('edit_mode', 'simulation');
 }
 
 // Subsidiary 'home' pages
@@ -30,17 +33,34 @@ Template.all_patterns.rendered = function() {
 }
 
 Template.create_new_pattern.events({
-  'submit form': function(event){
+  "click div.edit_mode": function(event) {
+    Session.set('edit_mode', event.currentTarget.getAttribute("name"))
+  },
+  "click input[type=submit]": function(event){""
     event.preventDefault();
 
-    var number_of_tablets = $('#num_tablets').val();
-    var number_of_rows = $('#num_rows').val();
-    var pattern_name = $('#pattern_name').val();
+    var params = {
+      edit_mode: event.currentTarget.value, // two submit buttons, simulation and freehand
+      number_of_tablets: $('#num_tablets').val(),
+      number_of_rows: $('#num_rows').val(), // only actually used by freehand patterns
+      name: $('#pattern_name').val()
+    }
 
-    Meteor.my_functions.new_pattern(pattern_name, number_of_tablets, number_of_rows);
+    Meteor.my_functions.new_pattern(params);
 
     $('[name=pattern_name]').val(''); // reset pattern name
     // however do not reset numbers, in case user wants to create another similar pattern?
+  }
+});
+
+Template.create_new_pattern.helpers({
+  header_width: function() {
+    var number = Session.get('thumbnails_in_row');
+    return (number * Meteor.my_params.pattern_thumbnail_width) + ((number - 1) * Meteor.my_params.pattern_thumbnail_rmargin);
+  },
+  is_selected_edit_mode: function(mode) {
+    if (Session.get("edit_mode") == mode)
+      return "selected";
   }
 });
 

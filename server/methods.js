@@ -51,6 +51,7 @@ Meteor.methods({
     // if number_of_tablets and number_of_rows are both specified, a blank pattern will be built with style 1 for all weaving and threading cells
 
     check(options, {
+      edit_mode: Match.Optional(String),
       number_of_tablets: Match.Optional(String),
       number_of_rows: Match.Optional(String),
       name: Match.Optional(String),
@@ -188,6 +189,16 @@ Meteor.methods({
 
     data.name = options.name;
 
+    if((options.edit_mode == "") || (typeof options.edit_mode === "undefined"))
+      options.edit_mode = "freehand"; // earlier data version
+
+    //console.log("options.edit_mode " + options.edit_mode);
+//console.log("data.edit_mode " + data.edit_mode);
+    if((data.edit_mode == "") || (typeof data.edit_mode === "undefined"))
+      data.edit_mode = options.edit_mode;
+
+    //console.log("mode " + data.edit_mode);
+
     // tags
     if (typeof data.tags === "undefined")
       data.tags = [];
@@ -210,6 +221,7 @@ Meteor.methods({
 
     var pattern_id = Patterns.insert({
       name: data.name,
+      edit_mode: data.edit_mode,
       description: description,
       weaving_notes: weaving_notes,
       weft_color: weft_color,
@@ -222,7 +234,8 @@ Meteor.methods({
       created_by: Meteor.userId(),           // _id of logged in user
       created_by_username: Meteor.user().username  // username of logged in user
     });
-      // Tags
+
+    // Tags
     for (var i=0; i<data.tags.length; i++)
     {
       Patterns.addTag(data.tags[i], { _id: pattern_id });
@@ -305,7 +318,6 @@ Meteor.methods({
     ///////////////////////////////////
     //
     ///////////////////////////////////
-
 
     return pattern_id;
   },
