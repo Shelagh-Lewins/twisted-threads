@@ -140,6 +140,20 @@ Meteor.my_functions = {
       }
     }
 
+    // Weaving simulation (if edit_mode == simulation)
+    // default to "simulation_mode": auto
+    //console.log("pattern.edit_mode " + pattern.edit_mode);
+    if (pattern.edit_mode == "simulation")
+    {
+      //console.log("simulation");
+      pattern_obj.simulation_mode = pattern.simulation_mode; // auto or manual
+      pattern_obj.auto_turn_sequence = pattern.auto_turn_sequence; // e.g. FFFFBBBB
+      
+      // not sure whether this needs to be turned into an array, as it will not have responsive UI
+      pattern_obj.auto_turn_sequence = pattern.auto_turn_sequence
+
+      // TODO manual_turn_sequence
+    }
     // weft color
     pattern_obj.weft_color = weft_color.get();
 
@@ -150,6 +164,7 @@ Meteor.my_functions = {
     /*
     {
     name: "my patttern",
+    edit_mode: "freehand",
     description: "This is a pattern",
     orientation: ["S", "Z", "S", "Z"], // one entry per tablet starting with tablet #1. Orientation is thread direction: "S" = tablet /, "Z" = tablet \
     threading: [ // columns are tablets starting with tablet #1
@@ -619,7 +634,6 @@ Meteor.my_functions = {
       if (typeof position_A_thread === "undefined")
             return; // in case
           //console.log("tablet " + tablet);
-//console.log("A thread " + typeof position_A_thread);
       if (direction == current_turn_direction[tablet])
       {
         // TODO check for distance == 3, 2 or 1
@@ -1197,6 +1211,7 @@ Meteor.my_functions = {
 
     current_row_indexes.shift(); // rows are reversed
     Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows - 1, number_of_tablets);
+    return;
   },
   add_tablet: function(pattern_id, position, style)
   {
@@ -2093,7 +2108,7 @@ Meteor.my_functions = {
   {
     current_threading_data[(hole) + "_" + (tablet)].set(style);
   },
-  /*is_style_special: function(style_value)
+  is_style_special: function(style_value)
   {
     if (typeof style_value === "undefined")
       return false;
@@ -2103,7 +2118,7 @@ Meteor.my_functions = {
 
     else
       return false;
-  },*/
+  },
   find_style: function(style_value) // e,g, 2, "S1", may be regular or special
   {
     if (typeof style_value === "undefined")
@@ -2132,6 +2147,49 @@ Meteor.my_functions = {
       style.special = false;
     }
     return style; // the style object
+  },
+  ////////////////////////////////////////////
+  // Simulation patterns: build weaving chart from threading and turning schedule
+  build_simulation_weaving_chart: function(pattern_id)
+  {
+    // auto
+
+    // TODO manual
+  },
+  weaving_style_from_threading_style: function(style_value, orientation, direction, number_of_turns)
+  {
+    // which style to use on the weaving chart to represent a tablet turning forwards / backwards, with S /Z orientation, and thread colour from threading style
+    // simulation styles for weaving appear after the 7 threading styles
+    // SF, ZF, ZB, SB are style no. 7 + 4(n-1) + 1,2,3,4
+    // TODO number_of_turns 0 - 3 (use special styles in weaving chart)
+    
+    if (!is_style_special(style_value))
+    {
+      var style = 7 + 4*(style_value - 1)
+    }
+    else
+    {
+      // special style for empty hole, hard-coded to last 4 styles
+      if (style_value == "S7")
+        var style = 7 + 4*7 // this is the 8th style (7-1)
+      else
+        return -1; // style does not correspond to a weaving chart style
+    }
+    if(direction == "F")
+    {
+      if (orientation == "S")
+        style_number += 1
+      else
+        style_number += 2
+    }
+    else
+    {
+      if (orientation == "Z")
+        style_number += 3
+      else
+        style_number += 4
+    }
+    return style_number;
   },
   ////////////////////////////////////////////
   // work around frequent failure of Meteor to register clicks on Styles palette

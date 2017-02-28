@@ -310,6 +310,248 @@
       "style": "S16"
     }
   ],
+  "simulation_styles": [
+    {
+      "background_color": "#cc0000",
+      "line_color": "#ffffff",
+      "warp": "none",
+      "style": 1
+    },
+    {
+      "background_color": "#ffd966",
+      "line_color": "#ffffff",
+      "warp": "none",
+      "style": 2
+    },
+    {
+      "background_color": "#1c4587",
+      "line_color": "#ffffff",
+      "warp": "none",
+      "style": 3
+    },
+    {
+      "background_color": "#6aa84f",
+      "line_color": "#ffffff",
+      "warp": "none",
+      "style": 4
+    },
+    {
+      "background_color": "#674ea7",
+      "line_color": "#ffffff",
+      "warp": "none",
+      "style": 5,
+      "special": false
+    },
+    {
+      "background_color": "#783f04",
+      "line_color": "#ffffff",
+      "warp": "none",
+      "style": 6,
+      "special": false
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#ffffff",
+      "warp": "none",
+      "style": 7
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#1c4587",
+      "warp": "forward",
+      "style": 8
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#1c4587",
+      "warp": "backward",
+      "style": 9
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#1c4587",
+      "warp": "forward",
+      "style": 10
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#1c4587",
+      "warp": "backward",
+      "style": 11
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#6aa84f",
+      "warp": "forward",
+      "style": 12
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#6aa84f",
+      "warp": "backward",
+      "style": 13
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#6aa84f",
+      "warp": "forward",
+      "style": 14
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#6aa84f",
+      "warp": "backward",
+      "style": 15
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#cc0000",
+      "warp": "forward",
+      "style": 16
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#cc0000",
+      "warp": "backward",
+      "style": 17
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#cc0000",
+      "warp": "forward",
+      "style": 18,
+      "special": false
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#cc0000",
+      "warp": "backward",
+      "style": 19,
+      "special": false
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#ffd966",
+      "warp": "forward",
+      "style": 20,
+      "special": false
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#ffd966",
+      "warp": "backward",
+      "style": 21,
+      "special": false
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#ffd966",
+      "warp": "forward",
+      "style": 22
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#ffd966",
+      "warp": "backward",
+      "style": 23
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#674ea7",
+      "warp": "forward",
+      "style": 24
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#674ea7",
+      "warp": "backward",
+      "style": 25
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#674ea7",
+      "warp": "forward",
+      "style": 26
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#674ea7",
+      "warp": "backward",
+      "style": 27
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#783f04",
+      "warp": "forward",
+      "style": 28
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#783f04",
+      "warp": "backward",
+      "style": 29
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#783f04",
+      "warp": "forward",
+      "style": 30
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#783f04",
+      "warp": "backward",
+      "style": 31
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#ffffff",
+      "warp": "forward",
+      "style": 32
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#ffffff",
+      "warp": "backward",
+      "style": 33
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#ffffff",
+      "warp": "forward",
+      "style": 34
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#ffffff",
+      "warp": "backward",
+      "style": 35
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#ffffff",
+      "warp": "forward_empty",
+      "style": 36
+    },
+    {
+      "background_color": "#ffffff",
+      "line_color": "#ffffff",
+      "warp": "backward_empty",
+      "style": 37
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#ffffff",
+      "warp": "forward_empty",
+      "style": 40
+    },
+    {
+      "background_color": "#bbbbbb",
+      "line_color": "#ffffff",
+      "warp": "backward_empty",
+      "style": 41
+    }
+  ],
   "orientation": ["S","Z","S","Z","S","Z","S","Z","S","Z","S","Z"],
   "threading": [
     [1,1,1,1,1,1,1,1,1,1,1,1],

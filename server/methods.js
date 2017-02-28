@@ -189,15 +189,12 @@ Meteor.methods({
 
     data.name = options.name;
 
+    // edit_mode "freehand" (default) or "simulation"
     if((options.edit_mode == "") || (typeof options.edit_mode === "undefined"))
       options.edit_mode = "freehand"; // earlier data version
 
-    //console.log("options.edit_mode " + options.edit_mode);
-//console.log("data.edit_mode " + data.edit_mode);
     if((data.edit_mode == "") || (typeof data.edit_mode === "undefined"))
       data.edit_mode = options.edit_mode;
-
-    //console.log("mode " + data.edit_mode);
 
     // tags
     if (typeof data.tags === "undefined")
@@ -243,26 +240,38 @@ Meteor.methods({
 
     // Styles
     var styles_array = [];
-    for (var i=0; i<32; i++) // create 32 styles
-    {
-      styles_array[i] = data.styles[i];
 
-      // version 1 has style.backward_stroke, style.forward_stroke
-      // convert to 2+
-      // style.stroke "forward" "backward" "none (other values possible in 2+)
-      
-      if (data.styles[i].backward_stroke)
-        data.styles[i].warp = "backward";
-        
-      if (data.styles[i].forward_stroke) // if both defined, choose forward
-        data.styles[i].warp = "forward";
-        
-      delete data.styles[i].backward_stroke;
-      delete data.styles[i].forward_stroke;
-      //console.log("style " + JSON.stringify(data.styles[i]));
-      if (typeof data.styles[i].warp === "undefined")
-        data.styles[i].warp = "none";
+    if (data.edit_mode == "simulation") // palette shows 7 regular styles for threading. The other 32 are used to automatically build the weaving chart: 4 per threading styles to show S/Z and turn forwards, backwards
+    {
+      for (var i=0; i<data.simulation_styles.length; i++)
+      {
+        styles_array[i] = data.simulation_styles[i];
+      }
     }
+    else // 32 visible styles for manually drawing threading and weaving charts
+    {
+      for (var i=0; i<32; i++) // create 32 styles
+      {
+        styles_array[i] = data.styles[i];
+
+        // version 1 has style.backward_stroke, style.forward_stroke
+        // convert to 2+
+        // style.stroke "forward" "backward" "none (other values possible in 2+)
+        
+        if (data.styles[i].backward_stroke)
+          data.styles[i].warp = "backward";
+          
+        if (data.styles[i].forward_stroke) // if both defined, choose forward
+          data.styles[i].warp = "forward";
+          
+        delete data.styles[i].backward_stroke;
+        delete data.styles[i].forward_stroke;
+        //console.log("style " + JSON.stringify(data.styles[i]));
+        if (typeof data.styles[i].warp === "undefined")
+          data.styles[i].warp = "none";
+      }
+    }
+
     Patterns.update({_id: pattern_id}, {$set: {styles: JSON.stringify(styles_array)}});
 
     // Special styles
@@ -291,6 +300,35 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
 
     //////////////////////////////
+        if (data.edit_mode == "simulation")
+    {
+      // auto or manual. New patterns default to "freehand". Patterns from JSON may be either.
+      if((data.simulation_mode == "") || (typeof data.simulation_mode === "undefined"))
+        data.simulation_mode = "auto";
+
+      Patterns.update({_id: pattern_id}, {$set: {simulation_mode: data.simulation_mode}});
+
+      // auto and manual turn sequences exist so the user can switch between them without losing data
+
+      // auto_turn_sequence e.g. FFFFBBBB
+      if((data.auto_turn_sequence == "") || (typeof data.auto_turn_sequence === "undefined"))
+        data.auto_turn_sequence = ["F","F","F","F","B","B","B","B"]; // default to 4 forward, 4 back
+
+      Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: data.auto_turn_sequence}});
+
+      // manual_turn_sequence, 3 packs each tablet turned individually
+      if((data.manual_turn_sequence == "") || (typeof data.manual_turn_sequence === "undefined"))
+        data.manual_turn_sequence = {}; // TODO
+
+      /*
+      3 packs, each tablet in one pack
+      for each pack, each pick: turn direction, number of turns 0,1,2,3
+      export JSON, import JSON
+
+      use this to build weaving chart dynamically
+      */
+    }
+    /////////////////////////////////
 
     // Threading
     var threading = new Array(4);
@@ -646,6 +684,28 @@ Meteor.methods({
       update["threading." + hole + "." + tablet + ".style"] = new_style;
       Patterns.update({_id: pattern_id}, {$set: update});
     }
+  },
+
+  //////////////////////////////////////
+  // Simulation patterns
+  build_simulation_weaving: function(pattern_id, number_of_tablets)
+  {
+    check(pattern_id, String);
+    check(number_of_tablets, Number);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1, number_of_tablets: 1}});
+console.log("rows 1 " + pattern.number_of_rows);
+    var weaving = new Array(1);
+    weaving[0] = new Array(number_of_tablets);
+
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      weaving[0][i] = 1;
+    }
+
+
+    Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
+    console.log("rows 2 " + pattern.number_of_rows);
   },
 
   //////////////////////////////////////

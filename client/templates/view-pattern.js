@@ -15,6 +15,51 @@ Template.view_pattern.rendered = function() {
   else
     Session.set('view_pattern_mode', "summary");
 
+  // simulation patterns: build weaving chart from turning schedule
+  // auto
+  var pattern = Patterns.findOne({_id: pattern_id});
+
+  if (pattern.edit_mode == "simulation")
+  {
+    console.log("initial weaving " + pattern.weaving);
+    var number_of_tablets = pattern.number_of_tablets;
+    // first row of weaving is row A of threading
+console.log("current weaving data " + current_weaving_data.valueOf());
+    Meteor.call("build_simulation_weaving", pattern_id, number_of_tablets, function(){
+        console.log("done " + pattern_id);
+        Meteor.my_functions.save_weaving_as_text(pattern_id, 1, number_of_tablets);
+        Meteor.my_functions.store_pattern(pattern_id);
+        Session.set("number_of_rows", 1);
+        Meteor.my_functions.update_after_tablet_change();
+        Meteor.my_functions.save_preview_as_text(pattern_id);
+        /*Meteor.my_functions.store_pattern(pattern_id);
+        
+        Session.set("number_of_rows", 1);
+        Session.set("number_of_tablets", number_of_tablets);
+
+        if (tablet_change)
+        {
+          Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
+          Meteor.my_functions.save_orientation_as_text(pattern_id);
+          Meteor.my_functions.update_after_tablet_change();
+        }
+
+        if (row_change)
+        {
+          Meteor.my_functions.update_after_tablet_change();
+        }
+        Meteor.my_functions.save_preview_as_text(pattern_id);*/
+      });
+    
+    /*for (var i=pattern.number_of_rows; i>1; i--)
+    {
+              console.log("i " + i);
+      var result = Meteor.my_functions.remove_weaving_row(pattern_id, i);
+    }*/
+  }
+
+  // TODO manual
+
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll
@@ -90,11 +135,11 @@ Template.view_pattern.helpers({
     if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
         return;
 
-    if (pattern.edit_mode == "freehand")
-      return "freehand";
+    if (pattern.edit_mode == "simulation")
+      return "simulation";
 
     else
-      return "simulation";
+      return "freehand";
   },
   can_remove_tablets: function() {
     // is there more than 1 tablet?
@@ -347,7 +392,6 @@ Template.styles_palette.helpers({
     return style.warp;
   },
   edit_style_warp: function(current_warp) {
-    //console.log("warp " + current_warp);
     var warps = [
       {
         new_warp: "forward",
