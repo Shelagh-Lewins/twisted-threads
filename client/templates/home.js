@@ -38,11 +38,15 @@ Template.create_new_pattern.events({
   },
   "click input[type=submit]": function(event){""
     event.preventDefault();
+    var edit_mode = event.currentTarget.value;
+    var number_of_rows = "1";
+    if(edit_mode != "simulation")
+      edit_mode = $('#num_rows').val();
 
     var params = {
       edit_mode: event.currentTarget.value, // two submit buttons, simulation and freehand
       number_of_tablets: $('#num_tablets').val(),
-      number_of_rows: $('#num_rows').val(), // only actually used by freehand patterns
+      number_of_rows: number_of_rows, // only actually used by freehand patterns
       name: $('#pattern_name').val()
     }
 

@@ -266,7 +266,7 @@ Meteor.methods({
           
         delete data.styles[i].backward_stroke;
         delete data.styles[i].forward_stroke;
-        //console.log("style " + JSON.stringify(data.styles[i]));
+
         if (typeof data.styles[i].warp === "undefined")
           data.styles[i].warp = "none";
       }
@@ -300,7 +300,7 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
 
     //////////////////////////////
-        if (data.edit_mode == "simulation")
+    if (data.edit_mode == "simulation")
     {
       // auto or manual. New patterns default to "freehand". Patterns from JSON may be either.
       if((data.simulation_mode == "") || (typeof data.simulation_mode === "undefined"))
@@ -309,9 +309,20 @@ Meteor.methods({
       Patterns.update({_id: pattern_id}, {$set: {simulation_mode: data.simulation_mode}});
 
       // auto and manual turn sequences exist so the user can switch between them without losing data
+      // track current rotation of each tablet
+      if(typeof data.position_of_A === "undefined")
+      {
+        data.position_of_A = new Array();
+        for (var i=0; i<number_of_tablets; i++)
+        {
+          data.position_of_A.push(0);
+        }
+      }
+
+      Patterns.update({_id: pattern_id}, {$set: {position_of_A: data.position_of_A}});
 
       // auto_turn_sequence e.g. FFFFBBBB
-      if((data.auto_turn_sequence == "") || (typeof data.auto_turn_sequence === "undefined"))
+      if(typeof data.auto_turn_sequence === "undefined")
         data.auto_turn_sequence = ["F","F","F","F","B","B","B","B"]; // default to 4 forward, 4 back
 
       Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: data.auto_turn_sequence}});
@@ -454,6 +465,8 @@ Meteor.methods({
       throw new Meteor.Error("too-many-tablets", "error saving pattern. Too many tablets.");
 
     // Save the individual cell data
+    var pattern = Patterns.findOne({_id: pattern_id}); // TODO remove
+;
     Patterns.update({_id: pattern_id}, {$set: { weaving: text}});
 
     // Record the number of rows
@@ -467,7 +480,6 @@ Meteor.methods({
   },
   save_preview_as_text: function(pattern_id, data)
   {
-    //console.log("save preview as text " + data);
     check(pattern_id, String);
     check(data, String);
 
@@ -688,26 +700,126 @@ Meteor.methods({
 
   //////////////////////////////////////
   // Simulation patterns
-  build_simulation_weaving: function(pattern_id, number_of_tablets)
+  build_simulation_weaving: function(pattern_id)
   {
     check(pattern_id, String);
-    check(number_of_tablets, Number);
 
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1, number_of_tablets: 1}});
-console.log("rows 1 " + pattern.number_of_rows);
-    var weaving = new Array(1);
-    weaving[0] = new Array(number_of_tablets);
+    var pattern = Patterns.findOne({_id: pattern_id});
 
+    var weaving = new Array();
+    var threading = JSON.parse(pattern.threading);
+    var orientations = JSON.parse(pattern.orientation);
+    var number_of_tablets = pattern.number_of_tablets;
+    var auto_turn_sequence = pattern.auto_turn_sequence;
+    var number_of_turns = auto_turn_sequence.length;
+
+    // reset all tablets to start position
+    var position_of_A = new Array();
     for (var i=0; i<number_of_tablets; i++)
     {
-      weaving[0][i] = 1;
+      position_of_A.push(0);
+    }
+
+    for (var j=0; j<number_of_turns; j++)
+    {
+      // find which thread shows in each tablet
+      var threading_row = [];
+
+      for (var i=0; i<number_of_tablets; i++)
+      {
+        // position of A = position_of_A[i] (row)
+        // tablet = i (column)
+        // thread style = threading[position_of_A[i]][i]
+        threading_row.push(threading[position_of_A[i]][i]);
+      }
+
+      //for (var i=0; i<auto_turn_sequence.length; i++)
+      //{
+        var new_row = Meteor.call("weave_simulation_row", number_of_tablets, threading_row, orientations);
+        weaving.push(new_row);
+      //}
+
+      // turn tablets
+      for (var i=0; i<number_of_tablets; i++)
+      {
+        // TODO turn tablets individually
+        if (auto_turn_sequence[j] = "F")
+          position_of_A[i] = (position_of_A[i] + 1) % 4;
+
+        else
+          position_of_A[i] = (position_of_A[i] - 1) % 4;
+
+      }
     }
 
 
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
-    console.log("rows 2 " + pattern.number_of_rows);
-  },
 
+    Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_turns}});
+
+    var pattern = Patterns.findOne({_id: pattern_id});
+  },
+  weave_simulation_row: function(number_of_tablets, threading_row, orientations)
+  {
+    var new_row = new Array(number_of_tablets);
+
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      var thread_style = threading_row[i];
+      var orientation = orientations[i];
+      new_row[i] = Meteor.call("weaving_style_from_threading_style", thread_style, orientation, "F", 1);
+    }
+
+    return new_row;
+  },
+  weaving_style_from_threading_style: function(style_value, orientation, direction, number_of_turns)
+  {
+    // which style to use on the weaving chart to represent a tablet turning forwards / backwards, with S /Z orientation, and thread colour from threading style
+    // simulation styles for weaving appear after the 7 threading styles
+    // SF, ZF, ZB, SB are style no. 7 + 4(n-1) + 1,2,3,4
+    // TODO number_of_turns 0 - 3 (use special styles in weaving chart)
+
+    if (!Meteor.call("is_style_special", style_value))
+    {
+      var style_number = 7 + 4*(style_value - 1);
+
+    }
+    else
+    {
+
+      // special style for empty hole, hard-coded to last 4 styles
+      if (style_value == "S7")
+        var style_number = 7 + 4*7 // this is the 8th style (7-1)
+      else
+        return -1; // style does not correspond to a weaving chart style
+    }
+    if(direction == "F")
+    {
+      if (orientation == "S")
+        style_number += 1
+      else
+        style_number += 2
+    }
+    else
+    {
+      if (orientation == "Z")
+        style_number += 3
+      else
+        style_number += 4
+    }
+    return style_number;
+  },
+  is_style_special: function(style_value)
+  {
+  if (typeof style_value === "undefined")
+      return false;
+
+    if (style_value.toString().charAt(0) == "S")
+      return true;
+
+    else
+      return false;
+  },
   //////////////////////////////////////
   // Recent patterns
   add_to_recent_patterns: function(pattern_id) {
@@ -1081,7 +1193,6 @@ console.log("rows 1 " + pattern.number_of_rows);
       switch (property)
       {
         case "caption":
-          //console.log("edit caption ");
           var update = {};
           update[property] = value; // this construction is necessary to handle a variable property name
           Images.update({_id: object_id}, {$set: update});

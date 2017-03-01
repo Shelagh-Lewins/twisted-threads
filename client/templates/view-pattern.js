@@ -21,41 +21,21 @@ Template.view_pattern.rendered = function() {
 
   if (pattern.edit_mode == "simulation")
   {
-    console.log("initial weaving " + pattern.weaving);
     var number_of_tablets = pattern.number_of_tablets;
     // first row of weaving is row A of threading
-console.log("current weaving data " + current_weaving_data.valueOf());
-    Meteor.call("build_simulation_weaving", pattern_id, number_of_tablets, function(){
-        console.log("done " + pattern_id);
+    Meteor.call("build_simulation_weaving", pattern_id, function(){
+
+      var pattern = Patterns.findOne({_id: pattern_id});
+
+        Session.set("number_of_rows", pattern.number_of_rows);
+
+        //Meteor.my_functions.update_after_tablet_change();
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
         Meteor.my_functions.save_weaving_as_text(pattern_id, 1, number_of_tablets);
-        Meteor.my_functions.store_pattern(pattern_id);
-        Session.set("number_of_rows", 1);
-        Meteor.my_functions.update_after_tablet_change();
         Meteor.my_functions.save_preview_as_text(pattern_id);
-        /*Meteor.my_functions.store_pattern(pattern_id);
-        
-        Session.set("number_of_rows", 1);
-        Session.set("number_of_tablets", number_of_tablets);
-
-        if (tablet_change)
-        {
-          Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
-          Meteor.my_functions.save_orientation_as_text(pattern_id);
-          Meteor.my_functions.update_after_tablet_change();
-        }
-
-        if (row_change)
-        {
-          Meteor.my_functions.update_after_tablet_change();
-        }
-        Meteor.my_functions.save_preview_as_text(pattern_id);*/
+        Meteor.my_functions.store_pattern(pattern_id);
       });
-    
-    /*for (var i=pattern.number_of_rows; i>1; i--)
-    {
-              console.log("i " + i);
-      var result = Meteor.my_functions.remove_weaving_row(pattern_id, i);
-    }*/
+
   }
 
   // TODO manual
@@ -583,7 +563,6 @@ Template.view_pattern.events({
         return;
 
       Meteor.my_functions.set_preview_cell_style(this.row, this.tablet, new_style);
-     
       Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets);
     }
   },
@@ -603,6 +582,7 @@ Template.view_pattern.events({
       Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
 
       Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
+
       Meteor.my_functions.store_pattern(pattern_id);
     }
   },

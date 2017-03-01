@@ -355,106 +355,107 @@
       "warp": "none",
       "style": 7
     },
-    {
+        {
       "background_color": "#ffffff",
-      "line_color": "#1c4587",
+      "line_color": "#cc0000",
       "warp": "forward",
       "style": 8
     },
     {
       "background_color": "#ffffff",
-      "line_color": "#1c4587",
+      "line_color": "#cc0000",
       "warp": "backward",
       "style": 9
     },
     {
       "background_color": "#bbbbbb",
-      "line_color": "#1c4587",
+      "line_color": "#cc0000",
       "warp": "forward",
-      "style": 10
+      "style": 10,
+      "special": false
     },
     {
       "background_color": "#bbbbbb",
-      "line_color": "#1c4587",
+      "line_color": "#cc0000",
       "warp": "backward",
-      "style": 11
+      "style": 11,
+      "special": false
     },
     {
       "background_color": "#ffffff",
-      "line_color": "#6aa84f",
+      "line_color": "#ffd966",
       "warp": "forward",
-      "style": 12
+      "style": 12,
+      "special": false
     },
     {
       "background_color": "#ffffff",
-      "line_color": "#6aa84f",
+      "line_color": "#ffd966",
       "warp": "backward",
-      "style": 13
+      "style": 14,
+      "special": false
     },
     {
       "background_color": "#bbbbbb",
-      "line_color": "#6aa84f",
+      "line_color": "#ffd966",
       "warp": "forward",
       "style": 14
     },
     {
       "background_color": "#bbbbbb",
-      "line_color": "#6aa84f",
+      "line_color": "#ffd966",
       "warp": "backward",
       "style": 15
     },
     {
       "background_color": "#ffffff",
-      "line_color": "#cc0000",
+      "line_color": "#1c4587",
       "warp": "forward",
       "style": 16
     },
     {
       "background_color": "#ffffff",
-      "line_color": "#cc0000",
+      "line_color": "#1c4587",
       "warp": "backward",
       "style": 17
     },
     {
       "background_color": "#bbbbbb",
-      "line_color": "#cc0000",
+      "line_color": "#1c4587",
       "warp": "forward",
-      "style": 18,
-      "special": false
+      "style": 18
     },
     {
       "background_color": "#bbbbbb",
-      "line_color": "#cc0000",
+      "line_color": "#1c4587",
       "warp": "backward",
-      "style": 19,
-      "special": false
+      "style": 19
     },
     {
       "background_color": "#ffffff",
-      "line_color": "#ffd966",
+      "line_color": "#6aa84f",
       "warp": "forward",
-      "style": 20,
-      "special": false
+      "style": 20
     },
     {
       "background_color": "#ffffff",
-      "line_color": "#ffd966",
+      "line_color": "#6aa84f",
       "warp": "backward",
-      "style": 21,
-      "special": false
+      "style": 21
     },
     {
       "background_color": "#bbbbbb",
-      "line_color": "#ffd966",
+      "line_color": "#6aa84f",
       "warp": "forward",
       "style": 22
     },
     {
       "background_color": "#bbbbbb",
-      "line_color": "#ffd966",
+      "line_color": "#6aa84f",
       "warp": "backward",
       "style": 23
     },
+
     {
       "background_color": "#ffffff",
       "line_color": "#674ea7",

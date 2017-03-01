@@ -142,10 +142,8 @@ Meteor.my_functions = {
 
     // Weaving simulation (if edit_mode == simulation)
     // default to "simulation_mode": auto
-    //console.log("pattern.edit_mode " + pattern.edit_mode);
     if (pattern.edit_mode == "simulation")
     {
-      //console.log("simulation");
       pattern_obj.simulation_mode = pattern.simulation_mode; // auto or manual
       pattern_obj.auto_turn_sequence = pattern.auto_turn_sequence; // e.g. FFFFBBBB
       
@@ -633,7 +631,7 @@ Meteor.my_functions = {
       var position_A_thread = position_A_threads[tablet]; // visible thread for this tablet
       if (typeof position_A_thread === "undefined")
             return; // in case
-          //console.log("tablet " + tablet);
+
       if (direction == current_turn_direction[tablet])
       {
         // TODO check for distance == 3, 2 or 1
@@ -670,7 +668,6 @@ Meteor.my_functions = {
     var idle_style = "S1"; // just so there is some value
     for (var i=0; i<pattern_obj.special_styles.length; i++)
     {
-     // console.log("name " + current_special_styles[i].name);
       if (pattern_obj.special_styles[i].name == "idle")
       {
         idle_style = pattern_obj.special_styles[i].style;
@@ -692,7 +689,7 @@ Meteor.my_functions = {
       for (var j=0; j<actions.length; j++)
       {
         var action = actions[j]["$"];
-//console.log("action " + j);
+
         if (action.Type == "Turn")
         {
           var distance = parseInt(action.Dist); // usually 1 (quarter turn)
@@ -704,7 +701,7 @@ Meteor.my_functions = {
             var target_pack = packs[action.TargetID];
             if (typeof target_pack === "undefined")
                 return {error: "no pack " + (action.TargetID) + " has been defined"};
-//console.log("turn pack " + target_pack);
+;
             for (var k=0; k<target_pack.length; k++) // each tablet in pack
             {
               var tablet = target_pack[k];
@@ -745,15 +742,12 @@ Meteor.my_functions = {
     data._id = pattern_id;
     data.number_of_rows = pattern.number_of_rows;
     data.number_of_tablets = pattern.number_of_tablets;
+
     data.weaving = Meteor.my_functions.get_weaving_as_text(data.number_of_rows, data.number_of_tablets);
     data.threading = Meteor.my_functions.get_threading_as_text(data.number_of_tablets);
     data.orientation = Meteor.my_functions.get_orientation_as_text(pattern_id);
     data.styles = Meteor.my_functions.get_styles_as_text(pattern_id);
     data.auto_preview = pattern.auto_preview;
-    /*setTimeout(function(){ 
-    data.auto_preview = pattern.auto_preview;
-    console.log("storing pattern " + pattern.auto_preview);
-  }, 2000);*/
 
     // remove any stored states after this point
     var splice_position = Session.get('undo_stack_position') + 1;
@@ -793,7 +787,6 @@ Meteor.my_functions = {
       return;
 
     Meteor.call('restore_pattern', data, function(){
-      //console.log("restore " + data.auto_preview);
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.initialize_background_color_picker();
       Meteor.my_functions.initialize_warp_color_picker();
@@ -1010,7 +1003,6 @@ Meteor.my_functions = {
     }
 
     // client-side weft color is a ReactiveVar
-    //console.log("new pattern " + pattern.weft_color);
     var color = (typeof pattern.weft_color !== "undefined") ? pattern.weft_color : "#76a5af"; // older version pattern does not have weft_color
     weft_color = new ReactiveVar(color);
 
@@ -1105,7 +1097,7 @@ Meteor.my_functions = {
   update_after_tablet_change: function()
   {
     var data = stored_patterns[stored_patterns.length-2];
-//console.log("change");
+
     number_of_tablets = data.number_of_tablets;
     number_of_rows = data.number_of_rows;
 
@@ -1137,6 +1129,9 @@ Meteor.my_functions = {
 
     // restore
     var data = stored_patterns[stored_patterns.length-1];
+
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}); // TODO remove, just for logging
 
     Meteor.call('update_after_tablet_change', data, function(){
       var pattern_id = Router.current().params._id;
@@ -1364,7 +1359,10 @@ Meteor.my_functions = {
 
     var weaving_array = Meteor.my_functions.get_weaving_as_text(number_of_rows, number_of_tablets);
 
-    Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets, function(){
+    var pattern = Patterns.findOne({_id: pattern_id});
+
+
+    Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), pattern.number_of_rows, pattern.number_of_tablets, function(){
 
         Meteor.my_functions.store_pattern(pattern_id);
         
@@ -1412,7 +1410,6 @@ Meteor.my_functions = {
   },
   save_weft_color_as_text: function(pattern_id, color)
   {
-    //console.log("to save color " + color);
     Meteor.call('save_weft_color_as_text', pattern_id, color);
   },
   get_orientation_as_text: function(pattern_id)
@@ -1454,7 +1451,6 @@ Meteor.my_functions = {
   },
   save_preview_as_text: function(pattern_id)
   {
-    //console.log("saving preview");
     // save the auto-generated preview to the database as a string
     // delay to allow the last cell to be rendered
     // It doesn't seem to be worth drawing this when patterns load, it's no quicker. and the whole thing has to be redrawn if you start editing. But it can be used outside the pattern view.
@@ -2108,17 +2104,6 @@ Meteor.my_functions = {
   {
     current_threading_data[(hole) + "_" + (tablet)].set(style);
   },
-  is_style_special: function(style_value)
-  {
-    if (typeof style_value === "undefined")
-      return false;
-
-    if (style_value.toString().charAt(0) == "S")
-      return true;
-
-    else
-      return false;
-  },
   find_style: function(style_value) // e,g, 2, "S1", may be regular or special
   {
     if (typeof style_value === "undefined")
@@ -2147,49 +2132,6 @@ Meteor.my_functions = {
       style.special = false;
     }
     return style; // the style object
-  },
-  ////////////////////////////////////////////
-  // Simulation patterns: build weaving chart from threading and turning schedule
-  build_simulation_weaving_chart: function(pattern_id)
-  {
-    // auto
-
-    // TODO manual
-  },
-  weaving_style_from_threading_style: function(style_value, orientation, direction, number_of_turns)
-  {
-    // which style to use on the weaving chart to represent a tablet turning forwards / backwards, with S /Z orientation, and thread colour from threading style
-    // simulation styles for weaving appear after the 7 threading styles
-    // SF, ZF, ZB, SB are style no. 7 + 4(n-1) + 1,2,3,4
-    // TODO number_of_turns 0 - 3 (use special styles in weaving chart)
-    
-    if (!is_style_special(style_value))
-    {
-      var style = 7 + 4*(style_value - 1)
-    }
-    else
-    {
-      // special style for empty hole, hard-coded to last 4 styles
-      if (style_value == "S7")
-        var style = 7 + 4*7 // this is the 8th style (7-1)
-      else
-        return -1; // style does not correspond to a weaving chart style
-    }
-    if(direction == "F")
-    {
-      if (orientation == "S")
-        style_number += 1
-      else
-        style_number += 2
-    }
-    else
-    {
-      if (orientation == "Z")
-        style_number += 3
-      else
-        style_number += 4
-    }
-    return style_number;
   },
   ////////////////////////////////////////////
   // work around frequent failure of Meteor to register clicks on Styles palette
