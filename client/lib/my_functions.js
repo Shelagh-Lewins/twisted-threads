@@ -1097,24 +1097,27 @@ Meteor.my_functions = {
     //////////////////////////////
     // build the simulation pattern auto_turn_sequence data
     // if rebuilding, clearing the array forces helpers to rerun
-    if (typeof current_auto_turn_sequence !== "undefined")
-      current_auto_turn_sequence.clear();
-
-    var auto_turn_sequence = pattern.auto_turn_sequence;
-
-    var blank_arr = new Array(auto_turn_sequence.length)
-    current_auto_turn_sequence = new ReactiveArray(blank_arr);
-
-    //var orientation_data = JSON.parse(pattern.orientation);
-
-    for (var i=0; i<auto_turn_sequence.length; i++)
+    if (pattern.edit_mode == "simulation")
     {
-      var obj = {
-        turn: i+1,
-        direction: auto_turn_sequence[i]
-      }
+      if (typeof current_auto_turn_sequence !== "undefined")
+        current_auto_turn_sequence.clear();
 
-      current_auto_turn_sequence[i] = obj;
+      var auto_turn_sequence = pattern.auto_turn_sequence;
+
+      var blank_arr = new Array(auto_turn_sequence.length)
+      current_auto_turn_sequence = new ReactiveArray(blank_arr);
+
+      //var orientation_data = JSON.parse(pattern.orientation);
+
+      for (var i=0; i<auto_turn_sequence.length; i++)
+      {
+        var obj = {
+          turn: i+1,
+          direction: auto_turn_sequence[i]
+        }
+
+        current_auto_turn_sequence[i] = obj;
+      }
     }
   },
   update_after_tablet_change: function()
@@ -1287,7 +1290,18 @@ Meteor.my_functions = {
     current_tablet_indexes.push(number_of_tablets+1);
 
     // save to database
+   /*if (pattern.edit_mode == "simulation")
+    {
+      Meteor.call("save_number_of_tablets", pattern_id, number_of_tablets + 1, function(){
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
+        Meteor.my_functions.build_simulation_weaving(pattern_id);
+      }); 
+    }*/
+      
+    //else
     Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets + 1);
+//      Meteor.my_functions.build_simulation_weaving(pattern_id);
+
   },
   remove_tablet: function(pattern_id, position)
   {
@@ -1337,18 +1351,11 @@ Meteor.my_functions = {
     current_tablet_indexes.pop();
 
     // save to database
-    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets - 1);
+    /*if (pattern.edit_mode == "simulation")
+      Meteor.my_functions.build_simulation_weaving(pattern_id);
+    else*/
+      Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets - 1);
   },
-  /*set_updating_pattern: function(set_updating_pattern)
-  {
-    if (typeof updating_pattern_timeout !== "undefined")
-      clearTimeout(updating_pattern_timeout);
-
-    Session.set("updating_pattern", true);
-    updating_pattern_timeout = setTimeout(function(){
-        Session.set("updating_pattern", false);
-      }, 2000);
-  },*/
   get_weaving_as_text: function(number_of_rows, number_of_tablets)
   {
     // turn the reactive array of objects into simple nested arrays of style values
@@ -1366,7 +1373,7 @@ Meteor.my_functions = {
 
     return weaving_array;
   },
-  save_weaving_as_text: function(pattern_id, number_of_rows, number_of_tablets)
+  save_weaving_as_text: function(pattern_id, number_of_rows, number_of_tablets, build_simulation_weaving)
   {
     var pattern = Patterns.findOne({_id: pattern_id});
     if (typeof pattern === "undefined")
@@ -1384,8 +1391,11 @@ Meteor.my_functions = {
 
     var pattern = Patterns.findOne({_id: pattern_id});
 
+    if (pattern.edit_mode == "simulation")
+      number_of_rows = pattern.number_of_rows;
 
-    Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), pattern.number_of_rows, pattern.number_of_tablets, function(){
+    Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets, function(){
+        var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
         Meteor.my_functions.store_pattern(pattern_id);
         
@@ -1397,6 +1407,9 @@ Meteor.my_functions = {
           Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
           Meteor.my_functions.save_orientation_as_text(pattern_id);
           Meteor.my_functions.update_after_tablet_change();
+
+          if (pattern.edit_mode == "simulation")
+            Meteor.my_functions.build_simulation_weaving(pattern_id)
         }
 
         if (row_change)
@@ -1404,6 +1417,9 @@ Meteor.my_functions = {
           Meteor.my_functions.update_after_tablet_change();
         }
         Meteor.my_functions.save_preview_as_text(pattern_id);
+
+        //if (pattern.edit_mode == "simulation")
+          //Meteor.my_functions.build_simulation_weaving(pattern_id);
       });
     
     Session.set('edited_pattern', true);

@@ -146,7 +146,6 @@ Meteor.methods({
           //data.weaving[i][j] = (j >= options.number_of_tablets/2) ? 19 :20; // warp twined
           data.weaving[i][j] = ((j % 2) == 0) ? 5 :6;
         }
-        console.log("row " + i);
       }
 
       // threading
@@ -295,7 +294,6 @@ Meteor.methods({
         weaving[i][j] = data.weaving[i][j];
       }
     }
-    console.log("weaving from data " + JSON.stringify(weaving));
 
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
 
@@ -479,6 +477,13 @@ Meteor.methods({
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);
   },
+  save_number_of_tablets: function(pattern_id, number_of_tablets)
+  {
+    check(pattern_id, String);
+    check(number_of_tablets, Number);
+
+    Patterns.update({_id: pattern_id}, {$set: {number_of_tablets: number_of_tablets}});
+  },
   save_preview_as_text: function(pattern_id, data)
   {
     check(pattern_id, String);
@@ -604,9 +609,6 @@ Meteor.methods({
     Meteor.call('save_orientation_as_text', data._id, JSON.stringify(data.orientation));
     Meteor.call('save_styles_as_text', data._id, JSON.stringify(data.styles));
     Patterns.update({_id: data._id}, {$unset: {auto_preview: ""}}); // preview must be re-read from the HTML after it has been built
-    //Patterns.update({_id: data._id}, {$set: {auto_preview: data.auto_preview}});
-    //console.log("restore pattern " + data.auto_preview);
-   // Meteor.call('save_preview_as_text', data._id, data.auto_preview);
     return;
   },
   update_after_tablet_change: function(data) // required to restore reactivity after tablets have been added or removed
@@ -860,6 +862,9 @@ Meteor.methods({
     check(pattern_id, String);
     check(new_number, Number);
 
+    if ((new_number < 1) || (new_number > 32))
+      return;
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, auto_turn_sequence: 1}});
 
     if (pattern.created_by != Meteor.userId())
@@ -877,22 +882,42 @@ Meteor.methods({
 
       if (difference < 0)
       {
-        console.log("add turns " + difference);
         for (var i=0; i<(-1 * difference); i++)
         {
           auto_turn_sequence.push("F")
         }
-        console.log("new sequence " + auto_turn_sequence);
       }
       else
       {
-        console.log("remove turns " + difference);
         auto_turn_sequence.splice(auto_turn_sequence.length - difference, difference);
-        console.log("new sequence " + auto_turn_sequence);
       }
 
       Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: auto_turn_sequence}});
     }
+  },
+  toggle_turn_direction: function(pattern_id, turn_number) {
+    // toggle direction of a turn of auto turning, for simulation pattern
+    check(pattern_id, String);
+    check(turn_number, Number);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, auto_turn_sequence: 1}});
+
+    if (pattern.created_by != Meteor.userId())
+      // Only the owner can edit a pattern
+      throw new Meteor.Error("not-authorized", "You can only update turn direction for a pattern you created");
+
+    var auto_turn_sequence = pattern.auto_turn_sequence;
+    var direction = auto_turn_sequence[turn_number - 1];
+
+    if (direction == "F")
+      direction = "B";
+
+    else
+      direction = "F";
+
+    auto_turn_sequence[turn_number - 1] = direction;
+
+    Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: auto_turn_sequence}});
   },
   //////////////////////////////////////
   // Recent patterns

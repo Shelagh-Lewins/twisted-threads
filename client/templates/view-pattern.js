@@ -626,15 +626,47 @@ Template.view_pattern.events({
   {
     // change number of turns in auto_turn_sequence for simulation pattern
     var pattern_id = Router.current().params._id;
-    //console.log("changed " + parseInt(event.currentTarget.value));
+
     Meteor.call("update_number_of_turns", pattern_id, parseInt(event.currentTarget.value), function(){
       Meteor.my_functions.build_simulation_weaving(pattern_id);
     });
   },
   'click .direction': function()
   {
-    console.log("clicked " + this.direction);
-    console.log("number " + this.turn); 
+    // change direction of turn in auto_turn_sequence for simulation pattern
+    var pattern_id = Router.current().params._id;
+
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
+    Meteor.call("toggle_turn_direction", pattern_id, this.turn, function(){
+      Meteor.my_functions.build_simulation_weaving(pattern_id);
+    });
+  },
+  'click #sim_add_tablet': function () {
+    if (Meteor.my_functions.accept_click())
+    {
+      var pattern_id = Router.current().params._id;
+
+      if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+
+      var style = Meteor.my_functions.get_selected_style();
+
+      Meteor.my_functions.add_tablet(pattern_id, -1, style);
+      //Meteor.my_functions.build_simulation_weaving(pattern_id); 
+    }
+  },
+  'click #sim_remove_tablet': function () {
+    if (Meteor.my_functions.accept_click())
+    {
+      var pattern_id = Router.current().params._id;
+      var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_tablets: 1}});
+
+      Meteor.my_functions.remove_tablet(pattern_id, pattern.number_of_tablets);
+
+      //Meteor.my_functions.build_simulation_weaving(pattern_id);
+    }
   }
 });
 
