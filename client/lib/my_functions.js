@@ -1093,6 +1093,29 @@ Meteor.my_functions = {
       current_special_styles.clear();
 
     current_special_styles = new ReactiveArray(special_styles_array);
+
+    //////////////////////////////
+    // build the simulation pattern auto_turn_sequence data
+    // if rebuilding, clearing the array forces helpers to rerun
+    if (typeof current_auto_turn_sequence !== "undefined")
+      current_auto_turn_sequence.clear();
+
+    var auto_turn_sequence = pattern.auto_turn_sequence;
+
+    var blank_arr = new Array(auto_turn_sequence.length)
+    current_auto_turn_sequence = new ReactiveArray(blank_arr);
+
+    //var orientation_data = JSON.parse(pattern.orientation);
+
+    for (var i=0; i<auto_turn_sequence.length; i++)
+    {
+      var obj = {
+        turn: i+1,
+        direction: auto_turn_sequence[i]
+      }
+
+      current_auto_turn_sequence[i] = obj;
+    }
   },
   update_after_tablet_change: function()
   {

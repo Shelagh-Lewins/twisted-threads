@@ -78,10 +78,15 @@
     <h2>Weaving Schedule</h2>
     {{#if can_edit_pattern _id}}
     <div id="toolbar" ><div class="inner_tube">
-    Weave by repeating a series of turns
+    <span class="hint">Weave by repeating a series of turns</span>
 
     <label for="num_turns">Number of turns:</label>
-    <input type="number" placeholder="Number of turns..." id="num_turns" min="1" max="32" size="3" value="8" ><br/>
+    <input type="number" placeholder="Number of turns..." id="num_turns" min="1" max="32" size="3" value="{{auto_turn_sequence.length}}" ><br/>
+    {{#each auto_turn_sequence}}
+      <span class="direction">
+        {{this.direction}}
+      </span>
+    {{/each}}
 
     </div></div>{{/if}}
     <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}} {{rendered}}">

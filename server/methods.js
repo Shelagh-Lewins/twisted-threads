@@ -707,6 +707,10 @@ Meteor.methods({
 
     var pattern = Patterns.findOne({_id: pattern_id});
 
+    if (pattern.created_by != Meteor.userId())
+      // Only the owner can edit a pattern
+      throw new Meteor.Error("not-authorized", "You can only build simulation weaving for a pattern you created");
+
     var weaving = new Array();
     var threading = JSON.parse(pattern.threading);
     var orientations = JSON.parse(pattern.orientation);
@@ -755,11 +759,7 @@ Meteor.methods({
 
       var new_row = Meteor.call("weave_simulation_row", number_of_tablets, threading_row, orientations, auto_turn_sequence[j]);
       weaving.push(new_row);
-
-
-      
     }
-
 
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
 
@@ -771,6 +771,11 @@ Meteor.methods({
   },
   weave_simulation_row: function(number_of_tablets, threading_row, orientations, direction)
   {
+    check(number_of_tablets, Number);
+    check(threading_row, [Number]);
+    check(orientations, [String]);
+    check(direction, String);
+
     var new_row = new Array(number_of_tablets);
 
     for (var i=0; i<number_of_tablets; i++)
@@ -789,10 +794,14 @@ Meteor.methods({
     // SF, ZF, ZB, SB are style no. 7 + 4(n-1) + 1,2,3,4
     // TODO number_of_turns 0 - 3 (use special styles in weaving chart)
 
+    check(style_value, Match.OneOf(Number, String));
+    check(orientation, String);
+    check(direction, String);
+    check(number_of_turns, Number);
+
     if (!Meteor.call("is_style_special", style_value))
     {
       var style_number = 7 + 4*(style_value - 1);
-
     }
     else
     {
@@ -822,6 +831,10 @@ Meteor.methods({
   modular_add: function(a, b, modulus)
   {
     // addition in modular arithmetic
+    check(a, Number);
+    check(b, Number);
+    check(modulus, Number);
+
     var result = (a + b) % modulus;
 
     if (result < 0)
@@ -831,7 +844,9 @@ Meteor.methods({
   },
   is_style_special: function(style_value)
   {
-  if (typeof style_value === "undefined")
+    check(style_value, Match.OneOf(Number, String));
+
+    if (typeof style_value === "undefined")
       return false;
 
     if (style_value.toString().charAt(0) == "S")
@@ -839,6 +854,45 @@ Meteor.methods({
 
     else
       return false;
+  },
+  update_number_of_turns: function(pattern_id, new_number)
+  {
+    check(pattern_id, String);
+    check(new_number, Number);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, auto_turn_sequence: 1}});
+
+    if (pattern.created_by != Meteor.userId())
+      // Only the owner can edit a pattern
+      throw new Meteor.Error("not-authorized", "You can only update number of turns for a pattern you created");
+
+      if (new_number < 1)
+        throw new Meteor.Error("not-valid", "You cannot have no turns in the sequence");
+
+    var auto_turn_sequence = pattern.auto_turn_sequence;
+
+    if (auto_turn_sequence.length != new_number)
+    {
+      var difference = auto_turn_sequence.length - new_number;
+
+      if (difference < 0)
+      {
+        console.log("add turns " + difference);
+        for (var i=0; i<(-1 * difference); i++)
+        {
+          auto_turn_sequence.push("F")
+        }
+        console.log("new sequence " + auto_turn_sequence);
+      }
+      else
+      {
+        console.log("remove turns " + difference);
+        auto_turn_sequence.splice(auto_turn_sequence.length - difference, difference);
+        console.log("new sequence " + auto_turn_sequence);
+      }
+
+      Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: auto_turn_sequence}});
+    }
   },
   //////////////////////////////////////
   // Recent patterns

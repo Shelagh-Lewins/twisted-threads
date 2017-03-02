@@ -105,6 +105,16 @@ Template.view_pattern.helpers({
     else
       return "freehand";
   },
+  auto_turn_sequence: function() {
+    // weaving sequence for auto simulation pattern
+    /*var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { auto_turn_sequence: 1}});
+    return pattern.auto_turn_sequence;*/
+
+
+    if (typeof current_auto_turn_sequence !== "undefined")
+      return current_auto_turn_sequence.list();   
+  },
   can_remove_tablets: function() {
     // is there more than 1 tablet?
     var pattern_id = Router.current().params._id;
@@ -611,6 +621,20 @@ Template.view_pattern.events({
       return;
 
     Meteor.call('toggle_hole_handedness', pattern_id);
+  },
+  'input #num_turns': function(event)
+  {
+    // change number of turns in auto_turn_sequence for simulation pattern
+    var pattern_id = Router.current().params._id;
+    //console.log("changed " + parseInt(event.currentTarget.value));
+    Meteor.call("update_number_of_turns", pattern_id, parseInt(event.currentTarget.value), function(){
+      Meteor.my_functions.build_simulation_weaving(pattern_id);
+    });
+  },
+  'click .direction': function()
+  {
+    console.log("clicked " + this.direction);
+    console.log("number " + this.turn); 
   }
 });
 
