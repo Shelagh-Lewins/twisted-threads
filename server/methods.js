@@ -124,10 +124,8 @@ Meteor.methods({
       var rows = parseInt(options.number_of_rows);
 
       if ((rows <1) || (rows > 100))
-        build_new = false;
-
-      else if ((rows <1) || (rows > 100))
-        build_new = false;
+        if (options.edit_mode != "simulation") // simulation pattern builds its own weaving chart
+          build_new = false;
     }
     else
     {
@@ -138,16 +136,17 @@ Meteor.methods({
     {
       // build pattern data
       // weaving
-      data.weaving = new Array(options.number_of_rows);
+      data.weaving = new Array();
 
       for (var i=0; i<options.number_of_rows; i++)
       {
-        data.weaving[i] = new Array(options.number_of_tablets);
+        data.weaving[i] = new Array();
         for (var j=0; j<options.number_of_tablets; j++)
         {
           //data.weaving[i][j] = (j >= options.number_of_tablets/2) ? 19 :20; // warp twined
           data.weaving[i][j] = ((j % 2) == 0) ? 5 :6;
         }
+        console.log("row " + i);
       }
 
       // threading
@@ -296,6 +295,7 @@ Meteor.methods({
         weaving[i][j] = data.weaving[i][j];
       }
     }
+    console.log("weaving from data " + JSON.stringify(weaving));
 
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
 
@@ -324,6 +324,7 @@ Meteor.methods({
       // auto_turn_sequence e.g. FFFFBBBB
       if(typeof data.auto_turn_sequence === "undefined")
         data.auto_turn_sequence = ["F","F","F","F","B","B","B","B"]; // default to 4 forward, 4 back
+      //data.auto_turn_sequence = ["F","F","F","F","B","B","B","B","B","B","B","B","F","F","F","F"];
 
       Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: data.auto_turn_sequence}});
 
@@ -722,6 +723,25 @@ Meteor.methods({
 
     for (var j=0; j<number_of_turns; j++)
     {
+      // turn tablets
+      for (var i=0; i<number_of_tablets; i++)
+      {
+        // TODO turn tablets individually
+
+        // if change of direction, no net turn
+        var direction = auto_turn_sequence[j];
+        var last_direction = auto_turn_sequence[j-1];
+
+        if (direction == last_direction)
+        {
+          if (auto_turn_sequence[j] == "F")
+            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], 1, 4);
+
+          else
+            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1, 4);
+        }
+      }
+
       // find which thread shows in each tablet
       var threading_row = [];
 
@@ -733,23 +753,11 @@ Meteor.methods({
         threading_row.push(threading[position_of_A[i]][i]);
       }
 
-      //for (var i=0; i<auto_turn_sequence.length; i++)
-      //{
-        var new_row = Meteor.call("weave_simulation_row", number_of_tablets, threading_row, orientations);
-        weaving.push(new_row);
-      //}
+      var new_row = Meteor.call("weave_simulation_row", number_of_tablets, threading_row, orientations, auto_turn_sequence[j]);
+      weaving.push(new_row);
 
-      // turn tablets
-      for (var i=0; i<number_of_tablets; i++)
-      {
-        // TODO turn tablets individually
-        if (auto_turn_sequence[j] = "F")
-          position_of_A[i] = (position_of_A[i] + 1) % 4;
 
-        else
-          position_of_A[i] = (position_of_A[i] - 1) % 4;
-
-      }
+      
     }
 
 
@@ -757,9 +765,11 @@ Meteor.methods({
 
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_turns}});
 
+    Patterns.update({_id: pattern_id}, {$set: {position_of_A: position_of_A}});
+
     var pattern = Patterns.findOne({_id: pattern_id});
   },
-  weave_simulation_row: function(number_of_tablets, threading_row, orientations)
+  weave_simulation_row: function(number_of_tablets, threading_row, orientations, direction)
   {
     var new_row = new Array(number_of_tablets);
 
@@ -767,7 +777,7 @@ Meteor.methods({
     {
       var thread_style = threading_row[i];
       var orientation = orientations[i];
-      new_row[i] = Meteor.call("weaving_style_from_threading_style", thread_style, orientation, "F", 1);
+      new_row[i] = Meteor.call("weaving_style_from_threading_style", thread_style, orientation, direction, 1);
     }
 
     return new_row;
@@ -808,6 +818,16 @@ Meteor.methods({
         style_number += 4
     }
     return style_number;
+  },
+  modular_add: function(a, b, modulus)
+  {
+    // addition in modular arithmetic
+    var result = (a + b) % modulus;
+
+    if (result < 0)
+      result += modulus;
+    
+    return result;
   },
   is_style_special: function(style_value)
   {

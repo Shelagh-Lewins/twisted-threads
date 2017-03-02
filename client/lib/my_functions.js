@@ -1997,6 +1997,24 @@ Meteor.my_functions = {
     return new_value;
   },
   ///////////////////////////////////
+  // Simulation patterns
+  build_simulation_weaving: function(pattern_id)
+  {
+    var pattern = Patterns.findOne({_id: pattern_id});
+    var number_of_tablets = pattern.number_of_tablets;
+    // first row of weaving is row A of threading
+    Meteor.call("build_simulation_weaving", pattern_id, function(){
+
+      var pattern = Patterns.findOne({_id: pattern_id});
+
+      Session.set("number_of_rows", pattern.number_of_rows);
+      Meteor.my_functions.build_pattern_display_data(pattern_id);
+      Meteor.my_functions.save_weaving_as_text(pattern_id, 1, number_of_tablets);
+      Meteor.my_functions.save_preview_as_text(pattern_id);
+      Meteor.my_functions.store_pattern(pattern_id);
+    });
+  },
+  ///////////////////////////////////
   // Searching
   hide_search_results: function()
   {

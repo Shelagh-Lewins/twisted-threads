@@ -39,9 +39,9 @@ Template.create_new_pattern.events({
   "click input[type=submit]": function(event){""
     event.preventDefault();
     var edit_mode = event.currentTarget.value;
-    var number_of_rows = "1";
+    var number_of_rows = "0";
     if(edit_mode != "simulation")
-      edit_mode = $('#num_rows').val();
+      number_of_rows = $('#num_rows').val();
 
     var params = {
       edit_mode: event.currentTarget.value, // two submit buttons, simulation and freehand

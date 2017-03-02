@@ -19,24 +19,8 @@ Template.view_pattern.rendered = function() {
   // auto
   var pattern = Patterns.findOne({_id: pattern_id});
 
-  if (pattern.edit_mode == "simulation")
-  {
-    var number_of_tablets = pattern.number_of_tablets;
-    // first row of weaving is row A of threading
-    Meteor.call("build_simulation_weaving", pattern_id, function(){
-
-      var pattern = Patterns.findOne({_id: pattern_id});
-
-        Session.set("number_of_rows", pattern.number_of_rows);
-
-        //Meteor.my_functions.update_after_tablet_change();
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_as_text(pattern_id, 1, number_of_tablets);
-        Meteor.my_functions.save_preview_as_text(pattern_id);
-        Meteor.my_functions.store_pattern(pattern_id);
-      });
-
-  }
+  if ((pattern.edit_mode == "simulation") && (JSON.parse(pattern.weaving).length == 0)) // a new simulation pattern which hasn't built the weaving chart yet
+    Meteor.my_functions.build_simulation_weaving(pattern_id);
 
   // TODO manual
 
@@ -583,7 +567,11 @@ Template.view_pattern.events({
 
       Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
 
-      Meteor.my_functions.store_pattern(pattern_id);
+      if (pattern.edit_mode == "simulation")
+        Meteor.my_functions.build_simulation_weaving(pattern_id);
+
+      else
+        Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click .tablets .row.orientation li': function(event, template)
@@ -591,6 +579,7 @@ Template.view_pattern.events({
     if (Meteor.my_functions.accept_click())
     {
       var pattern_id = Router.current().params._id;
+      var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
       if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
@@ -606,7 +595,12 @@ Template.view_pattern.events({
         current_orientation.splice(this.tablet-1, 1, obj);
 
       Meteor.my_functions.save_orientation_as_text(pattern_id);
-      Meteor.my_functions.store_pattern(pattern_id);
+
+      if (pattern.edit_mode == "simulation")
+        Meteor.my_functions.build_simulation_weaving(pattern_id);
+
+      else
+        Meteor.my_functions.store_pattern(pattern_id);
     }
   },
   'click #change_handedness': function()
