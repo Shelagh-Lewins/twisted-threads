@@ -207,7 +207,6 @@ background: #fff; /* set desired hover color */
 }
 
 /* Simulation pattern */
-
 .simulation #toolbar {
   max-width: 600px;
   width: 100%;
@@ -230,14 +229,21 @@ background: #fff; /* set desired hover color */
   min-height: 24px;
   border: 1px solid #424A6C;
   border-radius: 4px;
-  margin-right: 4px;
+  margin: 4px 4px 0 0;
   padding: 2px;
   background-color: #FFFFFF;
   text-align: center;
   cursor: pointer;
 }
 
-.simulation #toolbar #num _turns {
+.simulation #toolbar #num_turns {
+  font-size: 16px;
+  color: #424A6C;
+}
+
+.simulation #toolbar .edit_tablets {
+  display: block;
+  clear:both;
   font-size: 16px;
 }
 
@@ -422,6 +428,71 @@ background: #fff; /* set desired hover color */
 
 #styles_palette.show_special_styles #edit_style_button {
   display: none;
+}
+
+/* Simulation styles */
+.simulation .styles .pagination ul li:nth-child(2) {
+  display: none;
+}
+
+#styles_palette.simulation .styles .box {
+  display: block;
+  height: 45px;
+}
+
+.simulation .styles ul.row {
+  width: 308px;
+}
+
+
+.simulation .styles ul.row.special {
+  width: 36px;
+  margin-left: -4px; /* remove space between inline-block elements */
+}
+
+.simulation .styles ul.row:nth-child(2) {
+  display: none;
+}
+
+.simulation .styles ul.row li.cell {
+  display: none;
+}
+
+.simulation .styles ul.row.style li.cell:nth-child(-n+7) {
+  display: inline-block;
+}
+
+#styles_palette.show_special_styles.simulation .special_styles {
+  display: inline-block;
+}
+
+.simulation .styles .special_styles {
+  display: inline-block;
+}
+
+.simulation .styles ul.row.special li.cell:nth-child(7) {
+  display: inline-block;
+}
+
+#styles_palette.show_special_styles.simulation .box > .row:first-child {
+  display: inline-block;
+}
+
+.simulation.show_special_styles .styles ul.row li.cell.selected {
+    border-color: #333333;
+}
+
+.simulation .styles ul.row.special li.cell.selected {
+    border-color: #333333;
+}
+
+.simulation.show_special_styles .styles ul.row.special li.cell.selected {
+    border-color: #5555FF;
+}
+
+.simulation .styles .pagination ul li a {
+    background-color: #424A6C;
+    color: #FFFFFF;
 }
 
 /* *** Edit Style *** */

@@ -60,10 +60,14 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   {
     style_ref = this.style;
     data.style = style_ref;
+    if ($('#width').hasClass("simulation"))
+      data.tooltip = "Thread colour";
   }
   else if (type == "special_styles")
   {
-    style_ref = this.style; 
+    style_ref = this.style;
+    if ($('#width').hasClass("simulation"))
+      data.tooltip = "Empty hole";
   }
   else if (type == "threading")
   {

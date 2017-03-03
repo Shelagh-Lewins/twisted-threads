@@ -654,7 +654,6 @@ Template.view_pattern.events({
       var style = Meteor.my_functions.get_selected_style();
 
       Meteor.my_functions.add_tablet(pattern_id, -1, style);
-      //Meteor.my_functions.build_simulation_weaving(pattern_id); 
     }
   },
   'click #sim_remove_tablet': function () {
@@ -664,8 +663,6 @@ Template.view_pattern.events({
       var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_tablets: 1}});
 
       Meteor.my_functions.remove_tablet(pattern_id, pattern.number_of_tablets);
-
-      //Meteor.my_functions.build_simulation_weaving(pattern_id);
     }
   }
 });

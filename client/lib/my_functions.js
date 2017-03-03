@@ -1290,18 +1290,7 @@ Meteor.my_functions = {
     current_tablet_indexes.push(number_of_tablets+1);
 
     // save to database
-   /*if (pattern.edit_mode == "simulation")
-    {
-      Meteor.call("save_number_of_tablets", pattern_id, number_of_tablets + 1, function(){
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.build_simulation_weaving(pattern_id);
-      }); 
-    }*/
-      
-    //else
     Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets + 1);
-//      Meteor.my_functions.build_simulation_weaving(pattern_id);
-
   },
   remove_tablet: function(pattern_id, position)
   {
@@ -1350,11 +1339,7 @@ Meteor.my_functions = {
     // remove tablet from indexes
     current_tablet_indexes.pop();
 
-    // save to database
-    /*if (pattern.edit_mode == "simulation")
-      Meteor.my_functions.build_simulation_weaving(pattern_id);
-    else*/
-      Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets - 1);
+    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets - 1);
   },
   get_weaving_as_text: function(number_of_rows, number_of_tablets)
   {
@@ -1417,9 +1402,6 @@ Meteor.my_functions = {
           Meteor.my_functions.update_after_tablet_change();
         }
         Meteor.my_functions.save_preview_as_text(pattern_id);
-
-        //if (pattern.edit_mode == "simulation")
-          //Meteor.my_functions.build_simulation_weaving(pattern_id);
       });
     
     Session.set('edited_pattern', true);
@@ -1642,6 +1624,33 @@ Meteor.my_functions = {
           obj.background_color = options.background_color;
           current_styles.splice(selected_style-1, 1, obj);
 
+          // simulation pattern: weaving chart styles must also be updated
+          var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+          if (pattern.edit_mode == "simulation")
+          {
+            var style_number = 7 + 4*7; // default to empty hole to avoid error
+
+            if (selected_style.toString().charAt(0) == "S")
+            {
+              if (selected_style == "S7") // empty hole
+              {
+                style_number = 7 + 4*7;
+              }
+            }
+            else // regular style
+            {
+              style_number = 7 + 4*(selected_style - 1);
+            }
+
+            for (var i=1; i<=4; i++)
+            {
+              style_number += 1;
+              var obj = current_styles[style_number-1];
+              obj.line_color = options.background_color;
+              current_styles.splice(style_number-1, 1, obj);
+            }
+          }
+
           // update database
           Meteor.my_functions.save_styles_as_text(pattern_id);
 
@@ -1815,8 +1824,9 @@ Meteor.my_functions = {
   },
   view_pattern_render: function(pattern_id) {
     Session.set('edit_style', false);
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
-    if (typeof Session.get('styles_palette') === "undefined")
+    if ((typeof Session.get('styles_palette') === "undefined") || (pattern.edit_mode == "simulation"))
       Session.set('styles_palette', "styles_1");
 
     if (Session.equals('styles_palette', "special"))
@@ -2197,11 +2207,16 @@ Meteor.my_functions = {
     if(special_style)
     {
       Session.set("selected_special_style", style);
+      if ($('#width').hasClass("simulation"))
+        Meteor.my_functions.styles_pagination_clicked("special");
     }
     else
     {
       Session.set("selected_style", parseInt(style));
       Meteor.my_functions.update_color_pickers();
+
+      if ($('#width').hasClass("simulation"))
+        Meteor.my_functions.styles_pagination_clicked("all_styles");
     }
     
   },
@@ -2215,7 +2230,6 @@ Meteor.my_functions = {
   },
   styles_pagination_clicked: function(page)
   {
-    //event.preventDefault();
     Session.set('styles_palette', page);
 
     if (page == "special")

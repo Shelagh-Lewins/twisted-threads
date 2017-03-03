@@ -774,7 +774,7 @@ Meteor.methods({
   weave_simulation_row: function(number_of_tablets, threading_row, orientations, direction)
   {
     check(number_of_tablets, Number);
-    check(threading_row, [Number]);
+    check(threading_row, [Match.OneOf(Number, String)]);
     check(orientations, [String]);
     check(direction, String);
 

@@ -76,6 +76,10 @@
 {{#if equals view_pattern_mode "charts"}}
   {{#if equals edit_mode "simulation"}}
     <h2>Weaving Schedule</h2>
+    <div class="hint {{rendered}}">
+      {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells to set their colour. Use 'X' for empty thread.<br>{{/if}}
+      Select "Start weaving" to step through the pattern rows one by one as you weave.
+    </div>
     {{#if can_edit_pattern _id}}
     <div id="toolbar" ><div class="inner_tube">
     <span class="hint">Weave by repeating a series of turns</span>
@@ -93,9 +97,6 @@
     </div>
 
     </div></div>{{/if}}
-    <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}} {{rendered}}">
-    
-    </div>
   {{else}}
 
     <h2>Weaving Chart</h2>
@@ -195,11 +196,16 @@
 </template>
 
 <template name="styles_palette">{{#if can_edit_pattern _id}}
-<div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}} {{show_special_styles}} {{#if equals view_pattern_mode "charts"}}visible{{/if}} ">
+<div id="styles_palette" class="{{#if single_column}}single_column{{/if}} {{editing_text}} {{show_special_styles}} {{#if equals view_pattern_mode "charts"}}visible{{/if}} {{edit_mode}} ">
 <div class="styles">
 <div class="edit_style {{editing_style}}">
+{{#if equals edit_mode "simulation"}}
+<h2>Thread colour</h2>
+{{else}}
 <h2>Background</h2>
+{{/if}}
 <div class="colorpicker_holder"><input type="text" id="background_colorpicker"></div>
+{{#unless equals edit_mode "simulation"}}
 <h2>Warp thread</h2>
 <div class="colorpicker_holder"><input type="text" id="line_colorpicker"></div>
 <ul class="warps">
@@ -211,13 +217,14 @@
     </li>
   {{/each}}
 </ul>
+{{/unless}}
 </div>
 <div class="pagination"><ul>
 {{#if single_column}}
 <li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_1');">Styles 1</a></li>
 <li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_2');">Styles 2</a></li>
 {{else}}
-<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">Styles</a></li>
+<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">{{#if equals edit_mode "simulation"}}Threading styles{{else}}Styles{{/if}}</a></li>
 {{/if}}
 <li class="special no_select {{is_selected_style_palette "special"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('special');">Special</a></li>
 </ul></div>
@@ -228,7 +235,7 @@
 {{/if}}</template>
 
 <template name="style_cell">
-<li class="cell no_select {{is_selected_style style}}" style="background-color: {{background_color}}; background-image: url('{{image}}')" onclick="Meteor.my_functions.style_cell_clicked('{{style}}', '{{special_style}}');">
+<li class="cell no_select {{is_selected_style style}}" title="{{this.tooltip}}" style="background-color: {{background_color}}; background-image: url('{{image}}')" onclick="Meteor.my_functions.style_cell_clicked('{{style}}', '{{special_style}}');">
 {{> pattern_cell_svg}}
 </li>
 </template>
