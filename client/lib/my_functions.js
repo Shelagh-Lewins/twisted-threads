@@ -1099,6 +1099,7 @@ Meteor.my_functions = {
     // if rebuilding, clearing the array forces helpers to rerun
     if (pattern.edit_mode == "simulation")
     {
+      // auto
       if (typeof current_auto_turn_sequence !== "undefined")
         current_auto_turn_sequence.clear();
 
@@ -1106,8 +1107,6 @@ Meteor.my_functions = {
 
       var blank_arr = new Array(auto_turn_sequence.length)
       current_auto_turn_sequence = new ReactiveArray(blank_arr);
-
-      //var orientation_data = JSON.parse(pattern.orientation);
 
       for (var i=0; i<auto_turn_sequence.length; i++)
       {
@@ -1118,6 +1117,18 @@ Meteor.my_functions = {
 
         current_auto_turn_sequence[i] = obj;
       }
+
+      // manual
+      var manual_weaving_turns_data = JSON.parse(pattern.manual_weaving_turns);
+      //var number_of_turns = manual_weaving_turns_data.length;
+
+      /*var manual_weaving_turns_array = new Array(number_of_turns);
+      for (var i=0; i<number_of_styles; i++)
+      {
+        styles_array[i] = styles_data[i];
+      }*/
+
+      current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns_data);
     }
   },
   update_after_tablet_change: function()

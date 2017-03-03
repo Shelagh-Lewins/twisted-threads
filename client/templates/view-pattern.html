@@ -81,7 +81,18 @@
       Select "Start weaving" to step through the pattern rows one by one as you weave.
     </div>
     {{#if can_edit_pattern _id}}
-    <div id="toolbar" ><div class="inner_tube">
+    <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
+
+<div class="tabs">
+  <ul>
+    <li class="auto {{is_selected_simulation_mode "auto"}}"><a>Auto</a></li>
+    <li class="manual {{is_selected_simulation_mode "manual"}}"><a>Manual</a></li>
+  </ul>
+</div>
+
+<div class="content">
+  {{#if equals simulation_mode "auto"}}
+    <h3>Auto weaving schedule</h3>
     <span class="hint">Weave by repeating a series of turns</span>
 
     <label for="num_turns">Number of turns:</label>
@@ -95,8 +106,48 @@
       <button id="sim_add_tablet">Add tablet</button>
       <button id="sim_remove_tablet">Remove tablet</button>
     </div>
+    {{else}}
+      <h3>Manual weaving schedule</h3>
+      <span class="hint">Weave row by row, turning tablets individually. Assign tablets to packs and set turning direction and amount per pack, then click "Weave".</span>
 
-    </div></div>{{/if}}
+      <div class="packs">
+        <ul>
+          {{#each packs}}
+          <li class="row">
+            <span class="pack_number">
+              pack {{this.pack_number}}
+            </span>
+
+            <span class="direction">
+              {{this.direction}}
+            </span>
+
+            <span class="number_of_turns">
+              {{this.number_of_turns}}
+            </span>
+
+            <ul class="tablets">
+            {{#each this.tablets}}
+              <li>
+                {{this}}
+              </li>
+            {{/each}}
+            </ul>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+
+      <div class="weave_buttons">
+      <button id="weave">Weave</button>
+      <button id="unweave">Unweave</button>
+    </div>
+
+    {{/if}}
+</div>
+
+    </div></div>
+  {{/if}}
   {{else}}
 
     <h2>Weaving Chart</h2>

@@ -105,6 +105,20 @@ Template.view_pattern.helpers({
     else
       return "freehand";
   },
+  simulation_mode: function() {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
+
+    return pattern.simulation_mode;
+  },
+  is_selected_simulation_mode: function(mode) {
+    // simulation pattern, auto or manual
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
+
+    if (mode == pattern.simulation_mode)
+    return "selected";
+  },
   auto_turn_sequence: function() {
     // weaving sequence for auto simulation pattern
     /*var pattern_id = Router.current().params._id;
@@ -114,6 +128,34 @@ Template.view_pattern.helpers({
 
     if (typeof current_auto_turn_sequence !== "undefined")
       return current_auto_turn_sequence.list();   
+  },
+  packs: function() {
+    var packs = new Array();
+
+    var data = current_manual_weaving_turns[current_manual_weaving_turns.length -1]; // last row
+
+    for (var i=Meteor.my_params.number_of_packs-1; i>=0; i--) // reverse order
+    {
+      var pack_number = data.packs[i].pack_number
+      var new_pack = {
+        tablets: new Array(),
+        pack_number: pack_number,
+        direction: data.packs[i].direction,
+        number_of_turns: data.packs[i].number_of_turns
+      }
+
+      for (var j=0; j<current_tablet_indexes.length; j++)
+      {
+        if(data.tablets[j] == pack_number)
+          new_pack.tablets.push(1);
+
+        else
+          new_pack.tablets.push(0);
+      }
+      packs.push(new_pack);
+    }
+    
+    return packs;
   },
   can_remove_tablets: function() {
     // is there more than 1 tablet?
@@ -621,6 +663,18 @@ Template.view_pattern.events({
       return;
 
     Meteor.call('toggle_hole_handedness', pattern_id);
+  },
+  /////////////////////////////////
+  // Simulation patterns
+  'click #toolbar .tabs li': function(event) {
+    var pattern_id = Router.current().params._id;
+    var simulation_mode = "auto";
+    if ($(event.currentTarget).hasClass("manual"))
+      simulation_mode = "manual";
+
+    Meteor.call("update_simulation_mode", pattern_id, simulation_mode, function(){
+      console.log("callback");
+    });
   },
   'input #num_turns': function(event)
   {

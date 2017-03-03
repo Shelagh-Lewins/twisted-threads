@@ -326,9 +326,34 @@ Meteor.methods({
 
       Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: data.auto_turn_sequence}});
 
-      // manual_turn_sequence, 3 packs each tablet turned individually
-      if((data.manual_turn_sequence == "") || (typeof data.manual_turn_sequence === "undefined"))
-        data.manual_turn_sequence = {}; // TODO
+      // manual_weaving_turns, 3 packs each tablet turned individually
+      if((data.manual_weaving_turns == "") || (typeof data.manual_weaving_turns === "undefined"))
+        data.manual_weaving_turns = []; // TODO
+
+        var new_turn = {
+          row: 0, // this row is never woven, it is the default state
+          tablets: [], // for each tablet, the pack number
+          packs: [] // turning info for each pack
+        }
+
+        for (var i=1; i<=Meteor.my_params.number_of_packs; i++)
+        {
+          var pack = {
+            pack_number: i,
+            direction: "F",
+            number_of_turns: 1
+          }
+          new_turn.packs.push(pack);
+        }
+          
+        for (var j=0; j<number_of_tablets; j++)
+        {
+          new_turn.tablets.push(1); // all tablets start in pack 1
+        }
+
+        data.manual_weaving_turns[0] = new_turn;
+
+        Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(data.manual_weaving_turns)}});
 
       /*
       3 packs, each tablet in one pack
@@ -703,6 +728,18 @@ Meteor.methods({
 
   //////////////////////////////////////
   // Simulation patterns
+  update_simulation_mode: function(pattern_id, simulation_mode) {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, simulation_mode: 1}});
+
+    if (pattern.created_by != Meteor.userId())
+      // Only the owner can edit a pattern
+      throw new Meteor.Error("not-authorized", "You can only update simulation mode for a pattern you created");
+
+    if (pattern.simulation_mode == simulation_mode)
+      return;
+
+    Patterns.update({_id: pattern_id}, {$set: {simulation_mode: simulation_mode}});
+  },
   build_simulation_weaving: function(pattern_id)
   {
     check(pattern_id, String);
