@@ -125,7 +125,7 @@ Template.pattern_thumbnail.helpers({
 
     if (Images.find({used_by:pattern_id, role:"preview"}).count() > 0)
       var preview_url = Images.findOne({used_by:pattern_id, role:"preview"}).url;
-//console.log("preview " + preview_url);
+
     return preview_url;
   }
 });

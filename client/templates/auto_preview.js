@@ -27,6 +27,7 @@ Template.auto_preview.onCreated(function() {
     var height = (1 + Session.get("number_of_rows")) * this.cell_height / 2;
     return height;
   };
+
 });
 
 // extendContext is used in the template to supply the helper values to the child template.
@@ -49,6 +50,19 @@ Template.auto_preview.helpers({
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {auto_preview: 1}});
     if (typeof pattern.auto_preview === "string")
       return pattern.auto_preview;
+  },
+  repeats: function() {
+    var repeats = [];
+
+    for (var i=0; i<Session.get("number_of_repeats"); i++)
+    {
+      repeats.push(i);
+    }
+
+    return repeats;
+  },
+  repeat_offset: function(repeat) {
+    return parseFloat(repeat) * (Template.instance().viewbox_height() - (1 * Template.instance().unit_height));
   },
   weft_color: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {weft_color: 1}});
@@ -84,7 +98,7 @@ Template.auto_preview.helpers({
     }
   },
   rotation_correction: function() {
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
+    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1, edit_mode: 1, simulation_mode: 1}});
 
     var total_width = Template.instance().image_width();
     var max_width = Template.instance().max_image_width;
@@ -105,7 +119,12 @@ Template.auto_preview.helpers({
         return;
 
       case "right":
-        var total_height = Template.instance().image_height() * scaling;
+        var total_height = Template.instance().image_height() * scaling * Session.get("number_of_repeats");
+
+        if (pattern.edit_mode == "simulation")
+          if (pattern.simulation_mode == "auto")
+            total_height -= Template.instance().cell_height;
+
         return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
 
       case "down":
@@ -117,7 +136,6 @@ Template.auto_preview.helpers({
       default:
         var total_height = Template.instance().image_height() * scaling;
         return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
-        //return "margin-top: " + total_width + "px; height: 0;"; // left
     }
   },
   spinner_style: function() {
@@ -169,15 +187,15 @@ Template.auto_preview_weft.helpers({
   data: function(row)
   {
     var pattern_id = Router.current().params._id;
-      var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id});
 
-      if (typeof pattern === "undefined")
-        return;
+    if (typeof pattern === "undefined")
+      return;
 
-      var number_of_tablets = pattern.number_of_tablets;
+    var number_of_tablets = pattern.number_of_tablets;
 
-      var data = {};
-//console.log("row " + row);
+    var data = {};
+
     var unit_height = 113.08752;
 
     var row_up = Session.get("number_of_rows") - row;
@@ -193,7 +211,6 @@ Template.auto_preview_weft.helpers({
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
     var cell = current_weaving_data[(row) + "_" + (tablet)];
-    //if (row != 7) return;
 
     if (typeof cell === "undefined")
       return;
@@ -209,12 +226,6 @@ Template.auto_preview_element.helpers({
     var style;
     var previous_style = {};
     var data = {};
-/*if (row == 7)
-{  
-  console.log("***");
-  console.log("row " + 7);
-}*/
-
 
     // position of element
     data.x_offset = ((tablet - 1) * unit_width);
@@ -235,15 +246,17 @@ Template.auto_preview_element.helpers({
     style = Meteor.my_functions.find_style(style_value);
 
     // find previous style
-    if (row > 1)
-    {
+    if (row == 1)
+      // for first row, use last row as previous row so pattern repeats correctly
+      var previous_style_value = current_weaving_data[Session.get("number_of_rows") + "_" + (tablet)].get();
+
+    else
       var previous_style_value = current_weaving_data[(row-1) + "_" + (tablet)].get();
 
-      var previous_style = Meteor.my_functions.find_style(previous_style_value)
+    var previous_style = Meteor.my_functions.find_style(previous_style_value);
       
-      if (style.name == "idle") // idle tablet, use previous row
+    if (style.name == "idle") // idle tablet, use previous row
         style = Meteor.my_functions.find_style(previous_style_value);
-    }
 
     if (row == 1) // idle tablet in first row, try showing next row
     {
@@ -253,8 +266,6 @@ Template.auto_preview_element.helpers({
 
         if (typeof next_style_value !== "undefined")
         {
-          //var next_style = Meteor.my_functions.find_style(next_style_value)
-          
           if (style.name == "idle") // idle tablet, use previous row
             style = Meteor.my_functions.find_style(next_style_value);
         }
@@ -324,14 +335,8 @@ Template.auto_preview_element.helpers({
             data.shape = "backward_4";
           break;
       }  
-/*if (row == 7)
-{  
-  console.log("special");
-}*/
       return data;
     }
-
-//console.log("current style is " + style_value);
 
     switch(style.warp)
     {
@@ -411,12 +416,7 @@ Template.auto_preview_element.helpers({
       if ((previous_style.warp == "forward") || (previous_style.warp == "backward"))
         data.color = previous_style.line_color;
     }
-//console.log("color is " + data.color);
-/*if (row == 7)
-{  
-  console.log("***");
-  console.log("data " + JSON.stringify(data));
-}*/
+
     return data;
   }
 });

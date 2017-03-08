@@ -241,9 +241,18 @@ Meteor.methods({
 
     if (data.edit_mode == "simulation") // palette shows 7 regular styles for threading. The other 32 are used to automatically build the weaving chart: 4 per threading styles to show S/Z and turn forwards, backwards
     {
-      for (var i=0; i<data.simulation_styles.length; i++)
+      var styles;
+
+      if (typeof data.simulation_styles !== "undefined")
+        styles = data.simulation_styles; // new pattern
+      else if (typeof data.styles !== "undefined")
+        styles = data.styles; // copy of existing pattern JSON
+      else
+        throw new Meteor.Error("no-styles-data", "error creating pattern from JSON. No styles data.");
+
+      for (var i=0; i<styles.length; i++)
       {
-        styles_array[i] = data.simulation_styles[i];
+        styles_array[i] = styles[i];
       }
     }
     else // 32 visible styles for manually drawing threading and weaving charts
@@ -618,6 +627,17 @@ Meteor.methods({
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);
   },
+  save_manual_weaving_turns: function(pattern_id, text)
+  {
+    check(pattern_id, String);
+    check(text, String);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit packs in a pattern you created");
+  },
   restore_pattern: function(data)
   {
     check(data, Object);
@@ -894,6 +914,9 @@ Meteor.methods({
     else
       return false;
   },
+  /////////////////////////////////
+  // Simulation patterns
+  // auto
   update_number_of_turns: function(pattern_id, new_number)
   {
     check(pattern_id, String);
@@ -955,6 +978,15 @@ Meteor.methods({
     auto_turn_sequence[turn_number - 1] = direction;
 
     Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: auto_turn_sequence}});
+  },
+  // manual
+  assign_pack: function(pattern_id, tablet, pack) {
+    check(pattern_id, String);
+    check(tablet, Number);
+    check(pack, Number);
+
+    var pattern = Patterns.findOne({_id: pattern_id});
+    var manual_weaving_turns_data = JSON.parse(pattern.manual_weaving_turns);
   },
   //////////////////////////////////////
   // Recent patterns

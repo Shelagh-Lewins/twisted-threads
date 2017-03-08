@@ -1120,13 +1120,6 @@ Meteor.my_functions = {
 
       // manual
       var manual_weaving_turns_data = JSON.parse(pattern.manual_weaving_turns);
-      //var number_of_turns = manual_weaving_turns_data.length;
-
-      /*var manual_weaving_turns_array = new Array(number_of_turns);
-      for (var i=0; i<number_of_styles; i++)
-      {
-        styles_array[i] = styles_data[i];
-      }*/
 
       current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns_data);
     }
@@ -1369,7 +1362,7 @@ Meteor.my_functions = {
 
     return weaving_array;
   },
-  save_weaving_as_text: function(pattern_id, number_of_rows, number_of_tablets, build_simulation_weaving)
+  save_weaving_as_text: function(pattern_id, number_of_rows, number_of_tablets)
   {
     var pattern = Patterns.findOne({_id: pattern_id});
     if (typeof pattern === "undefined")
@@ -2060,8 +2053,8 @@ Meteor.my_functions = {
   // Simulation patterns
   build_simulation_weaving: function(pattern_id)
   {
-    var pattern = Patterns.findOne({_id: pattern_id});
-    var number_of_tablets = pattern.number_of_tablets;
+    var pattern = Patterns.findOne({_id: pattern_id, auto_turn_sequence: 1});
+
     // first row of weaving is row A of threading
     Meteor.call("build_simulation_weaving", pattern_id, function(){
 
@@ -2069,10 +2062,18 @@ Meteor.my_functions = {
 
       Session.set("number_of_rows", pattern.number_of_rows);
       Meteor.my_functions.build_pattern_display_data(pattern_id);
-      Meteor.my_functions.save_weaving_as_text(pattern_id, 1, number_of_tablets);
+      Meteor.my_functions.save_weaving_as_text(pattern_id, 1, pattern.number_of_tablets);
       Meteor.my_functions.save_preview_as_text(pattern_id);
       Meteor.my_functions.store_pattern(pattern_id);
     });
+  },
+  set_repeats: function(pattern_id) {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, auto_turn_sequence: 1}});
+
+    if ((pattern.edit_mode == "simulation") && (pattern.simulation_mode == "auto"))
+      Session.set("number_of_repeats", Math.floor(32/pattern.auto_turn_sequence.length));
+    else
+      Session.set("number_of_repeats", 1);
   },
   ///////////////////////////////////
   // Searching

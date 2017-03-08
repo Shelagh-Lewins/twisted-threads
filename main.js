@@ -58,6 +58,10 @@ if (Meteor.isClient) {
     return a === b;
   });
 
+  UI.registerHelper('multiply', function (a, b) {
+    return a*b;
+  });
+
   // allows a template to check whether a session variable equals a value
   UI.registerHelper('session_equals', function(session_var, test_value){
     if (Session.get(session_var) == test_value)

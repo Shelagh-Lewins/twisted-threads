@@ -8,6 +8,8 @@ Template.view_pattern.rendered = function() {
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
+  Session.set('auto_input_latch', false);
+  Meteor.my_functions.set_repeats(pattern_id);
 
   if (Router.current().params.mode)
     Session.set('view_pattern_mode', Router.current().params.mode);
@@ -20,7 +22,7 @@ Template.view_pattern.rendered = function() {
   var pattern = Patterns.findOne({_id: pattern_id});
 
   if ((pattern.edit_mode == "simulation") && (JSON.parse(pattern.weaving).length == 0)) // a new simulation pattern which hasn't built the weaving chart yet
-    Meteor.my_functions.build_simulation_weaving(pattern_id);
+      Meteor.my_functions.build_simulation_weaving(pattern_id);
 
   // TODO manual
 
@@ -121,18 +123,13 @@ Template.view_pattern.helpers({
   },
   auto_turn_sequence: function() {
     // weaving sequence for auto simulation pattern
-    /*var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { auto_turn_sequence: 1}});
-    return pattern.auto_turn_sequence;*/
-
-
     if (typeof current_auto_turn_sequence !== "undefined")
       return current_auto_turn_sequence.list();   
   },
   packs: function() {
     var packs = new Array();
 
-    var data = current_manual_weaving_turns[current_manual_weaving_turns.length -1]; // last row
+    var data = current_manual_weaving_turns.list()[current_manual_weaving_turns.length -1]; // last row
 
     for (var i=Meteor.my_params.number_of_packs-1; i>=0; i--) // reverse order
     {
@@ -146,11 +143,18 @@ Template.view_pattern.helpers({
 
       for (var j=0; j<current_tablet_indexes.length; j++)
       {
+        var obj = {
+          pack: i+1,
+          tablet: j+1
+        }
+
         if(data.tablets[j] == pack_number)
-          new_pack.tablets.push(1);
+          obj.selected = true;
 
         else
-          new_pack.tablets.push(0);
+          obj.selected = false;
+
+        new_pack.tablets.push(obj);
       }
       packs.push(new_pack);
     }
@@ -643,8 +647,8 @@ Template.view_pattern.events({
       }
 
       var obj = current_orientation[this.tablet-1];
-        obj.orientation = new_orientation;
-        current_orientation.splice(this.tablet-1, 1, obj);
+      obj.orientation = new_orientation;
+      current_orientation.splice(this.tablet-1, 1, obj);
 
       Meteor.my_functions.save_orientation_as_text(pattern_id);
 
@@ -666,26 +670,47 @@ Template.view_pattern.events({
   },
   /////////////////////////////////
   // Simulation patterns
+  // tabs
   'click #toolbar .tabs li': function(event) {
     var pattern_id = Router.current().params._id;
     var simulation_mode = "auto";
+
     if ($(event.currentTarget).hasClass("manual"))
       simulation_mode = "manual";
 
     Meteor.call("update_simulation_mode", pattern_id, simulation_mode, function(){
-      console.log("callback");
+      Meteor.my_functions.build_simulation_weaving(pattern_id);
+      Meteor.my_functions.set_repeats(pattern_id);
     });
   },
-  'input #num_turns': function(event)
+  // auto
+  'input .auto #num_auto_turns': function(event)
   {
     // change number of turns in auto_turn_sequence for simulation pattern
+    // event fires on keyup, which causes a double update if you type a 2-digit number and resets all turns to "F"
     var pattern_id = Router.current().params._id;
 
-    Meteor.call("update_number_of_turns", pattern_id, parseInt(event.currentTarget.value), function(){
-      Meteor.my_functions.build_simulation_weaving(pattern_id);
-    });
+    if (event.currentTarget.value != Math.floor(event.currentTarget.value))
+      event.currentTarget.value = Math.floor(event.currentTarget.value); // user pastes in a non-integer value
+
+    if (event.currentTarget.value > 32)
+      event.currentTarget.value = 32;
+
+    if (event.currentTarget.value < 1)
+      event.currentTarget.value = 1;
+
+    if (Session.get('auto_input_latch'))
+      Session.set('auto_input_latch', true);
+
+    auto_input_timeout = setTimeout(function() {
+      Meteor.call("update_number_of_turns", pattern_id, parseInt(event.currentTarget.value), function(){
+        Session.set('auto_input_latch', false);
+        Meteor.my_functions.set_repeats(pattern_id);
+        Meteor.my_functions.build_simulation_weaving(pattern_id);
+      });
+    }, 200);    
   },
-  'click .direction': function()
+  'click .auto .direction': function()
   {
     // change direction of turn in auto_turn_sequence for simulation pattern
     var pattern_id = Router.current().params._id;
@@ -696,6 +721,60 @@ Template.view_pattern.events({
     Meteor.call("toggle_turn_direction", pattern_id, this.turn, function(){
       Meteor.my_functions.build_simulation_weaving(pattern_id);
     });
+  },
+  // manual
+  'click .manual .direction': function() {
+    var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
+
+    var current_direction = obj.packs[this.pack_number - 1].direction;
+    var new_direction = "F";
+
+    if(current_direction == "F")
+      new_direction = "B";
+
+    obj.packs[this.pack_number - 1].direction = new_direction;
+    current_manual_weaving_turns.splice(0, 1, obj);
+  },
+  'input .manual #num_manual_turns': function(event)
+  {
+    // change number of turns for a pack in manual simulation pattern
+    // event fires on keyup, which causes a double update if you type a 2-digit number and resets all turns to "F"
+    var pattern_id = Router.current().params._id;
+
+    if (event.currentTarget.value != Math.floor(event.currentTarget.value))
+      event.currentTarget.value = Math.floor(event.currentTarget.value); // user pastes in a non-integer value
+
+    if (event.currentTarget.value > 3)
+      event.currentTarget.value = 3;
+
+    if (event.currentTarget.value < 0)
+      event.currentTarget.value = 0;
+
+    if (Session.get('manual_input_latch'))
+      Session.set('manual_input_latch', true);
+
+    var that = this;
+
+    manual_input_timeout = setTimeout(function() {
+      var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
+      obj.packs[that.pack_number - 1].number_of_turns = event.currentTarget.value;
+      current_manual_weaving_turns.splice(0, 1, obj);
+    }, 200);    
+  },
+  'click .manual .tablets li': function(event) {
+    var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
+    var new_pack = this.pack;
+
+    if (obj.tablets[this.tablet-1] == this.pack)
+      // tablet already in pack, so move it up one pack
+      {
+        new_pack = (new_pack + 1);
+        if (new_pack == 4)
+          new_pack = 1;
+      }
+
+    obj.tablets[this.tablet-1] = new_pack;
+    current_manual_weaving_turns.splice(0, 1, obj);
   },
   'click #sim_add_tablet': function () {
     if (Meteor.my_functions.accept_click())

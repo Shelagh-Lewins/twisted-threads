@@ -78,7 +78,7 @@
     <h2>Weaving Schedule</h2>
     <div class="hint {{rendered}}">
       {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells to set their colour. Use 'X' for empty thread.<br>{{/if}}
-      Select "Start weaving" to step through the pattern rows one by one as you weave.
+      To see the weaving chart, select "Start weaving" at the top of the screen.
     </div>
     {{#if can_edit_pattern _id}}
     <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
@@ -90,13 +90,13 @@
   </ul>
 </div>
 
-<div class="content">
+<div class="content {{simulation_mode}}">
   {{#if equals simulation_mode "auto"}}
     <h3>Auto weaving schedule</h3>
     <span class="hint">Weave by repeating a series of turns</span>
 
-    <label for="num_turns">Number of turns:</label>
-    <input type="number" placeholder="Number of turns..." id="num_turns" min="1" max="32" size="3" value="{{auto_turn_sequence.length}}" ><br/>
+    <label for="num_auto_turns">Number of weaving rows:</label>
+    <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="32" size="3" value="{{auto_turn_sequence.length}}" > (max 32)<br/>
     {{#each auto_turn_sequence}}
       <span class="direction">
         {{this.direction}}
@@ -108,28 +108,29 @@
     </div>
     {{else}}
       <h3>Manual weaving schedule</h3>
-      <span class="hint">Weave row by row, turning tablets individually. Assign tablets to packs and set turning direction and amount per pack, then click "Weave".</span>
+      <span class="hint">Weave row by row, turning tablets individually.<br/>
+      - Click tablets to assign them to a pack<br/>
+      - Set the turning direction and number of turns for each pack<br/>
+      - Click "Weave" to weave a row.</span>
 
       <div class="packs">
         <ul>
           {{#each packs}}
           <li class="row">
             <span class="pack_number">
-              pack {{this.pack_number}}
+              {{this.pack_number}}
             </span>
 
             <span class="direction">
               {{this.direction}}
             </span>
 
-            <span class="number_of_turns">
-              {{this.number_of_turns}}
-            </span>
+            <input type="number" placeholder="Turns..." id="num_manual_turns" min="0" max="3" size="2" value="{{this.number_of_turns}}" >
 
             <ul class="tablets">
             {{#each this.tablets}}
-              <li>
-                {{this}}
+              <li class="{{#if selected}}selected{{/if}}">
+                {{tablet}}
               </li>
             {{/each}}
             </ul>
