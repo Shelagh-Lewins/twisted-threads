@@ -2053,11 +2053,10 @@ Meteor.my_functions = {
   // Simulation patterns
   build_simulation_weaving: function(pattern_id)
   {
-    var pattern = Patterns.findOne({_id: pattern_id, auto_turn_sequence: 1});
+    //var pattern = Patterns.findOne({_id: pattern_id, auto_turn_sequence: 1});
 
     // first row of weaving is row A of threading
     Meteor.call("build_simulation_weaving", pattern_id, function(){
-
       var pattern = Patterns.findOne({_id: pattern_id});
 
       Session.set("number_of_rows", pattern.number_of_rows);
@@ -2074,6 +2073,23 @@ Meteor.my_functions = {
       Session.set("number_of_repeats", Math.floor(32/pattern.auto_turn_sequence.length));
     else
       Session.set("number_of_repeats", 1);
+  },
+  ///////////////////////////////////
+  // Manual patterns
+  build_manual_weaving: function(pattern_id)
+  {
+    var new_row_sequence = current_manual_weaving_turns.list()[0];
+
+    Meteor.call("build_manual_weaving", pattern_id, new_row_sequence, function(){
+      var pattern = Patterns.findOne({_id: pattern_id});
+
+      Session.set("number_of_rows", pattern.number_of_rows);
+      Meteor.my_functions.build_pattern_display_data(pattern_id);
+      Meteor.my_functions.save_weaving_as_text(pattern_id, 1, pattern.number_of_tablets);
+      Meteor.my_functions.save_preview_as_text(pattern_id);
+      Meteor.my_functions.store_pattern(pattern_id);
+      console.log("callback");
+    });
   },
   ///////////////////////////////////
   // Searching

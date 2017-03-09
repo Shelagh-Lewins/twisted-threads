@@ -776,6 +776,15 @@ Template.view_pattern.events({
     obj.tablets[this.tablet-1] = new_pack;
     current_manual_weaving_turns.splice(0, 1, obj);
   },
+  'click #weave': function () {
+    console.log("clicked");
+    if (Meteor.my_functions.accept_click())
+    {
+      console.log("clicked 2");
+      var pattern_id = Router.current().params._id;
+      Meteor.my_functions.build_manual_weaving(pattern_id);
+    }
+  },
   'click #sim_add_tablet': function () {
     if (Meteor.my_functions.accept_click())
     {
