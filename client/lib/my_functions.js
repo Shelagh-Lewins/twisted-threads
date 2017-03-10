@@ -2055,8 +2055,6 @@ Meteor.my_functions = {
   // Simulation pattersn
   build_simulation_weaving: function(pattern_id, rebuild)
   {
-    console.log("build new simulation weaving");
-
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {"edit_mode": 1, "simulation_mode": 1}});
     if (pattern.edit_mode != "simulation")
         return;
@@ -2078,7 +2076,7 @@ Meteor.my_functions = {
     else
     {
       var new_row_sequence = current_manual_weaving_turns.list()[0];
-
+      
       Meteor.call("build_manual_weaving", pattern_id, rebuild, new_row_sequence, function(){
         var pattern = Patterns.findOne({_id: pattern_id});
 
