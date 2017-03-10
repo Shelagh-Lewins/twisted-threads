@@ -868,7 +868,7 @@ Meteor.methods({
     }
     else // manual
     {
-      var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
+      
 
       /* 
       Turn sequence is an array of objects; each object is a row
@@ -898,10 +898,15 @@ Meteor.methods({
         {
           position_of_A.push(0);
         }
+
+        // remove manual_weaving_turns
+        var manual_weaving_turns = [new_row_sequence];
+
       }
       else
       {
         var position_of_A = JSON.parse(pattern.position_of_A);
+        var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
       }
 
       var tablet_directions = []; // for each tablet, which direction it turns
@@ -927,12 +932,14 @@ Meteor.methods({
           var reversal = false;
 ;
           // reversal from last row to this row?
-          if (new_row_sequence.row != 0) // first row, no reversal
+          console.log("new_row_sequence " + JSON.stringify(new_row_sequence));
+          console.log("current_row_number " + current_row_number);
+          if (current_row_number != 0) // first row, no reversal
           {
             var last_row_pack = last_row_data.tablets[i];
             var last_direction =  last_row_data.packs[last_row_pack - 1].direction;
 
-            if (direction == last_direction)
+            if (direction != last_direction)
               reversal = true;
           }
 
@@ -942,10 +949,12 @@ Meteor.methods({
             if (direction == "F")
             position_of_A[i] = Meteor.call("modular_add", position_of_A[i], number_of_turns, 4);
 
-          else
-            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1 * number_of_turns, 4);
+            else
+              position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1 * number_of_turns, 4);
           }
           tablet_directions.push(direction);
+          console.log("reversal " + reversal);
+          //console.log("position_of_A " + JSON.stringify(position_of_A));
         }
 
         // find which thread shows in each tablet
