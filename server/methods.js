@@ -759,8 +759,10 @@ Meteor.methods({
       return;
 
     Patterns.update({_id: pattern_id}, {$set: {simulation_mode: simulation_mode}});
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, simulation_mode: 1}});
   },
-  build_simulation_weaving: function(pattern_id)
+  build_auto_weaving: function(pattern_id)
   {
     check(pattern_id, String);
 
@@ -784,10 +786,12 @@ Meteor.methods({
       position_of_A.push(0);
     }
 
-    var tablet_directions = []; // for each tablet, which direction it turns
+    
 
     for (var j=0; j<number_of_turns; j++)
     {
+      var tablet_directions = []; // for each tablet, which direction it turns
+
       // turn tablets
       for (var i=0; i<number_of_tablets; i++)
       {
@@ -818,6 +822,7 @@ Meteor.methods({
         threading_row.push(threading[position_of_A[i]][i]);
         tablet_directions.push(direction);
       }
+      
 
       var new_row = Meteor.call("weave_simulation_row", number_of_tablets, threading_row, orientations, tablet_directions);
       weaving.push(new_row);
@@ -829,10 +834,12 @@ Meteor.methods({
   },
   //////////////////////////////////
   // Manual simulation
-  build_manual_weaving: function(pattern_id, new_row_sequence)
+  build_manual_weaving: function(pattern_id, rebuild, new_row_sequence)
   {
     check(pattern_id, String);
     check(new_row_sequence, Match.Optional(Object));
+    check(rebuild, Match.Optional(String));
+    console.log("rebuild " + rebuild);
 
     var pattern = Patterns.findOne({_id: pattern_id});
 
@@ -840,8 +847,12 @@ Meteor.methods({
       // Only the owner can edit a pattern
       throw new Meteor.Error("not-authorized", "You can only build simulation weaving for a pattern you created");
 
-    var weaving = JSON.parse(pattern.weaving);
-    //console.log("old weaving " + weaving);
+    if (rebuild == "rebuild")
+      var weaving = [];
+
+    else
+      var weaving = JSON.parse(pattern.weaving);
+    
     var threading = JSON.parse(pattern.threading);
     var orientations = JSON.parse(pattern.orientation);
     var number_of_tablets = pattern.number_of_tablets;
@@ -943,9 +954,9 @@ Meteor.methods({
         }
 
         var new_row = Meteor.call("weave_simulation_row", number_of_tablets, threading_row, orientations, tablet_directions);
-        //console.log("new row " + JSON.stringify(new_row));
+
         weaving.push(new_row);
-        //console.log("weaving " + JSON.stringify(weaving));
+;
       //}
       // save the new row turning sequence
       manual_weaving_turns.push(new_row_sequence);
@@ -955,7 +966,7 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: weaving.length}});
     // TODO store auto and manual separately, so pattern doesn't have to be reconstructed on switching?
-    //Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_turns}});
+
     Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(manual_weaving_turns)}});
 
   },
@@ -990,7 +1001,7 @@ Meteor.methods({
     check(orientation, String);
     check(direction, String);
     check(number_of_turns, Number);
-
+;
     if (!Meteor.call("is_style_special", style_value))
     {
       var style_number = 7 + 4*(style_value - 1);
