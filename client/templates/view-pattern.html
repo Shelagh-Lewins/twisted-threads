@@ -105,11 +105,7 @@
       {{/each}}
     </div>
     <span class="hint">Number of pattern repeats shown: {{auto_repeats}}</span>
-    <div class="edit_tablets">
-      <button id="sim_add_tablet">Add tablet</button>
-      <button id="sim_remove_tablet">Remove tablet</button>
-    </div>
-    {{else}}
+  {{else}}
       <h3>Manual weaving schedule</h3>
       <span class="hint">Weave row by row, turning tablets individually.<br/>
       - Click tablets to assign them to a pack<br/>
@@ -193,12 +189,16 @@
     </div>
   {{/if}}
 
-
-
   <h2>Tablets</h2>
   <div class="pattern_info">
     {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
   </div>
+  {{#if equals edit_mode "simulation"}}
+    <div class="edit_tablets">
+      <button id="sim_add_tablet">Add tablet</button>
+      <button id="sim_remove_tablet">Remove tablet</button>
+    </div>
+  {{/if}}
   <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
   {{#each hole_indexes}}
     {{> threading_row}}

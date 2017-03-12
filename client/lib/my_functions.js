@@ -1290,6 +1290,19 @@ Meteor.my_functions = {
 
     current_orientation.splice(position-1, 0, obj);
 
+    // manual_weaving_turns
+    if (pattern.edit_mode == "simulation")
+    {
+      for (var i=0;i<current_manual_weaving_turns.list().length; i++)
+      {
+        console.log("row " + i);
+        console.log("initial tablets " + current_manual_weaving_turns.list()[i].tablets);
+        current_manual_weaving_turns.list()[i].tablets.splice(position-1, 0, 1);
+        console.log("updated tablets " + current_manual_weaving_turns.list()[i].tablets);
+        //Meteor.call("save_manual_weaving_turns", pattern_id, current_manual_weaving_turns.list())
+      }
+    }
+
     // add new tablet to indexes
     current_tablet_indexes.push(number_of_tablets+1);
 
@@ -1339,6 +1352,17 @@ Meteor.my_functions = {
       current_orientation[j].tablet -= 1;
     }
     current_orientation.splice(position-1, 1);
+
+    // manual_weaving_turns
+    if (pattern.edit_mode == "simulation")
+    {
+      var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
+
+      for (var i=0;i<manual_weaving_turns.length; i++) // include row 0 which is default
+      {
+        manual_weaving_turns[i].tablets.splice(position-1, 1);
+      }
+    }
 
     // remove tablet from indexes
     current_tablet_indexes.pop();
@@ -1400,7 +1424,11 @@ Meteor.my_functions = {
           Meteor.my_functions.update_after_tablet_change();
 
           if (pattern.edit_mode == "simulation")
-            Meteor.my_functions.reset_simulation_weaving(pattern_id)
+          {
+            Meteor.call("save_manual_weaving_turns", pattern_id, Meteor.my_functions.get_manual_weaving_as_text(pattern_id), function(){
+               Meteor.my_functions.reset_simulation_weaving(pattern_id);
+            })
+          }
         }
 
         if (row_change)
@@ -1411,6 +1439,19 @@ Meteor.my_functions = {
       });
     
     Session.set('edited_pattern', true);
+  },
+  get_manual_weaving_as_text(pattern_id)
+  {
+    // concert the reactive array to a regular array that can be stringified
+    var manual_weaving_turns = new Array();
+    var data = current_manual_weaving_turns.list();
+
+    for (var i=0; i<data.length; i++)
+    {
+      manual_weaving_turns[i] = data[i];
+    }
+
+    return JSON.stringify(manual_weaving_turns);
   },
   get_threading_as_text: function(number_of_tablets)
   {
@@ -2091,41 +2132,6 @@ Meteor.my_functions = {
       });
     }
   },
-  /*build_simulation_weaving: function(pattern_id)
-  {
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {"edit_mode": 1, "simulation_mode": 1}});
-    if (pattern.edit_mode != "simulation")
-        return;
-
-    if (pattern.simulation_mode == "auto")
-    {
-      // first row of weaving is row A of threading
-      Meteor.call("build_auto_weaving", pattern_id, function(){
-        var pattern = Patterns.findOne({_id: pattern_id});
-
-        Session.set("number_of_rows", pattern.number_of_rows);
-        Meteor.my_functions.set_repeats(pattern_id);
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_as_text(pattern_id, 1, pattern.number_of_tablets);
-        Meteor.my_functions.save_preview_as_text(pattern_id);
-        //Meteor.my_functions.store_pattern(pattern_id);
-      });
-    }
-    else
-    {
-      var new_row_sequence = current_manual_weaving_turns.list()[0];
-
-      Meteor.call("build_manual_weaving", pattern_id, function(){
-        var pattern = Patterns.findOne({_id: pattern_id});
-        Session.set("number_of_rows", pattern.number_of_rows);
-        Meteor.my_functions.set_repeats(pattern_id);
-        Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_as_text(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
-        Meteor.my_functions.save_preview_as_text(pattern_id);
-        //Meteor.my_functions.store_pattern(pattern_id);
-      });
-    }
-  },*/
   set_repeats: function(pattern_id) {
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, auto_turn_sequence: 1}});
 

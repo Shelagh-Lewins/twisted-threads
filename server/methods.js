@@ -631,13 +631,15 @@ Meteor.methods({
   save_manual_weaving_turns: function(pattern_id, text)
   {
     check(pattern_id, String);
-    check(text, String);
+    check(text, text);
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1 }});
 
     if (pattern.created_by != Meteor.userId())
         // Only the owner can edit a pattern
-        throw new Meteor.Error("not-authorized", "You can only edit packs in a pattern you created");
+        throw new Meteor.Error("not-authorized", "You can only edit maual weaving turns in a pattern you created");
+
+     Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: text}});   
   },
   restore_pattern: function(data)
   {
@@ -1023,7 +1025,6 @@ Meteor.methods({
 
     return new_row;
   },
-
   weaving_style_from_threading_style: function(style_value, orientation, direction, number_of_turns)
   {
     // which style to use on the weaving chart to represent a tablet turning forwards / backwards, with S /Z orientation, and thread colour from threading style
@@ -1034,7 +1035,7 @@ Meteor.methods({
     check(orientation, String);
     check(direction, String);
     check(number_of_turns, Number);
-;
+
     if (!Meteor.call("is_style_special", style_value))
     {
       var style_number = 7 + 4*(style_value - 1);

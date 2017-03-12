@@ -124,7 +124,8 @@ Template.view_pattern.helpers({
     var packs = new Array();
 
     var data = current_manual_weaving_turns.list()[0]; // row 0 is just for working
-
+    if (typeof data === "undefined")
+        return; // can happen when tab first selected if there are no rows
     for (var i=Meteor.my_params.number_of_packs-1; i>=0; i--) // reverse order
     {
       var pack_number = data.packs[i].pack_number
