@@ -266,6 +266,10 @@ background: #fff; /* set desired hover color */
 }
 
 /* auto pattern */
+.simulation #toolbar.auto .auto_directions {
+  overflow: hidden;
+}
+
 .simulation #toolbar.auto .direction {
   float: left;
   min-width: 24px;

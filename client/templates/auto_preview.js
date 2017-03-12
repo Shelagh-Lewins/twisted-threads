@@ -123,8 +123,8 @@ Template.auto_preview.helpers({
 
         if (pattern.edit_mode == "simulation")
           if (pattern.simulation_mode == "auto")
-            total_height -= Template.instance().cell_height;
-
+            total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
+ 
         return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
 
       case "down":
@@ -246,9 +246,17 @@ Template.auto_preview_element.helpers({
     style = Meteor.my_functions.find_style(style_value);
 
     // find previous style
+    //if ((row == 1) && (Session.get("number_of_repeats") > 1))
     if (row == 1)
-      // for first row, use last row as previous row so pattern repeats correctly
-      var previous_style_value = current_weaving_data[Session.get("number_of_rows") + "_" + (tablet)].get();
+    {
+      if (Session.get("number_of_repeats") > 1)
+        // for first row, use last row as previous row so pattern repeats correctly
+        var previous_style_value = current_weaving_data[Session.get("number_of_rows") + "_" + (tablet)].get();
+      
+      else
+        var previous_style_value = current_weaving_data[row + "_" + (tablet)].get();
+    }
+      
 
     else
       var previous_style_value = current_weaving_data[(row-1) + "_" + (tablet)].get();

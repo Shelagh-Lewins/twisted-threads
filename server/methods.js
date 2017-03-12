@@ -336,11 +336,12 @@ Meteor.methods({
       Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: data.auto_turn_sequence}});
 
       // manual_weaving_turns, 3 packs each tablet turned individually
+      // create row 0 which is never woven, it is a default and working row
+      // actual weaving begins with row 1, 2...
       if((data.manual_weaving_turns == "") || (typeof data.manual_weaving_turns === "undefined"))
         data.manual_weaving_turns = []; // TODO
 
         var new_turn = {
-          row: 0, // this row is never woven, it is the default state
           tablets: [], // for each tablet, the pack number
           packs: [] // turning info for each pack
         }
@@ -760,7 +761,9 @@ Meteor.methods({
 
     Patterns.update({_id: pattern_id}, {$set: {simulation_mode: simulation_mode}});
 
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, simulation_mode: 1}});
+    Patterns.update({_id: pattern_id}, {$set: {weaving: "[]"}});
+    Patterns.update({_id: pattern_id}, {$set: {number_of_rows: 0}});
+
   },
   build_auto_weaving: function(pattern_id)
   {
@@ -823,8 +826,7 @@ Meteor.methods({
         tablet_directions.push(direction);
       }
       
-
-      var new_row = Meteor.call("weave_simulation_row", number_of_tablets, threading_row, orientations, tablet_directions);
+      var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions);
       weaving.push(new_row);
     }
 
@@ -834,11 +836,10 @@ Meteor.methods({
   },
   //////////////////////////////////
   // Manual simulation
-  build_manual_weaving: function(pattern_id, rebuild, new_row_sequence)
+  reset_simulation_weaving: function(pattern_id)
   {
+    // rebuild the weaving chart from the simulation instructions
     check(pattern_id, String);
-    check(new_row_sequence, Match.Optional(Object));
-    check(rebuild, Match.Optional(Match.OneOf(undefined, null, String))); // undefined turns into null and fails even optional check otherwise
 
     var pattern = Patterns.findOne({_id: pattern_id});
 
@@ -846,115 +847,41 @@ Meteor.methods({
       // Only the owner can edit a pattern
       throw new Meteor.Error("not-authorized", "You can only build simulation weaving for a pattern you created");
 
-    if (rebuild)
-      var weaving = [];
-
-    else
-      var weaving = JSON.parse(pattern.weaving);
-    
-    var threading = JSON.parse(pattern.threading);
-    var orientations = JSON.parse(pattern.orientation);
-    var number_of_tablets = pattern.number_of_tablets;
-    
-    // build each row of weaving chart
-    // pack by pack or tablet by tablet?
-
-    if (pattern.edit_mode != "simulation")
-        return;
-
     if (pattern.simulation_mode == "auto")
     {
-      var auto_turn_sequence = pattern.auto_turn_sequence; // e.g. ["F", "B"]
-    }
-    else // manual
-    {
-      
+      var weaving = new Array();
+      var threading = JSON.parse(pattern.threading);
+      var orientations = JSON.parse(pattern.orientation);
+      var number_of_tablets = pattern.number_of_tablets;
+      var auto_turn_sequence = pattern.auto_turn_sequence;
+      var number_of_turns = auto_turn_sequence.length;
 
-      /* 
-      Turn sequence is an array of objects; each object is a row
-      Default is row 0, which acts as a template and a working row in the client-side data
-      Note row 1 is manual_weaving_turns[1]
-      Each tablet is in pack 1, 2 or 3, defined in array tablets for each row
-      Each pack has direction "F" or "B", 0-3 turns
-      [
-        {
-          row:0,
-          tablets:[1,1,1,1,1,1,1,1,1,1,1,1],
-          packs:[
-            {pack_number:1,direction:"F",number_of_turns:1},
-            {pack_number:2,direction:"F",number_of_turns:1},
-            {pack_number:3,direction:"F",number_of_turns":1}
-          ]
-        }
-      ]
-      */
-      // new_row_sequence is the pack turning sequence shown in the UI
-
-      if (rebuild == "rebuild")
+      // reset all tablets to start position
+      var position_of_A = new Array();
+      for (var i=0; i<number_of_tablets; i++)
       {
-        // reset all tablets to start position
-        var position_of_A = new Array();
-        for (var i=0; i<number_of_tablets; i++)
-        {
-          position_of_A.push(0);
-        }
-
-        // remove manual_weaving_turns
-        var manual_weaving_turns = [new_row_sequence];
-
-      }
-      else
-      {
-        var position_of_A = JSON.parse(pattern.position_of_A);
-        var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
+        position_of_A.push(0);
       }
 
-      var tablet_directions = []; // for each tablet, which direction it turns
-
-     // for (var j=0; j<number_of_turns; j++)
-    //  {
-        var current_row_number = manual_weaving_turns.length - 1;
-        var last_row_number = current_row_number - 1;
-        if (last_row_number < 0) // this is the first row
-          last_row_number = 0; // use default row
-
-        var last_row_data = manual_weaving_turns[last_row_number];
+      for (var j=0; j<number_of_turns; j++)
+      {
+        var tablet_directions = []; // for each tablet, which direction it turns
 
         // turn tablets
         for (var i=0; i<number_of_tablets; i++)
         {
-          // find turn direction and number of turns
-          var pack_number = new_row_sequence.tablets[i];
-          var pack = new_row_sequence.packs[pack_number - 1];
-          var direction = pack.direction;
-          var number_of_turns = pack.number_of_turns;
-
-          var reversal = false;
-;
-          // reversal from last row to this row?
-          console.log("new_row_sequence " + JSON.stringify(new_row_sequence));
-          console.log("current_row_number " + current_row_number);
-          if (current_row_number != 0) // first row, no reversal
-          {
-            var last_row_pack = last_row_data.tablets[i];
-            var last_direction =  last_row_data.packs[last_row_pack - 1].direction;
-
-            if (direction != last_direction)
-              reversal = true;
-          }
-
           // if change of direction, no net turn
-          if (!reversal)
+          var direction = auto_turn_sequence[j];
+          var last_direction = auto_turn_sequence[j-1];
+
+          if (direction == last_direction)
           {
-            if (direction == "F")
-            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], number_of_turns, 4);
+            if (auto_turn_sequence[j] == "F")
+              position_of_A[i] = Meteor.call("modular_add", position_of_A[i], 1, 4);
 
             else
-              position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1 * number_of_turns, 4);
+              position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1, 4);
           }
-          tablet_directions.push(direction);
-          console.log("reversal " + reversal);
-          //console.log("position_of_A " + JSON.stringify(position_of_A));
         }
 
         // find which thread shows in each tablet
@@ -966,32 +893,119 @@ Meteor.methods({
           // tablet = i (column)
           // thread style = threading[position_of_A[i]][i]
           threading_row.push(threading[position_of_A[i]][i]);
+          tablet_directions.push(direction);
         }
-
-        var new_row = Meteor.call("weave_simulation_row", number_of_tablets, threading_row, orientations, tablet_directions);
-
+        
+        var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions);
         weaving.push(new_row);
+      }
 
-      //}
-      // save the new row turning sequence
-      manual_weaving_turns.push(new_row_sequence);
-      manual_weaving_turns[0] = new_row_sequence; // retain current packs UI
-      Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(manual_weaving_turns)}});
-
+      Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
+      Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_turns}});
       Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
     }
+    else if (pattern.simulation_mode == "manual")
+    {
+      // no rows woven
+      // reset all tablets to start position
+      var position_of_A = new Array();
+      for (var i=0; i<pattern.number_of_tablets; i++)
+      {
+        position_of_A.push(0);
+      }
 
-    Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
-    Patterns.update({_id: pattern_id}, {$set: {number_of_rows: weaving.length}});
-    
-    // TODO store auto and manual separately, so pattern doesn't have to be reconstructed on switching?
+      Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
+      Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify([])}});
+      Patterns.update({_id: pattern_id}, {$set: {number_of_rows: 0}});
 
-    Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(manual_weaving_turns)}});
+      // remove manual_weaving_turns except first row which gives UI default
+      var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
+      Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify([manual_weaving_turns[0]])}});
 
+      for (var i=1; i<manual_weaving_turns.length; i++)
+      {
+        Meteor.call("weave_row", pattern_id, manual_weaving_turns[i]);
+      }
+    }
   },
   //////////////////////////////////
   // auto and manual simulation use these
-  weave_simulation_row: function(number_of_tablets, threading_row, orientations, tablet_directions)
+  weave_row: function(pattern_id, new_row_sequence) {
+    check(pattern_id, String);
+    check(new_row_sequence, Object);
+
+    var pattern = Patterns.findOne({_id: pattern_id});
+
+    var number_of_tablets = pattern.number_of_tablets;
+    var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
+    var weaving = JSON.parse(pattern.weaving);
+    var position_of_A = JSON.parse(pattern.position_of_A);
+    var threading = JSON.parse(pattern.threading);
+    var orientations = JSON.parse(pattern.orientation);
+
+    var current_row_number = manual_weaving_turns.length;
+    var last_row_number = current_row_number - 1;
+
+    if (last_row_number < 0) // this is the first row
+      last_row_number = 0; // use default row
+
+    var last_row_data = manual_weaving_turns[last_row_number];
+    
+    var tablet_directions = []; // for each tablet, which direction it turns
+
+    // turn tablets
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      // find turn direction and number of turns
+      var pack_number = new_row_sequence.tablets[i];
+      var pack = new_row_sequence.packs[pack_number - 1];
+      var direction = pack.direction;
+      var number_of_turns = pack.number_of_turns;
+      var last_row_pack = last_row_data.tablets[i];
+      var last_direction =  last_row_data.packs[last_row_pack - 1].direction;
+;
+      var change_position = true;
+      if ((direction != last_direction) || (current_row_number == 1))
+        change_position = false;
+
+      // if change of direction, no net turn
+      // first row shows position 0
+      if (change_position)
+      {
+        if (direction == "F")
+        position_of_A[i] = Meteor.call("modular_add", position_of_A[i], number_of_turns, 4);
+
+        else
+          position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1 * number_of_turns, 4);
+      }
+      tablet_directions.push(direction);
+    }
+
+    // find which thread shows in each tablet
+    var threading_row = [];
+
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      // position of A = position_of_A[i] (row)
+      // tablet = i (column)
+      // thread style = threading[position_of_A[i]][i]
+      threading_row.push(threading[position_of_A[i]][i]);
+    }
+
+    var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions);
+
+    weaving.push(new_row);
+
+    // save the new row turning sequence
+    manual_weaving_turns.push(new_row_sequence);
+    manual_weaving_turns[0] = new_row_sequence; // retain current packs UI
+
+    Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
+    Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
+    Patterns.update({_id: pattern_id}, {$set: {number_of_rows: weaving.length}});
+    Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(manual_weaving_turns)}});
+  },
+  build_weaving_chart_row: function(number_of_tablets, threading_row, orientations, tablet_directions)
   {
     check(number_of_tablets, Number);
     check(threading_row, [Match.OneOf(Number, String)]);
@@ -1076,10 +1090,8 @@ Meteor.methods({
     else
       return false;
   },
-  /////////////////////////////////
-  // Simulation patterns
-  // auto
-  update_number_of_turns: function(pattern_id, new_number)
+  // auto simulation pattern UI
+  set_auto_number_of_turns: function(pattern_id, new_number)
   {
     check(pattern_id, String);
     check(new_number, Number);
@@ -1140,15 +1152,6 @@ Meteor.methods({
     auto_turn_sequence[turn_number - 1] = direction;
 
     Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: auto_turn_sequence}});
-  },
-  // manual
-  assign_pack: function(pattern_id, tablet, pack) {
-    check(pattern_id, String);
-    check(tablet, Number);
-    check(pack, Number);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-    var manual_weaving_turns_data = JSON.parse(pattern.manual_weaving_turns);
   },
   //////////////////////////////////////
   // Recent patterns

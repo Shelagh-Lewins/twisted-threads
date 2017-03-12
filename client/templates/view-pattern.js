@@ -17,15 +17,6 @@ Template.view_pattern.rendered = function() {
   else
     Session.set('view_pattern_mode', "summary");
 
-  // simulation patterns: build weaving chart from turning schedule
-  // auto
-  var pattern = Patterns.findOne({_id: pattern_id});
-
-  if ((pattern.edit_mode == "simulation") && (JSON.parse(pattern.weaving).length == 0)) // a new simulation pattern which hasn't built the weaving chart yet
-      Meteor.my_functions.build_simulation_weaving(pattern_id);
-
-  // TODO manual
-
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll
@@ -125,6 +116,9 @@ Template.view_pattern.helpers({
     // weaving sequence for auto simulation pattern
     if (typeof current_auto_turn_sequence !== "undefined")
       return current_auto_turn_sequence.list();   
+  },
+  auto_repeats: function() {
+    return Session.get("number_of_repeats");
   },
   packs: function() {
     var packs = new Array();
@@ -620,7 +614,7 @@ Template.view_pattern.events({
     Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
 
     if (pattern.edit_mode == "simulation")
-      Meteor.my_functions.build_simulation_weaving(pattern_id);
+      Meteor.my_functions.reset_simulation_weaving(pattern_id);
 
     else
       Meteor.my_functions.store_pattern(pattern_id);
@@ -649,7 +643,7 @@ Template.view_pattern.events({
     Meteor.my_functions.save_orientation_as_text(pattern_id);
 
     if (pattern.edit_mode == "simulation")
-      Meteor.my_functions.build_simulation_weaving(pattern_id);
+      Meteor.my_functions.reset_simulation_weaving(pattern_id);
 
     else
       Meteor.my_functions.store_pattern(pattern_id);
@@ -679,10 +673,7 @@ Template.view_pattern.events({
     if ($(event.currentTarget).hasClass("manual"))
       simulation_mode = "manual";
 
-    Meteor.call("update_simulation_mode", pattern_id, simulation_mode, function(){
-      Meteor.my_functions.build_simulation_weaving(pattern_id, "rebuild");
-      //Meteor.my_functions.set_repeats(pattern_id);
-    });
+    Meteor.my_functions.toggle_simulation_mode(pattern_id, simulation_mode);
   },
   // auto
   'input .auto #num_auto_turns': function(event)
@@ -707,10 +698,10 @@ Template.view_pattern.events({
       Session.set('auto_input_latch', true);
 
     auto_input_timeout = setTimeout(function() {
-      Meteor.call("update_number_of_turns", pattern_id, parseInt(event.currentTarget.value), function(){
+      Meteor.call("set_auto_number_of_turns", pattern_id, parseInt(event.currentTarget.value), function(){
         Session.set('auto_input_latch', false);
         Meteor.my_functions.set_repeats(pattern_id);
-        Meteor.my_functions.build_simulation_weaving(pattern_id);
+        Meteor.my_functions.reset_simulation_weaving(pattern_id);
       });
     }, 200);    
   },
@@ -726,7 +717,7 @@ Template.view_pattern.events({
       return;
 
     Meteor.call("toggle_turn_direction", pattern_id, this.turn, function(){
-      Meteor.my_functions.build_simulation_weaving(pattern_id);
+      Meteor.my_functions.reset_simulation_weaving(pattern_id);
     });
   },
   // manual
@@ -734,7 +725,6 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.accept_click())
         return;
 
-    console.log("clicked");
     var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
 
     var current_direction = obj.packs[this.pack_number - 1].direction;
@@ -798,7 +788,7 @@ Template.view_pattern.events({
         return;
 
     var pattern_id = Router.current().params._id;
-    Meteor.my_functions.build_simulation_weaving(pattern_id);
+    Meteor.my_functions.weave_row(pattern_id);
   },
   'click #sim_add_tablet': function () {
     if (!Meteor.my_functions.accept_click())
