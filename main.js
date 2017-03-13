@@ -141,7 +141,8 @@ if (Meteor.isClient) {
 
   Template.header.events({
     "click #home": function() {
-      Session.set("loading", true);   
+      Session.set("loading", true);  
+      console.log("clicked home");
     }
   });
 

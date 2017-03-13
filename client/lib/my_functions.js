@@ -146,11 +146,7 @@ Meteor.my_functions = {
     {
       pattern_obj.simulation_mode = pattern.simulation_mode; // auto or manual
       pattern_obj.auto_turn_sequence = pattern.auto_turn_sequence; // e.g. FFFFBBBB
-      
-      // not sure whether this needs to be turned into an array, as it will not have responsive UI
-      pattern_obj.auto_turn_sequence = pattern.auto_turn_sequence
-
-      // TODO manual_turn_sequence
+      pattern_obj.manual_weaving_turns = pattern.manual_weaving_turns;
     }
     // weft color
     pattern_obj.weft_color = weft_color.get();

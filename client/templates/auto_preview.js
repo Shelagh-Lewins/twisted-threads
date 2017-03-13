@@ -69,6 +69,10 @@ Template.auto_preview.helpers({
 
     return pattern.weft_color;
   },
+  show_tablets: function() {
+    if (Router.current().params.mode == "charts")
+      return "visible";
+  },
   preview_rotation: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 

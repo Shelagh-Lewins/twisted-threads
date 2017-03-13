@@ -339,7 +339,7 @@ Meteor.methods({
       // create row 0 which is never woven, it is a default and working row
       // actual weaving begins with row 1, 2...
       if((data.manual_weaving_turns == "") || (typeof data.manual_weaving_turns === "undefined"))
-        data.manual_weaving_turns = []; // TODO
+        data.manual_weaving_turns = [];
 
         var new_turn = {
           tablets: [], // for each tablet, the pack number

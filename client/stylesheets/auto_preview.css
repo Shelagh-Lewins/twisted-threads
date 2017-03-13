@@ -1,5 +1,6 @@
 body.view_pattern .auto_preview {
     margin: 0 0 10px 0;
+    float: left;
 }
 
 #auto_preview_spacer {
@@ -70,6 +71,7 @@ body.view_pattern .auto_preview.left svg {
 
 #weft_color.visible {
   display: block;
+  clear: both;
 }
 
 #weft_color .text {
@@ -83,6 +85,32 @@ button.rotate_preview {
 }
 
 button.rotate_preview.visible {
+  display: inline;
+}
+
+/* *** Tablets to show weaving direction *** */
+#preview_controls {
+  clear: both;
+}
+
+.preview_tablets {
+  display: none;
+}
+
+.preview_tablets.visible {
   display: block;
+  float: left;
+  width: 10px;
+}
+
+.preview_tablet {
+  display: block;
+  width: 9px;
+  height: 9px;
+  margin: 1px;
+  font-size: 7px;
+  background-color: #7580ac;
+  color: #FFFFFF;
+  text-align: center;
 }
 
