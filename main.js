@@ -132,6 +132,20 @@ if (Meteor.isClient) {
   });
 
   //////////////////////////////////
+  // turn off / show manually activated 'Loading...' indicator
+  UI.registerHelper('rendered_manual', function() {
+    // call this in the template to hide "loading..."
+    Session.set("loading", false);
+    return true;
+  }),
+
+  Template.header.events({
+    "click #home": function() {
+      Session.set("loading", true);   
+    }
+  });
+
+  //////////////////////////////////
   // provide lists of patterns in different categories
   UI.registerHelper('recent_patterns', function(limit){
     if (Meteor.userId()) // user is signed in

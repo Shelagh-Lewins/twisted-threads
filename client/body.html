@@ -26,15 +26,15 @@
 {{#if Template.subscriptionsReady}}
   <div class="inner_tube">
     <div class="header_left">
-      {{#if app_name_in_header}}<a class="home_link" href="{{pathFor route='home'}}"><span class="logo"></span><span class="app_name">Twisted Threads</span></a>{{/if}}
+      {{#if app_name_in_header}}<a class="home_link {{rendered_manual}}" href="{{pathFor route='home'}}"><span class="logo"></span><span class="app_name">Twisted Threads</span></a>{{/if}}
 
       {{#if equals route_name "user"}}<a href="{{pathFor route='home'}}">Home</a>{{/if}}
 
       {{#if equals route_name "account_settings"}}
-      <a href="{{pathFor route='home'}}">Home</a>{{/if}}
+      <a href="{{pathFor route='home'}}" id="home">Home</a>{{/if}}
 
       {{#if equals route_name "pattern"}}
-      <a href="{{pathFor route='home'}}">Home</a>{{/if}}
+      <a href="{{pathFor route='home'}}" id="home">Home</a>{{/if}}
 
       {{#if equals route_name "about"}}<a href="{{pathFor route='home'}}">Home</a>{{/if}}
       

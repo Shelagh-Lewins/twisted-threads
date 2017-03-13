@@ -1295,11 +1295,10 @@ Meteor.my_functions = {
     {
       for (var i=0;i<current_manual_weaving_turns.list().length; i++)
       {
-        console.log("row " + i);
-        console.log("initial tablets " + current_manual_weaving_turns.list()[i].tablets);
+        //console.log("row " + i);
+        //console.log("initial tablets " + current_manual_weaving_turns.list()[i].tablets);
         current_manual_weaving_turns.list()[i].tablets.splice(position-1, 0, 1);
-        console.log("updated tablets " + current_manual_weaving_turns.list()[i].tablets);
-        //Meteor.call("save_manual_weaving_turns", pattern_id, current_manual_weaving_turns.list())
+        //console.log("updated tablets " + current_manual_weaving_turns.list()[i].tablets);
       }
     }
 
@@ -1358,9 +1357,9 @@ Meteor.my_functions = {
     {
       var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
 
-      for (var i=0;i<manual_weaving_turns.length; i++) // include row 0 which is default
+      for (var i=0;i<current_manual_weaving_turns.list().length; i++)
       {
-        manual_weaving_turns[i].tablets.splice(position-1, 1);
+        current_manual_weaving_turns.list()[i].tablets.splice(position-1, 1);
       }
     }
 
@@ -2110,7 +2109,7 @@ Meteor.my_functions = {
       Meteor.my_functions.save_preview_as_text(pattern_id)
     });
   },
-  weave_row: function(pattern_id, new_row_sequence) {
+  weave_row: function(pattern_id) {
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {"edit_mode": 1, "simulation_mode": 1}});
 
     if (pattern.edit_mode != "simulation")
@@ -2128,7 +2127,24 @@ Meteor.my_functions = {
         Meteor.my_functions.build_pattern_display_data(pattern_id);
         Meteor.my_functions.save_weaving_as_text(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
         Meteor.my_functions.save_preview_as_text(pattern_id);
-        //Meteor.my_functions.store_pattern(pattern_id);
+      });
+    }
+  },
+  unweave_row: function(pattern_id) {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {"edit_mode": 1, "simulation_mode": 1}});
+
+    if (pattern.edit_mode != "simulation")
+        return;
+
+    if (pattern.simulation_mode == "manual")
+    {
+      Meteor.call("unweave_row", pattern_id, function(){
+        var pattern = Patterns.findOne({_id: pattern_id});
+        Session.set("number_of_rows", pattern.number_of_rows);
+        Meteor.my_functions.set_repeats(pattern_id);
+        Meteor.my_functions.build_pattern_display_data(pattern_id);
+        Meteor.my_functions.save_weaving_as_text(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
+        Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     }
   },

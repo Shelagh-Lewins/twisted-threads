@@ -6,15 +6,7 @@ Router.configure({
 Router.route('/', {
   name: 'home',
   loadingTemplate: 'loading',
-  //  trying to show loading template but it's not working
-  waitOn: function(){
-    return Meteor.subscribe('patterns');
-  },
-  action: function () {
-    this.render('home');
-  }
-  //
-  //template: 'home'
+  template: 'home'
 });
 
 Router.route('/about', {

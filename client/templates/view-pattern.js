@@ -79,11 +79,11 @@ Template.view_pattern.helpers({
     if ((typeof Router.current().params.mode === "undefined") && (mode == "summary"))
       return "selected"; // default if no mode specified
   },
-  rendered: function() {
+  /*rendered: function() {
     // call this in the template to hide "loading..."
     Session.set("loading", false);
     return true;
-  },
+  },*/
   edit_mode: function() {
     // simulation or freehand pattern?
     var pattern_id = Router.current().params._id;
@@ -155,6 +155,12 @@ Template.view_pattern.helpers({
     }
     
     return packs;
+  },
+  add_tablet_positions: function() {
+    return Session.get("number_of_tablets") + 1;
+  },
+  add_row_positions: function() {
+    return Session.get("number_of_rows") + 1;
   },
   can_remove_tablets: function() {
     // is there more than 1 tablet?
@@ -791,7 +797,15 @@ Template.view_pattern.events({
     var pattern_id = Router.current().params._id;
     Meteor.my_functions.weave_row(pattern_id);
   },
-  'click #sim_add_tablet': function () {
+  'click #unweave': function () {
+    if (!Meteor.my_functions.accept_click())
+        return;
+
+    var pattern_id = Router.current().params._id;
+    Meteor.my_functions.unweave_row(pattern_id);
+  },
+  'click #add_tablet': function () {
+    // add tablet at indicated position, e.g. position 1 = new tablet is #1
     if (!Meteor.my_functions.accept_click())
         return;
 
@@ -800,18 +814,56 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
 
+    var position = $('#tablet_to_add').val();
+
+    // basic data validation, must be an integer between 1 and number of tablets + 1 (new tablet at end)
+    position = Math.floor(position);
+    position = Math.max(position, 1);
+    position = Math.min(position, Session.get("number_of_tablets")+1);
+
     var style = Meteor.my_functions.get_selected_style();
 
-    Meteor.my_functions.add_tablet(pattern_id, -1, style);
+    Meteor.my_functions.add_tablet(pattern_id, position, style);
   },
-  'click #sim_remove_tablet': function () {
+  'click #remove_tablet': function () {
     if (!Meteor.my_functions.accept_click())
         return;
 
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_tablets: 1}});
 
-    Meteor.my_functions.remove_tablet(pattern_id, pattern.number_of_tablets);
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
+    var position = $('#tablet_to_remove').val();
+
+    // basic data validation, must be an integer between 1 and number of tablets
+    position = Math.floor(position);
+    position = Math.max(position, 1);
+    position = Math.min(position, Session.get("number_of_tablets"));
+    ///if position = 
+
+    Meteor.my_functions.remove_tablet(pattern_id, position);
+  },
+  'click #add_row': function () {
+    // add row at indicated position, e.g. position 1 = new row is #1
+    if (!Meteor.my_functions.accept_click())
+        return;
+
+    var pattern_id = Router.current().params._id;
+
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
+    var position = $('#row_to_add').val();
+
+    // basic data validation, must be an integer between 1 and number of tablets + 1 (new row at end)
+    position = Math.floor(position);
+    position = Math.max(position, 1);
+    position = Math.min(position, Session.get("number_of_rows")+1);
+
+    var style = Meteor.my_functions.get_selected_style();
+
+    Meteor.my_functions.add_weaving_row(pattern_id, position, style);
   }
 });
 
