@@ -2,6 +2,21 @@ UI.registerHelper('tablet_indexes', function() {
   return current_tablet_indexes.list();
 });
 
+UI.registerHelper('tablet_indexes_reverse', function() {
+  var source = current_tablet_indexes.list();
+  var my_array = [];
+  for (var i=source.length - 1; i >= 0; i--)
+  {
+    my_array.push(source[i]);
+  }
+
+  return my_array;
+});
+
+UI.registerHelper('tablet_indexes', function() {
+  return current_tablet_indexes.list();
+});
+
 UI.registerHelper('row_indexes', function() {
   return current_row_indexes.list();
 });

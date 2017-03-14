@@ -17,6 +17,11 @@ Template.view_pattern.rendered = function() {
   else
     Session.set('view_pattern_mode', "summary");
 
+  // is this a new pattern and needs the preview to be generated?
+  if (typeof $('.auto_preview path')[0] === "undefined")
+    Meteor.my_functions.reset_simulation_weaving(pattern_id);
+
+
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll
@@ -156,11 +161,31 @@ Template.view_pattern.helpers({
     
     return packs;
   },
+  weave_disabled: function() {
+    if (current_manual_weaving_turns.length > 100)
+      return "disabled";
+  },
+  unweave_disabled: function() {
+    if (current_manual_weaving_turns.length < 2)
+      return "disabled";
+  },
   add_tablet_positions: function() {
     return Session.get("number_of_tablets") + 1;
   },
   add_row_positions: function() {
     return Session.get("number_of_rows") + 1;
+  },
+  can_add_tablets: function() {
+    // is there more than 1 tablet?
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
+
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
+
+    if (pattern.number_of_tablets < 10)
+      if (Meteor.my_functions.can_edit_pattern(pattern_id))
+        return true;
   },
   can_remove_tablets: function() {
     // is there more than 1 tablet?

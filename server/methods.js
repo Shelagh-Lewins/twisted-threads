@@ -210,6 +210,9 @@ Meteor.methods({
     if (typeof data.weft_color !== "undefined")
       weft_color = data.weft_color;
 
+    if (typeof data.preview_rotation === "undefined")
+      data.preview_rotation = "right";
+
     var threading_notes = "";
     if (typeof data.threading_notes !== "undefined")
       threading_notes = data.threading_notes;
@@ -219,6 +222,7 @@ Meteor.methods({
       edit_mode: data.edit_mode,
       description: description,
       weaving_notes: weaving_notes,
+      preview_rotation: data.preview_rotation,
       weft_color: weft_color,
       threading_notes: threading_notes,
       private: true, // patterns are private by default so the user can edit them before revealing them to the world
@@ -929,7 +933,7 @@ Meteor.methods({
     }
   },
   //////////////////////////////////
-  // auto and manual simulation use these
+  // undo last manual weave row
   unweave_row: function(pattern_id) {
     // unweave the last row
     check(pattern_id, String);
@@ -982,30 +986,11 @@ Meteor.methods({
         else
           position_of_A[i] = Meteor.call("modular_add", position_of_A[i],  number_of_turns, 4);
       }
-      //tablet_directions.push(direction);
     }
-
-    // find which thread shows in each tablet
-    /*var threading_row = [];
-
-    for (var i=0; i<number_of_tablets; i++)
-    {
-      // position of A = position_of_A[i] (row)
-      // tablet = i (column)
-      // thread style = threading[position_of_A[i]][i]
-      threading_row.push(threading[position_of_A[i]][i]);
-    }
-
-    var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions);
-
-    weaving.push(new_row);*/
 
     weaving.pop(); // remove last row of weaving chart
     manual_weaving_turns.pop();
-    // save the new row turning sequence
-    //manual_weaving_turns.push(new_row_sequence);
-    //manual_weaving_turns[0] = new_row_sequence; // retain current packs UI
-
+   
     Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: weaving.length}});
@@ -1016,6 +1001,9 @@ Meteor.methods({
     check(new_row_sequence, Object);
 
     var pattern = Patterns.findOne({_id: pattern_id});
+
+    if (pattern.number_of_rows >= 100)
+      throw new Meteor.Error("row-limit-reached", "You cannot weave more than 100 rows.");
 
     var number_of_tablets = pattern.number_of_tablets;
     var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);

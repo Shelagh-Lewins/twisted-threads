@@ -101,6 +101,18 @@ Template.auto_preview.helpers({
         return "right";
     }
   },
+  preview_style: function() {
+    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
+
+    var sim_holder_height = Template.instance().image_height() * Session.get("number_of_repeats");
+    sim_holder_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
+
+    if (pattern.preview_rotation == "left")
+      return "width: " + (sim_holder_height + 18) + "px; float: right;"; // extra px to allow space for tablets
+
+    else if (pattern.preview_rotation == "right")
+      return "width: " + (sim_holder_height + 18) + "px; float: left;"; // extra px to allow space for tablets
+  },
   rotation_correction: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1, edit_mode: 1, simulation_mode: 1}});
 
@@ -117,19 +129,19 @@ Template.auto_preview.helpers({
     switch(pattern.preview_rotation)
     {
       case "left":
-        return "margin-top: " + total_width + "px; height: 0;";
+        return "margin-top: " + total_width + "px; height: 0;" + "width: 0;";
 
       case "up":
         return;
 
-      case "right":
+      case "right": // default view with tablets at left
         var total_height = Template.instance().image_height() * scaling * Session.get("number_of_repeats");
 
         if (pattern.edit_mode == "simulation")
           if (pattern.simulation_mode == "auto")
             total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
  
-        return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
+        return "margin-left: " + total_height + "px; height: " + total_width + "px; " + "width: 0;";
 
       case "down":
         var total_height = Template.instance().image_height() * scaling;
@@ -138,8 +150,13 @@ Template.auto_preview.helpers({
         return "width: " + total_width + "px; position: relative; height: " + total_height + "px; ";
 
       default:
-        var total_height = Template.instance().image_height() * scaling;
-        return "margin-left: " + total_height + "px; height: " + total_width + "px; ";
+        var total_height = Template.instance().image_height() * scaling * Session.get("number_of_repeats");
+
+        if (pattern.edit_mode == "simulation")
+          if (pattern.simulation_mode == "auto")
+            total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
+ 
+        return "margin-left: " + total_height + "px; height: " + total_width + "px; " + "width: 0;";
     }
   },
   spinner_style: function() {

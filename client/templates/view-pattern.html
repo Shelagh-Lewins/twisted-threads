@@ -18,7 +18,9 @@
   </div>
 </div>
 
-{{> auto_preview}}
+<div id="auto_preview_wrapper">
+  {{> auto_preview}}
+</div>
 
 {{#if equals view_pattern_mode "summary"}}
   <div class="pattern_info">
@@ -139,8 +141,8 @@
       </div>
 
       <div class="weave_buttons">
-      <button id="weave">Weave</button>
-      <button id="unweave">Unweave</button>
+      <button id="weave" disabled="{{weave_disabled}}">Weave</button>
+      <button id="unweave" disabled="{{unweave_disabled}}">Unweave</button>
     </div>
 
     {{/if}}
@@ -202,10 +204,10 @@
   </div>
   
   <div class="edit_tablets">
-    <button id="add_tablet">Add tablet</button> at 
+    <button id="add_tablet" disabled="{{#unless equals can_add_tablets true}}disabled{{/unless}}">Add tablet</button> at 
     <input type="number" placeholder="Position..." id="tablet_to_add" min="1" max="{{add_tablet_positions}}" size="3" value="1" ><br />
     {{#if equals edit_mode "simulation"}}
-      <button id="remove_tablet">Remove tablet</button>  
+      <button id="remove_tablet" disabled="{{#unless equals can_remove_tablets true}}disabled{{/unless}}">Remove tablet</button>  
       <input type="number" placeholder="Position..." id="tablet_to_remove" min="1" max="{{tablet_indexes.length}}" size="3" value="1" >
     {{/if}}
   </div>

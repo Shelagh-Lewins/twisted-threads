@@ -631,6 +631,10 @@ background: #fff; /* set desired hover color */
   background-color: #FFFFFF;
 }
 
+.simulation .edit_style {
+  width: 100px;
+}
+
 .edit_style.editing {
   display: block;
 }

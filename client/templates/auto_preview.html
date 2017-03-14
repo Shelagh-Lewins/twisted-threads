@@ -1,11 +1,18 @@
 <template name="auto_preview">
 <div id="auto_preview_spacer"></div>
-<div class="preview_tablets {{show_tablets}}">
+
+<div class="auto_preview {{preview_rotation}}" style="{{preview_style}}">
+  <div class="preview_tablets {{show_tablets}}">
+    {{#if equals preview_rotation "right"}}
       {{#each tablet_indexes}}
         <span class="preview_tablet">{{this}}</span>
       {{/each}}
+    {{else}}
+      {{#each tablet_indexes_reverse}}
+        <span class="preview_tablet">{{this}}</span>
+      {{/each}}
+    {{/if}}
     </div>
-<div class="auto_preview {{preview_rotation}}">
 
   <div class="holder" style="{{rotation_correction}}">
     {{#if use_stored_preview}}

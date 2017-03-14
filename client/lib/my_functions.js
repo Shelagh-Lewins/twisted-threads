@@ -146,12 +146,24 @@ Meteor.my_functions = {
     {
       pattern_obj.simulation_mode = pattern.simulation_mode; // auto or manual
       pattern_obj.auto_turn_sequence = pattern.auto_turn_sequence; // e.g. FFFFBBBB
-      pattern_obj.manual_weaving_turns = pattern.manual_weaving_turns;
+      //pattern_obj.manual_weaving_turns = pattern.manual_weaving_turns;
+
+      pattern_obj.manual_weaving_turns = [];
+      for (var i=0; i<current_manual_weaving_turns.length; i++)
+      {
+        pattern_obj.manual_weaving_turns[i] = current_manual_weaving_turns[i];
+      }
+      pattern_obj.position_of_A = JSON.parse(pattern.position_of_A);
     }
     // weft color
     pattern_obj.weft_color = weft_color.get();
 
+    // orientation of auto preview
+    pattern_obj.preview_rotation = pattern.preview_rotation;
+
     return pattern_obj;
+
+    
 
     ///////////////////////////
     // Example JSON data for pattern
@@ -198,7 +210,10 @@ Meteor.my_functions = {
       }
       // more styles
     ],
-    weft_color: "#76a5af"
+    weft_color: "#76a5af",
+    preview_rotation: "left"
+    // TODO add simulation pattern data
+
     
     */
   },
