@@ -1,10 +1,13 @@
 body.view_pattern .auto_preview {
-    margin: 0 0 10px 0;
+  margin: 0 0 10px 0;
+  width: 100%;
+  max-width: 600px;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 body.view_pattern #auto_preview_wrapper {
-  width: 100%;
-  max-width: 600px;
+  
 }
 
 #auto_preview_spacer {
@@ -60,8 +63,12 @@ body.view_pattern .auto_preview.left svg {
     top: 100%;
 }
 
-.auto_preview .holder {
+.auto_preview.right .holder {
     float: left;
+}
+
+.auto_preview.left .holder {
+    float: right;
 }
 
 /* *** Weft color *** */
@@ -110,8 +117,13 @@ button.rotate_preview.visible {
 
 .auto_preview.right .preview_tablets.visible {
   float: left;
-  margin-right: 3px;
+  margin-right: 5px;
   margin-left: 0;
+}
+
+.auto_preview.left .preview_tablets.visible {
+  position: absolute;
+  right: 0;
 }
 
 .preview_tablet {

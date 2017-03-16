@@ -13,7 +13,10 @@ Template.auto_preview.onCreated(function() {
   };
 
   this.viewbox_height = function(){
-    return this.unit_height * (1 + Session.get("number_of_rows") / 2);
+    
+    var viewbox_height = this.unit_height * ((Session.get("number_of_rows") + 1) / 2);
+    console.log("viewbox height " + viewbox_height);
+    return viewbox_height;
   };
 
   this.image_width = function(){
@@ -26,6 +29,14 @@ Template.auto_preview.onCreated(function() {
     // plus another half height that sticks out the top
     var height = (1 + Session.get("number_of_rows")) * this.cell_height / 2;
     return height;
+  };
+
+  this.sim_holder_height = function(){
+    var sim_holder_height = this.image_height() * Session.get("number_of_repeats");
+
+    sim_holder_height -= (Session.get("number_of_repeats") - 1) * this.cell_height/2;
+
+    return sim_holder_height + 18; // 18 = width of tablets showing direction of weaving
   };
 
 });
@@ -62,7 +73,11 @@ Template.auto_preview.helpers({
     return repeats;
   },
   repeat_offset: function(repeat) {
-    return parseFloat(repeat) * (Template.instance().viewbox_height() - (1 * Template.instance().unit_height));
+    //return parseFloat(repeat) * (Template.instance().viewbox_height() - (1 * Template.instance().unit_height));
+
+    var height = Template.instance().unit_height * ((Session.get("number_of_rows") +1) / 2);
+    var offset = parseFloat(repeat) * (height - (0.5 * Template.instance().unit_height));
+    return offset;
   },
   weft_color: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {weft_color: 1}});
@@ -70,7 +85,7 @@ Template.auto_preview.helpers({
     return pattern.weft_color;
   },
   show_tablets: function() {
-    if (Router.current().params.mode == "charts")
+    if ((Router.current().params.mode == "charts") || (Router.current().params.mode == "summary"))
       return "visible";
   },
   preview_rotation: function() {
@@ -104,14 +119,16 @@ Template.auto_preview.helpers({
   preview_style: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 
-    var sim_holder_height = Template.instance().image_height() * Session.get("number_of_repeats");
-    sim_holder_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
+    //var sim_holder_height = Template.instance().image_height() * Session.get("number_of_repeats");
+    //sim_holder_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
 
     if (pattern.preview_rotation == "left")
-      return "width: " + (sim_holder_height + 18) + "px; float: right;"; // extra px to allow space for tablets
+      return "width: " + (Template.instance().sim_holder_height()) + "px; min-width: 600px; position: relative;"; // extra px to allow space for tablets
+    //return "width: " + (sim_holder_height + 18) + "px; float: right;"
 
     else if (pattern.preview_rotation == "right")
-      return "width: " + (sim_holder_height + 18) + "px; float: left;"; // extra px to allow space for tablets
+      return "width: " + (Template.instance().sim_holder_height()) + "px;"; // extra px to allow space for tablets
+    //return "width: " + (sim_holder_height + 18) + "px; float: left;";
   },
   rotation_correction: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1, edit_mode: 1, simulation_mode: 1}});
@@ -129,7 +146,7 @@ Template.auto_preview.helpers({
     switch(pattern.preview_rotation)
     {
       case "left":
-        return "margin-top: " + total_width + "px; height: 0;" + "width: 0;";
+        return "margin-top: " + total_width + "px; height: 0;" + "width: 0; margin-right: " + Template.instance().sim_holder_height() + "px;";
 
       case "up":
         return;
@@ -140,7 +157,7 @@ Template.auto_preview.helpers({
         if (pattern.edit_mode == "simulation")
           if (pattern.simulation_mode == "auto")
             total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
- 
+
         return "margin-left: " + total_height + "px; height: " + total_width + "px; " + "width: 0;";
 
       case "down":
