@@ -793,7 +793,7 @@ Template.view_pattern.events({
 
     manual_input_timeout = setTimeout(function() {
       var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
-      obj.packs[that.pack_number - 1].number_of_turns = event.currentTarget.value;
+      obj.packs[that.pack_number - 1].number_of_turns = parseInt(event.currentTarget.value);
       current_manual_weaving_turns.splice(0, 1, obj);
     }, 200);    
   },

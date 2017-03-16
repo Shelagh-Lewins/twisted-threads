@@ -13,10 +13,7 @@ Template.auto_preview.onCreated(function() {
   };
 
   this.viewbox_height = function(){
-    
-    var viewbox_height = this.unit_height * ((Session.get("number_of_rows") + 1) / 2);
-    console.log("viewbox height " + viewbox_height);
-    return viewbox_height;
+    return viewbox_height = this.unit_height * ((Session.get("number_of_rows") + 1) / 2);
   };
 
   this.image_width = function(){
