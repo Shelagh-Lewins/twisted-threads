@@ -13,7 +13,26 @@ Template.auto_preview.onCreated(function() {
   };
 
   this.viewbox_height = function(){
-    return viewbox_height = this.unit_height * ((Session.get("number_of_rows") + 1) / 2);
+    return this.unit_height * ((Session.get("number_of_rows") + 1) / 2);
+  };
+
+  this.repeat_viewbox_height = function(){
+    var height = this.viewbox_height();
+    var pattern = Patterns.findOne({ _id: this.pattern_id});
+
+    if (pattern.simulation_mode == "auto")
+    {
+      height *= Session.get("number_of_repeats");
+      height -= (Session.get("number_of_repeats") - 1) * (this.unit_height / 2);
+    }
+
+    if (height == NaN)
+    {
+      console.log("initial height " + this.viewbox_height());
+      console.log("height " + height);
+    }
+
+    return height;
   };
 
   this.image_width = function(){
@@ -203,6 +222,9 @@ Template.auto_preview.helpers({
   },
   viewbox_height: function() {
     return Template.instance().viewbox_height();
+  },
+  repeat_viewbox_height: function() {
+    return Template.instance().repeat_viewbox_height();
   },
   total_width: function() {
     return Math.min(Template.instance().image_width(), Template.instance().max_image_width);
