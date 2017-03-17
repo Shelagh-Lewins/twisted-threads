@@ -99,42 +99,92 @@ button.rotate_preview.visible {
   display: inline;
 }
 
-/* *** Tablets to show weaving direction *** */
 #preview_controls {
   clear: both;
 }
 
-.preview_tablets {
+/* *** Tablets to show weaving direction & tablet position *** */
+/* Numbers */
+.tablet_numbers {
   display: none;
 }
 
-.preview_tablets.visible {
+.auto_preview.show_tablets .tablet_numbers {
   display: block;
-  float: right;
   width: 12px;
-  margin-left: 3px;
 }
+/*
+.auto_preview.left .tablet_numbers.visible {
+  float: right;
+  margin-left: 3px;
+}*/
 
-.auto_preview.right .preview_tablets.visible {
+.auto_preview.right.show_tablets .tablet_numbers {
   float: left;
   margin-right: 5px;
   margin-left: 0;
 }
 
-.auto_preview.left .preview_tablets.visible {
+.auto_preview.left.show_tablets .tablet_numbers {
   position: absolute;
   right: 0;
 }
 
-.preview_tablet {
+.tablet_numbers .tablet_number {
+  display: block;
+  width: 12px;
+  height: 9px;
+  margin-top: 1px;
+  font-size: 9px;
+  background-color: transparent;
+  color: #424A6C;
+  text-align: left;
+  line-height: 9px;
+}
+
+.auto_preview.right .tablet_numbers .tablet_number {
+  text-align: right;
+}
+
+/* Positions */
+.tablet_positions {
+  display: none;
+}
+
+.auto_preview.show_tablets .tablet_positions {
+  display: block;
+  width: 12px;
+}
+/*
+.auto_preview.left .tablet_positions.visible {
+  float: right;
+  margin-left: 3px;
+}*/
+
+.auto_preview.right.show_tablets .tablet_positions {
+  float: left;
+  margin-right: 5px;
+  margin-left: 0;
+}
+
+.auto_preview.left.show_tablets .tablet_positions {
+  position: absolute;
+  right: 18px;
+}
+
+.tablet_positions .position {
   display: block;
   width: 12px;
   height: 9px;
   margin-top: 1px;
   font-size: 8px;
-  background-color: #7580ac;
+  background-color: #666666;
   color: #FFFFFF;
   text-align: center;
   line-height: 9px;
+ }
+
+.tablet_positions .position.start {
+  background-color: #6aa84f;
 }
 

@@ -18,6 +18,7 @@ Template.auto_preview.onCreated(function() {
 
   this.repeat_viewbox_height = function(){
     var height = this.viewbox_height();
+    console.log("initial height " + this.viewbox_height());
     var pattern = Patterns.findOne({ _id: this.pattern_id});
 
     if (pattern.simulation_mode == "auto")
@@ -26,10 +27,11 @@ Template.auto_preview.onCreated(function() {
       height -= (Session.get("number_of_repeats") - 1) * (this.unit_height / 2);
     }
 
-    if (height == NaN)
+    if (isNaN(height))
     {
-      console.log("initial height " + this.viewbox_height());
       console.log("height " + height);
+      console.log("repeat initial height " + this.viewbox_height());
+      
     }
 
     return height;
@@ -52,7 +54,7 @@ Template.auto_preview.onCreated(function() {
 
     sim_holder_height -= (Session.get("number_of_repeats") - 1) * this.cell_height/2;
 
-    return sim_holder_height + 18; // 18 = width of tablets showing direction of weaving
+    return sim_holder_height + 36; // 36 = width of tablets showing direction of weaving
   };
 
 });
@@ -102,7 +104,20 @@ Template.auto_preview.helpers({
   },
   show_tablets: function() {
     if ((Router.current().params.mode == "charts") || (Router.current().params.mode == "summary"))
-      return "visible";
+      return "show_tablets";
+    else
+      return "don't show"
+  },
+  tablet_position: function() {
+    // which hole is currently in position A?
+    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, position_of_A: 1}});
+
+    if (pattern.edit_mode == "simulation")
+    {
+      var position_of_A = JSON.parse(pattern.position_of_A);
+      var labels = ["A", "B", "C", "D"];
+      return labels[position_of_A[this-1]];
+    }
   },
   preview_rotation: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
@@ -140,11 +155,9 @@ Template.auto_preview.helpers({
 
     if (pattern.preview_rotation == "left")
       return "width: " + (Template.instance().sim_holder_height()) + "px; min-width: 600px; position: relative;"; // extra px to allow space for tablets
-    //return "width: " + (sim_holder_height + 18) + "px; float: right;"
 
     else if (pattern.preview_rotation == "right")
       return "width: " + (Template.instance().sim_holder_height()) + "px;"; // extra px to allow space for tablets
-    //return "width: " + (sim_holder_height + 18) + "px; float: left;";
   },
   rotation_correction: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1, edit_mode: 1, simulation_mode: 1}});
