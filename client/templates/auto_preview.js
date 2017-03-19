@@ -17,8 +17,12 @@ Template.auto_preview.onCreated(function() {
   };
 
   this.repeat_viewbox_height = function(){
+    if (typeof Session.get("number_of_repeats") === "undefined")
+      return 0; // not ready
+    //console.log("undefined no.");
     var height = this.viewbox_height();
-    console.log("initial height " + this.viewbox_height());
+    //console.log("initial height " + this.viewbox_height());
+    //console.log("session no. of repeats " + Session.get("number_of_repeats"));
     var pattern = Patterns.findOne({ _id: this.pattern_id});
 
     if (pattern.simulation_mode == "auto")
@@ -27,12 +31,12 @@ Template.auto_preview.onCreated(function() {
       height -= (Session.get("number_of_repeats") - 1) * (this.unit_height / 2);
     }
 
-    if (isNaN(height))
-    {
-      console.log("height " + height);
-      console.log("repeat initial height " + this.viewbox_height());
+    //if (isNaN(height))
+    //{
+      //console.log(" final height " + height);
+      //console.log("repeat initial height " + this.viewbox_height());
       
-    }
+    //}
 
     return height;
   };

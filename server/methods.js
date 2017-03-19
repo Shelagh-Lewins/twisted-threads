@@ -871,33 +871,26 @@ Meteor.methods({
       {
         var tablet_directions = []; // for each tablet, which direction it turns
         var tablet_turns = []; // for each tablet, number of turns
-
-        // turn tablets
+        var direction = auto_turn_sequence[j]; // all tablets turn together
+        var threading_row = []; // which thread shows in each tablet
+        
         for (var i=0; i<number_of_tablets; i++)
         {
-          // if change of direction, no net turn
-          var direction = auto_turn_sequence[j];
-          var last_direction = auto_turn_sequence[j-1];
+          // turn tablet
+          if (direction == "F")
+            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], 1, 4);
 
-          if (direction == last_direction)
-          {
-            if (auto_turn_sequence[j] == "F")
-              position_of_A[i] = Meteor.call("modular_add", position_of_A[i], 1, 4);
+          else
+            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1, 4);
 
-            else
-              position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1, 4);
-          }
-        }
+          // which thread shows depends on direction of turn
+          if (direction == "F") // show thread currently in position D
+            var thread_to_show = Meteor.call("modular_add", position_of_A[i], -1, 4);
+          else // B: show thread in position A
+            var thread_to_show = position_of_A[i];
 
-        // find which thread shows in each tablet
-        var threading_row = [];
-
-        for (var i=0; i<number_of_tablets; i++)
-        {
-          // position of A = position_of_A[i] (row)
-          // tablet = i (column)
-          // thread style = threading[position_of_A[i]][i]
-          threading_row.push(threading[position_of_A[i]][i]);
+          // threading[thread_to_show] = row of threading chart
+          threading_row.push(threading[thread_to_show][i]);
           tablet_directions.push(direction);
           tablet_turns.push(1); // always turn 1
         }
@@ -1014,16 +1007,17 @@ Meteor.methods({
     var threading = JSON.parse(pattern.threading);
     var orientations = JSON.parse(pattern.orientation);
 
-    var current_row_number = manual_weaving_turns.length;
-    var last_row_number = current_row_number - 1;
+    //var current_row_number = manual_weaving_turns.length;
+    //var last_row_number = current_row_number - 1;
 
-    if (last_row_number < 0) // this is the first row
-      last_row_number = 0; // use default row
+    //if (last_row_number < 0) // this is the first row
+      //last_row_number = 0; // use default row
 
-    var last_row_data = manual_weaving_turns[last_row_number];
+    //var last_row_data = manual_weaving_turns[last_row_number];
     
     var tablet_directions = []; // for each tablet, which direction it turns
     var tablet_turns = []; // for each tablet, number of turns
+    var threading_row = [];
 
     // turn tablets
     for (var i=0; i<number_of_tablets; i++)
@@ -1033,16 +1027,16 @@ Meteor.methods({
       var pack = new_row_sequence.packs[pack_number - 1];
       var direction = pack.direction;
       var number_of_turns = pack.number_of_turns;
-      var last_row_pack = last_row_data.tablets[i];
-      var last_direction =  last_row_data.packs[last_row_pack - 1].direction;
+      //var last_row_pack = last_row_data.tablets[i];
+      //var last_direction =  last_row_data.packs[last_row_pack - 1].direction;
 
-      var change_position = true;
-      if ((direction != last_direction) || (current_row_number == 1))
-        change_position = false;
+      //var change_position = true;
+      //if ((direction != last_direction) || (current_row_number == 1))
+        //change_position = false;
 
       // if change of direction, no net turn
       // first row shows position 0
-      if (change_position)
+      /*if (change_position)
       {
         if (direction == "F")
         position_of_A[i] = Meteor.call("modular_add", position_of_A[i], number_of_turns, 4);
@@ -1063,6 +1057,25 @@ Meteor.methods({
       // tablet = i (column)
       // thread style = threading[position_of_A[i]][i]
       threading_row.push(threading[position_of_A[i]][i]);
+    }*/
+      // turn tablet
+      if (direction == "F")
+        position_of_A[i] = Meteor.call("modular_add", position_of_A[i], 1, 4);
+
+      else
+        position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1, 4);
+
+      // which thread shows depends on direction of turn
+      if (direction == "F") // show thread currently in position D
+        var thread_to_show = Meteor.call("modular_add", position_of_A[i], -1, 4);
+      else // B: show thread in position A
+        var thread_to_show = position_of_A[i];
+
+      // threading[thread_to_show] = row of threading chart
+      threading_row.push(threading[thread_to_show][i]);
+      tablet_directions.push(direction);
+      tablet_turns.push(number_of_turns);
+
     }
 
     var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions, tablet_turns);
@@ -1091,9 +1104,23 @@ Meteor.methods({
     for (var i=0; i<number_of_tablets; i++)
     {
       var thread_style = threading_row[i];
+
+      // F: show thread in position D
+      /*if (tablet_directions[i] == "F")
+      {
+        thread_style = Meteor.call("modular_add", thread_style, -1, 4);
+      }*/
+      
+      /*else // B: show thread in position A
+      {
+
+      }*/
+      //var thread_style = threading_row[i];
       var orientation = orientations[i];
       new_row[i] = Meteor.call("weaving_style_from_threading_style", thread_style, orientation, tablet_directions[i], tablet_turns[i]);
     }
+    //console.log("turn " + tablet_directions[0]);
+      //console.log("show thread in hole " + thread_style]);
 
     return new_row;
   },
