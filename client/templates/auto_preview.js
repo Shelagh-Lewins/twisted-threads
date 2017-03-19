@@ -19,10 +19,8 @@ Template.auto_preview.onCreated(function() {
   this.repeat_viewbox_height = function(){
     if (typeof Session.get("number_of_repeats") === "undefined")
       return 0; // not ready
-    //console.log("undefined no.");
+
     var height = this.viewbox_height();
-    //console.log("initial height " + this.viewbox_height());
-    //console.log("session no. of repeats " + Session.get("number_of_repeats"));
     var pattern = Patterns.findOne({ _id: this.pattern_id});
 
     if (pattern.simulation_mode == "auto")
@@ -31,14 +29,37 @@ Template.auto_preview.onCreated(function() {
       height -= (Session.get("number_of_repeats") - 1) * (this.unit_height / 2);
     }
 
-    //if (isNaN(height))
-    //{
-      //console.log(" final height " + height);
-      //console.log("repeat initial height " + this.viewbox_height());
-      
-    //}
-
     return height;
+  };
+
+  this.scaling = function(){
+    var pattern = Patterns.findOne({ _id: this.pattern_id});
+
+    var total_width = this.image_width();
+    var max_width = this.max_image_width;
+    var scaling = 1;
+
+    if (total_width > max_width)
+    {
+      scaling = max_width / total_width;
+      total_width = max_width;
+    }
+
+    return scaling;
+  };
+
+  this.total_height = function() { // for parent element css
+    if (typeof Session.get("number_of_repeats") === "undefined")
+      return 0; // not ready
+
+    var pattern = Patterns.findOne({ _id: this.pattern_id});
+    var total_height = this.image_height() * this.scaling() * Session.get("number_of_repeats");
+
+    if (pattern.edit_mode == "simulation")
+      if (pattern.simulation_mode == "auto")
+        total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
+
+    return total_height;
   };
 
   this.image_width = function(){
@@ -134,16 +155,8 @@ Template.auto_preview.helpers({
         return "left";
         break;
 
-      case "up":
-        return "up";
-        break;
-
       case "right":
         return "right";
-        break;
-
-      case "down":
-        return "down";
         break;
 
       default:
@@ -163,83 +176,33 @@ Template.auto_preview.helpers({
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1, edit_mode: 1, simulation_mode: 1}});
 
     var total_width = Template.instance().image_width();
-    var max_width = Template.instance().max_image_width;
-    var scaling = 1;
 
-    if (total_width > max_width)
-    {
-      scaling = max_width / total_width;
-      total_width = max_width;
-    }
+    var total_height = Template.instance().image_height() * Template.instance().scaling() * Session.get("number_of_repeats");
+
+        if (pattern.edit_mode == "simulation")
+          if (pattern.simulation_mode == "auto")
+            total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
 
     switch(pattern.preview_rotation)
     {
       case "left":
-        return "margin-top: " + total_width + "px; height: 0;" + "width: "  + total_width + "px;";
-
-      case "up":
-        return;
+        return "margin-top: " + total_width + "px; height: 0;" + "width: "  + total_height + "px;";
 
       case "right":
-        var total_height = Template.instance().image_height() * scaling * Session.get("number_of_repeats");
-
-        if (pattern.edit_mode == "simulation")
-          if (pattern.simulation_mode == "auto")
-            total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
-
-        return "height: " + total_width + "px; width: " + total_width + "px; position: relative; margin-right: 36px;";
-
-      case "down":
-        var total_height = Template.instance().image_height() * scaling;
-        return "width: " + total_width + "px; position: relative; height: " + total_height + "px; ";
-
-      default:
-        var total_height = Template.instance().image_height() * scaling * Session.get("number_of_repeats");
-
-        if (pattern.edit_mode == "simulation")
-          if (pattern.simulation_mode == "auto")
-            total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
- 
-        return "margin-left: " + total_height + "px; height: " + total_width + "px; " + "width: 0;";
+        return "height: " + total_width + "px; width: " + total_height + "px; position: relative; margin-right: 36px;";
     }
   },
   svg_style: function() {
     // push the SVG back into place after rotation
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 
-    var total_width = Template.instance().image_width();
-
     switch(pattern.preview_rotation)
     {
       case "right":
-        return "left: " + total_width + "px";
+        return "left: " + Template.instance().total_height() + "px;"
     }
   },
-  spinner_style: function() {
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 
-    var total_width = Template.instance().image_width();
-    var max_width = Template.instance().max_image_width;
-    var scaling = 1;
-
-    if (total_width > max_width)
-    {
-      scaling = max_width / total_width;
-      total_width = max_width;
-    }
-
-    var total_height = Template.instance().image_height() * scaling;
-
-    if (pattern.preview_rotation == "anticlockwise")
-    {
-      return "margin-top: -" + total_width + "px; height: " + total_width + "px;" + "width: " + total_height + "px;";
-    }
-
-    else
-    {
-      return "margin-left: -" + total_height + "px; height: " + total_width + "px; " + "width: " + total_height + "px;";
-    }
-  },
   viewbox_width: function() {
     return Template.instance().viewbox_width();
   },
