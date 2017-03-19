@@ -6,10 +6,6 @@ body.view_pattern .auto_preview {
   overflow-y: hidden;
 }
 
-body.view_pattern #auto_preview_wrapper {
-  
-}
-
 #auto_preview_spacer {
   height: 8px;
 }
@@ -38,7 +34,9 @@ body.view_pattern .auto_preview svg {
     -o-transform-origin: 0 0;
     transform-origin: 0 0;
 
-    max-width: 600px;
+    position: relative;
+
+    /*max-width: 600px;*/
 }
 
 body.view_pattern .auto_preview.left svg { 
@@ -63,11 +61,11 @@ body.view_pattern .auto_preview.left svg {
     top: 100%;
 }
 
-.auto_preview.right .holder {
+.auto_preview.left .holder {
     float: left;
 }
 
-.auto_preview.left .holder {
+.auto_preview.right .holder {
     float: right;
 }
 
@@ -113,19 +111,14 @@ button.rotate_preview.visible {
   display: block;
   width: 12px;
 }
-/*
-.auto_preview.left .tablet_numbers.visible {
-  float: right;
-  margin-left: 3px;
-}*/
 
-.auto_preview.right.show_tablets .tablet_numbers {
+.auto_preview.left.show_tablets .tablet_numbers {
   float: left;
   margin-right: 5px;
   margin-left: 0;
 }
 
-.auto_preview.left.show_tablets .tablet_numbers {
+.auto_preview.right.show_tablets .tablet_numbers {
   position: absolute;
   right: 0;
 }
@@ -142,7 +135,7 @@ button.rotate_preview.visible {
   line-height: 9px;
 }
 
-.auto_preview.right .tablet_numbers .tablet_number {
+.auto_preview.left .tablet_numbers .tablet_number {
   text-align: right;
 }
 
@@ -155,19 +148,14 @@ button.rotate_preview.visible {
   display: block;
   width: 12px;
 }
-/*
-.auto_preview.left .tablet_positions.visible {
-  float: right;
-  margin-left: 3px;
-}*/
 
-.auto_preview.right.show_tablets .tablet_positions {
+.auto_preview.left.show_tablets .tablet_positions {
   float: left;
   margin-right: 5px;
   margin-left: 0;
 }
 
-.auto_preview.left.show_tablets .tablet_positions {
+.auto_preview.right.show_tablets .tablet_positions {
   position: absolute;
   right: 18px;
 }

@@ -91,10 +91,9 @@ Template.auto_preview.helpers({
     return repeats;
   },
   repeat_offset: function(repeat) {
-    //return parseFloat(repeat) * (Template.instance().viewbox_height() - (1 * Template.instance().unit_height));
-
     var height = Template.instance().unit_height * ((Session.get("number_of_rows") +1) / 2);
     var offset = parseFloat(repeat) * (height - (0.5 * Template.instance().unit_height));
+
     return offset;
   },
   weft_color: function() {
@@ -150,13 +149,10 @@ Template.auto_preview.helpers({
   preview_style: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 
-    //var sim_holder_height = Template.instance().image_height() * Session.get("number_of_repeats");
-    //sim_holder_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
-
-    if (pattern.preview_rotation == "left")
+    if (pattern.preview_rotation == "right")
       return "width: " + (Template.instance().sim_holder_height()) + "px; min-width: 600px; position: relative;"; // extra px to allow space for tablets
 
-    else if (pattern.preview_rotation == "right")
+    else if (pattern.preview_rotation == "left")
       return "width: " + (Template.instance().sim_holder_height()) + "px;"; // extra px to allow space for tablets
   },
   rotation_correction: function() {
@@ -175,24 +171,22 @@ Template.auto_preview.helpers({
     switch(pattern.preview_rotation)
     {
       case "left":
-        return "margin-top: " + total_width + "px; height: 0;" + "width: 0; margin-right: " + Template.instance().sim_holder_height() + "px;";
+        return "margin-top: " + total_width + "px; height: 0;" + "width: "  + total_width + "px;";
 
       case "up":
         return;
 
-      case "right": // default view with tablets at left
+      case "right":
         var total_height = Template.instance().image_height() * scaling * Session.get("number_of_repeats");
 
         if (pattern.edit_mode == "simulation")
           if (pattern.simulation_mode == "auto")
             total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
 
-        return "margin-left: " + total_height + "px; height: " + total_width + "px; " + "width: 0;";
+        return "height: " + total_width + "px; width: " + total_width + "px; position: relative; margin-right: 36px;";
 
       case "down":
         var total_height = Template.instance().image_height() * scaling;
-        //return "margin-left: " + total_width + "px; height: 0; margin-top: " + total_height + "px; ";
-
         return "width: " + total_width + "px; position: relative; height: " + total_height + "px; ";
 
       default:
@@ -203,6 +197,18 @@ Template.auto_preview.helpers({
             total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
  
         return "margin-left: " + total_height + "px; height: " + total_width + "px; " + "width: 0;";
+    }
+  },
+  svg_style: function() {
+    // push the SVG back into place after rotation
+    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
+
+    var total_width = Template.instance().image_width();
+
+    switch(pattern.preview_rotation)
+    {
+      case "right":
+        return "left: " + total_width + "px";
     }
   },
   spinner_style: function() {
