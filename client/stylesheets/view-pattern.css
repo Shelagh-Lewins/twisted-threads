@@ -296,7 +296,6 @@ background: #fff; /* set desired hover color */
 
 /* manual pattern */
 .simulation #toolbar.manual .packs .row {
-  clear: both;
   float: left;
   width: 100%;
   margin-top: 4px;
@@ -305,6 +304,10 @@ background: #fff; /* set desired hover color */
 .simulation #toolbar.manual .packs .pack_number {
   float: left;
   padding: 2px;
+  color: #666666;
+  font-size: 12px;
+  line-height: 24px;
+  margin-right: 4px;
 }
 
 .simulation #toolbar.manual .direction {
@@ -685,4 +688,9 @@ background: #fff; /* set desired hover color */
 .edit_style .v_center.on:before,
 .edit_style .v_right.on:before {
   border-left: 2px solid #FFFFFF;
+}
+
+/* fixed buttons for adding and removing tablets at a specific point */
+#edit_tablets {
+  clear: both;
 }

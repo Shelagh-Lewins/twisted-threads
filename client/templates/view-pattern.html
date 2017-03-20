@@ -18,8 +18,78 @@
   </div>
 </div>
 
-{{> auto_preview}}
+{{#if equals view_pattern_mode "charts"}}
+  {{#if equals edit_mode "simulation"}}
+    <div class="hint {{rendered_manual}}">
+      {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells to set their colour. Use 'X' for empty thread.<br>{{/if}}
+      To see the weaving chart, select "Start weaving" at the top of the page.
+    </div>
+    {{#if can_edit_pattern _id}}
+    <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
+      <div class="tabs">
+        <ul>
+          <li class="auto {{is_selected_simulation_mode "auto"}}"><a>Auto</a></li>
+          <li class="manual {{is_selected_simulation_mode "manual"}}"><a>Manual</a></li>
+        </ul>
+      </div>
 
+<div class="content {{simulation_mode}}">
+  {{#if equals simulation_mode "auto"}}
+    <h3>Auto weaving schedule</h3>
+    <span class="hint">Turn all tablets together, forward (F) or backwards (B)</span>
+
+    <label for="num_auto_turns">Number of weaving rows:</label>
+    <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="32" size="3" value="{{auto_turn_sequence.length}}" > (max 32)<br/>
+    <div class="auto_directions">
+      {{#each auto_turn_sequence}}
+        <span class="direction">
+          {{this.direction}}
+        </span>
+      {{/each}}
+    </div>
+    <span class="hint">Number of pattern repeats shown: {{auto_repeats}}</span>
+  {{else}}
+      <h3>Manual weaving schedule</h3>
+      <span class="hint">Design your pattern row by row, turning each pack of tablets individually.</span>
+
+      <div class="packs">
+        <ul>
+          {{#each packs}}
+          <li class="row">
+            <span class="pack_number">
+              pack {{this.pack_number}}
+            </span>
+
+            <span class="direction">
+              {{this.direction}}
+            </span>
+
+            <input type="number" placeholder="Turns..." id="num_manual_turns" min="0" max="3" size="2" value="{{this.number_of_turns}}" >
+
+            <ul class="tablets">
+            {{#each this.tablets}}
+              <li class="{{#if selected}}selected{{/if}}">
+                {{tablet}}
+              </li>
+            {{/each}}
+            </ul>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      <div class="weave_buttons">
+        <button id="weave" disabled="{{weave_disabled}}">Weave</button>
+        <button id="unweave" disabled="{{unweave_disabled}}">Unweave</button>
+      </div>
+    {{/if}}
+      </div>
+    </div>
+  </div>
+  {{/if}}
+{{/if}}
+{{/if}}
+
+{{> auto_preview}}
 
 {{#if equals view_pattern_mode "summary"}}
   <div class="pattern_info">
@@ -49,11 +119,7 @@
       In order to add images, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a>
     {{/if}}
   {{/if}}
-  <!--<div id="pattern_preview">
-  {{#each pattern_preview}}
-    {{> image}}
-  {{/each}}
-  </div>-->
+
   <div id="pattern_images">
   {{#each pattern_image}}
     {{> image}}
@@ -75,82 +141,7 @@
 {{/if}}
 
 {{#if equals view_pattern_mode "charts"}}
-  {{#if equals edit_mode "simulation"}}
-    <h2>Weaving Schedule</h2>
-    <div class="hint {{rendered_manual}}">
-      {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells to set their colour. Use 'X' for empty thread.<br>{{/if}}
-      To see the weaving chart, select "Start weaving" at the top of the page.
-    </div>
-    {{#if can_edit_pattern _id}}
-    <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
-
-<div class="tabs">
-  <ul>
-    <li class="auto {{is_selected_simulation_mode "auto"}}"><a>Auto</a></li>
-    <li class="manual {{is_selected_simulation_mode "manual"}}"><a>Manual</a></li>
-  </ul>
-</div>
-
-<div class="content {{simulation_mode}}">
-  {{#if equals simulation_mode "auto"}}
-    <h3>Auto weaving schedule</h3>
-    <span class="hint">Weave by repeating a series of turns</span>
-
-    <label for="num_auto_turns">Number of weaving rows:</label>
-    <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="32" size="3" value="{{auto_turn_sequence.length}}" > (max 32)<br/>
-    <div class="auto_directions">
-      {{#each auto_turn_sequence}}
-        <span class="direction">
-          {{this.direction}}
-        </span>
-      {{/each}}
-    </div>
-    <span class="hint">Number of pattern repeats shown: {{auto_repeats}}</span>
-  {{else}}
-      <h3>Manual weaving schedule</h3>
-      <span class="hint">Weave row by row, turning tablets individually.<br/>
-      - Click tablets to assign them to a pack<br/>
-      - Set the turning direction and number of turns for each pack<br/>
-      - Click "Weave" to weave a row.</span>
-
-      <div class="packs">
-        <ul>
-          {{#each packs}}
-          <li class="row">
-            <span class="pack_number">
-              {{this.pack_number}}
-            </span>
-
-            <span class="direction">
-              {{this.direction}}
-            </span>
-
-            <input type="number" placeholder="Turns..." id="num_manual_turns" min="0" max="3" size="2" value="{{this.number_of_turns}}" >
-
-            <ul class="tablets">
-            {{#each this.tablets}}
-              <li class="{{#if selected}}selected{{/if}}">
-                {{tablet}}
-              </li>
-            {{/each}}
-            </ul>
-          </li>
-          {{/each}}
-        </ul>
-      </div>
-
-      <div class="weave_buttons">
-      <button id="weave" disabled="{{weave_disabled}}">Weave</button>
-      <button id="unweave" disabled="{{unweave_disabled}}">Unweave</button>
-    </div>
-
-    {{/if}}
-</div>
-
-    </div></div>
-  {{/if}}
-  {{else}}
-
+  {{#unless equals edit_mode "simulation"}}
     <h2>Weaving Chart</h2>
 
     <div class="hint">
@@ -195,35 +186,34 @@
     {{> remove_tablet}}
     {{/each}}</ul></div>{{/if}}
     </div>
-  {{/if}}
+  {{/unless}}
 
   <h2>Tablets</h2>
   <div class="pattern_info">
     {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
   </div>
-  
-  <div class="edit_tablets">
-    <button id="add_tablet" disabled="{{#unless equals can_add_tablets true}}disabled{{/unless}}">Add tablet</button> at 
-    <input type="number" placeholder="Position..." id="tablet_to_add" min="1" max="{{add_tablet_positions}}" size="3" value="1" ><br />
-    {{#if equals edit_mode "simulation"}}
-      <button id="remove_tablet" disabled="{{#unless equals can_remove_tablets true}}disabled{{/unless}}">Remove tablet</button>  
-      <input type="number" placeholder="Position..." id="tablet_to_remove" min="1" max="{{tablet_indexes.length}}" size="3" value="1" >
-    {{/if}}
-  </div>
-  
+   
   <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
-  {{#each hole_indexes}}
-    {{> threading_row}}
-  {{/each}}
-  {{> orientation}}
+    {{#each hole_indexes}}
+      {{> threading_row}}
+    {{/each}}
+    {{> orientation}}
+
+    <div id="edit_tablets">
+      <button id="add_tablet" disabled="{{#unless equals can_add_tablets true}}disabled{{/unless}}">Add tablet</button> at 
+      <input type="number" placeholder="Position..." id="tablet_to_add" min="1" max="{{add_tablet_positions}}" size="3" value="1" ><br />
+      {{#if equals edit_mode "simulation"}}
+        <button id="remove_tablet" disabled="{{#unless equals can_remove_tablets true}}disabled{{/unless}}">Remove tablet</button>  
+        <input type="number" placeholder="Position..." id="tablet_to_remove" min="1" max="{{tablet_indexes.length}}" size="3" value="1" >
+      {{/if}}
+    </div>
   </div>
-  <br/>
 
   <div class="notation">
   <img src="{{#if equals hole_handedness "clockwise"}}/images/tablet_labels.png{{else}}/images/tablet_labels_rev.png{{/if}}" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
 
   {{#if can_edit_pattern _id}}
-  <button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
+  <br/><button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
   {{/if}}
   </div>
   

@@ -160,7 +160,7 @@ Template.auto_preview.helpers({
         break;
 
       default:
-        return "right";
+        return "left";
     }
   },
   preview_style: function() {
@@ -213,7 +213,11 @@ Template.auto_preview.helpers({
     return Template.instance().repeat_viewbox_height();
   },
   total_width: function() {
-    return Math.min(Template.instance().image_width(), Template.instance().max_image_width);
+    if (Session.get("number_of_rows") == 0)
+      return 0;
+
+    else
+      return Math.min(Template.instance().image_width(), Template.instance().max_image_width);
   },
   total_height: function() {
     return Template.instance().image_height();
