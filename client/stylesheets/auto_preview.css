@@ -1,5 +1,4 @@
 body.view_pattern .auto_preview {
-  margin: 0 0 10px 0;
   width: 100%;
   max-width: 600px;
   overflow-x: auto;
@@ -13,11 +12,6 @@ body.view_pattern .auto_preview {
 .auto_preview.down,
 .auto_preview.up {
     float:right;
-}
-
-body.view_pattern .auto_preview {
-  /*margin-top: -16px;*/ /* Presence of space seems to make this not required */
-  margin-top: 0;
 }
 
 body.view_pattern .auto_preview.left {
@@ -61,12 +55,30 @@ body.view_pattern .auto_preview.left svg {
     top: 100%;
 }
 
+.auto_preview .holder {
+    position: relative;
+    overflow: hidden;
+}
+
 .auto_preview.left .holder {
     float: left;
 }
 
 .auto_preview.right .holder {
     float: right;
+}
+
+.auto_preview .repeat_border {
+  display: none;
+}
+
+.auto_preview.auto .repeat_border:not(:first-child) {
+  display: block;
+  border-left: 1px dotted #666666;
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  z-index: 10;
 }
 
 /* *** Weft color *** */
@@ -99,6 +111,7 @@ button.rotate_preview.visible {
 
 #preview_controls {
   clear: both;
+  margin-top: 8px;
 }
 
 /* *** Tablets to show weaving direction & tablet position *** */

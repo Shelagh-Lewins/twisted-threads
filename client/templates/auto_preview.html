@@ -1,7 +1,7 @@
 <template name="auto_preview">
 <div id="auto_preview_spacer"></div>
 
-<div class="auto_preview {{preview_rotation}} {{show_tablets}}">
+<div class="auto_preview {{preview_rotation}} {{show_tablets}} {{simulation_mode}}">
   <div id="auto_preview_wrapper" style="{{preview_style}}">
 
   <div class="tablet_numbers">
@@ -33,10 +33,15 @@
     {{#if use_stored_preview}}
       {{{stored_preview}}}
     {{else}}
+
+      {{#each repeats}}
+        <div class="repeat_border" style="left: {{repeat_border_offset}}px;"></div>
+      {{/each}}
+
       <svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{viewbox_width}} {{repeat_viewbox_height}}"  shape-rendering="geometricPrecision" width="{{total_width}}" style="{{svg_style}}">
 
       {{#each repeats}}
-      <g class="preview" transform="translate(0 {{repeat_offset this}})">
+      <g class="preview" transform="translate(0 {{repeat_offset}})">
           {{#each row_indexes}}
             {{> auto_preview_weft}}
           {{/each}}
@@ -44,7 +49,7 @@
       {{/each}}
 
       {{#each repeats}}
-      <g class="preview" transform="translate(0 {{repeat_offset this}})">
+      <g class="preview" transform="translate(0 {{repeat_offset}})">
           {{#each row_indexes}}
             {{> auto_preview_row}}
           {{/each}}

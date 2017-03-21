@@ -1,3 +1,11 @@
+Template.auto_preview.rendered = function() {
+  var pattern_id = Router.current().params._id;
+
+  var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
+  Session.set("preview_rotation", pattern.preview_rotation);
+  //console.log("setting preview_rotation to " + Session.get("preview_rotation"));
+}
+
 Template.auto_preview.onCreated(function() {
   this.unit_width = 41.560534;
   this.unit_height = 113.08752;
@@ -115,11 +123,19 @@ Template.auto_preview.helpers({
 
     return repeats;
   },
-  repeat_offset: function(repeat) {
+  repeat_offset: function() {
     var height = Template.instance().unit_height * ((Session.get("number_of_rows") +1) / 2);
-    var offset = parseFloat(repeat) * (height - (0.5 * Template.instance().unit_height));
+    var offset = parseFloat(this) * (height - (0.5 * Template.instance().unit_height));
 
     return offset;
+  },
+  repeat_border_offset: function()
+  {
+    var total_height = Template.instance().image_height() * Template.instance().scaling();
+
+    total_height -=  Template.instance().cell_height/2;
+
+    return Math.ceil(total_height * this + Template.instance().cell_height/4);
   },
   weft_color: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {weft_color: 1}});
@@ -144,36 +160,19 @@ Template.auto_preview.helpers({
     }
   },
   preview_rotation: function() {
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
-
-    if (typeof pattern === "undefined")
-        return;
-
-    switch(pattern.preview_rotation)
-    {
-      case "left":
-        return "left";
-        break;
-
-      case "right":
-        return "right";
-        break;
-
-      default:
-        return "left";
-    }
+    return Session.get("preview_rotation");
   },
   preview_style: function() {
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
+    //var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
 
-    if (pattern.preview_rotation == "right")
+    if (Session.get("preview_rotation") == "right")
       return "width: " + (Template.instance().sim_holder_height()) + "px; min-width: 600px; position: relative;"; // extra px to allow space for tablets
 
-    else if (pattern.preview_rotation == "left")
+    else if (Session.get("preview_rotation") == "left")
       return "width: " + (Template.instance().sim_holder_height()) + "px;"; // extra px to allow space for tablets
   },
   rotation_correction: function() {
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1, edit_mode: 1, simulation_mode: 1}});
+    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {edit_mode: 1, simulation_mode: 1}});
 
     var total_width = Template.instance().image_width();
 
@@ -183,23 +182,27 @@ Template.auto_preview.helpers({
           if (pattern.simulation_mode == "auto")
             total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
 
-    switch(pattern.preview_rotation)
+    switch(Session.get("preview_rotation"))
     {
       case "left":
-        return "margin-top: " + total_width + "px; height: 0;" + "width: "  + total_height + "px;";
+        return "height: "  + Template.instance().image_width() + "px; width: "  + total_height + "px;";
 
       case "right":
-        return "height: " + total_width + "px; width: " + total_height + "px; position: relative; margin-right: 36px;";
+        return "height: " + Template.instance().image_width() + "px; width: " + total_height + "px; position: relative; margin-right: 36px;";
     }
   },
   svg_style: function() {
     // push the SVG back into place after rotation
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
-
-    switch(pattern.preview_rotation)
+    //console.log("update svg style" + Session.get("preview_rotation"));
+    var preview_rotation = Session.get("preview_rotation");
+    switch(Session.get("preview_rotation"))
     {
       case "right":
-        return "left: " + Template.instance().total_height() + "px;"
+        return "left: " + Template.instance().total_height() + "px;";
+
+      case "left":
+        return "top: " + Template.instance().image_width() + "px;";
+        //console.log("update svg style");
     }
   },
 
@@ -226,7 +229,21 @@ Template.auto_preview.helpers({
 
 Template.auto_preview.events({
   "click .rotate_preview": function () {
-      Meteor.call("rotate_preview", this._id);
+    //console.log("clicked 1 " + Session.get("preview_rotation"));
+    Meteor.call("rotate_preview", this._id);
+
+    switch(Session.get("preview_rotation"))
+    {
+      case "left":
+        Session.set("preview_rotation", "right");
+        break;
+
+      case "right":
+        Session.set("preview_rotation", "left");
+        break;
+    }
+    //console.log("clicked 2 " + Session.get("preview_rotation"));
+    return;
   }
 });
 
@@ -293,7 +310,6 @@ Template.auto_preview_element.helpers({
     style = Meteor.my_functions.find_style(style_value);
 
     // find previous style
-    //if ((row == 1) && (Session.get("number_of_repeats") > 1))
     if (row == 1)
     {
       if (Session.get("number_of_repeats") > 1)
@@ -304,7 +320,6 @@ Template.auto_preview_element.helpers({
         var previous_style_value = current_weaving_data[row + "_" + (tablet)].get();
     }
       
-
     else
       var previous_style_value = current_weaving_data[(row-1) + "_" + (tablet)].get();
 
