@@ -89,6 +89,12 @@ background: #fff; /* set desired hover color */
   margin-bottom: 8px;
 }
 
+.view_pattern .hint.rows {
+  float: right;
+  line-height: 34px;
+  margin-bottom: 0;
+}
+
 /* *** Pattern Info *** */
 .name .text p {
   font-weight: bold;
@@ -108,7 +114,7 @@ background: #fff; /* set desired hover color */
 
 /* public private */
 .pattern_info .controls {
-  border-bottom: 1px solid #7580ac;
+  border-bottom: 1px solid #AAAAAA;
   float: left;
   width: 100%;
 }
@@ -117,7 +123,7 @@ background: #fff; /* set desired hover color */
   float: right;
   background-color: transparent;
   border: none;
-  color: #424A6C;
+  color: #999999;
   cursor: pointer;
   padding: 8px 0 0 8px;
   margin: 0;
@@ -167,6 +173,29 @@ background: #fff; /* set desired hover color */
 
 .pattern_info .tags .tags {
   display: inline;
+}
+
+button.styled_button {
+  padding: 4px 16px 4px 16px;
+  line-height: 1.5;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid #424A6C;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  background-color: #424A6C;
+  color: #FFFFFF;
+}
+
+button.styled_button:disabled {
+  background-color: #999999;
+  color: #DDDDDD;
+  border-color: #999999;
+  cursor: default;
 }
 
 /* *** Toolbar *** */
@@ -295,6 +324,11 @@ background: #fff; /* set desired hover color */
 }
 
 /* manual pattern */
+.simulation #toolbar.manual .packs {
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
 .simulation #toolbar.manual .packs .row {
   float: left;
   width: 100%;
@@ -370,6 +404,7 @@ background: #fff; /* set desired hover color */
 
 .simulation #toolbar.manual .weave_buttons {
   clear: both;
+  float: left;
 }
 
 /* *** Styles *** */
@@ -460,11 +495,10 @@ background: #fff; /* set desired hover color */
   color: #424A6C;
   padding: 4px 8px 4px 8px;
   line-height: 1.5;
-  cursor: pointer;
   text-decoration: none;
   display: inline-block;
   border-right: 1px solid #424A6C;
-  pointer: cursor;
+  cursor: pointer;
 }
 
 .styles .pagination ul li:last-child a {
@@ -480,13 +514,6 @@ background: #fff; /* set desired hover color */
   float: left;
   width: 352px;
 }
-/*
-#styles_palette .styles .box {
-  clear: both;
-  height: 90px;
-  overflow: hidden;
-  position: relative;
-}*/
 
 #styles_palette .styles .box {
   clear: both;

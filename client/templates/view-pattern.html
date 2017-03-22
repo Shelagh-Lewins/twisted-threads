@@ -22,8 +22,10 @@
   {{#if equals edit_mode "simulation"}}
     <div class="hint {{rendered_manual}}">
       {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells to set their colour. Use 'X' for empty thread.<br>{{/if}}
-      To see the weaving chart, select "Start weaving" at the top of the page.
     </div>
+
+     <button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">View interactive weaving chart</button>
+
     {{#if can_edit_pattern _id}}
 <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
   <div class="tabs">
@@ -52,13 +54,13 @@
       {{#if does_pattern_repeat}}
       Number of pattern repeats shown: {{auto_repeats}}
       {{else}}
-      Pattern will not repeat
+      The pattern will not repeat
       {{/if}}
     </span>
 
   {{else}}
       <h3>Manual weaving schedule</h3>
-      <span class="hint">Design your pattern row by row, turning each pack of tablets individually.</span>
+      <span class="hint">Design your pattern row by row, turning each pack of tablets separately.</span>
 
       <div class="packs">
         <ul>
@@ -87,17 +89,23 @@
       </div>
 
       <span class="hint">
-      {{#if does_pattern_repeat}}
-        Pattern will repeat
+      {{#if does_pattern_repeat}} 
+        {{#if equals number_of_rows 0}}
+          Click "weave" to add a row
+        {{else}}
+          The pattern will repeat
+        {{/if}}
       {{else}}
-        Pattern will not repeat
+        The pattern will not repeat
       {{/if}}
       </span>
 
       <div class="weave_buttons">
-        <button id="weave" disabled="{{weave_disabled}}">Weave</button>
-        <button id="unweave" disabled="{{unweave_disabled}}">Unweave</button>
+        <button id="weave" class="styled_button" disabled="{{weave_disabled}}">Weave</button>
+        <button id="unweave" class="styled_button" disabled="{{no_weaving_rows}}">Unweave</button>
       </div>
+      <span class="hint rows">Rows: {{number_of_rows}}</span>
+      <div class="clearing"></div>
     {{/if}}
 
 </div></div>

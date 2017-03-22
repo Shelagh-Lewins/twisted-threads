@@ -138,10 +138,11 @@ Template.auto_preview.helpers({
     return pattern.weft_color;
   },
   show_tablets: function() {
-    if ((Router.current().params.mode == "charts") || (Router.current().params.mode == "summary"))
+    //if ((Router.current().params.mode == "charts") || (Router.current().params.mode == "summary"))
+    if (Router.current().params.mode == "charts")
       return "show_tablets";
-    else
-      return "don't show"
+    //else
+      //return "hide_tablets"
   },
   tablet_position: function() {
     // which hole is currently in position A?
@@ -183,7 +184,7 @@ Template.auto_preview.helpers({
         return "height: "  + Template.instance().image_width() + "px; width: "  + total_height + "px;";
 
       case "right":
-        return "height: " + Template.instance().image_width() + "px; width: " + total_height + "px; position: relative; margin-right: 36px;";
+        return "height: " + Template.instance().image_width() + "px; width: " + total_height + "px; position: relative;";
     }
   },
   svg_style: function() {

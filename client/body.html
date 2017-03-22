@@ -40,9 +40,9 @@
       
       {{#if pattern_exists _id}}
         {{#if is_weaving}}
-          <a id="stop_weaving">Stop weaving</a>
+          <a id="stop_weaving" onclick="Meteor.my_functions.stop_weaving();">Stop weaving</a>
         {{else}}
-          <a id="start_weaving">Start weaving</a>
+          <a id="start_weaving" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">Start weaving</a>
         {{/if}}
       {{/if}}
     </div>

@@ -1,6 +1,6 @@
 /* desription, weaving notes, threading notes */
 .editable_field .controls {
-  border-bottom: 1px solid #424A6C;
+  border-bottom: 1px solid #AAAAAA;
   float: left;
   width: 100%;
 }
@@ -9,7 +9,7 @@
   float: right;
   background-color: transparent;
   border: none;
-  color: #424A6C;
+  color: #999999;
   cursor: pointer;
   padding: 8px 0 0 8px;
   margin: 0;

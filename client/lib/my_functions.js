@@ -712,7 +712,7 @@ Meteor.my_functions = {
             var target_pack = packs[action.TargetID];
             if (typeof target_pack === "undefined")
                 return {error: "no pack " + (action.TargetID) + " has been defined"};
-;
+
             for (var k=0; k<target_pack.length; k++) // each tablet in pack
             {
               var tablet = target_pack[k];
@@ -1450,7 +1450,7 @@ Meteor.my_functions = {
     
     Session.set('edited_pattern', true);
   },
-  get_manual_weaving_as_text(pattern_id)
+  get_manual_weaving_as_text: function(pattern_id)
   {
     // concert the reactive array to a regular array that can be stringified
     var manual_weaving_turns = new Array();
@@ -1914,7 +1914,7 @@ Meteor.my_functions = {
     $('#header').css({
         'left': $("#width").scrollLeft() // Always at left edge of window
     });
-;
+
     // keep the toolbar in the viewport
     if (($("#toolbar").length > 0) && $("#width").hasClass("freehand"))
     {
@@ -2343,7 +2343,6 @@ Meteor.my_functions = {
       if ($('#width').hasClass("simulation"))
         Meteor.my_functions.styles_pagination_clicked("all_styles");
     }
-    
   },
   edit_style_clicked: function()
   {
@@ -2367,5 +2366,34 @@ Meteor.my_functions = {
 
     else
       Session.set('show_special_styles', false);
+  },
+  ///////////////////////////////////
+  // navigation
+  // The router doesn't show the 'loading' template for these actions because only the data changes, not the route. So here we manually trigger a simple "Loading..." display to help the user when switching between view pattern and weave.
+  start_weaving: function(disabled)
+  {
+    if (disabled == "disabled")
+      return;
+
+    Session.set("loading", true);
+
+    var pattern_id = Router.current().params._id;
+    setTimeout(function(){
+      Router.go('pattern', { _id: pattern_id, mode: "weaving" });
+    }, 100);
+  },
+  stop_weaving: function()
+  {
+    Session.set("loading", true);
+
+    var pattern_id = Router.current().params._id;
+    setTimeout(function(){
+      if (Session.equals("view_pattern_mode", "charts"))
+        Router.go('pattern', { _id: pattern_id, mode: "charts" });
+
+      else
+        Router.go('pattern', { _id: pattern_id, mode: "summary" });
+    }, 100);
   }
 }
+

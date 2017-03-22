@@ -84,11 +84,6 @@ Template.view_pattern.helpers({
     if ((typeof Router.current().params.mode === "undefined") && (mode == "summary"))
       return "selected"; // default if no mode specified
   },
-  /*rendered: function() {
-    // call this in the template to hide "loading..."
-    Session.set("loading", false);
-    return true;
-  },*/
   edit_mode: function() {
     // simulation or freehand pattern?
     var pattern_id = Router.current().params._id;
@@ -162,13 +157,15 @@ Template.view_pattern.helpers({
     return packs;
   },
   weave_disabled: function() {
+    // cannot add a row to manual simulation pattern
     if (current_manual_weaving_turns.length > 100)
       return "disabled";
   },
-  unweave_disabled: function() {
-    if (current_manual_weaving_turns.length < 2)
+  /*unweave_disabled: function() {
+    // cannot remove a row from manual simulation pattern
+    if (current_manual_weaving_turns.length < 1)
       return "disabled";
-  },
+  },*/
   add_tablet_positions: function() {
     return Session.get("number_of_tablets") + 1;
   },

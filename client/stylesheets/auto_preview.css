@@ -14,6 +14,10 @@ body.view_pattern .auto_preview {
     float:right;
 }
 
+#auto_preview_wrapper {
+  position: relative;
+}
+
 body.view_pattern .auto_preview.left {
   margin-top: 0;
 }
@@ -66,6 +70,32 @@ body.view_pattern .auto_preview.left svg {
 
 .auto_preview.right .holder {
     float: right;
+}
+
+.auto_preview.right.show_tablets .holder {
+    margin-right: 36px;
+}
+
+/* repeat borders must not be inside .holder, as this is saved for Home page */
+.auto_preview .border_holder {
+  position: absolute !important;
+}
+
+.auto_preview.left .border_holder {
+    left: 0;
+}
+
+.auto_preview.right .border_holder {
+    right: 0;
+    margin-right: 0 !important;
+}
+
+.auto_preview.left.show_tablets .border_holder {
+    left: 36px;
+}
+
+.auto_preview.right.show_tablets .border_holder {
+    right: 36px;
 }
 
 .auto_preview .repeat_border {
