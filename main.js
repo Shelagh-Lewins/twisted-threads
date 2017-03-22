@@ -139,6 +139,13 @@ if (Meteor.isClient) {
     return true;
   }),
 
+  //////////////////////////////////
+  // does simulation pattern repeat?
+  UI.registerHelper('does_pattern_repeat', function(){
+    var pattern_id = Router.current().params._id;
+    return Meteor.my_functions.does_pattern_repeat(pattern_id);
+  });
+
   Template.header.events({
     "click #home": function() {
       Session.set("loading", true);  

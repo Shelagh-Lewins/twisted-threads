@@ -25,13 +25,13 @@
       To see the weaving chart, select "Start weaving" at the top of the page.
     </div>
     {{#if can_edit_pattern _id}}
-    <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
-      <div class="tabs">
-        <ul>
-          <li class="auto {{is_selected_simulation_mode "auto"}}"><a>Auto</a></li>
-          <li class="manual {{is_selected_simulation_mode "manual"}}"><a>Manual</a></li>
-        </ul>
-      </div>
+<div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
+  <div class="tabs">
+    <ul>
+      <li class="auto {{is_selected_simulation_mode "auto"}}"><a>Auto</a></li>
+      <li class="manual {{is_selected_simulation_mode "manual"}}"><a>Manual</a></li>
+    </ul>
+  </div>
 
 <div class="content {{simulation_mode}}">
   {{#if equals simulation_mode "auto"}}
@@ -47,7 +47,15 @@
         </span>
       {{/each}}
     </div>
-    <span class="hint">Number of pattern repeats shown: {{auto_repeats}}</span>
+
+    <span class="hint">
+      {{#if does_pattern_repeat}}
+      Number of pattern repeats shown: {{auto_repeats}}
+      {{else}}
+      Pattern will not repeat
+      {{/if}}
+    </span>
+
   {{else}}
       <h3>Manual weaving schedule</h3>
       <span class="hint">Design your pattern row by row, turning each pack of tablets individually.</span>
@@ -77,14 +85,23 @@
           {{/each}}
         </ul>
       </div>
+
+      <span class="hint">
+      {{#if does_pattern_repeat}}
+        Pattern will repeat
+      {{else}}
+        Pattern will not repeat
+      {{/if}}
+      </span>
+
       <div class="weave_buttons">
         <button id="weave" disabled="{{weave_disabled}}">Weave</button>
         <button id="unweave" disabled="{{unweave_disabled}}">Unweave</button>
       </div>
     {{/if}}
-      </div>
-    </div>
-  </div>
+
+</div></div>
+</div>
   {{/if}}
 {{/if}}
 {{/if}}

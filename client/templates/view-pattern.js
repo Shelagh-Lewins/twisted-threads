@@ -176,14 +176,14 @@ Template.view_pattern.helpers({
     return Session.get("number_of_rows") + 1;
   },
   can_add_tablets: function() {
-    // is there more than 1 tablet?
+    // are there more than 60 tablets?
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
 
     if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
         return;
 
-    if (pattern.number_of_tablets < 10)
+    if (pattern.number_of_tablets < 60)
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         return true;
   },
@@ -720,8 +720,8 @@ Template.view_pattern.events({
     if (event.currentTarget.value != Math.floor(event.currentTarget.value))
       event.currentTarget.value = Math.floor(event.currentTarget.value); // user pastes in a non-integer value
 
-    if (event.currentTarget.value > 32)
-      event.currentTarget.value = 32;
+    if (event.currentTarget.value > Meteor.my_params.max_auto_turns)
+      event.currentTarget.value = Meteor.my_params.max_auto_turns;
 
     if (event.currentTarget.value < 1)
       event.currentTarget.value = 1;

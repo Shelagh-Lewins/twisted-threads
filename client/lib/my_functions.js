@@ -2162,10 +2162,32 @@ Meteor.my_functions = {
   set_repeats: function(pattern_id) {
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, auto_turn_sequence: 1}});
 
-    if ((pattern.edit_mode == "simulation") && (pattern.simulation_mode == "auto"))
-      Session.set("number_of_repeats", Math.floor(32/pattern.auto_turn_sequence.length));
-    else
-      Session.set("number_of_repeats", 1);
+    var number_of_repeats = 1;
+
+    if ((pattern.edit_mode == "simulation") && (pattern.simulation_mode == "auto") &&
+      Meteor.my_functions.does_pattern_repeat(pattern_id))
+        number_of_repeats = Math.floor(Meteor.my_params.max_auto_turns/pattern.auto_turn_sequence.length);
+
+    Session.set("number_of_repeats", number_of_repeats);
+  },
+  does_pattern_repeat: function(pattern_id) {
+    var pattern = Patterns.findOne({ _id: pattern_id}, {fields: {edit_mode: 1, position_of_A: 1}});
+
+    if (pattern.edit_mode != "simulation") // freehand patterns do not track rotation of tablets
+      return;
+
+    var position_of_A = JSON.parse(pattern.position_of_A);
+    var does_pattern_repeat = true;
+
+    for (var i=0; i<position_of_A.length; i++)
+    {
+      if (position_of_A[i] != 0) // tablet is not in position A
+      {
+        does_pattern_repeat = false;
+        break;
+      } 
+    }
+    return does_pattern_repeat;
   },
   ///////////////////////////////////
   // Searching

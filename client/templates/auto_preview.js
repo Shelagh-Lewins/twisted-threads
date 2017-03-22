@@ -1,11 +1,3 @@
-Template.auto_preview.rendered = function() {
-  var pattern_id = Router.current().params._id;
-
-  var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
-  Session.set("preview_rotation", pattern.preview_rotation);
-  //console.log("setting preview_rotation to " + Session.get("preview_rotation"));
-}
-
 Template.auto_preview.onCreated(function() {
   this.unit_width = 41.560534;
   this.unit_height = 113.08752;
@@ -15,6 +7,9 @@ Template.auto_preview.onCreated(function() {
 
   var pattern_id = Router.current().params._id;
   this.pattern_id = pattern_id;
+
+  var pattern = Patterns.findOne({ _id: this.pattern_id}, { fields: {preview_rotation: 1}});
+  Session.set("preview_rotation", pattern.preview_rotation);
 
   this.viewbox_width = function(){
     return this.unit_width * Session.get("number_of_tablets");
