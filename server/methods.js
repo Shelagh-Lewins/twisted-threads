@@ -560,9 +560,11 @@ Meteor.methods({
         Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
         break;*/
 
-      default:
-          Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "right"}});
+      //default:
+          //Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "right"}});
     }
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, preview_rotation: 1}});
+    console.log("new rotation " + pattern.preview_rotation);
   },
   save_threading_as_text: function(pattern_id, text)
   {

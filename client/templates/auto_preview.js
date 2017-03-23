@@ -138,11 +138,8 @@ Template.auto_preview.helpers({
     return pattern.weft_color;
   },
   show_tablets: function() {
-    //if ((Router.current().params.mode == "charts") || (Router.current().params.mode == "summary"))
     if (Router.current().params.mode == "charts")
       return "show_tablets";
-    //else
-      //return "hide_tablets"
   },
   tablet_position: function() {
     // which hole is currently in position A?
@@ -159,8 +156,6 @@ Template.auto_preview.helpers({
     return Session.get("preview_rotation");
   },
   preview_style: function() {
-    //var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {preview_rotation: 1}});
-
     if (Session.get("preview_rotation") == "right")
       return "width: " + (Template.instance().sim_holder_height()) + "px; min-width: 600px; position: relative;"; // extra px to allow space for tablets
 
@@ -189,8 +184,7 @@ Template.auto_preview.helpers({
   },
   svg_style: function() {
     // push the SVG back into place after rotation
-    //console.log("update svg style" + Session.get("preview_rotation"));
-    var preview_rotation = Session.get("preview_rotation");
+    
     switch(Session.get("preview_rotation"))
     {
       case "right":
@@ -198,7 +192,6 @@ Template.auto_preview.helpers({
 
       case "left":
         return "top: " + Template.instance().image_width() + "px;";
-        //console.log("update svg style");
     }
   },
 
@@ -225,7 +218,7 @@ Template.auto_preview.helpers({
 
 Template.auto_preview.events({
   "click .rotate_preview": function () {
-    //console.log("clicked 1 " + Session.get("preview_rotation"));
+    Session.set('edited_pattern', true);
     Meteor.call("rotate_preview", this._id);
 
     switch(Session.get("preview_rotation"))
@@ -238,8 +231,6 @@ Template.auto_preview.events({
         Session.set("preview_rotation", "left");
         break;
     }
-    //console.log("clicked 2 " + Session.get("preview_rotation"));
-    return;
   }
 });
 
