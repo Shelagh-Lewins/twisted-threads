@@ -87,6 +87,8 @@ background: #fff; /* set desired hover color */
 .view_pattern .hint {
   max-width: 600px;
   margin-bottom: 8px;
+  color: #333333;
+  font-size: 14px;
 }
 
 .view_pattern .hint.rows {
@@ -256,13 +258,15 @@ button.styled_button:disabled {
   color: #666666;
   background: #DDDDDD;
   border: 1px solid #424A6C;
+  border-top: none;
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
   cursor: pointer;
 }
 
 .simulation #toolbar .tabs li:first-child {
-  margin-top: 8px
+  margin-top: 8px;
+  border-top: 1px solid #424A6C;
 }
 
 .simulation #toolbar .tabs li a {
@@ -321,6 +325,10 @@ button.styled_button:disabled {
   display: block;
   clear:both;
   font-size: 16px;
+}
+
+.freehand .edit_rows {
+  clear: both;
 }
 
 /* manual pattern */

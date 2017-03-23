@@ -21,7 +21,11 @@
 {{#if equals view_pattern_mode "charts"}}
   {{#if equals edit_mode "simulation"}}
     <div class="hint {{rendered_manual}}">
-      {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells to set their colour. Use 'X' for empty thread.<br>{{/if}}
+      {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells to set their colour.<br>{{/if}}
+    </div>
+
+    <div class="pattern_info">
+      {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
     </div>
 
      <button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">View interactive weaving chart</button>
@@ -171,20 +175,14 @@
 
     <div class="hint">
       {{#if can_create_pattern}}Select styles from the palette at the bottom of the screen, then click chart cells to set their style.<br>{{/if}}
-      Select "Start weaving" to step through the pattern rows one by one as you weave.
     </div>
 
     <div class="pattern_info">
       {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
+
+      <button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">View interactive weaving chart</button>
     </div>
 
-    {{#unless equals edit_mode "simulation"}}
-    <div class="edit_rows">
-      <button id="add_row">Add row</button> at 
-      <input type="number" placeholder="Position..." id="row_to_add" min="1" max="{{add_row_positions}}" size="3" value="1" ><br />
-    </div>
-    {{/unless}}
-    
     {{#if can_edit_pattern _id}}
     <div id="toolbar" ><div class="inner_tube">
     <button id="undo" disabled="{{undo_disabled}}" title="Undo">
@@ -201,7 +199,10 @@
     <button id="add_row_at_end" title="Add row at top"><img src="/images/row_top.svg" onerror="this.src='/images/row_top.png';this.onerror=null;" width="32" height="32" ></button>
     <button id="add_tablet_at_start" title="Add tablet at left"><img src="/images/tablet_left.svg" onerror="this.src='/images/tablet_left.png';this.onerror=null;" width="32" height="32" ></button>
     <button id="add_tablet_at_end" title="Add tablet at right"><img src="/images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
-    </div></div>{{/if}}
+    </div></div>
+
+    {{/if}}
+
     <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}} {{rendered_manual}}">
     {{> column_numbers}}
     {{#each row_indexes}}
@@ -210,6 +211,11 @@
     {{#each tablet_indexes}}
     {{> remove_tablet}}
     {{/each}}</ul></div>{{/if}}
+    </div>
+
+    <div class="edit_rows">
+      <button id="add_row">Add row</button> at 
+      <input type="number" placeholder="Position..." id="row_to_add" min="1" max="{{add_row_positions}}" size="3" value="1" ><br />
     </div>
   {{/unless}}
 
@@ -224,6 +230,7 @@
     {{/each}}
     {{> orientation}}
 
+    {{#if can_edit_pattern _id}}
     <div id="edit_tablets">
       <button id="add_tablet" disabled="{{#unless equals can_add_tablets true}}disabled{{/unless}}">Add tablet</button> at 
       <input type="number" placeholder="Position..." id="tablet_to_add" min="1" max="{{add_tablet_positions}}" size="3" value="1" ><br />
@@ -232,6 +239,8 @@
         <input type="number" placeholder="Position..." id="tablet_to_remove" min="1" max="{{tablet_indexes.length}}" size="3" value="1" >
       {{/if}}
     </div>
+    {{/if}}
+
   </div>
 
   <div class="notation">

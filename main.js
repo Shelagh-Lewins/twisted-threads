@@ -128,10 +128,13 @@ if (Meteor.isClient) {
     // cannot remove a row from pattern, and
     // cannot view interactive weaving chart because no rows woven
     // can only happen in manual simulation pattern
-    if (typeof current_manual_weaving_turns == "undefined")
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
+
+    if (typeof pattern == "undefined") // avoids error when pattern is private and user doesn't have permission to see it
       return "disabled";
 
-    if (current_manual_weaving_turns.length < 2) // row 0 is for workiing
+    if (pattern.number_of_rows < 1) // row 0 is for workiing
       return "disabled";
   });
 

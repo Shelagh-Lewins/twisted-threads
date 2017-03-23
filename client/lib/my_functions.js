@@ -403,10 +403,10 @@ Meteor.my_functions = {
                 pattern_obj.description = "A threaded-in pattern imported from Guntram's Tabletweaving Thingy (GTT)";
 
               if (typeof pattern_obj.weaving_notes === "undefined")
-                pattern_obj.weaving_notes = "White background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread";
+                pattern_obj.weaving_notes = "Weaving chart key:\nWhite background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread";
 
               if (typeof pattern_obj.threading_notes === "undefined")
-                pattern_obj.threading_notes = "Cell colour = thread colour for that hole\nThe angled lines below the threading chart show how to orient the tablets.";
+                pattern_obj.threading_notes = "Cell colour = thread colour for that hole\nX = empty hole";
 
                 var result = Meteor.my_functions.convert_gtt_threaded_in_pattern_to_json(pattern_data, pattern_obj); // split analysis of different pattern types off for readability
                 if (result.error)
