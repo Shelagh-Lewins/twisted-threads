@@ -131,6 +131,11 @@ body.view_pattern .auto_preview.left svg {
   line-height: 24px;
 }
 
+#preview_controls .hint {
+  line-height: 26px;
+  margin-left: 8px;
+}
+
 button.rotate_preview {
   display: none;
 }

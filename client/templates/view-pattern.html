@@ -213,10 +213,13 @@
     {{/each}}</ul></div>{{/if}}
     </div>
 
+     {{#if can_edit_pattern _id}}
     <div class="edit_rows">
       <button id="add_row">Add row</button> at 
       <input type="number" placeholder="Position..." id="row_to_add" min="1" max="{{add_row_positions}}" size="3" value="1" ><br />
     </div>
+    {{/if}}
+
   {{/unless}}
 
   <h2>Tablets</h2>
