@@ -590,6 +590,17 @@ button.styled_button:disabled {
   display: none;
 }
 
+#styles_palette.simulation .styles {
+  width: 352px;
+}
+
+#styles_palette.simulation.show_special_styles #edit_style_button {
+  display: block;
+  background-color: #DDDDDD;
+  color: #999999;
+  border-color: #999999;
+}
+
 /* Simulation styles */
 .simulation .styles .pagination ul li:nth-child(2) {
   display: none;

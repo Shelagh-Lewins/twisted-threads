@@ -987,6 +987,8 @@ Meteor.methods({
 
     weaving.pop(); // remove last row of weaving chart
     manual_weaving_turns.pop();
+    var last_row = manual_weaving_turns[manual_weaving_turns.length-1];
+    manual_weaving_turns[0] = last_row;
    
     Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
@@ -1024,10 +1026,10 @@ Meteor.methods({
 
       // turn tablet
       if (direction == "F")
-        position_of_A[i] = Meteor.call("modular_add", position_of_A[i], 1, 4);
+        position_of_A[i] = Meteor.call("modular_add", position_of_A[i], number_of_turns, 4);
 
       else
-        position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1, 4);
+        position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1 * number_of_turns, 4);
 
       // which thread shows depends on direction of turn
       if (direction == "F") // show thread currently in position D
@@ -1088,6 +1090,10 @@ Meteor.methods({
     {
       switch(number_of_turns)
       {
+        case 0:
+          style_name = "S15";
+          return style_name;
+          break;
         case 2:
           var style_name = "S"
 

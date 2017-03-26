@@ -1306,10 +1306,7 @@ Meteor.my_functions = {
     {
       for (var i=0;i<current_manual_weaving_turns.list().length; i++)
       {
-        //console.log("row " + i);
-        //console.log("initial tablets " + current_manual_weaving_turns.list()[i].tablets);
         current_manual_weaving_turns.list()[i].tablets.splice(position-1, 0, 1);
-        //console.log("updated tablets " + current_manual_weaving_turns.list()[i].tablets);
       }
     }
 

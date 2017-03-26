@@ -21,7 +21,7 @@
 {{#if equals view_pattern_mode "charts"}}
   {{#if equals edit_mode "simulation"}}
     <div class="hint {{rendered_manual}}">
-      {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells to set their colour.<br>{{/if}}
+      {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells.<br>{{/if}}
     </div>
 
     <div class="pattern_info">
@@ -323,7 +323,7 @@
 <li class="special no_select {{is_selected_style_palette "special"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('special');">Special</a></li>
 </ul></div>
 
-<input type="button" id="edit_style_button" class=" {{editing_style}}" value="Edit style" onclick="Meteor.my_functions.edit_style_clicked();">
+<input type="button" id="edit_style_button" class=" {{editing_style}}" value="{{#if equals edit_mode "simulation"}}Edit colour{{else}}Edit style{{/if}}" onclick="Meteor.my_functions.edit_style_clicked();">
 <div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
 <div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with weaving_cell_data 0 0 "special_styles"}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
