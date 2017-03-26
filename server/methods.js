@@ -987,6 +987,8 @@ Meteor.methods({
 
     weaving.pop(); // remove last row of weaving chart
     manual_weaving_turns.pop();
+
+    // restore packs to previous state
     var last_row = manual_weaving_turns[manual_weaving_turns.length-1];
     manual_weaving_turns[0] = last_row;
    
