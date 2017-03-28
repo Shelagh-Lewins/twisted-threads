@@ -485,14 +485,19 @@ if (Meteor.isClient) {
   });
 
   UI.registerHelper('edit_mode', function() {
-
     if (Router.current().route.getName() == "pattern")
     {
       var pattern_id = Router.current().params._id;
       var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
   
       if (typeof pattern !== "undefined")
-        return pattern.edit_mode;
+      {
+        if (pattern.edit_mode == "simulation")
+          return "simulation";
+
+        else
+          return "freehand";
+      }
     }
   });
 

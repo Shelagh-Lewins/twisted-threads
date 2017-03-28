@@ -1,8 +1,9 @@
 body.view_pattern .auto_preview {
   width: 100%;
-  max-width: 600px;
+  /*max-width: 600px;*/
   overflow-x: auto;
   overflow-y: hidden;
+  clear: both;
 }
 
 #auto_preview_spacer {
@@ -135,6 +136,13 @@ body.view_pattern .auto_preview.left svg {
   display: inline-block;
 }
 
+/* weft colour and rotate preview */
+
+#preview_controls {
+  clear: both;
+  margin-top: 0;
+}
+
 #preview_controls .hint {
   line-height: 26px;
   margin-left: 8px;
@@ -146,11 +154,6 @@ button.rotate_preview {
 
 button.rotate_preview.visible {
   display: inline;
-}
-
-#preview_controls {
-  clear: both;
-  margin-top: 8px;
 }
 
 /* *** Tablets to show weaving direction & tablet position *** */

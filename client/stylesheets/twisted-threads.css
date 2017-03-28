@@ -470,9 +470,16 @@ body {
 
 /* *** content *** */
 h2 {
-  /*clear: both;*/
   font-weight: bold;
   font-size: 24px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+h2 {
+  /*clear: both;*/
+  font-weight: bold;
+  font-size: 20px;
   margin-top: 16px;
   margin-bottom: 8px;
 }

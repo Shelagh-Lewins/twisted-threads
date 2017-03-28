@@ -4,12 +4,19 @@
   float: none;
 }
 
+.view_pattern a {
+  color: #424A6C;
+}
+
 /* Main tabs */
 /* http://www.menucool.com/horizontal/tab-menu#view4 */
+.view_pattern #main_tabs {
+  clear: both;
+}
 .view_pattern #main_tabs ul { /* general settings */
   text-align: left;
   font-size: 0;
-  margin: 0;
+  margin: 16px 0 0 0;
   padding: 0;
   padding-left: 20px;
   list-style-type: none;
@@ -200,6 +207,18 @@ button.styled_button:disabled {
   cursor: default;
 }
 
+body.weave button.styled_button {
+  background-color: #7580ac;
+  color: #FFFFFF;
+  border-color: #7580ac;
+}
+
+body.weave button.styled_button:disabled {
+  background-color: #DDDDDD;
+  color: #999999;
+  border-color: #DDDDDD;
+}
+
 /* *** Toolbar *** */
 /* Freehand pattern */
 .freehand #toolbar {
@@ -299,14 +318,17 @@ button.styled_button:disabled {
 }
 
 /* auto pattern */
-.simulation #toolbar.auto .auto_directions {
+.simulation .auto_directions {
   overflow: hidden;
+  max-width: 600px;
 }
 
-.simulation #toolbar.auto .direction {
+.simulation .auto_directions .direction {
   float: left;
-  min-width: 24px;
-  min-height: 24px;
+  position: relative;
+  min-width: 26px;
+  min-height: 26px;
+  line-height: 26px;
   border: 1px solid #424A6C;
   border-radius: 4px;
   margin: 4px 4px 0 0;
@@ -316,7 +338,17 @@ button.styled_button:disabled {
   cursor: pointer;
 }
 
-.simulation #toolbar.auto #num_auto_turns {
+.simulation .auto_directions .direction .turn_number {
+  position: absolute;
+  bottom: 0;
+  left: 1px;
+  font-size: 9px;
+  line-height: 1.1;
+  color: #666666;
+  text-align: left;
+}
+
+.simulation .auto_directions #num_auto_turns {
   font-size: 16px;
   color: #424A6C;
 }

@@ -2391,6 +2391,15 @@ Meteor.my_functions = {
       else
         Router.go('pattern', { _id: pattern_id, mode: "summary" });
     }, 100);
+  },
+  printer_friendly_pattern: function(disabled)
+  {
+    if (disabled == "disabled")
+      return;
+
+    var pattern_id = Router.current().params._id;
+
+    window.open(Router.url('pattern', {_id: pattern_id, mode: "print"}));
   }
 }
 

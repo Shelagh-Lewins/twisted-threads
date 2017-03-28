@@ -3,36 +3,45 @@
 {{> pattern_as_text}}
 {{> warp_svgs}}
 
+<div class="pattern_info">
+  <div class="name">
+  {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
+  </div>
+
+  <div class="hint">
+  Pattern type: {{#if equals edit_mode "simulation"}}simulation{{else}}freehand{{/if}}
+</div>
+</div>
+
+<button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.printer_friendly_pattern('{{no_weaving_rows}}');">Printer-friendly pattern</button>
+
+<button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">Interactive weaving chart</button>
+
+
+
+<div class="pattern_info">
+  <h2>Weaving notes</h2>
+  {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
+</div>
+
+{{> auto_preview}}
+
 <div id="main_tabs">
 <ul>
-  <li class="summary {{is_selected_main_tab "summary"}}" ><a>Summary</a></li>
-  <li class="charts {{is_selected_main_tab "charts"}}" ><a>Threading and weaving charts</a></li>
+  <li class="charts {{is_selected_main_tab "charts"}}" ><a>Pattern design</a></li>
+  <li class="summary {{is_selected_main_tab "summary"}}" ><a>Description</a></li>
 </ul>
 
 <div class="keyline">&nbsp;</div>
 </div>
 
-<div class="pattern_info">
-  <div class="name">
-  {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
-  </div>
-</div>
-
 {{#if equals view_pattern_mode "charts"}}
   {{#if equals edit_mode "simulation"}}
-    <div class="hint {{rendered_manual}}">
-      {{#if can_create_pattern}}Select thread colours from the threading styles palette at the bottom of the screen, then click tablet cells.<br>{{/if}}
-    </div>
-
-    <div class="pattern_info">
-      {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
-    </div>
-
-     <button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">View interactive weaving chart</button>
-
+  <h2>Weaving instructions</h2>
     {{#if can_edit_pattern _id}}
+
 <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
-  <div class="tabs">
+  <div class="tabs {{rendered_manual}}">
     <ul>
       <li class="auto {{is_selected_simulation_mode "auto"}}"><a>Auto</a></li>
       <li class="manual {{is_selected_simulation_mode "manual"}}"><a>Manual</a></li>
@@ -41,15 +50,16 @@
 
 <div class="content {{simulation_mode}}">
   {{#if equals simulation_mode "auto"}}
-    <h3>Auto weaving schedule</h3>
-    <span class="hint">Turn all tablets together, forward (F) or backwards (B)</span>
+    <span class="hint">
+      Turn all tablets together, forward or backward, following the sequence shown below:</span>
 
     <label for="num_auto_turns">Number of weaving rows:</label>
-    <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="32" size="3" value="{{auto_turn_sequence.length}}" > (max 32)<br/>
+    <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="48" size="3" value="{{auto_turn_sequence.length}}" > (max 48)<br/>
     <div class="auto_directions">
       {{#each auto_turn_sequence}}
         <span class="direction">
           {{this.direction}}
+          <span class="turn_number">{{this.turn}}</span>
         </span>
       {{/each}}
     </div>
@@ -63,8 +73,7 @@
     </span>
 
   {{else}}
-      <h3>Manual weaving schedule</h3>
-      <span class="hint">Design your pattern row by row, turning each pack of tablets separately.</span>
+      <span class="hint">Design your pattern row by row, turning each pack of tablets separately to create the <a href="#" onclick="Meteor.my_functions.start_weaving();">interactive weaving chart</a></span>
 
       <div class="packs">
         <ul>
@@ -114,13 +123,26 @@
 
 </div></div>
 </div>
+{{else}}
+  {{#if equals simulation_mode "auto"}}
+    <span class="hint">Turn all tablets together, forward or backward, following the sequence shown below:</span>
+    <div class="auto_directions">
+      {{#each auto_turn_sequence}}
+        <span class="direction">
+          {{this.direction}}
+          <span class="turn_number">{{this.turn}}</span>
+        </span>
+      {{/each}}
+    </div>
+  {{else}}
+    Turn tablets individually forward or backward according to the <a href="#" onclick="Meteor.my_functions.start_weaving();">interactive weaving chart</a>.
+  {{/if}}
+    {{/if}}
   {{/if}}
 {{/if}}
-{{/if}}
-
-{{> auto_preview}}
 
 {{#if equals view_pattern_mode "summary"}}
+
   <div class="pattern_info">
     <div class="box summary">
   <span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
@@ -132,7 +154,7 @@
   {{else}}
   <div class="box tags">{{> tags}}</div>
   {{/if}}
-  <br>
+
   {{#if can_edit_pattern _id}}
     {{#if isInRole 'verified' 'users'}}
       {{#if image_limit_reached}}
@@ -171,19 +193,13 @@
 
 {{#if equals view_pattern_mode "charts"}}
   {{#unless equals edit_mode "simulation"}}
-    <h2>Weaving Chart</h2>
-
-    <div class="hint">
-      {{#if can_create_pattern}}Select styles from the palette at the bottom of the screen, then click chart cells to set their style.<br>{{/if}}
-    </div>
-
-    <div class="pattern_info">
-      {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
-
-      <button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">View interactive weaving chart</button>
-    </div>
-
     {{#if can_edit_pattern _id}}
+
+    <h2>Weaving Chart</h2>
+    <div class="hint">
+      To edit the chart, select styles from the palette at the bottom of the screen, then click chart cells.<br>
+    </div>
+
     <div id="toolbar" ><div class="inner_tube">
     <button id="undo" disabled="{{undo_disabled}}" title="Undo">
     {{#if equals undo_disabled "disabled"}}
@@ -201,9 +217,7 @@
     <button id="add_tablet_at_end" title="Add tablet at right"><img src="/images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
     </div></div>
 
-    {{/if}}
-
-    <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}} {{rendered_manual}}">
+    <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
     {{> column_numbers}}
     {{#each row_indexes}}
     {{> pattern_row}}
@@ -213,7 +227,6 @@
     {{/each}}</ul></div>{{/if}}
     </div>
 
-     {{#if can_edit_pattern _id}}
     <div class="edit_rows">
       <button id="add_row">Add row</button> at 
       <input type="number" placeholder="Position..." id="row_to_add" min="1" max="{{add_row_positions}}" size="3" value="1" ><br />
@@ -223,7 +236,13 @@
   {{/unless}}
 
   <h2>Tablets</h2>
-  <div class="pattern_info">
+  {{#if can_edit_pattern _id}}
+  <div class="hint">
+    To edit the chart, select thread colours from the palette at the bottom of the screen, then click chart cells.<br />
+  </div>
+  {{/if}}
+
+  <div class="pattern_info {{rendered_manual}}">
     {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
   </div>
    

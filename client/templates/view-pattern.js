@@ -10,13 +10,13 @@ Template.view_pattern.rendered = function() {
   Session.set('edited_pattern', false);
   Session.set('auto_input_latch', false);
   Meteor.my_functions.set_repeats(pattern_id);
-
+//console.log("mode 1 " + Router.current().params.mode);
   if (Router.current().params.mode)
     Session.set('view_pattern_mode', Router.current().params.mode);
 
   else
-    Session.set('view_pattern_mode', "summary");
-
+    Session.set('view_pattern_mode', "charts");
+//console.log("mode 2 " + Session.get('view_pattern_mode'));
   // is this a new pattern and needs the preview to be generated?
   if (typeof $('.auto_preview path')[0] === "undefined")
     Meteor.my_functions.reset_simulation_weaving(pattern_id);
@@ -78,29 +78,15 @@ Template.view_pattern.helpers({
     return "summary"; // default if no mode specified
   },
   is_selected_main_tab: function(mode) {
-    if (Router.current().params.mode == mode)
+    if (Session.get('view_pattern_mode') == mode)
       return "selected";
-
-    if ((typeof Router.current().params.mode === "undefined") && (mode == "summary"))
-      return "selected"; // default if no mode specified
-  },
-  edit_mode: function() {
-    // simulation or freehand pattern?
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
-
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
-        return;
-
-    if (pattern.edit_mode == "simulation")
-      return "simulation";
-
-    else
-      return "freehand";
   },
   simulation_mode: function() {
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
+
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
 
     return pattern.simulation_mode;
   },
@@ -109,8 +95,11 @@ Template.view_pattern.helpers({
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
 
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
+
     if (mode == pattern.simulation_mode)
-    return "selected";
+      return "selected";
   },
   auto_turn_sequence: function() {
     // weaving sequence for auto simulation pattern
@@ -331,8 +320,6 @@ Template.styles_palette.helpers({
         return false;
   },
   styles: function(page) {
-    //var pattern_id = Router.current().params._id;
-
     var styles_array = [];
     if (typeof page === "undefined")
     {

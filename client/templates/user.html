@@ -1,7 +1,7 @@
 <template name="user">
 {{#if Template.subscriptionsReady}}
 {{#if show_description _id}}
-<h2>{{username}}</h2>
+<h1>{{username}}</h1>
 <div class="user_info">
 {{> editable_field extendContext collection="users" property="description" data=profile.description multiple=true button_text="Edit profile" placeholder_text="Tap \"Edit description\" to enter a description"}}
 </div>
@@ -16,11 +16,7 @@
 </ul>
 </div>
 {{> pagesNav}}
-<!--<ul class="patterns">
-{{#each user_patterns _id}}
-{{> pattern_thumbnail}}
-{{/each}}
-</ul>-->
+
 {{else}}
 {{username}} has not created any patterns yet.
 {{/if}}

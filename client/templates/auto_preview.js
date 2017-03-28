@@ -138,7 +138,8 @@ Template.auto_preview.helpers({
     return pattern.weft_color;
   },
   show_tablets: function() {
-    if (Router.current().params.mode == "charts")
+    //if ((Router.current().params.mode == "charts") || (Router.current().params.mode == "summary"))
+    if (Session.equals('view_pattern_mode', "charts") || Session.equals('view_pattern_mode', "summary"))
       return "show_tablets";
   },
   tablet_position: function() {

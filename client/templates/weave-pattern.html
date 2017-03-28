@@ -2,6 +2,12 @@
 {{> pattern_as_text}}
 {{#if Template.subscriptionsReady}}
 {{> warp_svgs}}
+
+<button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.printer_friendly_pattern('{{no_weaving_rows}}');">Printer-friendly pattern</button>
+
+<button class="styled_button" onclick="Meteor.my_functions.stop_weaving();">Close weaving chart</button>
+
+
 <div class="row_controls"><label for="current_row_input">Row: </label><input type="text" id="current_row_input" value={{selected_row}}>
 <input type="button" id="first_row" value="First row" />
 <input type="button" id="last_row" value="Last row" /></div>

@@ -564,7 +564,6 @@ Meteor.methods({
           //Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "right"}});
     }
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, preview_rotation: 1}});
-    console.log("new rotation " + pattern.preview_rotation);
   },
   save_threading_as_text: function(pattern_id, text)
   {
@@ -1197,7 +1196,7 @@ Meteor.methods({
     check(pattern_id, String);
     check(new_number, Number);
 
-    if ((new_number < 1) || (new_number > 32))
+    if ((new_number < 1) || (new_number > Meteor.my_params.max_auto_turns))
       return;
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, auto_turn_sequence: 1}});

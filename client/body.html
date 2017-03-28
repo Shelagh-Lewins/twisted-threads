@@ -3,7 +3,7 @@
 </template>
 
 <template name="main_layout">
-<div id="width" class="{{#if currentUser }}signed_in{{/if}} {{#if can_edit_pattern}}editable{{/if}} {{connection_status}} {{edit_mode}} ">
+<div id="width" class="{{#if currentUser }}signed_in{{/if}} {{edit_mode}} {{#if can_edit_pattern}}editable{{/if}} {{connection_status}}  ">
 
 <div id="spinner_box" class="{{loading}}"><div class="inner_tube">
 <p>Loading...</p>
@@ -38,13 +38,13 @@
 
       {{#if equals route_name "about"}}<a href="{{pathFor route='home'}}">Home</a>{{/if}}
       
-      {{#if pattern_exists _id}}
+      <!--{{#if pattern_exists _id}}
         {{#if is_weaving}}
           <a id="stop_weaving" onclick="Meteor.my_functions.stop_weaving();">Stop weaving</a>
         {{else}}
           <a id="start_weaving" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">Start weaving</a>
         {{/if}}
-      {{/if}}
+      {{/if}}-->
     </div>
     <div class="header_right">{{> search}}{{> loginButtons}}{{> menu}}</div>
   </div>

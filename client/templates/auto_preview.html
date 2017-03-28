@@ -1,6 +1,23 @@
 <template name="auto_preview">
 <div id="auto_preview_spacer"></div>
 
+<div id="preview_controls">
+  <div id="weft_color" class="{{#if equals view_pattern_mode "charts"}}visible{{/if}}
+  {{#if equals view_pattern_mode "summary"}}visible{{/if}}">
+    <span class="hint">Weft colour</span>
+    {{#if can_edit_pattern _id}}
+    <div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
+    {{else}}
+    <div class="weft_color" style="background-color: {{weft_color}}; float: left; width: 24px; height: 24px; border: 1px solid #7580ac;">&nbsp;
+    </div>
+    {{/if}}
+  </div>
+
+  {{#if can_edit_pattern _id}}
+  <button class="rotate_preview {{#if equals view_pattern_mode "charts"}}visible{{/if}}">Rotate preview</button>
+  {{/if}}
+</div>
+
 <div class="auto_preview {{preview_rotation}} {{show_tablets}} {{simulation_mode}}">
   <div id="auto_preview_wrapper" style="{{preview_style}}">
 
@@ -63,22 +80,6 @@
   </div>
 
 </div>
-</div>
-
-<div id="preview_controls">
-<div id="weft_color" class="{{#if equals view_pattern_mode "charts"}}visible{{/if}}">
-  <span class="hint">Weft colour</span>
-  {{#if can_edit_pattern _id}}
-  <div class="colorpicker_holder"><input type="text" id="weft_colorpicker"></div>
-  {{else}}
-  <div class="weft_color" style="background-color: {{weft_color}}; float: left; width: 24px; height: 24px; border: 1px solid #7580ac;">&nbsp;
-  </div>
-  {{/if}}
-</div>
-
-  {{#if can_edit_pattern _id}}
-  <button class="rotate_preview {{#if equals view_pattern_mode "charts"}}visible{{/if}}">Rotate preview</button>
-  {{/if}}
 </div>
 </template>
 
