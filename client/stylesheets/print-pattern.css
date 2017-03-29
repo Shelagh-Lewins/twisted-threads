@@ -11,6 +11,13 @@ body.print h1 {
   clear: both;
   text-align: center;
   font-weight: bold;
+  font-size: 20px;
+}
+
+body.print h2 {
+  clear: both;
+  font-weight: bold;
+  font-size: 18px;
 }
 
 body.print p {

@@ -197,3 +197,34 @@
   border-radius: 8px;  
 }
 
+
+/* Auto turn sequence */
+.auto_directions {
+  overflow: hidden;
+  max-width: 600px;
+}
+
+.auto_directions .direction {
+  float: left;
+  position: relative;
+  min-width: 26px;
+  min-height: 26px;
+  line-height: 26px;
+  border: 1px solid #424A6C;
+  border-radius: 4px;
+  margin: 4px 4px 0 0;
+  padding: 2px;
+  background-color: #FFFFFF;
+  text-align: center;
+  cursor: pointer;
+}
+
+ .auto_directions .direction .turn_number {
+  position: absolute;
+  bottom: 0;
+  left: 1px;
+  font-size: 9px;
+  line-height: 1.1;
+  color: #666666;
+  text-align: left;
+}

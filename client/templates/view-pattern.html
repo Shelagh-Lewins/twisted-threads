@@ -17,8 +17,6 @@
 
 <button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">Interactive weaving chart</button>
 
-
-
 <div class="pattern_info">
   <h2>Weaving notes</h2>
   {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
@@ -43,32 +41,27 @@
 <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
   <div class="tabs {{rendered_manual}}">
     <ul>
-      <li class="auto {{is_selected_simulation_mode "auto"}}"><a>Auto</a></li>
-      <li class="manual {{is_selected_simulation_mode "manual"}}"><a>Manual</a></li>
+      <li class="auto {{#if equals simulation_mode "auto"}}selected{{/if}}"><a>Auto</a></li>
+      <li class="manual {{#if equals simulation_mode "manual"}}selected{{/if}}"><a>Manual</a></li>
     </ul>
   </div>
 
 <div class="content {{simulation_mode}}">
   {{#if equals simulation_mode "auto"}}
     <span class="hint">
-      Turn all tablets together, forward or backward, following the sequence shown below:</span>
+      Turn all tablets together, forward or backward, following the sequence shown below
+    </span>
 
     <label for="num_auto_turns">Number of weaving rows:</label>
     <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="48" size="3" value="{{auto_turn_sequence.length}}" > (max 48)<br/>
-    <div class="auto_directions">
-      {{#each auto_turn_sequence}}
-        <span class="direction">
-          {{this.direction}}
-          <span class="turn_number">{{this.turn}}</span>
-        </span>
-      {{/each}}
-    </div>
+
+    {{> auto_sequence}}
 
     <span class="hint">
       {{#if does_pattern_repeat}}
       Number of pattern repeats shown: {{auto_repeats}}
       {{else}}
-      The pattern will not repeat
+      The pattern does not repeat
       {{/if}}
     </span>
 
@@ -126,14 +119,9 @@
 {{else}}
   {{#if equals simulation_mode "auto"}}
     <span class="hint">Turn all tablets together, forward or backward, following the sequence shown below:</span>
-    <div class="auto_directions">
-      {{#each auto_turn_sequence}}
-        <span class="direction">
-          {{this.direction}}
-          <span class="turn_number">{{this.turn}}</span>
-        </span>
-      {{/each}}
-    </div>
+    
+    {{> auto_sequence}}
+
   {{else}}
     Turn tablets individually forward or backward according to the <a href="#" onclick="Meteor.my_functions.start_weaving();">interactive weaving chart</a>.
   {{/if}}
@@ -363,6 +351,17 @@
 
 <template name="pattern_not_found">
 <h2>Pattern not found: {{id}}</h2>
+</template>
+
+<template name="auto_sequence">
+<div class="auto_directions">
+  {{#each auto_turn_sequence}}
+    <span class="direction">
+      {{this.direction}}
+      <span class="turn_number">{{this.turn}}</span>
+    </span>
+  {{/each}}
+</div>
 </template>
 
 

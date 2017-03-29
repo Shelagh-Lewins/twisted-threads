@@ -538,7 +538,10 @@ Meteor.methods({
 
     if (pattern.created_by != Meteor.userId())
         // Only the owner can edit a pattern
-        throw new Meteor.Error("not-authorized", "You can only edit a pattern you created");
+        throw new Meteor.Error("not-authorized", "You can only edit a pattern you created");      
+
+    if (typeof pattern.preview_rotation === "undefined")
+      Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
 
     switch(pattern.preview_rotation)
     {
@@ -546,22 +549,13 @@ Meteor.methods({
         Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "right"}});
         break;
 
-      /*case "up":
-        Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "right"}});
-        break;*/
-
-        // It'd be nice to have a floating vertical preview for some patterns, at the user's choice. But so far I haven't made the styles work: pattern info would need to be adjusted to fit round it. But the styles are partly done, in case I come back to this.
-
       case "right":
         Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
         break;
 
-      /*case "down":
-        Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
-        break;*/
-
-      //default:
-          //Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "right"}});
+      default:
+      console.log("default rotate pattern");
+          Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
     }
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, preview_rotation: 1}});
   },

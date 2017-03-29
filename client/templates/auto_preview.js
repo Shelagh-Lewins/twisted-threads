@@ -7,9 +7,22 @@ Template.auto_preview.onCreated(function() {
 
   var pattern_id = Router.current().params._id;
   this.pattern_id = pattern_id;
+  var pattern = Patterns.findOne({ _id: pattern_id}, { fields: {preview_rotation: 1}});
 
-  var pattern = Patterns.findOne({ _id: this.pattern_id}, { fields: {preview_rotation: 1}});
-  Session.set("preview_rotation", pattern.preview_rotation);
+  if (typeof pattern !== "undefined")
+  {
+    if (typeof pattern.preview_rotation === "undefined") // old pattern
+    {
+      Meteor.call('rotate_preview', pattern_id); // switch to 'left and save'
+      Session.set("preview_rotation", "left");
+      // TODO only reset if simulation pattern
+      //Meteor.my_functions.reset_simulation_weaving(pattern_id);
+    }
+    else
+    {
+      Session.set("preview_rotation", pattern.preview_rotation);
+    }
+  }
 
   this.viewbox_width = function(){
     return this.unit_width * Session.get("number_of_tablets");
@@ -60,7 +73,7 @@ Template.auto_preview.onCreated(function() {
 
     if (pattern.edit_mode == "simulation")
       if (pattern.simulation_mode == "auto")
-        total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
+        total_height -= (Session.get("number_of_repeats") - 1) * this.cell_height/2;
 
     return total_height;
   };
@@ -85,6 +98,41 @@ Template.auto_preview.onCreated(function() {
     return sim_holder_height + 36; // 36 = width of tablets showing direction of weaving
   };
 
+  this.set_svg_style = function() {
+    // svg style doesn't seem to be saved as svg image, so set it now to correct for rotation
+    // This needs to run every time the offset changes, e.g. if repeating -> non-repeating
+    // There is a problem with this, TODO figure out why sometimes it doesn't put the correct style on the svg even though the element is found. I can't see it being set elsewhere?    
+
+    var that = this;
+
+    setTimeout(function() {
+      var svg_style;
+
+      switch(Session.get("preview_rotation"))
+      {
+        case "right":
+          svg_style = "left: " + that.total_height() + "px;";
+          break;
+
+        case "left":
+          svg_style = "top: " + that.image_width() + "px;";
+          break;
+      }
+      //console.log("svg in timeout: " + $('.auto_preview svg')[0]);
+     // console.log("that is " + typeof that.set_svg_style);
+      if (typeof $('.auto_preview svg')[0] === "undefined")
+      {
+        //console.log("svg doesn't exist, trying again");
+        setTimeout(function() {
+          that.set_svg_style();
+        })
+      }
+      else
+        $('.auto_preview svg').attr("style", svg_style);
+    }, 5);
+  };
+
+  this.set_svg_style();
 });
 
 // extendContext is used in the template to supply the helper values to the child template.
@@ -115,7 +163,7 @@ Template.auto_preview.helpers({
     {
       repeats.push(i);
     }
-
+    Template.instance().set_svg_style();
     return repeats;
   },
   repeat_offset: function() {
@@ -138,13 +186,15 @@ Template.auto_preview.helpers({
     return pattern.weft_color;
   },
   show_tablets: function() {
-    //if ((Router.current().params.mode == "charts") || (Router.current().params.mode == "summary"))
     if (Session.equals('view_pattern_mode', "charts") || Session.equals('view_pattern_mode', "summary"))
       return "show_tablets";
   },
   tablet_position: function() {
     // which hole is currently in position A?
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, position_of_A: 1}});
+
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
 
     if (pattern.edit_mode == "simulation")
     {
@@ -166,6 +216,9 @@ Template.auto_preview.helpers({
   rotation_correction: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {edit_mode: 1, simulation_mode: 1}});
 
+  if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
+
     var total_width = Template.instance().image_width();
 
     var total_height = Template.instance().image_height() * Template.instance().scaling() * Session.get("number_of_repeats");
@@ -183,19 +236,6 @@ Template.auto_preview.helpers({
         return "height: " + Template.instance().image_width() + "px; width: " + total_height + "px; position: relative;";
     }
   },
-  svg_style: function() {
-    // push the SVG back into place after rotation
-    
-    switch(Session.get("preview_rotation"))
-    {
-      case "right":
-        return "left: " + Template.instance().total_height() + "px;";
-
-      case "left":
-        return "top: " + Template.instance().image_width() + "px;";
-    }
-  },
-
   viewbox_width: function() {
     return Template.instance().viewbox_width();
   },
@@ -232,6 +272,7 @@ Template.auto_preview.events({
         Session.set("preview_rotation", "left");
         break;
     }
+    Template.instance().set_svg_style();
   }
 });
 

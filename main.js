@@ -151,10 +151,37 @@ if (Meteor.isClient) {
     // call this in the template to hide "loading..."
     Session.set("loading", false);
     return true;
-  }),
+  });
 
   //////////////////////////////////
-  // does simulation pattern repeat?
+  // Simulation patterns
+  UI.registerHelper('edit_mode', function() {
+    if (Router.current().route.getName() == "pattern")
+    {
+      var pattern_id = Router.current().params._id;
+      var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
+  
+      if (typeof pattern !== "undefined")
+      {
+        if (pattern.edit_mode == "simulation")
+          return "simulation";
+
+        else
+          return "freehand";
+      }
+    }
+  });
+
+  UI.registerHelper('simulation_mode', function() {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
+
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
+
+    return pattern.simulation_mode;
+  });
+
   UI.registerHelper('does_pattern_repeat', function(){
     var pattern_id = Router.current().params._id;
     return Meteor.my_functions.does_pattern_repeat(pattern_id);
@@ -482,23 +509,6 @@ if (Meteor.isClient) {
       var pattern_id = Router.current().params._id;
 
     return Meteor.my_functions.can_edit_pattern(pattern_id);
-  });
-
-  UI.registerHelper('edit_mode', function() {
-    if (Router.current().route.getName() == "pattern")
-    {
-      var pattern_id = Router.current().params._id;
-      var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
-  
-      if (typeof pattern !== "undefined")
-      {
-        if (pattern.edit_mode == "simulation")
-          return "simulation";
-
-        else
-          return "freehand";
-      }
-    }
   });
 
   ///////////////////////////////////

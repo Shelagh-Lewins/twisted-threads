@@ -10,17 +10,23 @@ Template.view_pattern.rendered = function() {
   Session.set('edited_pattern', false);
   Session.set('auto_input_latch', false);
   Meteor.my_functions.set_repeats(pattern_id);
-//console.log("mode 1 " + Router.current().params.mode);
+
   if (Router.current().params.mode)
     Session.set('view_pattern_mode', Router.current().params.mode);
 
   else
     Session.set('view_pattern_mode', "charts");
-//console.log("mode 2 " + Session.get('view_pattern_mode'));
-  // is this a new pattern and needs the preview to be generated?
-  if (typeof $('.auto_preview path')[0] === "undefined")
-    Meteor.my_functions.reset_simulation_weaving(pattern_id);
 
+  // is this a new pattern and needs the preview to be generated?
+  if (typeof $('.auto_preview path')[0] === "undefined") // TODO only do this if simulation pattern
+    //Meteor.my_functions.reset_simulation_weaving(pattern_id);
+    Session.set('edited_pattern', true);
+
+  var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
+
+  if (typeof pattern !== "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    if (pattern.edit_mode == "simulation")
+      Meteor.my_functions.reset_simulation_weaving(pattern_id);
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -81,7 +87,7 @@ Template.view_pattern.helpers({
     if (Session.get('view_pattern_mode') == mode)
       return "selected";
   },
-  simulation_mode: function() {
+  /*simulation_mode: function() {
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
 
@@ -89,23 +95,7 @@ Template.view_pattern.helpers({
         return;
 
     return pattern.simulation_mode;
-  },
-  is_selected_simulation_mode: function(mode) {
-    // simulation pattern, auto or manual
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
-
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
-        return;
-
-    if (mode == pattern.simulation_mode)
-      return "selected";
-  },
-  auto_turn_sequence: function() {
-    // weaving sequence for auto simulation pattern
-    if (typeof current_auto_turn_sequence !== "undefined")
-      return current_auto_turn_sequence.list();   
-  },
+  },*/
   auto_repeats: function() {
     return Session.get("number_of_repeats");
   },
@@ -150,11 +140,6 @@ Template.view_pattern.helpers({
     if (current_manual_weaving_turns.length > 100)
       return "disabled";
   },
-  /*unweave_disabled: function() {
-    // cannot remove a row from manual simulation pattern
-    if (current_manual_weaving_turns.length < 1)
-      return "disabled";
-  },*/
   add_tablet_positions: function() {
     return Session.get("number_of_tablets") + 1;
   },
@@ -281,6 +266,14 @@ Template.orientation.helpers({
         return "orientation_s";
   }
 });
+
+Template.auto_sequence.helpers({
+  'auto_turn_sequence': function() {
+    // weaving sequence for auto simulation pattern
+    if (typeof current_auto_turn_sequence !== "undefined")
+      return current_auto_turn_sequence.list();   
+  }
+})
 
 Template.styles_palette.onRendered(function(){
   var pattern_id = Router.current().params._id;
