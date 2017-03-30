@@ -39,6 +39,9 @@ Template.auto_preview.onCreated(function() {
     var height = this.viewbox_height();
     var pattern = Patterns.findOne({ _id: this.pattern_id});
 
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
+
     if (pattern.simulation_mode == "auto")
     {
       height *= Session.get("number_of_repeats");
@@ -49,7 +52,7 @@ Template.auto_preview.onCreated(function() {
   };
 
   this.scaling = function(){
-    var pattern = Patterns.findOne({ _id: this.pattern_id});
+    //var pattern = Patterns.findOne({ _id: this.pattern_id});
 
     var total_width = this.image_width();
     var max_width = this.max_image_width;
@@ -69,6 +72,9 @@ Template.auto_preview.onCreated(function() {
       return 0; // not ready
 
     var pattern = Patterns.findOne({ _id: this.pattern_id});
+    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+        return;
+      
     var total_height = this.image_height() * this.scaling() * Session.get("number_of_repeats");
 
     if (pattern.edit_mode == "simulation")
@@ -99,8 +105,7 @@ Template.auto_preview.onCreated(function() {
   };
 
   this.set_svg_style = function() {
-    // svg style doesn't seem to be saved as svg image, so set it now to correct for rotation
-    // This needs to run every time the offset changes, e.g. if repeating -> non-repeating
+    // svg style doesn't seem to be saved in the svg image that is stored with the pattern for the Home page, so set it now to correct for rotation
     // There is a problem with this, TODO figure out why sometimes it doesn't put the correct style on the svg even though the element is found. I can't see it being set elsewhere?    
 
     var that = this;
@@ -163,7 +168,6 @@ Template.auto_preview.helpers({
     {
       repeats.push(i);
     }
-    Template.instance().set_svg_style();
     return repeats;
   },
   repeat_offset: function() {
@@ -215,6 +219,8 @@ Template.auto_preview.helpers({
   },
   rotation_correction: function() {
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {edit_mode: 1, simulation_mode: 1}});
+
+  Template.instance().set_svg_style();
 
   if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
         return;
