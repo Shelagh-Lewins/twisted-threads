@@ -2406,7 +2406,7 @@ Meteor.my_functions = {
 
     var pattern_id = Router.current().params._id;
 
-    window.open(Router.url('pattern', {_id: pattern_id, mode: "print"}));
+    Router.go('pattern', {_id: pattern_id, mode: "print"});
   }
 }
 
