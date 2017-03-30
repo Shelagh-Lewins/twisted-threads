@@ -536,6 +536,12 @@ Meteor.methods({
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, preview_rotation: 1 }});
 
+    if (typeof pattern.preview_rotation === "undefined") // old pattern, needs value setting
+    {
+      Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
+      return;
+    }
+
     if (pattern.created_by != Meteor.userId())
         // Only the owner can edit a pattern
         throw new Meteor.Error("not-authorized", "You can only edit a pattern you created");      
@@ -554,10 +560,8 @@ Meteor.methods({
         break;
 
       default:
-      console.log("default rotate pattern");
-          Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
+        Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
     }
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, preview_rotation: 1}});
   },
   save_threading_as_text: function(pattern_id, text)
   {

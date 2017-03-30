@@ -11,37 +11,44 @@ Router.route('/', {
 
 Router.route('/about', {
   name: 'about',
+  loadingTemplate: 'loading',
   template: 'about'
 });
 
 Router.route('/recent-patterns', {
   name: 'recent_patterns',
+  loadingTemplate: 'loading',
   template: 'recent_patterns'
 });
 
 Router.route('/new-patterns', {
   name: 'new_patterns',
+  loadingTemplate: 'loading',
   template: 'new_patterns'
 });
 
 Router.route('/my-patterns', {
   name: 'my_patterns',
+  loadingTemplate: 'loading',
   template: 'my_patterns'
 });
 
 Router.route('/all-patterns', {
   name: 'all_patterns',
+  loadingTemplate: 'loading',
   template: 'all_patterns'
 });
 
 Router.route('/users', {
   name: 'users',
+  loadingTemplate: 'loading',
   template: 'users'
 });
 
 
 Router.route('/pattern/:_id/:mode?', {
   name: 'pattern',
+  loadingTemplate: 'loading',
   data: function(){
     var pattern_id = this.params._id;
 
@@ -101,6 +108,7 @@ Router.route('/pattern/:_id/:mode?', {
 
 Router.route('/user/:_id', {
   name: 'user',
+  loadingTemplate: 'loading',
   data: function(){
     var user_id = this.params._id;
 
@@ -127,6 +135,7 @@ Router.route('/user/:_id', {
 
 Router.route('/account-settings', {
   name: 'account_settings',
+  loadingTemplate: 'loading',
   data: function() {
     var user_id = this.params._id;
     return Meteor.users.findOne({ _id: user_id });
