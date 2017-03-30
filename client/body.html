@@ -34,17 +34,13 @@
       <a href="{{pathFor route='home'}}" id="home">Home</a>{{/if}}
 
       {{#if equals route_name "pattern"}}
-      <a href="{{pathFor route='home'}}" id="home">Home</a>{{/if}}
+      <a href="{{pathFor route='home'}}" id="home">Home</a>
+        {{#if currentUser}}
+        <a href="{{pathFor route='my_patterns'}}" id="my_patterns">My patterns</a>
+        {{/if}}
+      {{/if}}
 
       {{#if equals route_name "about"}}<a href="{{pathFor route='home'}}">Home</a>{{/if}}
-      
-      <!--{{#if pattern_exists _id}}
-        {{#if is_weaving}}
-          <a id="stop_weaving" onclick="Meteor.my_functions.stop_weaving();">Stop weaving</a>
-        {{else}}
-          <a id="start_weaving" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">Start weaving</a>
-        {{/if}}
-      {{/if}}-->
     </div>
     <div class="header_right">{{> search}}{{> loginButtons}}{{> menu}}</div>
   </div>

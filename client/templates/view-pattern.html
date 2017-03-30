@@ -97,6 +97,8 @@
       <span class="hint">
         {{#if equals number_of_rows 0}}
           Click "weave" to add a row
+        {{else}}
+          To turn tablets separately, move them into different packs
         {{/if}}
       </span>
 
@@ -124,6 +126,9 @@
 {{/if}}
 
 {{#if equals view_pattern_mode "summary"}}
+  {{#if can_edit_pattern _id}}
+    <button id="delete">Delete pattern</button>
+  {{/if}}
 
   <div class="pattern_info">
     <div class="box summary">

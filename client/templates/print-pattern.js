@@ -1,8 +1,5 @@
 Template.print_pattern.rendered = function() {
   $('body').attr("class", "print");
-
-  var pattern_id = Router.current().params._id;
-  var created_by_id = Patterns.findOne({ _id: pattern_id}, {fields: {created_by: 1 }}).created_by;
   Meteor.subscribe('user_info');
 }
 
@@ -17,6 +14,9 @@ Template.print_pattern.helpers({
   },
   created_by: function(){
     var pattern_id = Router.current().params._id;
+    if (typeof pattern === "undefined")
+        return;
+
     var created_by_id = Patterns.findOne({ _id: pattern_id}, {fields: {created_by: 1 }}).created_by;
     return Meteor.users.findOne({ _id: created_by_id}).username;
   }

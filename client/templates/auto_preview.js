@@ -15,8 +15,6 @@ Template.auto_preview.onCreated(function() {
     {
       Meteor.call('rotate_preview', pattern_id); // switch to 'left and save'
       Session.set("preview_rotation", "left");
-      // TODO only reset if simulation pattern
-      //Meteor.my_functions.reset_simulation_weaving(pattern_id);
     }
     else
     {
@@ -39,7 +37,7 @@ Template.auto_preview.onCreated(function() {
     var height = this.viewbox_height();
     var pattern = Patterns.findOne({ _id: this.pattern_id});
 
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    if (typeof pattern === "undefined")
         return;
 
     if (pattern.simulation_mode == "auto")
@@ -52,8 +50,6 @@ Template.auto_preview.onCreated(function() {
   };
 
   this.scaling = function(){
-    //var pattern = Patterns.findOne({ _id: this.pattern_id});
-
     var total_width = this.image_width();
     var max_width = this.max_image_width;
     var scaling = 1;
@@ -72,7 +68,7 @@ Template.auto_preview.onCreated(function() {
       return 0; // not ready
 
     var pattern = Patterns.findOne({ _id: this.pattern_id});
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    if (typeof pattern === "undefined")
         return;
       
     var total_height = this.image_height() * this.scaling() * Session.get("number_of_repeats");
@@ -123,11 +119,8 @@ Template.auto_preview.onCreated(function() {
           svg_style = "top: " + that.image_width() + "px;";
           break;
       }
-      //console.log("svg in timeout: " + $('.auto_preview svg')[0]);
-     // console.log("that is " + typeof that.set_svg_style);
       if (typeof $('.auto_preview svg')[0] === "undefined")
       {
-        //console.log("svg doesn't exist, trying again");
         setTimeout(function() {
           that.set_svg_style();
         })
@@ -197,7 +190,7 @@ Template.auto_preview.helpers({
     // which hole is currently in position A?
     var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, position_of_A: 1}});
 
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    if (typeof pattern === "undefined")
         return;
 
     if (pattern.edit_mode == "simulation")
@@ -222,7 +215,7 @@ Template.auto_preview.helpers({
 
   Template.instance().set_svg_style();
 
-  if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+  if (typeof pattern === "undefined")
         return;
 
     var total_width = Template.instance().image_width();

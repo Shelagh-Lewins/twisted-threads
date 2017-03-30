@@ -131,19 +131,14 @@ Template.pattern_thumbnail.helpers({
 });
 
 Template.pattern_thumbnail.events({
-// Delete pattern
-  'click #delete': function(event) {
+  // Delete pattern
+  'click .delete': function(event) {
     event.preventDefault();
-    var name = Patterns.findOne({ _id: this._id}).name;
     var pattern_id = this._id;
 
-    var r = confirm(name + "\nDo you want to delete this pattern?");
-    if (r == true)
-    {
-      Meteor.call('remove_pattern', pattern_id);
-    }
+    Meteor.my_functions.delete_pattern(pattern_id);
   },
-  "click #toggle_private": function (event) {
+  "click .toggle_private": function (event) {
     event.preventDefault();
     Meteor.call("set_private", this._id, !this.private);
   }

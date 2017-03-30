@@ -277,6 +277,13 @@ Meteor.my_functions = {
       }
     });
   },
+  delete_pattern: function(pattern_id) {
+    var r = confirm(name + "\nDo you want to delete this pattern?");
+    if (r == true)
+    {
+      Meteor.call('remove_pattern', pattern_id);
+    }
+  },
   is_file_loading_supported: function() {
     if (window.File && window.FileReader && window.FileList && window.Blob)
       return true;

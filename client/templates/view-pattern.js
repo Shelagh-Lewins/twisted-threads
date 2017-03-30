@@ -24,7 +24,7 @@ Template.view_pattern.rendered = function() {
 
   var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
 
-  if (typeof pattern !== "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+  if (typeof pattern !== "undefined")
     if (pattern.edit_mode == "simulation")
       Meteor.my_functions.reset_simulation_weaving(pattern_id);
 
@@ -64,7 +64,7 @@ Template.remove_row.helpers({
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
 
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    if (typeof pattern === "undefined")
         return;
 
     if (pattern.number_of_rows > 1) {
@@ -87,15 +87,6 @@ Template.view_pattern.helpers({
     if (Session.get('view_pattern_mode') == mode)
       return "selected";
   },
-  /*simulation_mode: function() {
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
-
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
-        return;
-
-    return pattern.simulation_mode;
-  },*/
   auto_repeats: function() {
     return Session.get("number_of_repeats");
   },
@@ -151,7 +142,7 @@ Template.view_pattern.helpers({
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
 
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    if (typeof pattern === "undefined")
         return;
 
     if (pattern.number_of_tablets < 60)
@@ -163,7 +154,7 @@ Template.view_pattern.helpers({
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
 
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    if (typeof pattern === "undefined")
         return;
 
     if (pattern.number_of_tablets > 1)
@@ -188,7 +179,7 @@ Template.view_pattern.helpers({
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { hole_handedness: 1}});
 
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    if (typeof pattern === "undefined")
         return;
 
     if (pattern.hole_handedness == "anticlockwise")
@@ -277,8 +268,6 @@ Template.auto_sequence.helpers({
 
 Template.styles_palette.onRendered(function(){
   var pattern_id = Router.current().params._id;
-
-  // avoids error when pattern is private and user doesn't have permission to see it
 
   if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
@@ -488,6 +477,13 @@ Template.view_pattern.events({
       Router.go('pattern', { _id: pattern_id, mode: "charts" });
       Session.set('view_pattern_mode', "charts");
     }, 100);
+  },
+  'click #delete': function(event) {
+    event.preventDefault();
+    var pattern_id = Router.current().params._id;
+
+    Meteor.my_functions.delete_pattern(pattern_id);
+    Router.go('my_patterns');
   },
   // Make pattern private / public
   "click .toggle_private": function () {

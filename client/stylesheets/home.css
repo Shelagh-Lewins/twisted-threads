@@ -328,13 +328,13 @@ ul.patterns li a.created_by {
   cursor: pointer;
 }
 
-ul.patterns li #delete,
-ul.patterns li #toggle_private {
+ul.patterns li .delete,
+ul.patterns li .toggle_private {
   float: right;
 }
 
-ul.patterns li #delete span,
-ul.patterns li #toggle_private span {
+ul.patterns li .delete span,
+ul.patterns li .toggle_private span {
   float: right;
   width: 16px;
   height: 16px;
@@ -343,20 +343,20 @@ ul.patterns li #toggle_private span {
   background-size: 16px 16px;
 }
 
-ul.patterns li #delete:active,
-ul.patterns li #toggle_private:active {
+ul.patterns li .delete:active,
+ul.patterns li .toggle_private:active {
   background-color: #A8E1FF;
 }
 
-ul.patterns li #delete span {
+ul.patterns li .delete span {
   background-image: url("../images/delete.svg");
 }
 
-ul.patterns li #toggle_private.private span {
+ul.patterns li .toggle_private.private span {
   background-image: url("../images/private.svg");
 }
 
-ul.patterns li #toggle_private.public span {
+ul.patterns li .toggle_private.public span {
   background-image: url("../images/public.svg");
 }
 

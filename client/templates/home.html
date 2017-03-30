@@ -151,11 +151,11 @@
 <!--<div class="image" style="background-image: url('{{preview_url}}')"></div>-->
 </a></div>
 <div class="footer"><a href="{{pathFor route='user' _id=created_by}}" class="created_by">{{created_by_username}}</a>{{#if can_edit_pattern _id}}
-<a href="#" id="delete" title="Delete this pattern"><span></span></a>
+<a href="#" class="delete" title="Delete this pattern"><span></span></a>
 {{#if private}}
-<a href="#" id="toggle_private" class="private" title="Private: nobody else can see this pattern"><span></span></a>
+<a href="#" class="toggle_private private" title="Private: nobody else can see this pattern"><span></span></a>
 {{else}}
-<a href="#" id="toggle_private" class="public" title="Public: other people can see this pattern but they can't edit it"><span></span></a>
+<a href="#" class="toggle_private public" title="Public: other people can see this pattern but they can't edit it"><span></span></a>
 {{/if}}{{/if}}</div>
 </li>
 </template>
