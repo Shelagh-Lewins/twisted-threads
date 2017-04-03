@@ -965,7 +965,7 @@ Meteor.methods({
       var number_of_turns = pack.number_of_turns;
       var last_row_pack = last_row_data.tablets[i];
       var last_direction =  last_row_data.packs[last_row_pack - 1].direction;
-;
+
       var change_position = true;
       if ((direction != last_direction) || (current_row_number == 1))
         change_position = false;

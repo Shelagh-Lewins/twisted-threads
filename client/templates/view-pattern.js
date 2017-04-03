@@ -614,14 +614,17 @@ Template.view_pattern.events({
       return;
 
     var number_of_tablets = pattern.number_of_tablets;
-
+console.log("hole " + this.hole);
+    if (pattern.edit_mode == "simulation")
+    {
+      var old_style = current_threading_data[this.hole.toString() + "_" + this.tablet.toString()].get();
+      Meteor.my_functions.change_sim_thread_color(pattern_id, old_style, new_style);
+    }
+    
     Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
     Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
 
-    if (pattern.edit_mode == "simulation")
-      Meteor.my_functions.reset_simulation_weaving(pattern_id);
-
-    else
+    if (pattern.edit_mode != "simulation")
       Meteor.my_functions.store_pattern(pattern_id);
   },
   'click .tablets .row.orientation li': function(event, template)

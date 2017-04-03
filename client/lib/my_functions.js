@@ -2193,6 +2193,65 @@ Meteor.my_functions = {
     }
     return does_pattern_repeat;
   },
+  change_sim_thread_color: function(pattern_id, old_style, new_style) {
+    // update simulation pattern with different colour, no changes to rows, tablets or turning
+    console.log("old style " + old_style);
+    console.log("new style " + new_style);
+    // only color styles will change
+    // find the four old corresponding weaving chart styles
+    // map them to the four new styles
+    // replace old with new in weaving chart
+
+    // TODO track which thread is visible for each tablet in each row
+    // Only change styles for this tablet, and when this thread is visible
+    // may need to move all simulation weaving processing into client so it can be optimistic
+    var old_weaving_styles = Meteor.my_functions.map_weaving_styles(old_style);
+    var new_weaving_styles = Meteor.my_functions.map_weaving_styles(new_style);
+
+    var number_of_rows = current_row_indexes.length;
+    var number_of_tablets = current_tablet_indexes.length;
+    console.log("old styles " + JSON.stringify(old_weaving_styles));
+    console.log("new styles " + JSON.stringify(new_weaving_styles));
+
+    // Weaving chart
+    for (var i=0; i<number_of_rows; i++)
+    {
+      //console.log("i " + i);
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        //console.log("j " + j);
+        var cell_style = current_weaving_data[(i+1) + "_" + (j+1)].get();
+        
+        for (var k=0; k<4; k++)
+        {
+          console.log("current value " + cell_style);
+          console.log("old style " + old_weaving_styles[k]);
+          if (cell_style == old_weaving_styles[k])
+          {
+            //console.log("cell style " + cell_style);
+            current_weaving_data[(i+1) + "_" + (j+1)].set(new_weaving_styles[k]);
+            console.log("*** match ***");
+            console.log("row " + i);
+            console.log("tablet " + j);
+
+          }
+            
+        }
+      }
+    }
+    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets);
+  },
+  map_weaving_styles: function(style_value)
+  {
+    var weaving_styles = [];
+
+    for (var i=0; i<4; i++)
+    {
+      weaving_styles[i] = 7 + 4*(style_value - 1) + 1;
+    }
+
+    return weaving_styles;
+  },
   ///////////////////////////////////
   // Searching
   hide_search_results: function() {
