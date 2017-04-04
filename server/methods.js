@@ -952,6 +952,7 @@ Meteor.methods({
     var position_of_A = JSON.parse(pattern.position_of_A);
     var threading = JSON.parse(pattern.threading);
     var orientations = JSON.parse(pattern.orientation);
+    var manual_weaving_threads = pattern.manual_weaving_threads;
 
     var current_row_number = manual_weaving_turns.length;
     var last_row_number = current_row_number - 1;
@@ -996,6 +997,7 @@ Meteor.methods({
 
     weaving.pop(); // remove last row of weaving chart
     manual_weaving_turns.pop();
+    manual_weaving_threads.pop();
 
     // restore packs to previous state
     var last_row = manual_weaving_turns[manual_weaving_turns.length-1];
@@ -1004,7 +1006,8 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: weaving.length}});
-    Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(manual_weaving_turns)}});    
+    Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(manual_weaving_turns)}});
+    Patterns.update({_id: pattern_id}, {$set: {manual_weaving_threads: manual_weaving_threads}});  
   },
   weave_row: function(pattern_id, new_row_sequence) {
     check(pattern_id, String);
@@ -1072,7 +1075,6 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: weaving.length}});
     Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(manual_weaving_turns)}});
-
     Patterns.update({_id: pattern_id}, {$set: {manual_weaving_threads: manual_weaving_threads}});
   },
   build_weaving_chart_row: function(number_of_tablets, threading_row, orientations, tablet_directions, tablet_turns)
