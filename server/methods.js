@@ -335,7 +335,6 @@ Meteor.methods({
       // auto_turn_sequence e.g. FFFFBBBB
       if(typeof data.auto_turn_sequence === "undefined")
         data.auto_turn_sequence = ["F","F","F","F","B","B","B","B"]; // default to 4 forward, 4 back
-      //data.auto_turn_sequence = ["F","F","F","F","B","B","B","B","B","B","B","B","F","F","F","F"];
 
       Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: data.auto_turn_sequence}});
 
@@ -504,7 +503,7 @@ Meteor.methods({
 
     // Save the individual cell data
     var pattern = Patterns.findOne({_id: pattern_id}); // TODO remove
-;
+
     Patterns.update({_id: pattern_id}, {$set: { weaving: text}});
 
     // Record the number of rows
@@ -859,6 +858,9 @@ Meteor.methods({
       var auto_turn_sequence = pattern.auto_turn_sequence;
       var number_of_rows = auto_turn_sequence.length;
 
+      // record which thread shows
+      var auto_turn_threads = new Array();
+
       // reset all tablets to start position
       var position_of_A = new Array();
       for (var i=0; i<number_of_tablets; i++)
@@ -872,6 +874,8 @@ Meteor.methods({
         var tablet_turns = []; // for each tablet, number of turns
         var direction = auto_turn_sequence[j]; // all tablets turn together
         var threading_row = []; // which thread shows in each tablet
+
+        auto_turn_threads[j] = new Array();
         
         for (var i=0; i<number_of_tablets; i++)
         {
@@ -892,6 +896,8 @@ Meteor.methods({
           threading_row.push(threading[thread_to_show][i]);
           tablet_directions.push(direction);
           tablet_turns.push(1); // always turn 1
+
+          auto_turn_threads[j][i] = thread_to_show;
         }
         
         var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions, tablet_turns);
@@ -901,11 +907,14 @@ Meteor.methods({
       Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
       Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_rows}});
       Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
+
+      Patterns.update({_id: pattern_id}, {$set: {auto_turn_threads: auto_turn_threads}});
     }
     else if (pattern.simulation_mode == "manual")
     {
       // no rows woven
       // reset all tablets to start position
+      
       var position_of_A = new Array();
       for (var i=0; i<pattern.number_of_tablets; i++)
       {
@@ -919,6 +928,9 @@ Meteor.methods({
       // remove manual_weaving_turns except first row which gives UI default
       var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
       Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify([manual_weaving_turns[0]])}});
+
+      // which thread shows
+      Patterns.update({_id: pattern_id}, {$set: {manual_weaving_threads: []}});
 
       for (var i=1; i<manual_weaving_turns.length; i++)
       {
@@ -1014,6 +1026,9 @@ Meteor.methods({
     var tablet_turns = []; // for each tablet, number of turns
     var threading_row = [];
 
+    var manual_weaving_threads = pattern.manual_weaving_threads;
+    var new_threads_row = [];
+
     // turn tablets
     for (var i=0; i<number_of_tablets; i++)
     {
@@ -1041,11 +1056,13 @@ Meteor.methods({
       tablet_directions.push(direction);
       tablet_turns.push(number_of_turns);
 
+      new_threads_row.push(thread_to_show);
     }
 
     var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions, tablet_turns);
 
     weaving.push(new_row);
+    manual_weaving_threads.push(new_threads_row);
 
     // save the new row turning sequence
     manual_weaving_turns.push(new_row_sequence);
@@ -1055,6 +1072,8 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: weaving.length}});
     Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(manual_weaving_turns)}});
+
+    Patterns.update({_id: pattern_id}, {$set: {manual_weaving_threads: manual_weaving_threads}});
   },
   build_weaving_chart_row: function(number_of_tablets, threading_row, orientations, tablet_directions, tablet_turns)
   {

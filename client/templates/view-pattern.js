@@ -608,19 +608,19 @@ Template.view_pattern.events({
 
     var new_style = Meteor.my_functions.get_selected_style();
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
 
     if (typeof pattern === "undefined")
       return;
 
     var number_of_tablets = pattern.number_of_tablets;
-console.log("hole " + this.hole);
+
     if (pattern.edit_mode == "simulation")
     {
       var old_style = current_threading_data[this.hole.toString() + "_" + this.tablet.toString()].get();
-      Meteor.my_functions.change_sim_thread_color(pattern_id, old_style, new_style);
+      Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, this.hole, old_style, new_style);
     }
-    
+
     Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
     Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
 

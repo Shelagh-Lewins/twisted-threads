@@ -1486,8 +1486,8 @@ Meteor.my_functions = {
   },
   save_threading_as_text: function(pattern_id, number_of_tablets)
   {
+    
     var threading_array = Meteor.my_functions.get_threading_as_text(number_of_tablets);
-
     Meteor.call('save_threading_as_text', pattern_id, JSON.stringify(threading_array));
   },
   save_weft_color_as_text: function(pattern_id, color)
@@ -2193,61 +2193,66 @@ Meteor.my_functions = {
     }
     return does_pattern_repeat;
   },
-  change_sim_thread_color: function(pattern_id, old_style, new_style) {
+  change_sim_thread_color: function(pattern_id, tablet, hole, old_style, new_style) {
     // update simulation pattern with different colour, no changes to rows, tablets or turning
-    console.log("old style " + old_style);
-    console.log("new style " + new_style);
     // only color styles will change
     // find the four old corresponding weaving chart styles
     // map them to the four new styles
     // replace old with new in weaving chart
+console.log("tablet " + tablet);
+console.log("hole " + hole);
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, auto_turn_threads: 1, manual_weaving_threads: 1}});
 
-    // TODO track which thread is visible for each tablet in each row
-    // Only change styles for this tablet, and when this thread is visible
-    // may need to move all simulation weaving processing into client so it can be optimistic
+    if (pattern.edit_mode != "simulation")
+          return;
+
     var old_weaving_styles = Meteor.my_functions.map_weaving_styles(old_style);
     var new_weaving_styles = Meteor.my_functions.map_weaving_styles(new_style);
 
     var number_of_rows = current_row_indexes.length;
     var number_of_tablets = current_tablet_indexes.length;
-    console.log("old styles " + JSON.stringify(old_weaving_styles));
-    console.log("new styles " + JSON.stringify(new_weaving_styles));
+
+    if (pattern.simulation_mode == "auto")
+      var threads = pattern.auto_turn_threads;
+    else
+      var threads = pattern.manual_weaving_threads;
 
     // Weaving chart
     for (var i=0; i<number_of_rows; i++)
     {
-      //console.log("i " + i);
-      for (var j=0; j<number_of_tablets; j++)
-      {
-        //console.log("j " + j);
-        var cell_style = current_weaving_data[(i+1) + "_" + (j+1)].get();
-        
+      var weaving_cell_index = (i+1) + "_" + tablet;
+      var cell_style = current_weaving_data[weaving_cell_index].get();
+      var thread_to_show = threads[i][tablet-1];
+
+      if (thread_to_show + 1 == hole)
+      {   
         for (var k=0; k<4; k++)
         {
-          console.log("current value " + cell_style);
-          console.log("old style " + old_weaving_styles[k]);
           if (cell_style == old_weaving_styles[k])
-          {
-            //console.log("cell style " + cell_style);
-            current_weaving_data[(i+1) + "_" + (j+1)].set(new_weaving_styles[k]);
-            console.log("*** match ***");
-            console.log("row " + i);
-            console.log("tablet " + j);
-
-          }
-            
+            current_weaving_data[weaving_cell_index].set(new_weaving_styles[k]);
         }
       }
+
+      Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets);
     }
-    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets);
   },
   map_weaving_styles: function(style_value)
   {
     var weaving_styles = [];
 
+    // special style for empty hole, hard-coded to last 4 styles
+    if (style_value == "S7")
+      var style_number = 7 + 4*7; // this is the 8th style (7-1)
+
+    else if (typeof style_value === "number")
+      var style_number = 7 + 4*(style_value - 1);
+
+    else // all threading chart styles have been included
+      return;
+
     for (var i=0; i<4; i++)
     {
-      weaving_styles[i] = 7 + 4*(style_value - 1) + 1;
+      weaving_styles[i] = style_number + i + 1;
     }
 
     return weaving_styles;
@@ -2387,6 +2392,17 @@ Meteor.my_functions = {
       style.special = false;
     }
     return style; // the style object
+  },
+  is_style_special: function(style_value)
+  {
+    if (typeof style_value === "undefined")
+      return false;
+
+    if (style_value.toString().charAt(0) == "S")
+      return true;
+
+    else
+      return false;
   },
   ////////////////////////////////////////////
   // work around frequent failure of Meteor to register clicks on Styles palette
