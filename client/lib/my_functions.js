@@ -1394,8 +1394,14 @@ Meteor.my_functions = {
 
       for (var j=0; j<number_of_tablets; j++)
       {
-        
-        //console.log("j " + j);
+        // TODO find why this code sometimes gives an error and fix it
+        var identifier = (i+1) + "_" + (j+1);
+        var value = current_weaving_data[identifier].get();
+        if (typeof value === "undefined")
+        {
+          console.log("get_weaving_as_text error");
+          console.log("identifier " + identifier);
+                  }
         weaving_array[i][j] = current_weaving_data[(i+1) + "_" + (j+1)].get();
       }
     }
@@ -1537,6 +1543,9 @@ Meteor.my_functions = {
     // delay to allow the last cell to be rendered
     // It doesn't seem to be worth drawing this when patterns load, it's no quicker. and the whole thing has to be redrawn if you start editing. But it can be used outside the pattern view.
     setTimeout( function(){
+      if (typeof $('.auto_preview .holder')[0] === "undefined") // user has switched to another screen? There is no auto preview in the doc
+          return;
+
       var data = $('.auto_preview .holder')[0].innerHTML;
       Meteor.call('save_preview_as_text', pattern_id, data);
     }, 1000);
@@ -1879,6 +1888,10 @@ Meteor.my_functions = {
     stored_patterns = [];
     Session.set('undo_stack_position', -1);
     Meteor.my_functions.store_pattern(pattern_id);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+    if (pattern.edit_mode === "simulation")
+      Meteor.my_functions.reset_simulation_weaving(pattern_id);
 
     //Meteor.my_functions.initialize_background_color_picker();
     //Meteor.my_functions.initialize_warp_color_picker();
