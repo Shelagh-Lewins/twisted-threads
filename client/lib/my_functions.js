@@ -2212,8 +2212,7 @@ Meteor.my_functions = {
     // find the four old corresponding weaving chart styles
     // map them to the four new styles
     // replace old with new in weaving chart
-//console.log("tablet " + tablet);
-//console.log("hole " + hole);
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, auto_turn_threads: 1, manual_weaving_threads: 1}});
 
     if (pattern.edit_mode != "simulation")

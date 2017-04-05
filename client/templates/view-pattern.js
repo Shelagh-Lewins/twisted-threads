@@ -675,6 +675,8 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.accept_click())
         return;
 
+    Session.set("loading", true);
+
     var pattern_id = Router.current().params._id;
     var simulation_mode = "auto";
 
