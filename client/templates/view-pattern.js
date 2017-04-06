@@ -126,6 +126,25 @@ Template.view_pattern.helpers({
     
     return packs;
   },
+  manual_pack_width: function() {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
+    if ($('#toolbar .packs_inner .row:first-child').length == 0)
+        return 600;
+      
+    var width = 0;
+
+    $('#toolbar .packs_inner .row:first-child').children(':not(:last-child)').each(function() {
+        width += $(this).outerWidth( true );
+        //console.log("new width " + width);
+    });
+
+    width += $($($('#toolbar .packs_inner .row:first-child :last-child')[0]).children()[0]).outerWidth(true) * pattern.number_of_tablets;
+
+    //var children = $('.packs .packs_inner').find();
+    //var width=900;
+    return width;
+  },
   weave_disabled: function() {
     // cannot add a row to manual simulation pattern
     if (current_manual_weaving_turns.length > 100)

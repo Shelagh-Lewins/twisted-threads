@@ -99,8 +99,9 @@ background: #fff; /* set desired hover color */
 }
 
 .view_pattern .hint.rows {
-  float: right;
+  float: left;
   line-height: 34px;
+  margin-left: 16px;
   margin-bottom: 0;
 }
 
@@ -258,7 +259,7 @@ body.weave button.styled_button:disabled {
 
 /* Simulation pattern */
 .simulation #toolbar {
-  max-width: 600px;
+  min-width: 600px;
   width: 100%;
 }
 
@@ -335,12 +336,15 @@ body.weave button.styled_button:disabled {
 
 /* manual pattern */
 .simulation #toolbar.manual .packs {
-  overflow: hidden;
+  overflow: auto;
   margin-bottom: 8px;
+  float: left;
+  width: 100%;
 }
 
 .simulation #toolbar.manual .packs .row {
   float: left;
+  clear: left;
   width: 100%;
   margin-top: 4px;
 }
@@ -376,9 +380,9 @@ body.weave button.styled_button:disabled {
 }
 
 .simulation #toolbar.manual ul.tablets {
-  float: left;
+  float: none;
   clear: none;
-  display: inline-block;
+  /*display: inline-block;*/
   margin: 0 4px 0 4px;
   padding: 0;
   

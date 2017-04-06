@@ -53,13 +53,14 @@ Template.auto_preview.onCreated(function() {
     var total_width = this.image_width();
     var max_width = this.max_image_width;
     var scaling = 1;
-
+/*
     if (total_width > max_width)
     {
       scaling = max_width / total_width;
       total_width = max_width;
-    }
-
+    }*/
+console.log("scaling " + scaling);
+return 1;
     return scaling;
   };
 
@@ -71,7 +72,8 @@ Template.auto_preview.onCreated(function() {
     if (typeof pattern === "undefined")
         return;
       
-    var total_height = this.image_height() * this.scaling() * Session.get("number_of_repeats");
+    //var total_height = this.image_height() * this.scaling() * Session.get("number_of_repeats");
+    var total_height = this.image_height() * Session.get("number_of_repeats");
 
     if (pattern.edit_mode == "simulation")
       if (pattern.simulation_mode == "auto")
@@ -171,7 +173,8 @@ Template.auto_preview.helpers({
   },
   repeat_border_offset: function()
   {
-    var total_height = Template.instance().image_height() * Template.instance().scaling();
+    var total_height = Template.instance().image_height();
+    //var total_height = Template.instance().image_height() * Template.instance().scaling();
 
     total_height -=  Template.instance().cell_height/2;
 
@@ -220,7 +223,8 @@ Template.auto_preview.helpers({
 
     var total_width = Template.instance().image_width();
 
-    var total_height = Template.instance().image_height() * Template.instance().scaling() * Session.get("number_of_repeats");
+    var total_height = Template.instance().image_height() * Session.get("number_of_repeats");
+    //var total_height = Template.instance().image_height() * Template.instance().scaling() * Session.get("number_of_repeats");
 
         if (pattern.edit_mode == "simulation")
           if (pattern.simulation_mode == "auto")
@@ -249,7 +253,8 @@ Template.auto_preview.helpers({
       return 0;
 
     else
-      return Math.min(Template.instance().image_width(), Template.instance().max_image_width);
+      //return Math.min(Template.instance().image_width(), Template.instance().max_image_width);
+    return Math.min(Template.instance().image_width());
   },
   total_height: function() {
     return Template.instance().image_height();

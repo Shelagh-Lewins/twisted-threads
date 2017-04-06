@@ -46,7 +46,7 @@
     </ul>
   </div>
 
-<div class="content {{simulation_mode}}">
+<div class="content {{simulation_mode}}" style="max-width: {{manual_pack_width}}px;">
   {{#if equals simulation_mode "auto"}}
     <span class="hint">
       Turn all tablets together, forward or backward, following the sequence shown below
@@ -69,9 +69,9 @@
       <span class="hint">Design your pattern row by row, turning each pack of tablets separately to create the <a href="#" onclick="Meteor.my_functions.start_weaving();">interactive weaving chart</a></span>
 
       <div class="packs">
-        <ul>
+        <div class="packs_inner" style="width: {{manual_pack_width}}px;">
           {{#each packs}}
-          <li class="row">
+          <span class="row">
             <span class="pack_number">
               pack {{this.pack_number}}
             </span>
@@ -89,9 +89,9 @@
               </li>
             {{/each}}
             </ul>
-          </li>
+          </span>
           {{/each}}
-        </ul>
+        </div>
       </div>
 
       <span class="hint">
@@ -106,7 +106,7 @@
         <button id="weave" class="styled_button" disabled="{{weave_disabled}}">Weave</button>
         <button id="unweave" class="styled_button" disabled="{{no_weaving_rows}}">Unweave</button>
       </div>
-      <span class="hint rows">Rows: {{number_of_rows}}</span>
+      <span class="hint rows">Current rows: {{number_of_rows}}</span>
       <div class="clearing"></div>
     {{/if}}
 

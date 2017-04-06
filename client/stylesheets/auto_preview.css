@@ -165,6 +165,7 @@ button.rotate_preview.visible {
 .auto_preview.show_tablets .tablet_numbers {
   display: block;
   width: 12px;
+  /*transform: scale(1, 0.75);*/
 }
 
 .auto_preview.left.show_tablets .tablet_numbers {
@@ -202,6 +203,7 @@ button.rotate_preview.visible {
 .auto_preview.show_tablets .tablet_positions {
   display: block;
   width: 12px;
+  /*transform: scale(1, 0.75);*/
 }
 
 .auto_preview.left.show_tablets .tablet_positions {
