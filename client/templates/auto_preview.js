@@ -359,19 +359,77 @@ Template.auto_preview_element.helpers({
     var previous_style = Meteor.my_functions.find_style(previous_style_value);
       
     if (style.name == "idle") // idle tablet, use previous row
-        style = Meteor.my_functions.find_style(previous_style_value);
-
-    if (row == 1) // idle tablet in first row, try showing next row
     {
-      if (typeof current_weaving_data[(row+1) + "_" + (tablet)] !== "undefined")
-      {
-        var next_style_value = current_weaving_data[(row+1) + "_" + (tablet)].get();
+      style = Meteor.my_functions.find_style(previous_style_value);
 
-        if (typeof next_style_value !== "undefined")
+      if (row == 1) // idle tablet in first row, try showing next row
+      {
+        //if (typeof current_weaving_data[(row+1) + "_" + (tablet)] !== "undefined")
+        //{
+          //var next_style_value = current_weaving_data[(row+1) + "_" + (tablet)].get();
+
+          //if (typeof next_style_value !== "undefined")
+          //{
+            //if (style.name == "idle") // idle tablet, use previous row
+
+        console.log("idle. row " + row + ", tablet " + tablet);
+
+        var show_empty = true;
+        var pattern_id = Router.current().params._id;
+        var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1, simulation_mode: 1, manual_weaving_threads: 1}});
+
+        if (typeof pattern !== "undefined")
         {
-          if (style.name == "idle") // idle tablet, use previous row
-            style = Meteor.my_functions.find_style(next_style_value);
+          if (pattern.edit_mode == "simulation")
+          {
+            if (pattern.simulation_mode == "manual")
+            {
+              // we should be able to find the previous thread from the weaving threads
+              if (Router.current().route.getName() == "pattern")
+              {
+                
+                //console.log("got here");
+                var thread_to_show = pattern.manual_weaving_threads[0][tablet-1];
+                //console.log("thread to show " + thread_to_show);
+                // show the thread in hole A, that is row 0 of threading chart
+                
+                var style_value = current_threading_data["1_" + tablet].get();
+                console.log("style_value " + style_value);
+                //var thread_style = Meteor.my_functions.find_style(thread_style_name);
+                //console.log("thread style " + thread_style);
+
+                //var weaving_chart_style = Meteor.my_functions.map_weaving_styles(thread_style);
+                var weaving_chart_style = 7 + 4*(style_value - 1);
+                var orientation = current_orientation[tablet-1].orientation;
+
+                if (orientation == "S")
+                  weaving_chart_style += 1;
+                else
+                  weaving_chart_style += 2;
+
+                // find tablet orientation
+                console.log("weaving_chart_style " + weaving_chart_style);
+
+                if (!Meteor.my_functions.is_style_special(weaving_chart_style))
+                {
+                  show_empty = false;
+                  
+                  style = Meteor.my_functions.find_style(weaving_chart_style);
+                  console.log("final style " + style);
+                }
+
+                // TODO check for empty hole
+              }
+              
+            }
+          }
         }
+
+        if (show_empty)
+        //style = Meteor.my_functions.find_style(next_style_value);
+            return data; // we don't know what the previous thread was just from the weaving chart, so leave it empty. Ideally for simulation patterns we would check the weaving threads, but they are not currently reactive.
+        //}
+        //}
       }
     }
 

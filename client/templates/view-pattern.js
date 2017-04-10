@@ -143,7 +143,7 @@ Template.view_pattern.helpers({
 
     //var children = $('.packs .packs_inner').find();
     //var width=900;
-    return width;
+    return Math.max(width, 600);
   },
   weave_disabled: function() {
     // cannot add a row to manual simulation pattern

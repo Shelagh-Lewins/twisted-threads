@@ -8,7 +8,7 @@ Meteor.startup(function () {
   });
 
   Accounts.emailTemplates.siteName = "Twisted Threads";
-  Accounts.emailTemplates.from = "Twisted Threads <no-reply@twisted-threads.com>";
+  Accounts.emailTemplates.from = "Twisted Threads <no-reply@twistedthreads.org>";
   Accounts.emailTemplates.verifyEmail.subject = function (user) {
       return "Verify your email address";
   };
