@@ -59,7 +59,7 @@ Template.auto_preview.onCreated(function() {
       scaling = max_width / total_width;
       total_width = max_width;
     }*/
-console.log("scaling " + scaling);
+//console.log("scaling " + scaling);
 return 1;
     return scaling;
   };
@@ -104,8 +104,6 @@ return 1;
 
   this.set_svg_style = function() {
     // svg style doesn't seem to be saved in the svg image that is stored with the pattern for the Home page, so set it now to correct for rotation
-    // There is a problem with this, TODO figure out why sometimes it doesn't put the correct style on the svg even though the element is found. I can't see it being set elsewhere?    
-
     var that = this;
 
     setTimeout(function() {
@@ -307,6 +305,13 @@ Template.auto_preview_weft.helpers({
 
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
+    // pattern info used for simulation pattern
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1, simulation_mode: 1, manual_weaving_threads: 1}});
+
+    if (typeof pattern === "undefined")
+        return;
+
     var cell = current_weaving_data[(row) + "_" + (tablet)];
 
     if (typeof cell === "undefined")
@@ -362,43 +367,23 @@ Template.auto_preview_element.helpers({
     {
       style = Meteor.my_functions.find_style(previous_style_value);
 
-      if (row == 1) // idle tablet in first row, try showing next row
+      if (row == 1) // idle tablet in first row
       {
-        //if (typeof current_weaving_data[(row+1) + "_" + (tablet)] !== "undefined")
-        //{
-          //var next_style_value = current_weaving_data[(row+1) + "_" + (tablet)].get();
+        var show_empty = true; // default is to leave the cell blank
 
-          //if (typeof next_style_value !== "undefined")
-          //{
-            //if (style.name == "idle") // idle tablet, use previous row
-
-        console.log("idle. row " + row + ", tablet " + tablet);
-
-        var show_empty = true;
-        var pattern_id = Router.current().params._id;
-        var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1, simulation_mode: 1, manual_weaving_threads: 1}});
-
-        if (typeof pattern !== "undefined")
-        {
-          if (pattern.edit_mode == "simulation")
-          {
-            if (pattern.simulation_mode == "manual")
+        if (pattern.edit_mode == "simulation")
+          if (pattern.simulation_mode == "manual")
+            // find the previous thread from the weaving threads
+            if (Router.current().route.getName() == "pattern")
             {
-              // we should be able to find the previous thread from the weaving threads
-              if (Router.current().route.getName() == "pattern")
+              // check it's not empty hole
+              if (!Meteor.my_functions.is_style_special(weaving_chart_style))
               {
-                
-                //console.log("got here");
-                var thread_to_show = pattern.manual_weaving_threads[0][tablet-1];
-                //console.log("thread to show " + thread_to_show);
-                // show the thread in hole A, that is row 0 of threading chart
-                
-                var style_value = current_threading_data["1_" + tablet].get();
-                console.log("style_value " + style_value);
-                //var thread_style = Meteor.my_functions.find_style(thread_style_name);
-                //console.log("thread style " + thread_style);
+                show_empty = false;
 
-                //var weaving_chart_style = Meteor.my_functions.map_weaving_styles(thread_style);
+                // show the thread in hole D, that is row 4 of threading chart   
+                var style_value = current_threading_data["4_" + tablet].get();
+
                 var weaving_chart_style = 7 + 4*(style_value - 1);
                 var orientation = current_orientation[tablet-1].orientation;
 
@@ -406,30 +391,13 @@ Template.auto_preview_element.helpers({
                   weaving_chart_style += 1;
                 else
                   weaving_chart_style += 2;
-
-                // find tablet orientation
-                console.log("weaving_chart_style " + weaving_chart_style);
-
-                if (!Meteor.my_functions.is_style_special(weaving_chart_style))
-                {
-                  show_empty = false;
-                  
-                  style = Meteor.my_functions.find_style(weaving_chart_style);
-                  console.log("final style " + style);
-                }
-
-                // TODO check for empty hole
+                
+                style = Meteor.my_functions.find_style(weaving_chart_style);
               }
-              
             }
-          }
-        }
 
         if (show_empty)
-        //style = Meteor.my_functions.find_style(next_style_value);
-            return data; // we don't know what the previous thread was just from the weaving chart, so leave it empty. Ideally for simulation patterns we would check the weaving threads, but they are not currently reactive.
-        //}
-        //}
+            return data; // we don't know what the previous thread was just from the weaving chart, so leave it empty.
       }
     }
 
@@ -446,6 +414,33 @@ Template.auto_preview_element.helpers({
     // shape
     if (style.special)
     {
+      //console.log("edit_mode " + pattern.edit_mode);
+      if (pattern.edit_mode == "simulation")
+      {
+        //console.log("simulation_mode " + pattern.simulation_mode);
+        if (pattern.simulation_mode == "manual") // auto patterns only ever have 1 turn
+        {
+          if (typeof pattern.manual_weaving_threads[row-1] !== "undefined") // in case rebuilding array
+          {
+            //console.log("here " + pattern.manual_weaving_threads.length);
+            var thread_colors = [];
+            for (var i=0; i<4; i++)
+            {
+              thread_colors[i] = current_threading_data[(i+1) + "_" + tablet].get();
+            }
+            //console.log("row " + row);
+            //console.log("tablet " + tablet);
+            //console.log("there " + typeof pattern.manual_weaving_threads[row-1]);
+            var thread_to_show = pattern.manual_weaving_threads[row-1][tablet-1];
+            //console.log("thread_colors " + thread_colors);
+            //console.log("thread to show " + thread_to_show);
+
+            // TODO
+            // set data.color to line color of style in hole
+          }
+        }
+      }
+
       switch (style.name)
       {
         case "forward_2":

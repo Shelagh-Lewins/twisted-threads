@@ -103,8 +103,8 @@
       </span>
 
       <div class="weave_buttons">
-        <button id="weave" class="styled_button" disabled="{{weave_disabled}}">Weave</button>
         <button id="unweave" class="styled_button" disabled="{{no_weaving_rows}}">Unweave</button>
+        <button id="weave" class="styled_button" disabled="{{weave_disabled}}">Weave</button>
       </div>
       <span class="hint rows">Current rows: {{number_of_rows}}</span>
       <div class="clearing"></div>
@@ -222,10 +222,10 @@
 
   {{/unless}}
 
-  <h2>Tablets</h2>
+  <h2>Threading chart</h2>
   {{#if can_edit_pattern _id}}
   <div class="hint">
-    To edit the chart, select thread colours from the palette at the bottom of the screen, then click chart cells.<br />
+    To edit the threading chart, select thread colours from the palette at the bottom of the screen, then click chart cells. Use X for an unthreaded hole.<br />
   </div>
   {{/if}}
 

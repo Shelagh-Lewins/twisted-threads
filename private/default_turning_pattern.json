@@ -3,7 +3,7 @@
   "name": "New pattern",
   "description": "A pattern woven by forward and backward turning of the tablets.",
   "weaving_notes": "Weaving chart key:\nWhite background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread",
-  "threading_notes": "Cell colour = thread colour for that hole\nX = empty hole",
+  "threading_notes": "",
   "tags": [],
     "styles": [
     {

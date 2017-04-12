@@ -1548,7 +1548,7 @@ Meteor.my_functions = {
 
       var data = $('.auto_preview .holder')[0].innerHTML;
       Meteor.call('save_preview_as_text', pattern_id, data);
-    }, 1000);
+    }, 2000);
     
   },
   ///////////////////////////////

@@ -69,8 +69,6 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   var data = {};
   var style_ref;
 
-
-
   if (type == "styles")
   {
     style_ref = this.style;
@@ -94,6 +92,22 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
     data.tablet = tablet;
     data.hole = row;
     style_ref = cell.get();
+
+    // for simulation patterns, map styles to show thread direction
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
+
+    if (typeof pattern === "undefined")
+        return;
+
+    if (pattern.edit_mode == "simulation")
+    {
+      var mapped_styles = Meteor.my_functions.map_weaving_styles(style_ref);
+      if (current_orientation[this.tablet-1].orientation == "S")
+        style_ref = mapped_styles[0];
+      else
+        style_ref = mapped_styles[1];
+    }
   }
   else // weaving cell
   {

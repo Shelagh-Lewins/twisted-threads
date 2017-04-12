@@ -421,6 +421,11 @@ body.weave button.styled_button:disabled {
   float: left;
 }
 
+.simulation #toolbar.manual #weave {
+  background-color: #458027;
+  border-color: #458027;
+}
+
 /* *** Styles *** */
 #styles_palette {
   position: absolute;
