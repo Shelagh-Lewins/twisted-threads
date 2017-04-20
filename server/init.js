@@ -2,6 +2,8 @@ Meteor.startup(function () {
 
   process.env.MAIL_URL = 'smtp://postmaster%40sandbox6680005cdc0a4cc4b9550bf1026d7205.mailgun.org:43127wtf@smtp.mailgun.org:587';
 
+  process.env.ROOT_URL = 'http://twistedthreads.org';
+
   // Accounts
   Accounts.config({
     sendVerificationEmail: true 
