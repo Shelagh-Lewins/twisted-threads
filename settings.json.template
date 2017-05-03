@@ -1,7 +1,0 @@
-{
-  "private": {
-    "AWSAccessKeyId" : "<AWS KEY>",
-    "AWSSecretAccessKey" : "<AWS SECRET>",
-    "AWSBucket" : "<AWS BUCKET>"
-  }
-}

@@ -9,10 +9,12 @@
 </div>
 {{/with}}
 {{#with my_patterns}}{{#if this.count}}
+
+{{#if currentUser}}
+  {{> create_new_pattern}}
+{{/if}}
+
 <h2>My patterns</h2>
-
-
-
 {{> filter_on_tablets}}
 <div class="results">
 <ul class="patterns">
