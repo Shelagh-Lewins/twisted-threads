@@ -17,6 +17,11 @@
   margin: 0 0 16px 0;
 }
 
+.home .introduction .notice {
+  font-size: 14px;
+  color: #666666;
+}
+
 .home .warning {
   width: 600px;
   margin: 0 0 16px 0;
@@ -97,6 +102,10 @@
 
 #new_pattern input[type="submit"] {
   text-align: center;
+}
+
+#new_pattern .instruction {
+  padding: 16px;
 }
 
 /* *** Category header *** */

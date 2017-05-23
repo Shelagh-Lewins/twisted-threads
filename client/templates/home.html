@@ -28,17 +28,16 @@
 
 <template name="home_patterns">
   <div class="introduction">
-  <p><strong>Welcome to Twisted Threads, the online app for tablet weaving.<br>You can use this site to design, weave and share patterns.</strong></p>
+  <p><strong>Welcome to Twisted Threads, the online app for tablet weaving.<br>You can use this site to design, weave and share patterns.</strong><br /></p>
+  <p class="notice">The copyright of any pattern designed using Twisted Threads rests with the designer of the pattern, not with the creator or owner of the software.</p>
   <p>Choose a pattern to see the threading and weaving charts. Then choose "Interactive weaving chart" to step through the rows one by one as you weave.</p>
   <p>Tablet weaving is an ancient craft known around the world by different names including card weaving, brettchen weberei, brikvævning and tissage &agrave; carton.</p>
   {{> donate_paypal}}
   <p>Join our <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss Twisted Threads with other users, request new features or share feedback with the app developer. <a href="{{pathFor route='about'}}" >More information</a></p>
 </div>
-  {{#if currentUser}}
-  {{> create_new_pattern}}
-  {{else}}
-  <p>Sign in to create and share patterns.</p>
-  {{/if}}
+
+{{> create_new_pattern}}
+
 
 {{#with recent_patterns true}}{{#if this.length}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
@@ -97,8 +96,10 @@
 </template>
 
 <template name="create_new_pattern">
-{{#if can_create_pattern}}
 <div id="new_pattern">
+{{#if currentUser}}
+{{#if can_create_pattern}}
+
   <h2>Create a new pattern</h2>
   <form action="">
     <label for="pattern_name">Name:</label>
@@ -125,14 +126,18 @@
       <input value="freehand" type="submit">
     </div>
   </form> 
-</div>
+
 {{else}}
   {{#if isInRole 'verified' 'users'}}
-    You have created the maximum allowed number of patterns.  
+    <p class="instruction">You have created the maximum allowed number of patterns.</p>
   {{else}}
-    In order to create more patterns, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a>
+    <p class="instruction">In order to create more patterns, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a></p>
   {{/if}}
 {{/if}}
+{{else}}
+  <p class="instruction"><span class="additional_login">{{> loginButtons}}</span> to create and share patterns.</p>
+{{/if}}
+</div>
 </template>
 
 <template name="pattern_thumbnail"><li class="pattern_thumbnail {{#if private}}private{{/if}}" style="width: {{width}}; margin-right: {{rmargin}}" >

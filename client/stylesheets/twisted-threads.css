@@ -321,6 +321,11 @@ body {
   float: right;
 }
 
+/* Ensure the login dialog is only shown once, even if there are multiple login links on a page */
+.additional_login #login-dropdown-list {
+  display: none !important;
+}
+
 #header .accounts-dialog .additional-link {
   font-size: 90%;
   padding: 8px 0 8px 0;
