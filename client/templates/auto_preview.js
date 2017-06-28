@@ -50,8 +50,9 @@ Template.auto_preview.onCreated(function() {
   };
 
   this.scaling = function(){
-    var total_width = this.image_width();
-    var max_width = this.max_image_width;
+    // preview now scrolls instead of scaling, but the code is here in case this changes
+    //var total_width = this.image_width();
+    //var max_width = this.max_image_width;
     var scaling = 1;
 /*
     if (total_width > max_width)
@@ -60,7 +61,7 @@ Template.auto_preview.onCreated(function() {
       total_width = max_width;
     }*/
 //console.log("scaling " + scaling);
-return 1;
+
     return scaling;
   };
 

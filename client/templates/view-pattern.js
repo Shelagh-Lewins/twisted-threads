@@ -9,6 +9,7 @@ Template.view_pattern.rendered = function() {
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
   Session.set('auto_input_latch', false);
+
   Meteor.my_functions.set_repeats(pattern_id);
 
   if (Router.current().params.mode)
@@ -18,15 +19,8 @@ Template.view_pattern.rendered = function() {
     Session.set('view_pattern_mode', "charts");
 
   // is this a new pattern and needs the preview to be generated?
-  if (typeof $('.auto_preview path')[0] === "undefined") // TODO only do this if simulation pattern
-    //Meteor.my_functions.reset_simulation_weaving(pattern_id);
+  if (typeof $('.auto_preview path')[0] === "undefined")
     Session.set('edited_pattern', true);
-
-  var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
-
-  if (typeof pattern !== "undefined")
-    if (pattern.edit_mode == "simulation")
-      Meteor.my_functions.reset_simulation_weaving(pattern_id);
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -42,6 +36,9 @@ Template.view_pattern.rendered = function() {
 
 Template.view_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
+
+  Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id)); // quicker than checking db
+
   Meteor.my_functions.view_pattern_created(pattern_id);
 
   /////////
@@ -391,7 +388,6 @@ Template.styles_palette.helpers({
         return "selected";
   },
   special_styles: function(){
-
     var special_styles_array = [];
     for (var i=0; i<current_special_styles.length; i++)
     {

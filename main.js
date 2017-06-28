@@ -55,7 +55,7 @@ if (Meteor.isClient) {
   /* *** Helper functions that may be used by more than one template *** */
   // Allows a template to check whether a helper value equals a string
   UI.registerHelper('equals', function (a, b) {
-    return a === b;
+    return (a === b);
   });
 
   UI.registerHelper('multiply', function (a, b) {
@@ -505,9 +505,10 @@ if (Meteor.isClient) {
 
 
   UI.registerHelper('can_edit_pattern', function(pattern_id) {
-    if ((typeof pattern_id === "undefined") && (Router.current().route.getName() == "pattern"))
-      var pattern_id = Router.current().params._id;
-
+    // Session var is quicker in pattern view
+    if (Router.current().route.getName() == "pattern")
+      return (Session.get("can_edit_pattern"));
+ 
     return Meteor.my_functions.can_edit_pattern(pattern_id);
   });
 

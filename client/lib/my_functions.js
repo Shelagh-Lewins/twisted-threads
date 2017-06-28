@@ -941,7 +941,7 @@ Meteor.my_functions = {
     if (!Meteor.userId())
         return false;
 
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1}});
 
     if (typeof pattern === "undefined")
         return false;
@@ -1010,31 +1010,35 @@ Meteor.my_functions = {
 
     // Client-side weaving data is an object which references a ReactiveVar for each cell data point
     var weaving_data = JSON.parse(pattern.weaving);
-    current_weaving_data = {};
+    var temp = {};
 
     for (var i=0; i<number_of_rows; i++)
     {
       for (var j=0; j<number_of_tablets; j++)
       {
-        current_weaving_data[(i + 1) + "_" + (j + 1)] = new ReactiveVar(weaving_data[i][j]);
+        temp[(i + 1) + "_" + (j + 1)] = new ReactiveVar(weaving_data[i][j]);
       }
     }
+
+    current_weaving_data = temp;
 
     // client-side weft color is a ReactiveVar
     var color = (typeof pattern.weft_color !== "undefined") ? pattern.weft_color : "#76a5af"; // older version pattern does not have weft_color
     weft_color = new ReactiveVar(color);
 
     // Client-side threading data is an object which references a ReactiveVar for each cell data point
-    current_threading_data = {}; // new object format
+    var temp = {};
 
     var threading_data = JSON.parse(pattern.threading);
     for (var i=0; i<4; i++)
     {
       for (var j=0; j<number_of_tablets; j++)
       {
-        current_threading_data[(i + 1) + "_" + (j + 1)] = new ReactiveVar(threading_data[i][j]);
+        temp[(i + 1) + "_" + (j + 1)] = new ReactiveVar(threading_data[i][j]);
       }
     }
+
+    current_threading_data = temp;
 
     //////////////////////////////
     // build the orientation data
@@ -1890,11 +1894,9 @@ Meteor.my_functions = {
     Meteor.my_functions.store_pattern(pattern_id);
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+    console.log("edit mode " + pattern.edit_mode);
     if (pattern.edit_mode === "simulation")
       Meteor.my_functions.reset_simulation_weaving(pattern_id);
-
-    //Meteor.my_functions.initialize_background_color_picker();
-    //Meteor.my_functions.initialize_warp_color_picker();
   },
   view_pattern_render: function(pattern_id) {
     Session.set('edit_style', false);
@@ -2128,7 +2130,9 @@ Meteor.my_functions = {
     });
   },
   reset_simulation_weaving: function(pattern_id, simulation_mode) {
+    console.log("reset simulation weaving");
     Meteor.call("reset_simulation_weaving", pattern_id, function() {
+      console.log("callback");
       var pattern = Patterns.findOne({_id: pattern_id});
       Session.set("number_of_rows", pattern.number_of_rows);
       Meteor.my_functions.set_repeats(pattern_id);
