@@ -33,18 +33,20 @@ Template.all_patterns.rendered = function() {
 }
 
 Template.create_new_pattern.events({
-  "click div.edit_mode": function(event) {
+  /*"click div.edit_mode": function(event) {
     Session.set('edit_mode', event.currentTarget.getAttribute("name"))
-  },
+  },*/
   "click input[type=submit]": function(event){""
     event.preventDefault();
-    var edit_mode = event.currentTarget.value;
+    console.log(event.currentTarget.value);
+    console.log(event.currentTarget.name);
+    var edit_mode = event.currentTarget.name;
     var number_of_rows = "0";
     if(edit_mode != "simulation")
       number_of_rows = $('#num_rows').val();
 
     var params = {
-      edit_mode: event.currentTarget.value, // two submit buttons, simulation and freehand
+      edit_mode: edit_mode, // two submit buttons, simulation and freehand
       number_of_tablets: $('#num_tablets').val(),
       number_of_rows: number_of_rows, // only actually used by freehand patterns
       name: $('#pattern_name').val()

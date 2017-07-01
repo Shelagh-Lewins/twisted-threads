@@ -813,14 +813,14 @@ Template.view_pattern.events({
         return;
 
     var pattern_id = Router.current().params._id;
-    Meteor.my_functions.weave_row(pattern_id);
+    Meteor.my_functions.weave_button(pattern_id);
   },
   'click #unweave': function () {
     if (!Meteor.my_functions.accept_click())
         return;
 
     var pattern_id = Router.current().params._id;
-    Meteor.my_functions.unweave_row(pattern_id);
+    Meteor.my_functions.unweave_button(pattern_id);
   },
   'click #add_tablet': function () {
     // add tablet at indicated position, e.g. position 1 = new tablet is #1
