@@ -481,7 +481,7 @@ Meteor.methods({
   },
   ///////////////////////////////
   // Stringify pattern data and save it
-  save_weaving_as_text: function(pattern_id, text, number_of_rows, number_of_tablets)
+  save_weaving_to_db: function(pattern_id, text, number_of_rows, number_of_tablets)
   {
     check(pattern_id, String);
     check(text, String);
@@ -562,7 +562,7 @@ Meteor.methods({
         Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
     }
   },
-  save_threading_as_text: function(pattern_id, text)
+  save_threading_to_db: function(pattern_id, text)
   {
     check(pattern_id, String);
     check(text, String);
@@ -579,7 +579,7 @@ Meteor.methods({
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);
   },
-  save_weft_color_as_text: function(pattern_id, text)
+  save_weft_color_to_db: function(pattern_id, text)
   {
     check(pattern_id, String);
     check(text, String);
@@ -596,7 +596,7 @@ Meteor.methods({
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);
   },
-  save_orientation_as_text: function(pattern_id, text)
+  save_orientation_to_db: function(pattern_id, text)
   {
     check(pattern_id, String);
     check(text, String);
@@ -613,7 +613,7 @@ Meteor.methods({
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);
   },
-  save_styles_as_text: function(pattern_id, text)
+  save_styles_to_db: function(pattern_id, text)
   {
     check(pattern_id, String);
     check(text, String);
@@ -654,10 +654,10 @@ Meteor.methods({
         throw new Meteor.Error("not-authorized", "You can only restore a pattern you created");
 
     // reconstruct the pattern according to the data, e.g. for undo
-    Meteor.call('save_weaving_as_text', data._id, JSON.stringify(data.weaving), data.number_of_rows, data.number_of_tablets);
-    Meteor.call('save_threading_as_text', data._id, JSON.stringify(data.threading));
-    Meteor.call('save_orientation_as_text', data._id, JSON.stringify(data.orientation));
-    Meteor.call('save_styles_as_text', data._id, JSON.stringify(data.styles));
+    Meteor.call('save_weaving_to_db', data._id, JSON.stringify(data.weaving), data.number_of_rows, data.number_of_tablets);
+    Meteor.call('save_threading_to_db', data._id, JSON.stringify(data.threading));
+    Meteor.call('save_orientation_to_db', data._id, JSON.stringify(data.orientation));
+    Meteor.call('save_styles_to_db', data._id, JSON.stringify(data.styles));
     Patterns.update({_id: data._id}, {$unset: {auto_preview: ""}}); // preview must be re-read from the HTML after it has been built
     return;
   },
@@ -666,7 +666,7 @@ Meteor.methods({
   {
     check(data, Object);
 
-    Meteor.call('save_weaving_as_text', data._id, JSON.stringify(data.weaving), data.number_of_rows, data.number_of_tablets);
+    Meteor.call('save_weaving_to_db', data._id, JSON.stringify(data.weaving), data.number_of_rows, data.number_of_tablets);
 
     var pattern = Patterns.findOne({_id: data._id}, {fields: {created_by: 1 }});
 
@@ -769,76 +769,8 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {number_of_rows: 0}});
 
   },
-  /*build_auto_weaving: function(pattern_id)
-  {
-    check(pattern_id, String);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId())
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only build simulation weaving for a pattern you created");
-
-    var weaving = new Array();
-    var threading = JSON.parse(pattern.threading);
-    var orientations = JSON.parse(pattern.orientation);
-    var number_of_tablets = pattern.number_of_tablets;
-    var auto_turn_sequence = pattern.auto_turn_sequence;
-    var number_of_turns = auto_turn_sequence.length;
-
-    // reset all tablets to start position
-    var position_of_A = new Array();
-    for (var i=0; i<number_of_tablets; i++)
-    {
-      position_of_A.push(0);
-    }
-
-    for (var j=0; j<number_of_turns; j++)
-    {
-      var tablet_directions = []; // for each tablet, which direction it turns
-
-      // turn tablets
-      for (var i=0; i<number_of_tablets; i++)
-      {
-        // TODO turn tablets individually
-
-        // if change of direction, no net turn
-        var direction = auto_turn_sequence[j];
-        var last_direction = auto_turn_sequence[j-1];
-
-        if (direction == last_direction)
-        {
-          if (auto_turn_sequence[j] == "F")
-            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], 1, 4);
-
-          else
-            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1, 4);
-        }
-      }
-
-      // find which thread shows in each tablet
-      var threading_row = [];
-
-      for (var i=0; i<number_of_tablets; i++)
-      {
-        // position of A = position_of_A[i] (row)
-        // tablet = i (column)
-        // thread style = threading[position_of_A[i]][i]
-        threading_row.push(threading[position_of_A[i]][i]);
-        tablet_directions.push(direction);
-      }
-      
-      var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions);
-      weaving.push(new_row);
-    }
-
-    Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
-    Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_turns}});
-    Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
-  },*/
   //////////////////////////////////
   // Manual simulation
-  // NEW
   update_auto_weaving: function(pattern_id, data)
   {
     check(data, Object);
@@ -858,146 +790,27 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(data.manual_weaving_turns)}});
     Patterns.update({_id: pattern_id}, {$set: {manual_weaving_threads: data.manual_weaving_threads}});
   },
-// OLD
-  /////////////////////
-  /*reset_simulation_weaving: function(pattern_id)
-  {
-    // rebuild the weaving chart from the simulation instructions
-    check(pattern_id, String);
-
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.created_by != Meteor.userId())
-      // Only the owner can edit a pattern
-      throw new Meteor.Error("not-authorized", "You can only build simulation weaving for a pattern you created");
-
-    if (pattern.simulation_mode == "auto")
-    {
-      var weaving = new Array();
-      var threading = JSON.parse(pattern.threading);
-      var orientations = JSON.parse(pattern.orientation);
-      var number_of_tablets = pattern.number_of_tablets;
-      var auto_turn_sequence = pattern.auto_turn_sequence;
-      var number_of_rows = auto_turn_sequence.length;
-
-      // record which thread shows
-      var auto_turn_threads = new Array();
-
-      // reset all tablets to start position
-      var position_of_A = new Array();
-      for (var i=0; i<number_of_tablets; i++)
-      {
-        position_of_A.push(0);
-      }
-
-      for (var j=0; j<number_of_rows; j++)
-      {
-        var tablet_directions = []; // for each tablet, which direction it turns
-        var tablet_turns = []; // for each tablet, number of turns
-        var direction = auto_turn_sequence[j]; // all tablets turn together
-        var threading_row = []; // which thread shows in each tablet
-
-        auto_turn_threads[j] = new Array();
-        
-        for (var i=0; i<number_of_tablets; i++)
-        {
-          // turn tablet
-          if (direction == "F")
-            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], 1, 4);
-
-          else
-            position_of_A[i] = Meteor.call("modular_add", position_of_A[i], -1, 4);
-
-          // which thread shows depends on direction of turn
-          if (direction == "F") // show thread currently in position D
-            var thread_to_show = Meteor.call("modular_add", position_of_A[i], -1, 4);
-          else // B: show thread in position A
-            var thread_to_show = position_of_A[i];
-
-          // threading[thread_to_show] = row of threading chart
-          threading_row.push(threading[thread_to_show][i]);
-          tablet_directions.push(direction);
-          tablet_turns.push(1); // always turn 1
-
-          auto_turn_threads[j][i] = thread_to_show;
-        }
-        
-        var new_row = Meteor.call("build_weaving_chart_row", number_of_tablets, threading_row, orientations, tablet_directions, tablet_turns);
-        weaving.push(new_row);
-      }
-
-      Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify(weaving)}});
-      Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_rows}});
-      Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
-
-      Patterns.update({_id: pattern_id}, {$set: {auto_turn_threads: auto_turn_threads}});
-    }
-    else if (pattern.simulation_mode == "manual")
-    {
-      // no rows woven
-      // reset all tablets to start position
-      
-      var position_of_A = new Array();
-      for (var i=0; i<pattern.number_of_tablets; i++)
-      {
-        position_of_A.push(0);
-      }
-
-      Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(position_of_A)}});
-      Patterns.update({_id: pattern_id}, {$set: {weaving: JSON.stringify([])}});
-      Patterns.update({_id: pattern_id}, {$set: {number_of_rows: 0}});
-
-      // remove manual_weaving_turns except first row which gives UI default
-      var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
-      Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify([manual_weaving_turns[0]])}});
-
-      // which thread shows
-      Patterns.update({_id: pattern_id}, {$set: {manual_weaving_threads: []}});
-
-      for (var i=1; i<manual_weaving_turns.length; i++)
-      {
-        Meteor.call("weave_row", pattern_id, manual_weaving_turns[i]);
-      }
-    }
-  },*/
+  /////////////////////////////
   // auto simulation pattern UI
-  set_auto_number_of_turns: function(pattern_id, new_number)
+  set_auto_number_of_turns: function(pattern_id, auto_turn_sequence)
   {
     check(pattern_id, String);
-    check(new_number, Number);
+    check(auto_turn_sequence, [String]);
 
-    if ((new_number < 1) || (new_number > Meteor.my_params.max_auto_turns))
-      return;
+    var num_auto_turns = auto_turn_sequence.length
+
+    if ((num_auto_turns < 1) || (num_auto_turns > Meteor.my_params.max_auto_turns))
+      throw new Meteor.Error("not-valid", "Number of turns exceeds the allowed maximum");
+
+    if (num_auto_turns < 1)
+        throw new Meteor.Error("not-valid", "You cannot have 0 turns in the sequence");
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, auto_turn_sequence: 1}});
 
     if (pattern.created_by != Meteor.userId())
-      // Only the owner can edit a pattern
       throw new Meteor.Error("not-authorized", "You can only update number of turns for a pattern you created");
 
-      if (new_number < 1)
-        throw new Meteor.Error("not-valid", "You cannot have no turns in the sequence");
-
-    var auto_turn_sequence = pattern.auto_turn_sequence;
-
-    if (auto_turn_sequence.length != new_number)
-    {
-      var difference = auto_turn_sequence.length - new_number;
-
-      if (difference < 0)
-      {
-        for (var i=0; i<(-1 * difference); i++)
-        {
-          auto_turn_sequence.push("F")
-        }
-      }
-      else
-      {
-        auto_turn_sequence.splice(auto_turn_sequence.length - difference, difference);
-      }
-
       Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: auto_turn_sequence}});
-    }
   },
   toggle_turn_direction: function(pattern_id, turn_number) {
     // toggle direction of a turn of auto turning, for simulation pattern

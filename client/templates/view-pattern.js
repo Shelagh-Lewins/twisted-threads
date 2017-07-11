@@ -8,7 +8,7 @@ Template.view_pattern.rendered = function() {
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
-  Session.set('auto_input_latch', false);
+  //Session.set('auto_input_latch', false);
 
   Meteor.my_functions.set_repeats(pattern_id);
 
@@ -21,6 +21,10 @@ Template.view_pattern.rendered = function() {
   // is this a new pattern and needs the preview to be generated?
   if (typeof $('.auto_preview path')[0] === "undefined")
     Session.set('edited_pattern', true);
+
+/*var pattern_id = Router.current().params._id;
+var pattern = Patterns.findOne({_id: pattern_id});
+  console.log("rendered " + JSON.parse(pattern.position_of_A));*/
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -615,7 +619,7 @@ Template.view_pattern.events({
       return;
 
     Meteor.my_functions.set_preview_cell_style(this.row, this.tablet, new_style);
-    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets);
+    Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
   },
   'click .tablets li.cell': function(event, template) {
     if (!Meteor.my_functions.accept_click())
@@ -637,7 +641,7 @@ Template.view_pattern.events({
     }
 
     Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
-    Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
+    Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets);
 
     if (pattern.edit_mode != "simulation")
       Meteor.my_functions.store_pattern(pattern_id);
@@ -663,7 +667,7 @@ Template.view_pattern.events({
     obj.orientation = new_orientation;
     current_orientation.splice(this.tablet-1, 1, obj);
 
-    Meteor.my_functions.save_orientation_as_text(pattern_id);
+    Meteor.my_functions.save_orientation_to_db(pattern_id);
 
     if (pattern.edit_mode == "simulation")
       Meteor.my_functions.reset_simulation_weaving(pattern_id);
@@ -704,7 +708,7 @@ Template.view_pattern.events({
   'input .auto #num_auto_turns': function(event)
   {
     // change number of turns in auto_turn_sequence for simulation pattern
-    // event fires on keyup, which causes a double update if you type a 2-digit number and resets all turns to "F"
+    // timeout because event fires on keyup and otherwise causes a double update if you type a 2-digit number and resets all turns to "F"
     if (!Meteor.my_functions.accept_click())
         return;
 
@@ -718,17 +722,40 @@ Template.view_pattern.events({
 
     if (event.currentTarget.value < 1)
       event.currentTarget.value = 1;
-
-    if (Session.get('auto_input_latch'))
-      Session.set('auto_input_latch', true);
-
+   
     auto_input_timeout = setTimeout(function() {
-      Meteor.call("set_auto_number_of_turns", pattern_id, parseInt(event.currentTarget.value), function(){
-        Session.set('auto_input_latch', false);
-        Meteor.my_functions.set_repeats(pattern_id);
-        Meteor.my_functions.reset_simulation_weaving(pattern_id);
-      });
-    }, 200);    
+
+      var num_auto_turns = parseInt(event.currentTarget.value);
+      var old_num_turns = current_auto_turn_sequence.length;
+
+      if (old_num_turns != num_auto_turns)
+      {
+        var difference = old_num_turns - num_auto_turns;
+
+        if (difference < 0)
+        {
+          for (var i=0; i<(-1 * difference); i++)
+          {
+            var new_turn = {
+              direction: "F",
+              turn: i+1
+            }
+            current_auto_turn_sequence.push(new_turn);
+          }
+        }
+        else
+        {
+          current_auto_turn_sequence.splice(current_auto_turn_sequence.length - difference, difference);
+        }
+
+        var auto_turn_sequence = Meteor.my_functions.get_auto_turn_sequence_as_array();
+
+        Meteor.call("set_auto_number_of_turns", pattern_id, auto_turn_sequence, function(){       
+          Meteor.my_functions.reset_simulation_weaving(pattern_id);
+          Meteor.my_functions.set_repeats(pattern_id);
+        });
+      }
+    }, 300);  
   },
   'click .auto .direction': function()
   {
@@ -741,8 +768,16 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
 
+    var current_direction = current_auto_turn_sequence[this.turn - 1].direction;
+    if (current_direction == "F")
+      current_auto_turn_sequence[this.turn - 1].direction = "B";
+
+    else
+      current_auto_turn_sequence[this.turn - 1].direction = "F";
+
     Meteor.call("toggle_turn_direction", pattern_id, this.turn, function(){
       Meteor.my_functions.reset_simulation_weaving(pattern_id);
+      Meteor.my_functions.set_repeats(pattern_id);
     });
   },
   // manual
@@ -761,10 +796,9 @@ Template.view_pattern.events({
     obj.packs[this.pack_number - 1].direction = new_direction;
     current_manual_weaving_turns.splice(0, 1, obj);
   },
-  'input .manual #num_manual_turns': function(event)
+  'input .manual .num_manual_turns': function(event)
   {
     // change number of turns for a pack in manual simulation pattern
-    // event fires on keyup, which causes a double update if you type a 2-digit number and resets all turns to "F"
     if (!Meteor.my_functions.accept_click())
         return;
 
@@ -779,16 +813,16 @@ Template.view_pattern.events({
     if (event.currentTarget.value < 0)
       event.currentTarget.value = 0;
 
-    if (Session.get('manual_input_latch'))
-      Session.set('manual_input_latch', true);
+    //if (Session.get('manual_input_latch'))
+      //Session.set('manual_input_latch', true);
 
-    var that = this;
+    //var that = this;
 
-    manual_input_timeout = setTimeout(function() {
+    //manual_input_timeout = setTimeout(function() {
       var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
-      obj.packs[that.pack_number - 1].number_of_turns = parseInt(event.currentTarget.value);
+      obj.packs[this.pack_number - 1].number_of_turns = parseInt(event.currentTarget.value);
       current_manual_weaving_turns.splice(0, 1, obj);
-    }, 200);    
+    //}, 300);    
   },
   'click .manual .tablets li': function(event) {
     if (!Meteor.my_functions.accept_click())

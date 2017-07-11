@@ -761,10 +761,10 @@ Meteor.my_functions = {
     data.number_of_rows = pattern.number_of_rows;
     data.number_of_tablets = pattern.number_of_tablets;
 
-    data.weaving = Meteor.my_functions.get_weaving_as_text(data.number_of_rows, data.number_of_tablets);
-    data.threading = Meteor.my_functions.get_threading_as_text(data.number_of_tablets);
-    data.orientation = Meteor.my_functions.get_orientation_as_text(pattern_id);
-    data.styles = Meteor.my_functions.get_styles_as_text(pattern_id);
+    data.weaving = Meteor.my_functions.get_weaving_as_array(data.number_of_rows, data.number_of_tablets);
+    data.threading = Meteor.my_functions.get_threading_as_array(data.number_of_tablets);
+    data.orientation = Meteor.my_functions.get_orientation_as_array(pattern_id);
+    data.styles = Meteor.my_functions.get_styles_as_array(pattern_id);
     data.auto_preview = pattern.auto_preview;
 
     // remove any stored states after this point
@@ -1226,7 +1226,7 @@ Meteor.my_functions = {
 
     current_row_indexes.unshift(number_of_rows+1); //  rows are reversed
 
-    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows + 1, number_of_tablets);
+    Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows + 1, number_of_tablets);
   },
   remove_weaving_row: function(pattern_id, position){
     var pattern = Patterns.findOne({_id: pattern_id});
@@ -1257,7 +1257,7 @@ Meteor.my_functions = {
     }
 
     current_row_indexes.shift(); // rows are reversed
-    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows - 1, number_of_tablets);
+    Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows - 1, number_of_tablets);
     return;
   },
   add_tablet: function(pattern_id, position, style)
@@ -1325,7 +1325,7 @@ Meteor.my_functions = {
     current_tablet_indexes.push(number_of_tablets+1);
 
     // save to database
-    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets + 1);
+    Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets + 1);
   },
   remove_tablet: function(pattern_id, position)
   {
@@ -1385,9 +1385,9 @@ Meteor.my_functions = {
     // remove tablet from indexes
     current_tablet_indexes.pop();
 
-    Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets - 1);
+    Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets - 1);
   },
-  get_weaving_as_text: function(number_of_rows, number_of_tablets)
+  get_weaving_as_array: function(number_of_rows, number_of_tablets)
   {
     // turn the reactive array of objects into simple nested arrays of style values
     var weaving_array = new Array(number_of_rows);
@@ -1403,7 +1403,7 @@ Meteor.my_functions = {
         var value = current_weaving_data[identifier].get();
         if (typeof value === "undefined")
         {
-          console.log("get_weaving_as_text error");
+          console.log("get_weaving_as_array error");
           console.log("identifier " + identifier);
                   }
         weaving_array[i][j] = current_weaving_data[(i+1) + "_" + (j+1)].get();
@@ -1412,7 +1412,7 @@ Meteor.my_functions = {
 
     return weaving_array;
   },
-  save_weaving_as_text: function(pattern_id, number_of_rows, number_of_tablets)
+  save_weaving_to_db: function(pattern_id, number_of_rows, number_of_tablets)
   {
     var pattern = Patterns.findOne({_id: pattern_id});
     if (typeof pattern === "undefined")
@@ -1426,14 +1426,14 @@ Meteor.my_functions = {
     if (number_of_rows != pattern.number_of_rows)
       row_change = true;
 
-    var weaving_array = Meteor.my_functions.get_weaving_as_text(number_of_rows, number_of_tablets);
+    var weaving_array = Meteor.my_functions.get_weaving_as_array(number_of_rows, number_of_tablets);
 
     var pattern = Patterns.findOne({_id: pattern_id});
 
     if (pattern.edit_mode == "simulation")
       number_of_rows = pattern.number_of_rows;
 
-    Meteor.call('save_weaving_as_text', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets, function(){
+    Meteor.call('save_weaving_to_db', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets, function(){
         var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
         Meteor.my_functions.store_pattern(pattern_id);
@@ -1443,13 +1443,13 @@ Meteor.my_functions = {
 
         if (tablet_change)
         {
-          Meteor.my_functions.save_threading_as_text(pattern_id, number_of_tablets);
-          Meteor.my_functions.save_orientation_as_text(pattern_id);
+          Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets);
+          Meteor.my_functions.save_orientation_to_db(pattern_id);
           Meteor.my_functions.update_after_tablet_change();
 
           if (pattern.edit_mode == "simulation")
           {
-            Meteor.call("save_manual_weaving_turns", pattern_id, Meteor.my_functions.get_manual_weaving_as_text(pattern_id), function(){
+            Meteor.call("save_manual_weaving_turns", pattern_id, Meteor.my_functions.get_manual_weaving_as_array(pattern_id), function(){
                Meteor.my_functions.reset_simulation_weaving(pattern_id);
             })
           }
@@ -1464,20 +1464,20 @@ Meteor.my_functions = {
     
     Session.set('edited_pattern', true);
   },
-  get_manual_weaving_as_text: function(pattern_id)
+  get_manual_weaving_as_array: function(pattern_id)
   {
     // concert the reactive array to a regular array that can be stringified
     var manual_weaving_turns = new Array();
     var data = current_manual_weaving_turns.list();
-console.log("get_manual_weaving_as_text start");
+
     for (var i=0; i<data.length; i++)
     {
       manual_weaving_turns[i] = data[i];
     }
-console.log("get_manual_weaving_as_text end");
+
     return JSON.stringify(manual_weaving_turns);
   },
-  get_threading_as_text: function(number_of_tablets)
+  get_threading_as_array: function(number_of_tablets)
   {
     // turn the reactive array of objects into simple nested arrays of style values
     var threading_array = new Array(4);
@@ -1502,21 +1502,20 @@ console.log("get_manual_weaving_as_text end");
     {
       auto_turn_sequence[i] = current_auto_turn_sequence[i].direction;
     }
-    console.log("sequence " + JSON.stringify(auto_turn_sequence));
 
     return auto_turn_sequence;
   },
-  save_threading_as_text: function(pattern_id, number_of_tablets)
+  save_threading_to_db: function(pattern_id, number_of_tablets)
   {
     
-    var threading_array = Meteor.my_functions.get_threading_as_text(number_of_tablets);
-    Meteor.call('save_threading_as_text', pattern_id, JSON.stringify(threading_array));
+    var threading_array = Meteor.my_functions.get_threading_as_array(number_of_tablets);
+    Meteor.call('save_threading_to_db', pattern_id, JSON.stringify(threading_array));
   },
-  save_weft_color_as_text: function(pattern_id, color)
+  save_weft_color_to_db: function(pattern_id, color)
   {
-    Meteor.call('save_weft_color_as_text', pattern_id, color);
+    Meteor.call('save_weft_color_to_db', pattern_id, color);
   },
-  get_orientation_as_text: function()
+  get_orientation_as_array: function()
   {
     var number_of_tablets = current_orientation.length;
 
@@ -1529,14 +1528,14 @@ console.log("get_manual_weaving_as_text end");
 
     return orientation_array;
   },
-  save_orientation_as_text: function(pattern_id)
+  save_orientation_to_db: function(pattern_id)
   {
-    var orientation_array = Meteor.my_functions.get_orientation_as_text(pattern_id);
+    var orientation_array = Meteor.my_functions.get_orientation_as_array(pattern_id);
 
-    Meteor.call('save_orientation_as_text', pattern_id, JSON.stringify(orientation_array)); 
+    Meteor.call('save_orientation_to_db', pattern_id, JSON.stringify(orientation_array)); 
 
   },
-  get_styles_as_text: function(pattern_id)
+  get_styles_as_array: function(pattern_id)
   {
     var styles_array = [];
     for (var i=0; i<current_styles.length; i++)
@@ -1546,11 +1545,11 @@ console.log("get_manual_weaving_as_text end");
 
     return styles_array;
   },
-  save_styles_as_text: function(pattern_id)
+  save_styles_to_db: function(pattern_id)
   {
-    var styles_array = Meteor.my_functions.get_styles_as_text(pattern_id);
+    var styles_array = Meteor.my_functions.get_styles_as_array(pattern_id);
 
-    Meteor.call('save_styles_as_text', pattern_id, JSON.stringify(styles_array));
+    Meteor.call('save_styles_to_db', pattern_id, JSON.stringify(styles_array));
     Session.set('edited_pattern', true);
   },
   save_preview_as_text: function(pattern_id)
@@ -1592,7 +1591,7 @@ console.log("get_manual_weaving_as_text end");
         weft_color.set(color);
 
         // update database
-        Meteor.my_functions.save_weft_color_as_text(pattern_id, color);
+        Meteor.my_functions.save_weft_color_to_db(pattern_id, color);
 
         // store style for undo stack
         Meteor.my_functions.store_pattern(pattern_id);
@@ -1629,7 +1628,7 @@ console.log("get_manual_weaving_as_text end");
           weft_color.set(color.toHexString());
 
           // update database
-          Meteor.my_functions.save_weft_color_as_text(pattern_id, color.toHexString());
+          Meteor.my_functions.save_weft_color_to_db(pattern_id, color.toHexString());
 
           // store style for undo stack
           Meteor.my_functions.store_pattern(pattern_id);
@@ -1738,7 +1737,7 @@ console.log("get_manual_weaving_as_text end");
           }
 
           // update database
-          Meteor.my_functions.save_styles_as_text(pattern_id);
+          Meteor.my_functions.save_styles_to_db(pattern_id);
 
           // store style for undo stack
           Meteor.my_functions.store_pattern(pattern_id);
@@ -1812,7 +1811,7 @@ console.log("get_manual_weaving_as_text end");
         current_styles.splice(selected_style-1, 1, obj);
 
         // update database
-        Meteor.my_functions.save_styles_as_text(pattern_id);
+        Meteor.my_functions.save_styles_to_db(pattern_id);
 
         // store style for undo stack
         Meteor.my_functions.store_pattern(pattern_id);      
@@ -1873,7 +1872,7 @@ console.log("get_manual_weaving_as_text end");
     current_styles.splice(style.style-1, 1, obj);
 
     // update database
-    Meteor.my_functions.save_styles_as_text(pattern_id);
+    Meteor.my_functions.save_styles_to_db(pattern_id);
     Meteor.my_functions.store_pattern(pattern_id);
   },
   //////////////////////////////////
@@ -2144,24 +2143,25 @@ console.log("get_manual_weaving_as_text end");
   reset_simulation_weaving: function(pattern_id, simulation_mode) {
     // remove and rebuild the current simulation pattern weaving
     var pattern = Patterns.findOne({_id: pattern_id});
-console.log("reset simulation weaving");
+
+    // reset all tablets to start position
+    var number_of_tablets = pattern.number_of_tablets;
+    var position_of_A = new Array();
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      position_of_A.push(0);
+    }
+
     if (pattern.simulation_mode == "auto")
     {
       var weaving = new Array();
-      var threading = Meteor.my_functions.get_threading_as_text(pattern.number_of_tablets);
-      var orientations = Meteor.my_functions.get_orientation_as_text();
-      var number_of_tablets = pattern.number_of_tablets;
+      var threading = Meteor.my_functions.get_threading_as_array(pattern.number_of_tablets);
+      var orientations = Meteor.my_functions.get_orientation_as_array();
+      
       var auto_turn_sequence =  Meteor.my_functions.get_auto_turn_sequence_as_array();
       var number_of_rows = auto_turn_sequence.length;
       // record which thread shows
       var auto_turn_threads = new Array();
-
-      // reset all tablets to start position
-      var position_of_A = new Array();
-      for (var i=0; i<number_of_tablets; i++)
-      {
-        position_of_A.push(0);
-      }
 
       for (var j=0; j<number_of_rows; j++)
       {
@@ -2205,39 +2205,33 @@ console.log("reset simulation weaving");
         position_of_A: JSON.stringify(position_of_A),
         auto_turn_threads: auto_turn_threads
       }
+
       Meteor.call("update_auto_weaving", pattern_id, data, function(){
         var pattern = Patterns.findOne({_id: pattern_id});
 
         Session.set("number_of_rows", pattern.number_of_rows);
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_as_text(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
+        Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
         Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     }
     else if (pattern.simulation_mode == "manual")
     {
-      // no rows woven
-      // reset all tablets to start position
-      var position_of_A = new Array();
-      for (var i=0; i<pattern.number_of_tablets; i++)
-      {
-        position_of_A.push(0);
-      }
-
       ////////////////
       // construct fresh pattern data
       var data = {
         number_of_tablets: pattern.number_of_tablets,
-        threading: Meteor.my_functions.get_threading_as_text(pattern.number_of_tablets),
-        orientations: Meteor.my_functions.get_orientation_as_text(),
-        position_of_A: JSON.parse(pattern.position_of_A),
+        threading: Meteor.my_functions.get_threading_as_array(pattern.number_of_tablets),
+        orientations: Meteor.my_functions.get_orientation_as_array(),
+        //position_of_A: JSON.parse(pattern.position_of_A),
+        position_of_A: position_of_A,
         weaving: [],
         //number_of_rows: pattern.number_of_rows,
         manual_weaving_turns: [JSON.parse(pattern.manual_weaving_turns)[0]], // remove manual_weaving_turns except first row which gives UI default
         manual_weaving_threads: [] // which thread shows
       }
-console.log("orientations " + data.orientations); 
+ 
       var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
 
       for (var i=1; i<manual_weaving_turns.length; i++)
@@ -2253,7 +2247,7 @@ console.log("orientations " + data.orientations);
         Session.set("number_of_rows", pattern.number_of_rows);
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_as_text(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
+        Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
         Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     }
@@ -2269,7 +2263,6 @@ console.log("orientations " + data.orientations);
     // turn tablets
     for (var i=0; i<data.number_of_tablets; i++)
     {
-      console.log("i " + i);
       // find turn direction and number of turns
       var pack_number = new_row_sequence.tablets[i];
       var pack = new_row_sequence.packs[pack_number - 1];
@@ -2446,7 +2439,7 @@ console.log("orientations " + data.orientations);
         Session.set("number_of_rows", pattern.number_of_rows);
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_as_text(pattern_id, data.weaving.length, pattern.number_of_tablets);
+        Meteor.my_functions.save_weaving_to_db(pattern_id, data.weaving.length, pattern.number_of_tablets);
         Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     }
@@ -2470,14 +2463,6 @@ console.log("orientations " + data.orientations);
         manual_weaving_turns: JSON.parse(pattern.manual_weaving_turns),
         manual_weaving_threads: pattern.manual_weaving_threads // which thread shows
       }
-
-      //var number_of_tablets = data.number_of_tablets;
-      //var manual_weaving_turns = data.manual_weaving_turns;
-      //var weaving = data.weaving;
-      //var position_of_A = data.position_of_A;
-      //var threading = data.threading;
-      //var //orientations = data.orientation;
-      //var manual_weaving_threads = data.manual_weaving_threads;
 
       var current_row_number = data.manual_weaving_turns.length;
       var last_row_number = current_row_number - 1;
@@ -2528,7 +2513,7 @@ console.log("orientations " + data.orientations);
         Session.set("number_of_rows", pattern.number_of_rows);
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_as_text(pattern_id, data.weaving.length, pattern.number_of_tablets);
+        Meteor.my_functions.save_weaving_to_db(pattern_id, data.weaving.length, pattern.number_of_tablets);
         Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     }
@@ -2602,7 +2587,7 @@ console.log("orientations " + data.orientations);
         }
       }
 
-      Meteor.my_functions.save_weaving_as_text(pattern_id, number_of_rows, number_of_tablets);
+      Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
     }
   },
   map_weaving_styles: function(style_value)

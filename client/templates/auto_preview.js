@@ -415,7 +415,6 @@ Template.auto_preview_element.helpers({
     // shape
     if (style.special)
     {
-      //console.log("edit_mode " + pattern.edit_mode);
       if (pattern.edit_mode == "simulation")
       {
         //console.log("simulation_mode " + pattern.simulation_mode);
@@ -446,10 +445,17 @@ Template.auto_preview_element.helpers({
       {
         case "forward_2":
         case "forward_2_gray":
+        //console.log("color 1 " + style.line_color);
           if(reversal)
+          {
             data.shape = "triangle_left_2";
+            //data.color = style.line_color;
+          }
           else
+          {
             data.shape = "forward_2";
+            //data.color = style.line_color;
+          }
           break;
 
         case "backward_2":

@@ -371,7 +371,7 @@ body.weave button.styled_button:disabled {
   cursor: pointer;
 }
 
-.simulation #toolbar.manual .packs #num_manual_turns {
+.simulation #toolbar.manual .packs .num_manual_turns {
   font-size: 16px;
   color: #424A6C;
   float: left;
