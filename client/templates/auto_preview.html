@@ -17,7 +17,7 @@
   <button class="rotate_preview {{#if equals view_pattern_mode "charts"}}visible{{/if}}">Rotate preview</button>
   {{/if}}
 </div>
-
+hide preview {{session_equals "hide_preview" true}}
 <div class="auto_preview {{preview_rotation}} {{show_tablets}} {{simulation_mode}}">
   <div id="auto_preview_wrapper" style="{{preview_style}}">
 
@@ -58,6 +58,7 @@
 
     <svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{viewbox_width}} {{repeat_viewbox_height}}"  shape-rendering="geometricPrecision" width="{{total_width}}">
 
+    {{#unless session_equals "hide_preview" true}}
       {{#each repeats}}
       <g class="preview" transform="translate(0 {{repeat_offset}})">
           {{#each row_indexes}}
@@ -74,6 +75,7 @@
       </g>
 
       {{/each}}
+      {{/unless}}
     </svg>
     {{/if}}
   </div>
@@ -145,13 +147,13 @@
 
 <!-- special styles -->
 <template name="forward_2_svg">
-<path d="m0.36291 112 40.839-54.951v-27.538l-40.839 54.947z" stroke="#000" stroke-width="1.015"  fill="{{color}}"></path>
-<path d="m0.36291 83.917 40.839-54.947v-27.538l-40.839 54.947z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m0.36291 112 40.839-54.951v-27.538l-40.839 54.947z" stroke="#000" stroke-width="1.015"  fill="{{color_3}}"></path>
+<path d="m0.36291 83.917 40.839-54.947v-27.538l-40.839 54.947z" stroke="#000" stroke-width="1.015" fill="{{color_0}}"></path>
 </template>
 
 <template name="backward_2_svg">
-<path d="m41.202 112-40.839-54.951v-27.538l40.839 54.947" stroke="#000" stroke-width="1.015"  fill="{{color}}"></path>
-<path d="m41.202 83.917-40.839-54.947v-27.538l40.839 54.947z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m41.202 112-40.839-54.951v-27.538l40.839 54.947" stroke="#000" stroke-width="1.015"  fill="{{color_3}}"></path>
+<path d="m41.202 83.917-40.839-54.947v-27.538l40.839 54.947z" stroke="#000" stroke-width="1.015" fill="{{color_0}}"></path>
 </template>
 
 <template name="forward_3_svg">
@@ -182,13 +184,13 @@
 
 <!-- special style at reversal -->
 <template name="triangle_left_2_svg">
-<path d="m41.341 85.466v-83.399l-30.74 41.699z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
-<path d="m41.189 112.75-40.837-54.951l-0.00044-0.099 10.156-13.777 30.681 41.285v27.537z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m41.341 85.466v-83.399l-30.74 41.699z" stroke="#000" stroke-width="1.015" fill="{{color_0}}"></path>
+<path d="m41.189 112.75-40.837-54.951l-0.00044-0.099 10.156-13.777 30.681 41.285v27.537z" stroke="#000" stroke-width="1.015" fill="{{color_1}}"></path>
 </template>
 
 <template name="triangle_right_2_svg">
-<path d="m0.3518 85.621-0.00045-83.399 30.741 41.699z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
-<path d="m0.50225 112.9 40.839-54.947v-0.09961l-10.156-13.777-30.683 41.286v27.538z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+<path d="m0.3518 85.621-0.00045-83.399 30.741 41.699z" stroke="#000" stroke-width="1.015" fill="{{color_0}}"></path>
+<path d="m0.50225 112.9 40.839-54.947v-0.09961l-10.156-13.777-30.683 41.286v27.538z" stroke="#000" stroke-width="1.015" fill="{{color_1}}"></path>
 </template>
 
 <template name="triangle_left_3_svg">

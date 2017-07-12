@@ -308,7 +308,7 @@ Template.auto_preview_element.helpers({
   data: function(row, tablet) {
     // pattern info used for simulation pattern
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1, simulation_mode: 1, manual_weaving_threads: 1}});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1, simulation_mode: 1, manual_weaving_threads: 1, position_of_A: 1}});
 
     if (typeof pattern === "undefined")
         return;
@@ -413,30 +413,63 @@ Template.auto_preview_element.helpers({
       reversal = true;
 
     // shape
-    if (style.special)
+    if (style.special) // 2, 3 or 4 turns
     {
+      // freehand patterns don't show colour
+      data.color_0 = "#FFFFFF";
+      data.color_1 = "#FFFFFF";
+      data.color_2 = "#FFFFFF";
+      data.color_3 = "#FFFFFF";
+
       if (pattern.edit_mode == "simulation")
       {
-        //console.log("simulation_mode " + pattern.simulation_mode);
         if (pattern.simulation_mode == "manual") // auto patterns only ever have 1 turn
         {
-          if (typeof pattern.manual_weaving_threads[row-1] !== "undefined") // in case rebuilding array
+          var threads_to_show = pattern.manual_weaving_threads[row-1];
+          if (typeof threads_to_show !== "undefined") // in case rebuilding array
           {
-            //console.log("here " + pattern.manual_weaving_threads.length);
+            //var position_of_A = JSON.parse(pattern.position_of_A);
+            var thread_styles = [];
             var thread_colors = [];
+            //console.log("row " + row);
+            //console.log("threads_to_show " + threads_to_show);
+            var pack = current_manual_weaving_turns[row].tablets[tablet-1];
+            //console.log("Pack " + pack);
+            var direction = current_manual_weaving_turns[row].packs[pack-1].direction;
+
             for (var i=0; i<4; i++)
             {
-              thread_colors[i] = current_threading_data[(i+1) + "_" + tablet].get();
-            }
-            //console.log("row " + row);
-            //console.log("tablet " + tablet);
-            //console.log("there " + typeof pattern.manual_weaving_threads[row-1]);
-            var thread_to_show = pattern.manual_weaving_threads[row-1][tablet-1];
-            //console.log("thread_colors " + thread_colors);
-            //console.log("thread to show " + thread_to_show);
+              //console.log("threads_to_show[tablet-1] " + threads_to_show[tablet-1]);
+              var identifier = (Meteor.my_functions.modular_add(i, threads_to_show[tablet-1], 4) + 1) + "_" + tablet;
+              //var identifier = (index+1) + "_" + tablet;
+              //console.log("identifier "+ identifier);
+              var thread_style = current_threading_data[identifier].get();
+              //console.log("style " + thread_style);
 
-            // TODO
-            // set data.color to line color of style in hole
+              var index = i;
+              if (direction == "B")
+                index = 3 - i;
+
+              if (Meteor.my_functions.is_style_special(thread_style))
+              {
+                thread_colors[index] = "rgba(0, 0, 0, 0)";
+              }
+              else
+              {
+                thread_colors[index] = current_styles[thread_style-1].background_color;
+              }
+ 
+            }
+            //console.log("direction " + direction);
+            //console.log("colors: " + thread_colors);
+
+            data.color_0 = thread_colors[0];
+            data.color_1 = thread_colors[1];
+            data.color_2 = thread_colors[2];
+            data.color_3 = thread_colors[3];
+
+            //var thread_to_show = pattern.manual_weaving_threads[row-1][tablet-1];
+            //console.log("thread_colors " + thread_styles);
           }
         }
       }
@@ -445,17 +478,10 @@ Template.auto_preview_element.helpers({
       {
         case "forward_2":
         case "forward_2_gray":
-        //console.log("color 1 " + style.line_color);
           if(reversal)
-          {
             data.shape = "triangle_left_2";
-            //data.color = style.line_color;
-          }
           else
-          {
             data.shape = "forward_2";
-            //data.color = style.line_color;
-          }
           break;
 
         case "backward_2":

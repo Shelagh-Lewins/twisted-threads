@@ -8,7 +8,6 @@ Template.view_pattern.rendered = function() {
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
-  //Session.set('auto_input_latch', false);
 
   Meteor.my_functions.set_repeats(pattern_id);
 
@@ -21,10 +20,6 @@ Template.view_pattern.rendered = function() {
   // is this a new pattern and needs the preview to be generated?
   if (typeof $('.auto_preview path')[0] === "undefined")
     Session.set('edited_pattern', true);
-
-/*var pattern_id = Router.current().params._id;
-var pattern = Patterns.findOne({_id: pattern_id});
-  console.log("rendered " + JSON.parse(pattern.position_of_A));*/
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -137,13 +132,10 @@ Template.view_pattern.helpers({
 
     $('#toolbar .packs_inner .row:first-child').children(':not(:last-child)').each(function() {
         width += $(this).outerWidth( true );
-        //console.log("new width " + width);
     });
 
     width += $($($('#toolbar .packs_inner .row:first-child :last-child')[0]).children()[0]).outerWidth(true) * pattern.number_of_tablets;
 
-    //var children = $('.packs .packs_inner').find();
-    //var width=900;
     return Math.max(width, 600);
   },
   weave_disabled: function() {

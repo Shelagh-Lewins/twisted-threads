@@ -1141,9 +1141,24 @@ Meteor.my_functions = {
       }
 
       // manual
-      var manual_weaving_turns_data = JSON.parse(pattern.manual_weaving_turns);
+      var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
 
-      current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns_data);
+      if (Session.get("number_of_rows") == 0)
+      {
+        // reset direction, number of turns to "F", 1
+        for (var i=0; i<manual_weaving_turns[0].packs.length; i++)
+        {
+          manual_weaving_turns[0].packs[i].direction = "F";
+          manual_weaving_turns[0].packs[i].number_of_turns = 1;
+        }
+      }
+      else
+      {
+        // show direction, number of turns for latest row
+        manual_weaving_turns[0] = manual_weaving_turns[manual_weaving_turns.length-1];
+      }
+
+      current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
     }
   },
   update_after_tablet_change: function()
@@ -1192,10 +1207,8 @@ Meteor.my_functions = {
   },
   add_weaving_row: function(pattern_id, position, style)
   {
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    var number_of_tablets = pattern.number_of_tablets;
-    var number_of_rows = pattern.number_of_rows;
+    var number_of_tablets = Session.get("number_of_tablets");
+    var number_of_rows = Session.get("number_of_rows");
 
     if (number_of_rows == 0)
       var position = 1;
@@ -1229,10 +1242,8 @@ Meteor.my_functions = {
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows + 1, number_of_tablets);
   },
   remove_weaving_row: function(pattern_id, position){
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    var number_of_tablets = pattern.number_of_tablets;
-    var number_of_rows = pattern.number_of_rows;
+    var number_of_tablets = Session.get("number_of_tablets");
+    var number_of_rows = Session.get("number_of_rows");
 
     if ((number_of_rows <= 1) || (position < 1) || (position > (number_of_rows)))
       return;
@@ -1262,10 +1273,10 @@ Meteor.my_functions = {
   },
   add_tablet: function(pattern_id, position, style)
   {
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
-    var number_of_tablets = pattern.number_of_tablets;
-    var number_of_rows = pattern.number_of_rows;
+    var number_of_tablets = Session.get("number_of_tablets");
+    var number_of_rows = Session.get("number_of_rows");
 
     if (position == -1) // -1 is a shorthand meaning add tablet at end
       var position = number_of_tablets+1;
@@ -1329,10 +1340,10 @@ Meteor.my_functions = {
   },
   remove_tablet: function(pattern_id, position)
   {
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
-    var number_of_tablets = pattern.number_of_tablets;
-    var number_of_rows = pattern.number_of_rows;
+    var number_of_tablets = Session.get("number_of_tablets");
+    var number_of_rows = Session.get("number_of_rows");
 
     if ((number_of_tablets <= 1) || (position < 1) || (position > (number_of_tablets)))
       return;
@@ -1374,8 +1385,6 @@ Meteor.my_functions = {
     // manual_weaving_turns
     if (pattern.edit_mode == "simulation")
     {
-      var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
-
       for (var i=0;i<current_manual_weaving_turns.list().length; i++)
       {
         current_manual_weaving_turns.list()[i].tablets.splice(position-1, 1);
@@ -1400,12 +1409,14 @@ Meteor.my_functions = {
       {
         // TODO find why this code sometimes gives an error and fix it
         var identifier = (i+1) + "_" + (j+1);
-        var value = current_weaving_data[identifier].get();
-        if (typeof value === "undefined")
+
+        if (typeof current_weaving_data[identifier] === "undefined")
         {
           console.log("get_weaving_as_array error");
           console.log("identifier " + identifier);
-                  }
+        }
+        var value = current_weaving_data[identifier].get();
+        
         weaving_array[i][j] = current_weaving_data[(i+1) + "_" + (j+1)].get();
       }
     }
@@ -1414,7 +1425,7 @@ Meteor.my_functions = {
   },
   save_weaving_to_db: function(pattern_id, number_of_rows, number_of_tablets)
   {
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_tablets: 1, number_of_rows: 1, edit_mode: 1}});
     if (typeof pattern === "undefined")
         return;
 
@@ -1428,14 +1439,7 @@ Meteor.my_functions = {
 
     var weaving_array = Meteor.my_functions.get_weaving_as_array(number_of_rows, number_of_tablets);
 
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (pattern.edit_mode == "simulation")
-      number_of_rows = pattern.number_of_rows;
-
     Meteor.call('save_weaving_to_db', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets, function(){
-        var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
-
         Meteor.my_functions.store_pattern(pattern_id);
         
         Session.set("number_of_rows", number_of_rows);
@@ -2018,8 +2022,7 @@ Meteor.my_functions = {
 
     var pattern_id = Router.current().params._id;
 
-    var pattern = Patterns.findOne({_id: pattern_id});
-    var number_of_rows = pattern.number_of_rows;
+    var number_of_rows = Session.get("number_of_rows");
 
     if (row_number == number_of_rows + 1)
     {
@@ -2064,18 +2067,17 @@ Meteor.my_functions = {
     // index is a readable row number starting with 1 at the bottom
     // Row number must be an integer between 1 and last row
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {current_weave_row: 1}});
 
     if (typeof pattern === "undefined")
       return;
 
-    var number_of_rows = pattern.number_of_rows;
+    var number_of_rows = Session.get("number_of_rows");
 
     var new_value = parseInt(index);
     if (isNaN(new_value))
     {
       // use the current value
-      //new_value = Patterns.findOne({_id: pattern_id}).current_weave_row;
       new_value = pattern.current_weave_row;
     }
     else
@@ -2100,13 +2102,7 @@ Meteor.my_functions = {
   {
     // index is an array index starting with 0 at the top
     // Row number must be an integer between 0 and last row -1
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (typeof pattern === "undefined")
-      return;
-
-    var number_of_rows = pattern.number_of_rows;
+    var number_of_rows = Session.get("number_of_rows");
 
     var new_value = parseInt(index);
 
@@ -2141,11 +2137,15 @@ Meteor.my_functions = {
     });
   },
   reset_simulation_weaving: function(pattern_id, simulation_mode) {
+    Session.set("hide_preview", true); // force a clean refresh of the preview
+    
     // remove and rebuild the current simulation pattern weaving
     var pattern = Patterns.findOne({_id: pattern_id});
 
+    var number_of_rows = Session.get("number_of_rows");
+    var number_of_tablets = Session.get("number_of_tablets");
+
     // reset all tablets to start position
-    var number_of_tablets = pattern.number_of_tablets;
     var position_of_A = new Array();
     for (var i=0; i<number_of_tablets; i++)
     {
@@ -2155,11 +2155,12 @@ Meteor.my_functions = {
     if (pattern.simulation_mode == "auto")
     {
       var weaving = new Array();
-      var threading = Meteor.my_functions.get_threading_as_array(pattern.number_of_tablets);
+      var threading = Meteor.my_functions.get_threading_as_array(number_of_tablets);
       var orientations = Meteor.my_functions.get_orientation_as_array();
       
       var auto_turn_sequence =  Meteor.my_functions.get_auto_turn_sequence_as_array();
       var number_of_rows = auto_turn_sequence.length;
+
       // record which thread shows
       var auto_turn_threads = new Array();
 
@@ -2209,11 +2210,12 @@ Meteor.my_functions = {
       Meteor.call("update_auto_weaving", pattern_id, data, function(){
         var pattern = Patterns.findOne({_id: pattern_id});
 
-        Session.set("number_of_rows", pattern.number_of_rows);
+        Session.set("number_of_rows", number_of_rows);
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
+        Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
         Meteor.my_functions.save_preview_as_text(pattern_id);
+        Session.set("hide_preview", false);
       });
     }
     else if (pattern.simulation_mode == "manual")
@@ -2221,13 +2223,11 @@ Meteor.my_functions = {
       ////////////////
       // construct fresh pattern data
       var data = {
-        number_of_tablets: pattern.number_of_tablets,
-        threading: Meteor.my_functions.get_threading_as_array(pattern.number_of_tablets),
+        number_of_tablets: number_of_tablets,
+        threading: Meteor.my_functions.get_threading_as_array(number_of_tablets),
         orientations: Meteor.my_functions.get_orientation_as_array(),
-        //position_of_A: JSON.parse(pattern.position_of_A),
         position_of_A: position_of_A,
         weaving: [],
-        //number_of_rows: pattern.number_of_rows,
         manual_weaving_turns: [JSON.parse(pattern.manual_weaving_turns)[0]], // remove manual_weaving_turns except first row which gives UI default
         manual_weaving_threads: [] // which thread shows
       }
@@ -2238,17 +2238,15 @@ Meteor.my_functions = {
       {
         data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);
       }
-
-      var pattern = Patterns.findOne({_id: pattern_id});
         
       Meteor.call("update_manual_weaving", pattern_id, data, function(){
-        var pattern = Patterns.findOne({_id: pattern_id});
-
+        var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1}});
         Session.set("number_of_rows", pattern.number_of_rows);
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, pattern.number_of_tablets);
+        Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, number_of_tablets);
         Meteor.my_functions.save_preview_as_text(pattern_id);
+        Session.set("hide_preview", false);
       });
     }
   },
@@ -2423,12 +2421,11 @@ Meteor.my_functions = {
       var new_row_sequence = current_manual_weaving_turns.list()[0];
 
       data = {
-        number_of_tablets: pattern.number_of_tablets,
+        number_of_tablets: Session.get("number_of_tablets"),
         threading: JSON.parse(pattern.threading),
         orientations: JSON.parse(pattern.orientation),
         position_of_A: JSON.parse(pattern.position_of_A),
         weaving: JSON.parse(pattern.weaving),
-        //number_of_rows: pattern.number_of_rows,
         manual_weaving_turns: JSON.parse(pattern.manual_weaving_turns),
         manual_weaving_threads: pattern.manual_weaving_threads // which thread shows
       }
@@ -2436,10 +2433,10 @@ Meteor.my_functions = {
       data = Meteor.my_functions.weave_row(data, new_row_sequence);
 
       Meteor.call("update_manual_weaving", pattern_id, data, function(){
-        Session.set("number_of_rows", pattern.number_of_rows);
+        Session.set("number_of_rows", Session.get("number_of_rows"));
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_to_db(pattern_id, data.weaving.length, pattern.number_of_tablets);
+        Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
         Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     }
@@ -2454,12 +2451,10 @@ Meteor.my_functions = {
     if (pattern.simulation_mode == "manual")
     {
       data = {
-        number_of_tablets: pattern.number_of_tablets,
-        //threading: JSON.parse(pattern.threading),
+        number_of_tablets: Session.get("number_of_tablets"),
         orientations: JSON.parse(pattern.orientation),
         position_of_A: JSON.parse(pattern.position_of_A),
         weaving: JSON.parse(pattern.weaving),
-        //number_of_rows: pattern.number_of_rows,
         manual_weaving_turns: JSON.parse(pattern.manual_weaving_turns),
         manual_weaving_threads: pattern.manual_weaving_threads // which thread shows
       }
@@ -2510,10 +2505,10 @@ Meteor.my_functions = {
       data.manual_weaving_threads.pop();
 
       Meteor.call("update_manual_weaving", pattern_id, data, function(){
-        Session.set("number_of_rows", pattern.number_of_rows);
+        Session.set("number_of_rows", Session.get("number_of_rows") - 1);
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
-        Meteor.my_functions.save_weaving_to_db(pattern_id, data.weaving.length, pattern.number_of_tablets);
+        Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
         Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     }
@@ -2563,8 +2558,8 @@ Meteor.my_functions = {
     var old_weaving_styles = Meteor.my_functions.map_weaving_styles(old_style);
     var new_weaving_styles = Meteor.my_functions.map_weaving_styles(new_style);
 
-    var number_of_rows = current_row_indexes.length;
-    var number_of_tablets = current_tablet_indexes.length;
+    var number_of_rows = Session.get("number_of_rows");
+    var number_of_tablets = Session.get("number_of_tablets");
 
     if (pattern.simulation_mode == "auto")
       var threads = pattern.auto_turn_threads;

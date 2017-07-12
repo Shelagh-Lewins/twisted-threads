@@ -38,8 +38,6 @@ Template.create_new_pattern.events({
   },*/
   "click input[type=submit]": function(event){""
     event.preventDefault();
-    console.log(event.currentTarget.value);
-    console.log(event.currentTarget.name);
     var edit_mode = event.currentTarget.name;
     var number_of_rows = "0";
     if(edit_mode != "simulation")

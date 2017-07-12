@@ -222,17 +222,7 @@
 
   {{/unless}}
 
-  <h2>Threading chart</h2>
-  {{#if can_edit_pattern _id}}
-  <div class="hint">
-    To edit the threading chart, select thread colours from the palette at the bottom of the screen, then click chart cells. Use X for an unthreaded hole.<br />
-  </div>
-  {{/if}}
-
-  <div class="pattern_info {{rendered_manual}}">
-    {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
-  </div>
-   
+  <h2>Threading chart</h2>   
   <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
     {{#each hole_indexes}}
       {{> threading_row}}
@@ -250,6 +240,16 @@
     </div>
     {{/if}}
 
+  </div>
+
+  {{#if can_edit_pattern _id}}
+  <div class="hint clearing">
+    To edit the threading chart, select thread colours from the palette at the bottom of the screen, then click chart cells. Use X for an unthreaded hole.<br />
+  </div>
+  {{/if}}
+
+  <div class="pattern_info {{rendered_manual}}">
+    {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
   </div>
 
   <h2>Tablet labels</h2>
