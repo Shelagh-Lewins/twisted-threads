@@ -447,8 +447,11 @@ Template.auto_preview_element.helpers({
               //console.log("style " + thread_style);
 
               var index = i;
-              if (direction == "B")
+              if (direction == "B") // threads appear in opposite order, and thread D shows not thread A
+              {
                 index = 3 - i;
+                index = Meteor.my_functions.modular_add(index, 1, 4);
+              }
 
               if (Meteor.my_functions.is_style_special(thread_style))
               {
@@ -508,7 +511,7 @@ Template.auto_preview_element.helpers({
             data.shape = "backward_3";
           break;
 
-        case "forward_4":
+        case "forward_4": // only available for freehand
         case "forward_4_gray":
            if(reversal)
             data.shape = "triangle_left_4";
@@ -516,7 +519,7 @@ Template.auto_preview_element.helpers({
             data.shape = "forward_4";
           break;
 
-        case "backward_4":
+        case "backward_4": // only available for freehand
         case "backward_4_gray":
           if(reversal)
             data.shape = "triangle_right_4";
@@ -549,6 +552,7 @@ Template.auto_preview_element.helpers({
 
       case "none": // a regular style with no warp is assumed to be a brocade pattern
         data.shape = block;
+        data.brocade = true; // stops previous style's color being used, see later
         data.color = style.background_color;
         break;
 
@@ -600,8 +604,9 @@ Template.auto_preview_element.helpers({
       // leave empty to show weft
     }
 
-    else if (typeof previous_style !== "undefined")
+    else if ((typeof previous_style !== "undefined") && !data.brocade)
     {
+      console.log("shape " + data.shape);
       if ((previous_style.warp == "forward") || (previous_style.warp == "backward"))
         data.color = previous_style.line_color;
     }

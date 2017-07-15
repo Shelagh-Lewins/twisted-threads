@@ -1,4 +1,5 @@
 Template.view_pattern.rendered = function() {
+  console.log("View pattern rendered start");
   $('body').attr("class", "view_pattern");
   var pattern_id = Router.current().params._id;
   Meteor.my_functions.add_to_recent_patterns(pattern_id);
@@ -34,6 +35,7 @@ Template.view_pattern.rendered = function() {
 }
 
 Template.view_pattern.onCreated(function(){
+  console.log("view pattern onCreated start");
   var pattern_id = Router.current().params._id;
 
   Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id)); // quicker than checking db
@@ -791,8 +793,8 @@ Template.view_pattern.events({
   'input .manual .num_manual_turns': function(event)
   {
     // change number of turns for a pack in manual simulation pattern
-    if (!Meteor.my_functions.accept_click())
-        return;
+    //if (!Meteor.my_functions.accept_click())
+        //return;
 
     var pattern_id = Router.current().params._id;
 
@@ -899,15 +901,10 @@ Template.view_pattern.events({
       return;
 
     var position = $('#row_to_add').val();
-
-    // basic data validation, must be an integer between 1 and number of tablets + 1 (new row at end)
-    position = Math.floor(position);
-    position = Math.max(position, 1);
-    position = Math.min(position, Session.get("number_of_rows")+1);
-
     var style = Meteor.my_functions.get_selected_style();
+    var num_new_rows = $('#num_new_rows').val();
 
-    Meteor.my_functions.add_weaving_row(pattern_id, position, style);
+    Meteor.my_functions.add_weaving_row(pattern_id, position, style, num_new_rows);
   }
 });
 

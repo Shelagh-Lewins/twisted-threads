@@ -972,7 +972,7 @@ Meteor.my_functions = {
   build_pattern_display_data:  function(pattern_id)
   {
     // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
-
+console.log("build pattern display data start");
     // elements in reactive arrays need to be updated with arr.splice(pos, 1 new_value) to be reactive
 
     var pattern = Patterns.findOne({_id: pattern_id});
@@ -1160,6 +1160,8 @@ Meteor.my_functions = {
 
       current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
     }
+
+    console.log("build pattern display data end");
   },
   update_after_tablet_change: function()
   {
@@ -1205,10 +1207,27 @@ Meteor.my_functions = {
       Meteor.my_functions.build_pattern_display_data(pattern_id);
     });
   },
-  add_weaving_row: function(pattern_id, position, style)
+  add_weaving_row: function(pattern_id, position, style, num_new_rows)
   {
     var number_of_tablets = Session.get("number_of_tablets");
     var number_of_rows = Session.get("number_of_rows");
+
+    // basic data validation, must be an integer between 1 and number of tablets + 1 (new row at end)
+    position = Math.floor(position);
+    position = Math.max(position, 1);
+    position = Math.min(position, Session.get("number_of_rows")+1);
+
+    // only add a valid number of rows, integer between 1 & 20
+    if (typeof num_new_rows != "number")
+    {
+      num_new_rows = 1;
+    }
+    else
+    {
+      num_new_rows = Math.floor(num_new_rows);
+      num_new_rows = Math.max(num_new_rows, 1);
+      num_new_rows = Math.min(num_new_rows, 20);
+    }
 
     if (number_of_rows == 0)
       var position = 1;
@@ -1219,27 +1238,30 @@ Meteor.my_functions = {
     if (position < 0) // -1 is a shorthand meaning add row at end
       var position = 1;
 
-    // increment row number of cells in subsequent rows
-    for (var i=number_of_rows-1; i>= position-1; i--)
+    for (var k=0; k<num_new_rows; k++)
     {
+      // increment row number of cells in subsequent rows
+      for (var i=number_of_rows+k-1; i>= position-1; i--)
+      {
+        for (var j=0; j<number_of_tablets; j++)
+        {
+          // delete the existing ReactiveVar
+          // recreate a new one with the same style but greater row
+          var cell_style = current_weaving_data[(i + 1) + "_" + (j + 1)].get();
+          delete current_weaving_data[(i + 1) + "_" + (j + 1)];
+          current_weaving_data[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_style);
+        }
+      }
+      // add new row
       for (var j=0; j<number_of_tablets; j++)
       {
-        // delete the existing ReactiveVar
-        // recreate a new one with the same style but greater row
-        var cell_style = current_weaving_data[(i + 1) + "_" + (j + 1)].get();
-        delete current_weaving_data[(i + 1) + "_" + (j + 1)];
-        current_weaving_data[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_style);
+        current_weaving_data[position + "_" + (j + 1)] = new ReactiveVar(style);
       }
-    }
-    // add new row
-    for (var j=0; j<number_of_tablets; j++)
-    {
-      current_weaving_data[position + "_" + (j + 1)] = new ReactiveVar(style);
+
+      current_row_indexes.unshift(number_of_rows+1); //  rows are reversed
     }
 
-    current_row_indexes.unshift(number_of_rows+1); //  rows are reversed
-
-    Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows + 1, number_of_tablets);
+    Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows + num_new_rows, number_of_tablets);
   },
   remove_weaving_row: function(pattern_id, position){
     var number_of_tablets = Session.get("number_of_tablets");
@@ -1912,6 +1934,7 @@ Meteor.my_functions = {
 
     if (pattern.edit_mode === "simulation")
       Meteor.my_functions.reset_simulation_weaving(pattern_id);
+    console.log("end of view pattern created");
   },
   view_pattern_render: function(pattern_id) {
     Session.set('edit_style', false);
