@@ -128,11 +128,13 @@ if (Meteor.isClient) {
     // cannot remove a row from pattern, and
     // cannot view interactive weaving chart because no rows woven
     // can only happen in manual simulation pattern
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
 
-    if (typeof pattern == "undefined") // avoids error when pattern is private and user doesn't have permission to see it
-      return "disabled";
+    // avoids error when pattern is private and user doesn't have permission to see it
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+        return "disabled";
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
 
     if (pattern.number_of_rows < 1) // row 0 is for workiing
       return "disabled";
@@ -158,28 +160,33 @@ if (Meteor.isClient) {
   UI.registerHelper('edit_mode', function() {
     if (Router.current().route.getName() == "pattern")
     {
-      var pattern_id = Router.current().params._id;
+      //console.log("checking edit mode: " + Session.get("edit_mode"));
+      return Session.get("edit_mode");
+      /*var pattern_id = Router.current().params._id;
+      if (!Meteor.my_functions.pattern_exists(pattern_id))
+          return;
+
       var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
   
-      if (typeof pattern !== "undefined")
-      {
-        if (pattern.edit_mode == "simulation")
-          return "simulation";
+      if (pattern.edit_mode == "simulation")
+        return "simulation";
 
-        else
-          return "freehand";
-      }
+      else
+        return "freehand";*/
     }
   });
 
   UI.registerHelper('simulation_mode', function() {
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
-
-    if (typeof pattern === "undefined") // avoids error when pattern is private and user doesn't have permission to see it
+    //console.log("checking simulation mode: " + Session.get("simulation_mode"));
+    if (Router.current().route.getName() == "pattern")
+      return Session.get("simulation_mode");
+    /*var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
         return;
 
-    return pattern.simulation_mode;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
+
+    return pattern.simulation_mode;*/
   });
 
   UI.registerHelper('does_pattern_repeat', function(){

@@ -9,6 +9,12 @@ Template.view_pattern.rendered = function() {
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
+  Session.set('hide_preview', true);
+
+  // for some reason, including preview immediately causes a big delay in loading
+  setTimeout(function(){
+    Session.set("hide_preview", false);
+  }, 1);
 
   Meteor.my_functions.set_repeats(pattern_id);
 
@@ -21,6 +27,18 @@ Template.view_pattern.rendered = function() {
   // is this a new pattern and needs the preview to be generated?
   if (typeof $('.auto_preview path')[0] === "undefined")
     Session.set('edited_pattern', true);
+
+  // set session variables to avoid checking db every time
+  if (Meteor.my_functions.pattern_exists(pattern_id));
+  {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
+
+    Session.set("edit_mode", pattern.edit_mode);
+    //console.log("setting edit mode to " + Session.get("edit_mode"));
+
+    if (pattern.edit_mode == "simulation")
+      Session.set("simulation_mode", pattern.simulation_mode);
+  }
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -35,7 +53,6 @@ Template.view_pattern.rendered = function() {
 }
 
 Template.view_pattern.onCreated(function(){
-  console.log("view pattern onCreated start");
   var pattern_id = Router.current().params._id;
 
   Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id)); // quicker than checking db
@@ -58,12 +75,12 @@ Template.pattern_not_found.helpers({
 
 Template.remove_row.helpers({
   can_remove_rows: function() {
-    // is there more than 1 row?
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+      return;
 
-    if (typeof pattern === "undefined")
-        return;
+    // is there more than 1 row?   
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
 
     if (pattern.number_of_rows > 1) {
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
@@ -126,6 +143,9 @@ Template.view_pattern.helpers({
   },
   manual_pack_width: function() {
     var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+      return;
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
     if ($('#toolbar .packs_inner .row:first-child').length == 0)
         return 600;
@@ -152,24 +172,24 @@ Template.view_pattern.helpers({
     return Session.get("number_of_rows") + 1;
   },
   can_add_tablets: function() {
-    // are there more than 60 tablets?
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+      return;
 
-    if (typeof pattern === "undefined")
-        return;
+    // are there more than 60 tablets?  
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
 
     if (pattern.number_of_tablets < 60)
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
         return true;
   },
   can_remove_tablets: function() {
-    // is there more than 1 tablet?
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
-
-    if (typeof pattern === "undefined")
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
         return;
+
+    // is there more than 1 tablet?
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_tablets: 1}});
 
     if (pattern.number_of_tablets > 1)
       if (Meteor.my_functions.can_edit_pattern(pattern_id))
@@ -188,13 +208,13 @@ Template.view_pattern.helpers({
       return "disabled";
   },
   hole_handedness: function() {
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+        return;
+
     // are the tablet holes labelled clockwise or anticlockwise?
     // default is clockwise if not otherwise specified
-    var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { hole_handedness: 1}});
-
-    if (typeof pattern === "undefined")
-        return;
 
     if (pattern.hole_handedness == "anticlockwise")
       return "anticlockwise";
@@ -285,7 +305,7 @@ Template.styles_palette.onRendered(function(){
 
   if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
-  Meteor.my_functions.initialize_weft_color_picker();
+  //Meteor.my_functions.initialize_weft_color_picker();
   Meteor.my_functions.initialize_warp_color_picker();
   Meteor.my_functions.initialize_background_color_picker();
 
@@ -597,17 +617,13 @@ Template.view_pattern.events({
         return;
 
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
-
-    if (typeof pattern === "undefined")
-      return;
-
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+        return;
+    
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1, number_of_tablets: 1}});
     var number_of_rows = pattern.number_of_rows;
     var number_of_tablets = pattern.number_of_tablets;
-
     var new_style = Meteor.my_functions.get_selected_style();
-
-    var pattern_id = Router.current().params._id;
 
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
@@ -618,9 +634,12 @@ Template.view_pattern.events({
   'click .tablets li.cell': function(event, template) {
     if (!Meteor.my_functions.accept_click())
         return;
+   
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+        return;
 
     var new_style = Meteor.my_functions.get_selected_style();
-    var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
 
     if (typeof pattern === "undefined")

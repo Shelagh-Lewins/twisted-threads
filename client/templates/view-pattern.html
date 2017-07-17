@@ -22,7 +22,9 @@
   {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
 </div>
 
+{{#if session_equals "hide_preview" false}}
 {{> auto_preview}}
+{{/if}}
 
 <div id="main_tabs">
 <ul>

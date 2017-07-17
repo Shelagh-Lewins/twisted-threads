@@ -14,6 +14,17 @@ Meteor.my_functions = {
     }
     return accept_click;
   },
+  pattern_exists: function(pattern_id)
+  {
+    // this is a faster check than using findOne
+    // findOne() will always read + return the document if it exists. find() just returns a cursor (or not) and only reads the data if you iterate through the cursor.
+    // https://blog.serverdensity.com/checking-if-a-document-exists-mongodb-slow-findone-vs-find/
+    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() > 0)
+      return true;
+
+    else
+      return false;
+  },
   ///////////////////////
   // creating patterns
   can_create_pattern: function() {
@@ -220,7 +231,7 @@ Meteor.my_functions = {
   copy_pattern: function(pattern_id)
   {
     Session.set('loading', true);
-    var name = Patterns.findOne({_id: pattern_id}).name;
+    var name = Patterns.findOne({_id: pattern_id}, {fields: {name: 1}}).name;
 
     // get the JSON data
     var data = Meteor.my_functions.export_pattern_to_json(pattern_id)
@@ -972,7 +983,7 @@ Meteor.my_functions = {
   build_pattern_display_data:  function(pattern_id)
   {
     // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
-console.log("build pattern display data start");
+
     // elements in reactive arrays need to be updated with arr.splice(pos, 1 new_value) to be reactive
 
     var pattern = Patterns.findOne({_id: pattern_id});
@@ -1160,8 +1171,6 @@ console.log("build pattern display data start");
 
       current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
     }
-
-    console.log("build pattern display data end");
   },
   update_after_tablet_change: function()
   {
@@ -1599,7 +1608,10 @@ console.log("build pattern display data start");
     // Set the #weft_colorpicker to the selected style's weft colour
     var pattern_id = Router.current().params._id;
 
-    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+    //if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+    // pattern not loaded or preview not built
+    if (!Meteor.my_functions.pattern_exists(pattern_id) ||
+      ($("#weft_colorpicker").length == 0))
     {
       setTimeout(function(){Meteor.my_functions.initialize_weft_color_picker(); }, 10);
     }
@@ -1689,7 +1701,8 @@ console.log("build pattern display data start");
     var pattern_id = Router.current().params._id;
 
     //if (Patterns.findOne({_id: pattern_id}) == null)
-    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+    //if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
     {
       setTimeout(function(){Meteor.my_functions.initialize_background_color_picker(); }, 10);
     }
@@ -2157,6 +2170,7 @@ console.log("build pattern display data start");
     Meteor.call("update_simulation_mode", pattern_id, simulation_mode, function(){
       Meteor.my_functions.reset_simulation_weaving(pattern_id, simulation_mode);
       Meteor.my_functions.set_repeats(pattern_id);
+      Session.set("simulation_mode", simulation_mode);
     });
   },
   reset_simulation_weaving: function(pattern_id, simulation_mode) {
@@ -2339,9 +2353,8 @@ console.log("build pattern display data start");
     // which style to use on the weaving chart to represent a tablet turning forwards / backwards, with S /Z orientation, and thread colour from threading style
     // simulation styles for weaving appear after the 7 threading styles
     // SF, ZF, ZB, SB are style no. 7 + 4(n-1) + 1,2,3,4
-    // TODO number_of_turns 0 - 3 (use special styles in weaving chart)
 
-    if (!Meteor.my_functions.is_style_special(style_value))
+    if (!Meteor.my_functions.is_style_special(style_value) || (number_of_turns > 1)) // if more than 1 turn, then we use the multi-turn special style even when the hole is unthreaded
     {
       switch(number_of_turns)
       {

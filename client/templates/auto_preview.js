@@ -1,4 +1,9 @@
-Template.auto_preview.onCreated(function() {
+
+  Template.auto_preview.rendered = function() {
+    Meteor.my_functions.initialize_weft_color_picker();
+  }
+
+    Template.auto_preview.onCreated(function() {
   this.unit_width = 41.560534;
   this.unit_height = 113.08752;
   this.cell_width = 10;
@@ -35,12 +40,8 @@ Template.auto_preview.onCreated(function() {
       return 0; // not ready
 
     var height = this.viewbox_height();
-    var pattern = Patterns.findOne({ _id: this.pattern_id});
 
-    if (typeof pattern === "undefined")
-        return;
-
-    if (pattern.simulation_mode == "auto")
+    if (Session.get("simulation_mode") == "auto")
     {
       height *= Session.get("number_of_repeats");
       height -= (Session.get("number_of_repeats") - 1) * (this.unit_height / 2);
@@ -68,30 +69,33 @@ Template.auto_preview.onCreated(function() {
   this.total_height = function() { // for parent element css
     if (typeof Session.get("number_of_repeats") === "undefined")
       return 0; // not ready
-
-    var pattern = Patterns.findOne({ _id: this.pattern_id});
-    if (typeof pattern === "undefined")
-        return;
+//console.log("total height");
+    //var pattern = Patterns.findOne({ _id: this.pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
+    //if (typeof pattern === "undefined")
+        //return;
       
     //var total_height = this.image_height() * this.scaling() * Session.get("number_of_repeats");
     var total_height = this.image_height() * Session.get("number_of_repeats");
 
-    if (pattern.edit_mode == "simulation")
-      if (pattern.simulation_mode == "auto")
+    if (Session.get("edit_mode") == "simulation")
+      if (Session.get("simulation_mode") == "auto")
         total_height -= (Session.get("number_of_repeats") - 1) * this.cell_height/2;
 
     return total_height;
   };
 
   this.image_width = function(){
+    //console.log("image width");
     return this.cell_width * Session.get("number_of_tablets");
   };
 
   this.image_height = function(){
+    //console.log("image height start");
     // elements overlap by half their height
     // so total height is half their height * number of rows
     // plus another half height that sticks out the top
     var height = (1 + Session.get("number_of_rows")) * this.cell_height / 2;
+    //console.log("image height end");
     return height;
   };
 
@@ -99,12 +103,13 @@ Template.auto_preview.onCreated(function() {
     var sim_holder_height = this.image_height() * Session.get("number_of_repeats");
 
     sim_holder_height -= (Session.get("number_of_repeats") - 1) * this.cell_height/2;
-
+//console.log("sim holder height");
     return sim_holder_height + 36; // 36 = width of tablets showing direction of weaving
   };
 
   this.set_svg_style = function() {
     // svg style doesn't seem to be saved in the svg image that is stored with the pattern for the Home page, so set it now to correct for rotation
+    //console.log("set svg style");
     var that = this;
 
     setTimeout(function() {
@@ -122,16 +127,20 @@ Template.auto_preview.onCreated(function() {
       }
       if (typeof $('.auto_preview svg')[0] === "undefined")
       {
+        //console.log("need to rerun set svg style");
         setTimeout(function() {
           that.set_svg_style();
         })
       }
       else
+      {
+        //console.log("setting svg style")
         $('.auto_preview svg').attr("style", svg_style);
+      }
     }, 5);
   };
 
-  this.set_svg_style();
+  //this.set_svg_style(); // TODO restore!
 });
 
 // extendContext is used in the template to supply the helper values to the child template.
@@ -190,12 +199,12 @@ Template.auto_preview.helpers({
   },
   tablet_position: function() {
     // which hole is currently in position A?
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, position_of_A: 1}});
+    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {position_of_A: 1}});
 
     if (typeof pattern === "undefined")
         return;
 
-    if (pattern.edit_mode == "simulation")
+    if (Session.get("edit_mode") == "simulation")
     {
       var position_of_A = JSON.parse(pattern.position_of_A);
       var labels = ["A", "B", "C", "D"];
@@ -203,30 +212,37 @@ Template.auto_preview.helpers({
     }
   },
   preview_rotation: function() {
+    //console.log("preview rotation");
     return Session.get("preview_rotation");
   },
   preview_style: function() {
+    //console.log("preview style");
+
+    //return "width: 600px";
     if (Session.get("preview_rotation") == "right")
-      return "width: " + (Template.instance().sim_holder_height()) + "px; min-width: 600px; position: relative;"; // extra px to allow space for tablets
+      var value = "width: " + (Template.instance().sim_holder_height()) + "px; min-width: 600px; position: relative;"; // extra px to allow space for tablets
 
     else if (Session.get("preview_rotation") == "left")
-      return "width: " + (Template.instance().sim_holder_height()) + "px;"; // extra px to allow space for tablets
+      var value = "width: " + (Template.instance().sim_holder_height()) + "px;"; // extra px to allow space for tablets
+
+    //console.log("preview style end " + value);
+    return value;
   },
   rotation_correction: function() {
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {edit_mode: 1, simulation_mode: 1}});
+    //var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {edit_mode: 1, simulation_mode: 1}});
 
   Template.instance().set_svg_style();
 
-  if (typeof pattern === "undefined")
-        return;
+  //if (typeof pattern === "undefined")
+        //return;
 
     var total_width = Template.instance().image_width();
 
     var total_height = Template.instance().image_height() * Session.get("number_of_repeats");
     //var total_height = Template.instance().image_height() * Template.instance().scaling() * Session.get("number_of_repeats");
 
-        if (pattern.edit_mode == "simulation")
-          if (pattern.simulation_mode == "auto")
+        if (Session.get("edit_mode") == "simulation")
+          if (Session.get("simulation_mode") == "auto")
             total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
 
     switch(Session.get("preview_rotation"))
@@ -306,13 +322,6 @@ Template.auto_preview_weft.helpers({
 
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
-    // pattern info used for simulation pattern
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1, simulation_mode: 1, manual_weaving_threads: 1, position_of_A: 1}});
-
-    if (typeof pattern === "undefined")
-        return;
-
     var cell = current_weaving_data[(row) + "_" + (tablet)];
 
     if (typeof cell === "undefined")
@@ -372,11 +381,14 @@ Template.auto_preview_element.helpers({
       {
         var show_empty = true; // default is to leave the cell blank
 
-        if (pattern.edit_mode == "simulation")
-          if (pattern.simulation_mode == "manual")
+        if (Session.get("edit_mode") == "simulation")
+          if (Session.get("simulation_mode") == "manual")
             // find the previous thread from the weaving threads
             if (Router.current().route.getName() == "pattern")
             {
+              var pattern_id = Router.current().params._id;
+              var pattern = Patterns.findOne({_id: pattern_id}, {fields: {manual_weaving_threads: 1, position_of_A: 1}});
+
               // check it's not empty hole
               if (!Meteor.my_functions.is_style_special(weaving_chart_style))
               {
@@ -398,7 +410,33 @@ Template.auto_preview_element.helpers({
             }
 
         if (show_empty)
-            return data; // we don't know what the previous thread was just from the weaving chart, so leave it empty.
+        {
+          return data; // we don't know what the previous thread was just from the weaving chart, so leave it empty.
+        }
+      }
+      else
+      {
+        console.log("carry on with idle in auto preview, check sim and freehand patterns, also multiple turns")
+console.log("row " + row);
+        console.log("idle. previously " + JSON.stringify(style));
+
+        // if previous style idle, go back through the rows until we find a non-idle style
+        if (style.name == "idle")
+        {
+          console.log("idle!");
+          for (var i = row-1; i> 0; i--)
+          {
+            previous_style_value = current_weaving_data[i + "_" + (tablet)].get();
+            style = Meteor.my_functions.find_style(previous_style_value);
+
+            if (!Meteor.my_functions.is_style_special(previous_style_value))
+            {
+              console.log("found a regular style " + i + ", " + previous_style_value);
+              style = Meteor.my_functions.find_style(previous_style_value);
+              break;
+            }
+          }
+        }
       }
     }
 
@@ -421,10 +459,12 @@ Template.auto_preview_element.helpers({
       data.color_2 = "#FFFFFF";
       data.color_3 = "#FFFFFF";
 
-      if (pattern.edit_mode == "simulation")
+      if (Session.get("edit_mode") == "simulation")
       {
-        if (pattern.simulation_mode == "manual") // auto patterns only ever have 1 turn
+        if (Session.get("simulation_mode") == "manual") // auto patterns only ever have 1 turn
         {
+          var pattern_id = Router.current().params._id;
+          var pattern = Patterns.findOne({_id: pattern_id}, {fields: {manual_weaving_threads: 1}});
           var threads_to_show = pattern.manual_weaving_threads[row-1];
           if (typeof threads_to_show !== "undefined") // in case rebuilding array
           {
@@ -443,6 +483,8 @@ Template.auto_preview_element.helpers({
               var identifier = (Meteor.my_functions.modular_add(i, threads_to_show[tablet-1], 4) + 1) + "_" + tablet;
               //var identifier = (index+1) + "_" + tablet;
               //console.log("identifier "+ identifier);
+              if (typeof current_threading_data[identifier] === "undefined")
+                  return; // can happen after insert tablet, this is temporary
               var thread_style = current_threading_data[identifier].get();
               //console.log("style " + thread_style);
 
@@ -460,19 +502,13 @@ Template.auto_preview_element.helpers({
               else
               {
                 thread_colors[index] = current_styles[thread_style-1].background_color;
-              }
- 
+              } 
             }
-            //console.log("direction " + direction);
-            //console.log("colors: " + thread_colors);
 
             data.color_0 = thread_colors[0];
             data.color_1 = thread_colors[1];
             data.color_2 = thread_colors[2];
             data.color_3 = thread_colors[3];
-
-            //var thread_to_show = pattern.manual_weaving_threads[row-1][tablet-1];
-            //console.log("thread_colors " + thread_styles);
           }
         }
       }
