@@ -61,7 +61,6 @@
       scaling = max_width / total_width;
       total_width = max_width;
     }*/
-//console.log("scaling " + scaling);
 
     return scaling;
   };
@@ -69,12 +68,7 @@
   this.total_height = function() { // for parent element css
     if (typeof Session.get("number_of_repeats") === "undefined")
       return 0; // not ready
-//console.log("total height");
-    //var pattern = Patterns.findOne({ _id: this.pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
-    //if (typeof pattern === "undefined")
-        //return;
-      
-    //var total_height = this.image_height() * this.scaling() * Session.get("number_of_repeats");
+
     var total_height = this.image_height() * Session.get("number_of_repeats");
 
     if (Session.get("edit_mode") == "simulation")
@@ -85,17 +79,15 @@
   };
 
   this.image_width = function(){
-    //console.log("image width");
     return this.cell_width * Session.get("number_of_tablets");
   };
 
   this.image_height = function(){
-    //console.log("image height start");
     // elements overlap by half their height
     // so total height is half their height * number of rows
     // plus another half height that sticks out the top
     var height = (1 + Session.get("number_of_rows")) * this.cell_height / 2;
-    //console.log("image height end");
+
     return height;
   };
 
@@ -103,13 +95,12 @@
     var sim_holder_height = this.image_height() * Session.get("number_of_repeats");
 
     sim_holder_height -= (Session.get("number_of_repeats") - 1) * this.cell_height/2;
-//console.log("sim holder height");
+
     return sim_holder_height + 36; // 36 = width of tablets showing direction of weaving
   };
 
   this.set_svg_style = function() {
     // svg style doesn't seem to be saved in the svg image that is stored with the pattern for the Home page, so set it now to correct for rotation
-    //console.log("set svg style");
     var that = this;
 
     setTimeout(function() {
@@ -127,20 +118,18 @@
       }
       if (typeof $('.auto_preview svg')[0] === "undefined")
       {
-        //console.log("need to rerun set svg style");
         setTimeout(function() {
           that.set_svg_style();
         })
       }
       else
       {
-        //console.log("setting svg style")
         $('.auto_preview svg').attr("style", svg_style);
       }
     }, 5);
   };
 
-  //this.set_svg_style(); // TODO restore!
+  this.set_svg_style(); // TODO restore!
 });
 
 // extendContext is used in the template to supply the helper values to the child template.
@@ -182,8 +171,6 @@ Template.auto_preview.helpers({
   repeat_border_offset: function()
   {
     var total_height = Template.instance().image_height();
-    //var total_height = Template.instance().image_height() * Template.instance().scaling();
-
     total_height -=  Template.instance().cell_height/2;
 
     return Math.ceil(total_height * this + Template.instance().cell_height/4);
@@ -199,51 +186,37 @@ Template.auto_preview.helpers({
   },
   tablet_position: function() {
     // which hole is currently in position A?
-    var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {position_of_A: 1}});
-
-    if (typeof pattern === "undefined")
-        return;
-
     if (Session.get("edit_mode") == "simulation")
     {
+      var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {position_of_A: 1}});
+
       var position_of_A = JSON.parse(pattern.position_of_A);
       var labels = ["A", "B", "C", "D"];
       return labels[position_of_A[this-1]];
     }
   },
   preview_rotation: function() {
-    //console.log("preview rotation");
     return Session.get("preview_rotation");
   },
   preview_style: function() {
-    //console.log("preview style");
-
-    //return "width: 600px";
     if (Session.get("preview_rotation") == "right")
       var value = "width: " + (Template.instance().sim_holder_height()) + "px; min-width: 600px; position: relative;"; // extra px to allow space for tablets
 
     else if (Session.get("preview_rotation") == "left")
       var value = "width: " + (Template.instance().sim_holder_height()) + "px;"; // extra px to allow space for tablets
 
-    //console.log("preview style end " + value);
     return value;
   },
   rotation_correction: function() {
-    //var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, { fields: {edit_mode: 1, simulation_mode: 1}});
-
-  Template.instance().set_svg_style();
-
-  //if (typeof pattern === "undefined")
-        //return;
+    Template.instance().set_svg_style();
 
     var total_width = Template.instance().image_width();
 
     var total_height = Template.instance().image_height() * Session.get("number_of_repeats");
-    //var total_height = Template.instance().image_height() * Template.instance().scaling() * Session.get("number_of_repeats");
 
-        if (Session.get("edit_mode") == "simulation")
-          if (Session.get("simulation_mode") == "auto")
-            total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
+    if (Session.get("edit_mode") == "simulation")
+      if (Session.get("simulation_mode") == "auto")
+        total_height -= (Session.get("number_of_repeats") - 1) * Template.instance().cell_height/2;
 
     switch(Session.get("preview_rotation"))
     {
@@ -268,8 +241,7 @@ Template.auto_preview.helpers({
       return 0;
 
     else
-      //return Math.min(Template.instance().image_width(), Template.instance().max_image_width);
-    return Math.min(Template.instance().image_width());
+      return Math.min(Template.instance().image_width());
   },
   total_height: function() {
     return Template.instance().image_height();
@@ -325,7 +297,7 @@ Template.auto_preview_element.helpers({
     var cell = current_weaving_data[(row) + "_" + (tablet)];
 
     if (typeof cell === "undefined")
-      return; // may happen when rows or tablets are added or removed
+        return; // may happen when rows or tablets are added or removed
 
     var style_value = cell.get();
     var style = Meteor.my_functions.find_style(style_value);
@@ -342,8 +314,9 @@ Template.auto_preview_element.helpers({
     }
 
     // manual simululation pattern needs to know what threads are in what positions if number of turns is 0 (idle) or 2, 3 (special style in weaving chart)
-    if ((Session.get("edit_mode") == "simulation") && 
-      (Session.get("simulation_mode") == "manual") &&
+    var simulation = ((Session.get("edit_mode") == "simulation") && (Session.get("simulation_mode") == "manual"));
+
+    if (simulation &&
       ((style.special) || (style.name == "idle")))
     {
       var pattern_id = Router.current().params._id;
@@ -351,39 +324,34 @@ Template.auto_preview_element.helpers({
       var threads_to_show = pattern.manual_weaving_threads[row-1];
 
       if (typeof threads_to_show === "undefined") // in case rebuilding array
-      {
-        return;
-      }
+          return;
 
-      else
-      {
-        var thread_styles = [];
-        var thread_colors = [];
-        var pack = current_manual_weaving_turns[row].tablets[tablet-1];
-        var direction = current_manual_weaving_turns[row].packs[pack-1].direction;
+      var thread_styles = [];
+      var thread_colors = [];
+      var pack = current_manual_weaving_turns[row].tablets[tablet-1];
+      var direction = current_manual_weaving_turns[row].packs[pack-1].direction;
 
-        for (var i=0; i<4; i++)
+      for (var i=0; i<4; i++)
+      {
+        var identifier = (Meteor.my_functions.modular_add(i, threads_to_show[tablet-1], 4) + 1) + "_" + tablet;
+        if (typeof current_threading_data[identifier] === "undefined")
+            return; // can happen after insert tablet, this is temporary
+        var thread_style = current_threading_data[identifier].get();
+
+        var index = i;
+        if (direction == "B") // threads appear in opposite order, and thread D shows not thread A
         {
-          var identifier = (Meteor.my_functions.modular_add(i, threads_to_show[tablet-1], 4) + 1) + "_" + tablet;
-          if (typeof current_threading_data[identifier] === "undefined")
-              return; // can happen after insert tablet, this is temporary
-          var thread_style = current_threading_data[identifier].get();
-
-          var index = i;
-          if (direction == "B") // threads appear in opposite order, and thread D shows not thread A
-          {
-            index = 3 - i;
-            index = Meteor.my_functions.modular_add(index, 1, 4);
-          }
-
-          if (Meteor.my_functions.is_style_special(thread_style))
-            thread_colors[index] = "rgba(0, 0, 0, 0)";
-
-          else
-            thread_colors[index] = current_styles[thread_style-1].background_color;
-
-          thread_styles[index] = thread_style;
+          index = 3 - i;
+          index = Meteor.my_functions.modular_add(index, 1, 4);
         }
+
+        if (Meteor.my_functions.is_style_special(thread_style))
+          thread_colors[index] = "rgba(0, 0, 0, 0)";
+
+        else
+          thread_colors[index] = current_styles[thread_style-1].background_color;
+
+        thread_styles[index] = thread_style;
       }
     }  
 
@@ -424,74 +392,29 @@ Template.auto_preview_element.helpers({
     }
 
     var previous_style = Meteor.my_functions.find_style(previous_style_value);
-      
+
     if (style.name == "idle") // idle tablet, use previous row
     {
-      //style = Meteor.my_functions.find_style(previous_style_value);
-
-      if ((Session.get("edit_mode") == "simulation") && (Session.get("simulation_mode") == "manual"))
+      if (simulation)
       {
-        // find the previous thread from the weaving threads
-        //var pattern_id = Router.current().params._id;
-        //var pattern = Patterns.findOne({_id: pattern_id}, {fields: {manual_weaving_threads: 1, position_of_A: 1}});
-
-        // check it's not empty hole
-        //if (!Meteor.my_functions.is_style_special(weaving_chart_style))
-        //console.log("idle in manual sim, style is " + JSON.stringify(style));
-        //if (!Meteor.my_functions.is_style_special(style))
-        //{
-          show_empty = false;
-          //style = thread_styles[0];
-          //style = Meteor.my_functions.find_style(thread_styles[0]);
-
-          var orientation = current_orientation[tablet-1].orientation;
-          //console.log("thread_styles[0] " + thread_styles[0]);
-
-          style_value = Meteor.my_functions.weaving_style_from_threading_style(thread_styles[0], orientation, direction, 1);
-
-          style = Meteor.my_functions.find_style(style_value);
-
-          //console.log("use style " + JSON.stringify(style));
-
-
-
-          // Forward turn
-          // show the thread in hole D, that is row 4 of threading chart   
-          /*var style_value = current_threading_data["1_" + tablet].get();
-
-          var weaving_chart_style = 7 + 4*(style_value - 1);
-          var orientation = current_orientation[tablet-1].orientation;
-
-          if (orientation == "S")
-            weaving_chart_style += 1;
-          else
-            weaving_chart_style += 2;
-          
-          style = Meteor.my_functions.find_style(weaving_chart_style);*/
-        //}
+        show_empty = false;
+        var orientation = current_orientation[tablet-1].orientation;
+        style_value = Meteor.my_functions.weaving_style_from_threading_style(thread_styles[0], orientation, direction, 1);
+        style = Meteor.my_functions.find_style(style_value);
       }
 
       else if (row == 1) // idle tablet in first row
       {
-        //var show_empty = true; // default is to leave the cell blank
-
-        //if (show_empty)
-        //{
           return data; // we don't know what the previous thread was just from the weaving chart, so leave it empty.
-        //}
       }
       else
       {
         style = Meteor.my_functions.find_style(previous_style_value);
 
-        console.log("carry on with idle in auto preview, check sim and freehand patterns, also multiple turns")
-console.log("row " + row);
-        console.log("idle. previously " + JSON.stringify(style));
-
         // if previous style idle, go back through the rows until we find a non-idle style
+        // this does not handle change of direction via 2 or 3 turn special, but I'm not sure any real patterns have +1 turn directly followed by idle
         if (style.name == "idle")
         {
-          console.log("idle!");
           for (var i = row-1; i> 0; i--)
           {
             previous_style_value = current_weaving_data[i + "_" + (tablet)].get();
@@ -499,7 +422,6 @@ console.log("row " + row);
 
             if (!Meteor.my_functions.is_style_special(previous_style_value))
             {
-              console.log("found a regular style " + i + ", " + previous_style_value);
               style = Meteor.my_functions.find_style(previous_style_value);
               break;
             }
@@ -521,63 +443,13 @@ console.log("row " + row);
     // shape
     if (style.special) // 2 or 3 turns
     {
-      // freehand patterns don't show colour
-      /*data.color_0 = "#FFFFFF";
-      data.color_1 = "#FFFFFF";
-      data.color_2 = "#FFFFFF";
-      data.color_3 = "#FFFFFF";
-
-      if ((Session.get("edit_mode") == "simulation") && (Session.get("simulation_mode") == "manual")) // auto patterns only ever have 1 turn
-        {*/
-          /*var pattern_id = Router.current().params._id;
-          var pattern = Patterns.findOne({_id: pattern_id}, {fields: {manual_weaving_threads: 1}});
-          var threads_to_show = pattern.manual_weaving_threads[row-1];
-          if (typeof threads_to_show !== "undefined") // in case rebuilding array
-          {*/
-            //var position_of_A = JSON.parse(pattern.position_of_A);
-            //var thread_styles = [];
-            //var thread_colors = [];
-            //console.log("row " + row);
-            //console.log("threads_to_show " + threads_to_show);
-            /*var pack = current_manual_weaving_turns[row].tablets[tablet-1];
-            //console.log("Pack " + pack);
-            var direction = current_manual_weaving_turns[row].packs[pack-1].direction;*/
-
-            /*for (var i=0; i<4; i++)
-            {
-              //console.log("threads_to_show[tablet-1] " + threads_to_show[tablet-1]);
-              var identifier = (Meteor.my_functions.modular_add(i, threads_to_show[tablet-1], 4) + 1) + "_" + tablet;
-              //var identifier = (index+1) + "_" + tablet;
-              //console.log("identifier "+ identifier);
-              if (typeof current_threading_data[identifier] === "undefined")
-                  return; // can happen after insert tablet, this is temporary
-              var thread_style = current_threading_data[identifier].get();
-              //console.log("style " + thread_style);
-
-              var index = i;
-              if (direction == "B") // threads appear in opposite order, and thread D shows not thread A
-              {
-                index = 3 - i;
-                index = Meteor.my_functions.modular_add(index, 1, 4);
-              }
-
-              if (Meteor.my_functions.is_style_special(thread_style))
-              {
-                thread_colors[index] = "rgba(0, 0, 0, 0)";
-              }
-              else
-              {
-                thread_colors[index] = current_styles[thread_style-1].background_color;
-              } 
-            }*/
-
-            data.color_0 = thread_colors[0];
-            data.color_1 = thread_colors[1];
-            data.color_2 = thread_colors[2];
-            data.color_3 = thread_colors[3];
-          //}
-        //}
-      //}
+      if (simulation)
+      {
+        data.color_0 = thread_colors[0];
+        data.color_1 = thread_colors[1];
+        data.color_2 = thread_colors[2];
+        data.color_3 = thread_colors[3];
+      }
 
       switch (style.name)
       {
@@ -707,7 +579,6 @@ console.log("row " + row);
 
     else if ((typeof previous_style !== "undefined") && !data.brocade)
     {
-      //console.log("shape " + data.shape);
       if ((previous_style.warp == "forward") || (previous_style.warp == "backward"))
         data.color = previous_style.line_color;
     }

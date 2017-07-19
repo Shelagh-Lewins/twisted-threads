@@ -55,7 +55,7 @@
     </span>
 
     <label for="num_auto_turns">Number of weaving rows:</label>
-    <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="48" size="3" value="{{auto_turn_sequence.length}}" > (max 48)<br/>
+    <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="48" size="3" value="{{auto_turn_sequence.length}}" > (max 48)<br>
 
     {{> auto_sequence}}
 
@@ -205,7 +205,7 @@
     <button id="add_tablet_at_start" title="Add tablet at left"><img src="/images/tablet_left.svg" onerror="this.src='/images/tablet_left.png';this.onerror=null;" width="32" height="32" ></button>
     <button id="add_tablet_at_end" title="Add tablet at right"><img src="/images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
     </div></div>
-
+{{#if session_equals "hide_while_loading" false}}
     <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
     {{> column_numbers}}
     {{#each row_indexes}}
@@ -215,40 +215,42 @@
     {{> remove_tablet}}
     {{/each}}</ul></div>{{/if}}
     </div>
+{{/if}}
 
     <div class="edit_rows">
       <button id="add_row">Add row</button> at 
-      <input type="number" placeholder="Position..." id="row_to_add" min="1" max="{{add_row_positions}}" size="3" value="1" ><br />
+      <input type="number" placeholder="Position..." id="row_to_add" min="1" max="{{add_row_positions}}" size="3" value="1" ><br >
       Number of new rows:
-      <input type="number" placeholder="Number..." id="num_new_rows" min="1" max="20" size="3" value="1" ><br />
+      <input type="number" placeholder="Number..." id="num_new_rows" min="1" max="20" size="3" value="1" ><br>
     </div>
     {{/if}}
 
   {{/unless}}
 
   <h2>Threading chart</h2>   
-  <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{> column_numbers}}
+  <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
+    {{> column_numbers}}
     {{#each hole_indexes}}
       {{> threading_row}}
     {{/each}}
     {{> orientation}}
+    {{/if}}
 
     {{#if can_edit_pattern _id}}
     <div id="edit_tablets">
       <button id="add_tablet" disabled="{{#unless equals can_add_tablets true}}disabled{{/unless}}">Add tablet</button> at 
-      <input type="number" placeholder="Position..." id="tablet_to_add" min="1" max="{{add_tablet_positions}}" size="3" value="1" ><br />
+      <input type="number" placeholder="Position..." id="tablet_to_add" min="1" max="{{add_tablet_positions}}" size="3" value="1" ><br>
       {{#if equals edit_mode "simulation"}}
         <button id="remove_tablet" disabled="{{#unless equals can_remove_tablets true}}disabled{{/unless}}">Remove tablet</button>  
         <input type="number" placeholder="Position..." id="tablet_to_remove" min="1" max="{{tablet_indexes.length}}" size="3" value="1" >
       {{/if}}
     </div>
     {{/if}}
-
   </div>
 
   {{#if can_edit_pattern _id}}
-  <div class="hint clearing">
-    To edit the threading chart, select thread colours from the palette at the bottom of the screen, then click chart cells. Use X for an unthreaded hole.<br />
+  <div class="hint clearboth">
+    To edit the threading chart, select thread colours from the palette at the bottom of the screen, then click chart cells. Use X for an unthreaded hole.<br>
   </div>
   {{/if}}
 
@@ -261,12 +263,12 @@
   <img src="{{#if equals hole_handedness "clockwise"}}/images/tablet_labels.png{{else}}/images/tablet_labels_rev.png{{/if}}" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
 
   <div class="hint">
-    The arrows show turning the tablet forwards.<br />
+    The arrows show turning the tablet forwards.<br>
   </div>
 
   {{#unless equals edit_mode "simulation"}}
     {{#if can_edit_pattern _id}}
-    <br/><button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
+    <br><button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
     {{/if}}
     {{/unless}}
   </div>

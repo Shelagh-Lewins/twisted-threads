@@ -179,7 +179,7 @@ Meteor.methods({
     if (number_of_rows > Meteor.settings.private.max_pattern_rows)
       throw new Meteor.Error("too-many-rows", "error creating pattern from JSON. Too many rows.");
 
-    if (number_of_rows > Meteor.settings.private.max_pattern_tablets)
+    if (number_of_tablets > Meteor.settings.private.max_pattern_tablets)
       throw new Meteor.Error("too-many-tablets", "error creating pattern from JSON. Too many tablets.");
 
     if(options.name == "")
@@ -498,7 +498,7 @@ Meteor.methods({
     if (number_of_rows > Meteor.settings.private.max_pattern_rows)
       throw new Meteor.Error("too-many-rows", "error saving pattern. Too many rows.");
 
-    if (number_of_rows > Meteor.settings.private.max_pattern_tablets)
+    if (number_of_tablets > Meteor.settings.private.max_pattern_tablets)
       throw new Meteor.Error("too-many-tablets", "error saving pattern. Too many tablets.");
 
     // Save the individual cell data

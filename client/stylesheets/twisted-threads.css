@@ -68,6 +68,11 @@ body {
   overflow:hidden;
 }
 
+/* but sometimes float must be cleared */
+.clearboth {
+  clear: both;
+}
+
 /* *** Header *** */
 #header .header_left {
   float: left;

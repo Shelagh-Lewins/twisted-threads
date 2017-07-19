@@ -1,7 +1,11 @@
 Template.view_pattern.rendered = function() {
+  Session.set('hide_preview', true);
+  Session.set('hide_while_loading', true);
+
   console.log("View pattern rendered start");
   $('body').attr("class", "view_pattern");
   var pattern_id = Router.current().params._id;
+
   Meteor.my_functions.add_to_recent_patterns(pattern_id);
   Meteor.my_functions.view_pattern_render(pattern_id);
   Meteor.my_functions.initialize_route();
@@ -9,12 +13,6 @@ Template.view_pattern.rendered = function() {
   Session.set('show_image_uploader', false);
   Session.set('upload_status', 'not started');
   Session.set('edited_pattern', false);
-  Session.set('hide_preview', true);
-
-  // for some reason, including preview immediately causes a big delay in loading
-  setTimeout(function(){
-    Session.set("hide_preview", false);
-  }, 1);
 
   Meteor.my_functions.set_repeats(pattern_id);
 
@@ -28,17 +26,11 @@ Template.view_pattern.rendered = function() {
   if (typeof $('.auto_preview path')[0] === "undefined")
     Session.set('edited_pattern', true);
 
-  // set session variables to avoid checking db every time
-  if (Meteor.my_functions.pattern_exists(pattern_id));
-  {
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
-
-    Session.set("edit_mode", pattern.edit_mode);
-    //console.log("setting edit mode to " + Session.get("edit_mode"));
-
-    if (pattern.edit_mode == "simulation")
-      Session.set("simulation_mode", pattern.simulation_mode);
-  }
+  // for some reason, including some templates immediately causes a big delay in loading
+  setTimeout(function(){
+    Session.set("hide_preview", false);
+    Session.set("hide_while_loading", false);
+  }, 1);
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -53,18 +45,29 @@ Template.view_pattern.rendered = function() {
 }
 
 Template.view_pattern.onCreated(function(){
+  console.log("view pattern created start");
   var pattern_id = Router.current().params._id;
 
-  Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id)); // quicker than checking db
+  // set session variables to avoid checking db every time
+  if (Meteor.my_functions.pattern_exists(pattern_id));
+  {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
 
-  Meteor.my_functions.view_pattern_created(pattern_id);
+    Session.set("edit_mode", pattern.edit_mode);
 
-  /////////
-  // Images
-  Tracker.autorun(function() {
-    Meteor.subscribe('images');
-  });
+    if (pattern.edit_mode == "simulation")
+      Session.set("simulation_mode", pattern.simulation_mode);
 
+    Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id));
+
+    Meteor.my_functions.view_pattern_created(pattern_id);
+
+    /////////
+    // Images
+    Tracker.autorun(function() {
+      Meteor.subscribe('images');
+    });
+  }
 });
 
 Template.pattern_not_found.helpers({

@@ -241,6 +241,7 @@ Meteor.my_functions = {
       name: name + " (copy)",
       data: data
     };
+
     Meteor.call('new_pattern_from_json', options, function(error, result){
       // automatically view new pattern
       Session.set('loading', false);
@@ -1221,22 +1222,15 @@ Meteor.my_functions = {
     var number_of_tablets = Session.get("number_of_tablets");
     var number_of_rows = Session.get("number_of_rows");
 
-    // basic data validation, must be an integer between 1 and number of tablets + 1 (new row at end)
+    // must be an integer between 1 and number of tablets + 1 (new row at end)
     position = Math.floor(position);
     position = Math.max(position, 1);
     position = Math.min(position, Session.get("number_of_rows")+1);
 
     // only add a valid number of rows, integer between 1 & 20
-    if (typeof num_new_rows != "number")
-    {
-      num_new_rows = 1;
-    }
-    else
-    {
-      num_new_rows = Math.floor(num_new_rows);
-      num_new_rows = Math.max(num_new_rows, 1);
-      num_new_rows = Math.min(num_new_rows, 20);
-    }
+    num_new_rows = Math.floor(num_new_rows);
+    num_new_rows = Math.max(num_new_rows, 1);
+    num_new_rows = Math.min(num_new_rows, 20);
 
     if (number_of_rows == 0)
       var position = 1;
@@ -1269,7 +1263,7 @@ Meteor.my_functions = {
 
       current_row_indexes.unshift(number_of_rows+1); //  rows are reversed
     }
-
+console.log("add row, rows " + (number_of_rows + num_new_rows));
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows + num_new_rows, number_of_tablets);
   },
   remove_weaving_row: function(pattern_id, position){
@@ -1470,8 +1464,11 @@ Meteor.my_functions = {
 
     var weaving_array = Meteor.my_functions.get_weaving_as_array(number_of_rows, number_of_tablets);
 
-    Meteor.call('save_weaving_to_db', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets, function(){
+    Meteor.call('save_weaving_to_db', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets, function(error, result){
         Meteor.my_functions.store_pattern(pattern_id);
+
+        if (typeof error !== "undefined")
+          alert(error);
         
         Session.set("number_of_rows", number_of_rows);
         Session.set("number_of_tablets", number_of_tablets);
@@ -1947,7 +1944,6 @@ Meteor.my_functions = {
 
     if (pattern.edit_mode === "simulation")
       Meteor.my_functions.reset_simulation_weaving(pattern_id);
-    console.log("end of view pattern created");
   },
   view_pattern_render: function(pattern_id) {
     Session.set('edit_style', false);
