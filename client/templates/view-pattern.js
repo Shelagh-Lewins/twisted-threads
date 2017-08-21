@@ -2,7 +2,6 @@ Template.view_pattern.rendered = function() {
   Session.set('hide_preview', true);
   Session.set('hide_while_loading', true);
 
-  console.log("View pattern rendered start");
   $('body').attr("class", "view_pattern");
   var pattern_id = Router.current().params._id;
 
@@ -45,7 +44,6 @@ Template.view_pattern.rendered = function() {
 }
 
 Template.view_pattern.onCreated(function(){
-  console.log("view pattern created start");
   var pattern_id = Router.current().params._id;
 
   // set session variables to avoid checking db every time
@@ -517,9 +515,10 @@ Template.view_pattern.events({
   'click #delete': function(event) {
     event.preventDefault();
     var pattern_id = Router.current().params._id;
+    var r = Meteor.my_functions.delete_pattern(pattern_id);
 
-    Meteor.my_functions.delete_pattern(pattern_id);
-    Router.go('my_patterns');
+    if (r == true)
+      Router.go('my_patterns');
   },
   // Make pattern private / public
   "click .toggle_private": function () {

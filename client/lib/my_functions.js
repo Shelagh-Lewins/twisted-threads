@@ -70,7 +70,7 @@ Meteor.my_functions = {
 
     var pattern_obj = {}; // JSON object to hold pattern
 
-    pattern_obj.version = "2.02";
+    pattern_obj.version = "2.03";
     // version number
     /*
       1.1 first ever
@@ -80,6 +80,7 @@ Meteor.my_functions = {
       2 replaced style.forward_stroke, style.backward_stroke with style.warp to allow more, mutually exclusive thread types
       2.01 added weft_color
       2.02 added edit_mode (simulation, freehand)
+      2.03 added fourth simulation / manual pack
     */
 
     var number_of_rows = pattern.number_of_rows;
@@ -290,11 +291,14 @@ Meteor.my_functions = {
     });
   },
   delete_pattern: function(pattern_id) {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { name: 1}});
+    var name = pattern.name;
     var r = confirm(name + "\nDo you want to delete this pattern?");
+
     if (r == true)
-    {
       Meteor.call('remove_pattern', pattern_id);
-    }
+
+    return r;
   },
   is_file_loading_supported: function() {
     if (window.File && window.FileReader && window.FileList && window.Blob)
@@ -1154,6 +1158,24 @@ Meteor.my_functions = {
 
       // manual
       var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
+
+      // add new packs if necessary
+      // dta format changed from 3 packs to 4 packs to better support 3 /1 broken twill
+      if (manual_weaving_turns[0].packs.length < Meteor.my_params.number_of_packs)
+      {
+        for (i=0; i<manual_weaving_turns.length; i++)
+        {
+          for (j=manual_weaving_turns[i].packs.length; j<Meteor.my_params.number_of_packs; j++)
+          {
+            var pack = {
+              pack_number: j+1,
+              direction: "F",
+              number_of_turns: 1
+            }
+            manual_weaving_turns[i].packs.push(pack);
+          }
+        }
+      }
 
       if (Session.get("number_of_rows") == 0)
       {
@@ -2784,6 +2806,36 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
 
     else
       return false;
+  },
+  last_non_idle_style: function(style_value, row, tablet) // find the most recent non-idle style before this row. Simulation / manual patterns only
+  {
+    //console.log("here, row " + row);
+
+    var previous_style_value = current_weaving_data[row + "_" + (tablet)].get();
+      //console.log("previous_style_value " + previous_style_value);
+    //var previous_style = Meteor.my_functions.find_style(previous_style_value);
+
+    //if (row != 1)
+    //{
+    for (var i = row-1; i> 0; i--)
+    {
+      //console.log("there");
+      var previous_style_value = current_weaving_data[i + "_" + (tablet)].get();
+      //console.log("previous_style_value " + previous_style_value);
+      //previous_style = Meteor.my_functions.find_style(previous_style_value);
+
+      if (!Meteor.my_functions.is_style_special(previous_style_value))
+      {
+        //var previous_style = Meteor.my_functions.find_style(previous_style_value);
+        break;
+      }
+      //}
+    }
+
+    var previous_style = Meteor.my_functions.find_style(previous_style_value);
+    console.log("previous_style " + JSON.stringify(previous_style));
+    
+    return previous_style;
   },
   ////////////////////////////////////////////
   // work around frequent failure of Meteor to register clicks on Styles palette

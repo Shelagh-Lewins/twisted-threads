@@ -338,7 +338,7 @@ Meteor.methods({
 
       Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: data.auto_turn_sequence}});
 
-      // manual_weaving_turns, 3 packs each tablet turned individually
+      // manual_weaving_turns, 4 packs each tablet turned individually
       // create row 0 which is never woven, it is a default and working row
       // actual weaving begins with row 1, 2...
       if((data.manual_weaving_turns == "") || (typeof data.manual_weaving_turns === "undefined"))
@@ -369,7 +369,7 @@ Meteor.methods({
         Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(data.manual_weaving_turns)}});
 
       /*
-      3 packs, each tablet in one pack
+      4 packs, each tablet in one pack
       for each pack, each pick: turn direction, number of turns 0,1,2,3
       export JSON, import JSON
 

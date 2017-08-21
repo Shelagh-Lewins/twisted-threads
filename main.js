@@ -160,33 +160,13 @@ if (Meteor.isClient) {
   UI.registerHelper('edit_mode', function() {
     if (Router.current().route.getName() == "pattern")
     {
-      //console.log("checking edit mode: " + Session.get("edit_mode"));
       return Session.get("edit_mode");
-      /*var pattern_id = Router.current().params._id;
-      if (!Meteor.my_functions.pattern_exists(pattern_id))
-          return;
-
-      var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
-  
-      if (pattern.edit_mode == "simulation")
-        return "simulation";
-
-      else
-        return "freehand";*/
     }
   });
 
   UI.registerHelper('simulation_mode', function() {
-    //console.log("checking simulation mode: " + Session.get("simulation_mode"));
     if (Router.current().route.getName() == "pattern")
       return Session.get("simulation_mode");
-    /*var pattern_id = Router.current().params._id;
-    if (!Meteor.my_functions.pattern_exists(pattern_id))
-        return;
-
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { simulation_mode: 1}});
-
-    return pattern.simulation_mode;*/
   });
 
   UI.registerHelper('does_pattern_repeat', function(){
