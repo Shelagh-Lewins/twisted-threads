@@ -294,6 +294,9 @@ Template.auto_preview_weft.helpers({
 
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
+    ////////////////////
+    // KNOWN ISSUE: reversal during or after idling shows an error.
+    // This is proving hard to fix and is a very unusual situation, so I'm parking it for now.
     var cell = current_weaving_data[(row) + "_" + (tablet)];
 
     if (typeof cell === "undefined")
@@ -313,6 +316,25 @@ Template.auto_preview_element.helpers({
       data.color_3 = "#FFFFFF";
     }
 
+    // find previous style    
+    if (row == 1)
+    {
+      var previous_style_value;
+
+      if (Session.get("number_of_repeats") > 1)
+        // for first row, use last row as previous row so pattern repeats correctly
+        previous_style_value = current_weaving_data[Session.get("number_of_rows") + "_" + (tablet)].get();
+      
+      else
+        previous_style_value = current_weaving_data[row + "_" + (tablet)].get();
+
+      var previous_style = Meteor.my_functions.find_style(previous_style_value);
+    }
+    else
+    {
+      previous_style = Meteor.my_functions.last_non_idle_style(row, tablet);
+    }
+
     // manual simululation pattern needs to know what threads are in what positions if number of turns is 0 (idle) or 2, 3 (special style in weaving chart)
     var simulation = ((Session.get("edit_mode") == "simulation") && (Session.get("simulation_mode") == "manual"));
 
@@ -327,24 +349,26 @@ Template.auto_preview_element.helpers({
 
       var thread_styles = [];
       var thread_colors = [];
-      var pack = current_manual_weaving_turns[row].tablets[tablet-1];
-      var direction = current_manual_weaving_turns[row].packs[pack-1].direction;
-      console.log("row " + row);
-      //console.log("initial direction " + direction);
+      var pack = current_manual_weaving_turns[row].tablets[tablet-1];    
 
+      // which thread shows?
+      // find direction of turn
+      var direction;
       if (style.name == "idle")
       {
         // use direction from last non-idle turn to find which thread shows
-        console.log("idle style");
-      direction = Meteor.my_functions.last_non_idle_style(style, row, tablet).warp;
-      //console.log("direction " + direction);
-
-      direction = (Meteor.my_functions.last_non_idle_style(style, row, tablet).warp == "forward")? "F": "B";
-      //console.log("direction " + direction);
-
+        // check tablet threading
+        var orientation = current_orientation[tablet-1].orientation;
+        //console.log("orientation " + orientation);
+        if (orientation == "S")
+          direction = (previous_style.warp == "forward")? "F": "B";
+        else
+          direction = (previous_style.warp == "forward")? "B": "F";
       }
-
-      console.log("direction " + direction);
+      else
+      {
+        current_manual_weaving_turns[row].packs[pack-1].direction;
+      }
 
       for (var i=0; i<4; i++)
       {
@@ -367,11 +391,7 @@ Template.auto_preview_element.helpers({
           thread_colors[index] = current_styles[thread_style-1].background_color;
 
         thread_styles[index] = thread_style;
-
-
       }
-
-      console.log("threads_colours " + thread_colors);
     }  
 
     var unit_width = 41.560534;
@@ -393,25 +413,6 @@ Template.auto_preview_element.helpers({
     var v_right = "m41.121 85.614h-29.491v-55.147h29.491z";
     var v_center = "m35.721 85.614h-29.491v-55.147h29.491z";
 
-    // find previous style
-    var previous_style_value;
-    if (row == 1)
-    {
-      if (Session.get("number_of_repeats") > 1)
-        // for first row, use last row as previous row so pattern repeats correctly
-        previous_style_value = current_weaving_data[Session.get("number_of_rows") + "_" + (tablet)].get();
-      
-      else
-        previous_style_value = current_weaving_data[row + "_" + (tablet)].get();
-    }
-      
-    else
-    {
-      previous_style_value = current_weaving_data[(row-1) + "_" + (tablet)].get();
-    }
-
-    var previous_style = Meteor.my_functions.find_style(previous_style_value);
-
     if (style.name == "idle") // idle tablet, use previous row
     {
       if (simulation)
@@ -428,12 +429,7 @@ Template.auto_preview_element.helpers({
       }
       else
       {
-        style = Meteor.my_functions.find_style(previous_style_value);
-
-        // if previous style idle, go back through the rows until we find a non-idle style
-        // this does not handle change of direction via 2 or 3 turn special, but I'm not sure any real patterns have >1 turn directly followed by idle
-        if (style.name == "idle")
-          style = Meteor.my_functions.last_non_idle_style(style, row, tablet);
+        style = previous_style;
       }
     }
 
@@ -441,16 +437,14 @@ Template.auto_preview_element.helpers({
 
     // has the twining direction reversed?
     var reversal = false;
+    //console.log("style.warp " + style.warp);
+    //console.log("previous_style.warp " + previous_style.warp);
     if ((style.warp == "forward") && (previous_style.warp == "backward"))
       reversal = true;
 
     if ((style.warp == "backward") && (previous_style.warp == "forward"))
       reversal = true;
-
-    if (style.name == "idle")
-      reversal = false;
-    console.log("reversal " + reversal);
-
+//console.log("reversal " + reversal);
     // shape
     if (style.special) // 2 or 3 turns
     {

@@ -1159,24 +1159,6 @@ Meteor.my_functions = {
       // manual
       var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
 
-      // add new packs if necessary
-      // dta format changed from 3 packs to 4 packs to better support 3 /1 broken twill
-      if (manual_weaving_turns[0].packs.length < Meteor.my_params.number_of_packs)
-      {
-        for (i=0; i<manual_weaving_turns.length; i++)
-        {
-          for (j=manual_weaving_turns[i].packs.length; j<Meteor.my_params.number_of_packs; j++)
-          {
-            var pack = {
-              pack_number: j+1,
-              direction: "F",
-              number_of_turns: 1
-            }
-            manual_weaving_turns[i].packs.push(pack);
-          }
-        }
-      }
-
       if (Session.get("number_of_rows") == 0)
       {
         // reset direction, number of turns to "F", 1
@@ -1189,7 +1171,8 @@ Meteor.my_functions = {
       else
       {
         // show direction, number of turns for latest row
-        manual_weaving_turns[0] = manual_weaving_turns[manual_weaving_turns.length-1];
+        // ensure it's a new object not a reference
+        manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[manual_weaving_turns.length-1]));
       }
 
       current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
@@ -1428,13 +1411,20 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
       current_orientation[j].tablet -= 1;
     }
     current_orientation.splice(position-1, 1);
-
+//console.log("current_manual_weaving_turns " + JSON.stringify(current_manual_weaving_turns.list()))
     // manual_weaving_turns
     if (pattern.edit_mode == "simulation")
     {
       for (var i=0;i<current_manual_weaving_turns.list().length; i++)
       {
+        //console.log(" ")
+        //console.log("i " + i);
+        //console.log("current_manual_weaving_turns before " + current_manual_weaving_turns.list()[i].tablets);
+        //console.log("position: " + position);
         current_manual_weaving_turns.list()[i].tablets.splice(position-1, 1);
+        //console.log("current_manual_weaving_turns after " + current_manual_weaving_turns.list()[i].tablets);
+
+        //console.log("current_manual_weaving_turns check " + JSON.stringify(current_manual_weaving_turns.list()))
       }
     }
 
@@ -2291,6 +2281,7 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
 
       for (var i=1; i<manual_weaving_turns.length; i++)
       {
+        //console.log("reset manual weaving");
         data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);
       }
         
@@ -2309,16 +2300,18 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
     var tablet_directions = []; // for each tablet, which direction it turns
     var tablet_turns = []; // for each tablet, number of turns
     var threading_row = [];
-
-    //var manual_weaving_threads = pattern.manual_weaving_threads;
     var new_threads_row = [];
-
+//console.log("Number of tablets " + data.number_of_tablets);
+//console.log("new_row_sequence " + JSON.stringify(new_row_sequence));
+//console.log("data.number_of_tablets " + data.number_of_tablets);
     // turn tablets
     for (var i=0; i<data.number_of_tablets; i++)
     {
       // find turn direction and number of turns
       var pack_number = new_row_sequence.tablets[i];
+      //console.log("pack_number " + pack_number);
       var pack = new_row_sequence.packs[pack_number - 1];
+      //console.log("pack " + pack);
       var direction = pack.direction;
       var number_of_turns = pack.number_of_turns;
 
@@ -2807,35 +2800,23 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
     else
       return false;
   },
-  last_non_idle_style: function(style_value, row, tablet) // find the most recent non-idle style before this row. Simulation / manual patterns only
+  last_non_idle_style: function(row, tablet) // find the most recent non-idle style before this row.
   {
-    //console.log("here, row " + row);
-
     var previous_style_value = current_weaving_data[row + "_" + (tablet)].get();
-      //console.log("previous_style_value " + previous_style_value);
-    //var previous_style = Meteor.my_functions.find_style(previous_style_value);
 
-    //if (row != 1)
-    //{
     for (var i = row-1; i> 0; i--)
     {
-      //console.log("there");
       var previous_style_value = current_weaving_data[i + "_" + (tablet)].get();
-      //console.log("previous_style_value " + previous_style_value);
-      //previous_style = Meteor.my_functions.find_style(previous_style_value);
 
       if (!Meteor.my_functions.is_style_special(previous_style_value))
       {
-        //var previous_style = Meteor.my_functions.find_style(previous_style_value);
-        break;
+        //if (Meteor.my_functions.find_style(previous_style_value).name != "idle")
+        // TODO make sure this works for multiple turn followed by reversal, which is special but not idle!
+          break;
       }
-      //}
     }
-
-    var previous_style = Meteor.my_functions.find_style(previous_style_value);
-    console.log("previous_style " + JSON.stringify(previous_style));
     
-    return previous_style;
+    return Meteor.my_functions.find_style(previous_style_value);
   },
   ////////////////////////////////////////////
   // work around frequent failure of Meteor to register clicks on Styles palette
