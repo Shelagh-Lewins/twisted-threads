@@ -70,7 +70,7 @@ Meteor.my_functions = {
 
     var pattern_obj = {}; // JSON object to hold pattern
 
-    pattern_obj.version = "2.03";
+    pattern_obj.version = "2.02";
     // version number
     /*
       1.1 first ever
@@ -80,7 +80,6 @@ Meteor.my_functions = {
       2 replaced style.forward_stroke, style.backward_stroke with style.warp to allow more, mutually exclusive thread types
       2.01 added weft_color
       2.02 added edit_mode (simulation, freehand)
-      2.03 added fourth simulation / manual pack
     */
 
     var number_of_rows = pattern.number_of_rows;
@@ -2281,7 +2280,6 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
 
       for (var i=1; i<manual_weaving_turns.length; i++)
       {
-        //console.log("reset manual weaving");
         data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);
       }
         
@@ -2301,17 +2299,13 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
     var tablet_turns = []; // for each tablet, number of turns
     var threading_row = [];
     var new_threads_row = [];
-//console.log("Number of tablets " + data.number_of_tablets);
-//console.log("new_row_sequence " + JSON.stringify(new_row_sequence));
-//console.log("data.number_of_tablets " + data.number_of_tablets);
+
     // turn tablets
     for (var i=0; i<data.number_of_tablets; i++)
     {
       // find turn direction and number of turns
       var pack_number = new_row_sequence.tablets[i];
-      //console.log("pack_number " + pack_number);
       var pack = new_row_sequence.packs[pack_number - 1];
-      //console.log("pack " + pack);
       var direction = pack.direction;
       var number_of_turns = pack.number_of_turns;
 

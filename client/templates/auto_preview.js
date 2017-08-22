@@ -357,10 +357,8 @@ Template.auto_preview_element.helpers({
       if (style.name == "idle")
       {
         // use direction from last non-idle turn to find which thread shows
-        // check tablet threading
-        var orientation = current_orientation[tablet-1].orientation;
-        //console.log("orientation " + orientation);
-        if (orientation == "S")
+        // tablet orientation determines which way thread is angled
+        if (current_orientation[tablet-1].orientation == "S")
           direction = (previous_style.warp == "forward")? "F": "B";
         else
           direction = (previous_style.warp == "forward")? "B": "F";
@@ -437,14 +435,12 @@ Template.auto_preview_element.helpers({
 
     // has the twining direction reversed?
     var reversal = false;
-    //console.log("style.warp " + style.warp);
-    //console.log("previous_style.warp " + previous_style.warp);
     if ((style.warp == "forward") && (previous_style.warp == "backward"))
       reversal = true;
 
     if ((style.warp == "backward") && (previous_style.warp == "forward"))
       reversal = true;
-//console.log("reversal " + reversal);
+
     // shape
     if (style.special) // 2 or 3 turns
     {
