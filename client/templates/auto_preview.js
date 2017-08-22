@@ -295,7 +295,7 @@ Template.auto_preview_weft.helpers({
 Template.auto_preview_element.helpers({
   data: function(row, tablet) {
     ////////////////////
-    // KNOWN ISSUE: reversal during or after idling shows an error.
+    // KNOWN ISSUE: reversal during idling shows an error.
     // This is proving hard to fix and is a very unusual situation, so I'm parking it for now.
     var cell = current_weaving_data[(row) + "_" + (tablet)];
 
