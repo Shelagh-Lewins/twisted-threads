@@ -361,6 +361,8 @@ Meteor.my_functions = {
   },
   import_pattern_from_gtt: function(data, filename) {
     Session.set('loading', true);
+    console.log("typeof data " + typeof data);
+    console.log("data " + JSON.stringify(data));
 
     Meteor.call('xml2js', data, function(error, result){
       Session.set('loading', false);
@@ -437,6 +439,24 @@ Meteor.my_functions = {
                 else pattern_obj = result.result;
               break;
 
+            case "BrokenTwill":
+              if (typeof pattern_obj.description === "undefined")
+                pattern_obj.description = "A 3/1 broken twill pattern imported from Guntram's Tabletweaving Thingy (GTT)";
+
+              if (typeof pattern_obj.weaving_notes === "undefined")
+                pattern_obj.weaving_notes = "Weaving chart key:\nWhite background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread";
+
+              if (typeof pattern_obj.threading_notes === "undefined")
+                pattern_obj.threading_notes = "Cell colour = thread colour for that hole";
+              
+              var result = Meteor.my_functions.convert_gtt_3_1_twill_pattern_to_json(pattern_data, pattern_obj); // split analysis of different pattern types off for readability
+                if (result.error)
+                  local_error = "Error converting pattern " + result.error;
+
+                else pattern_obj = result.result;
+                console.log("pattern_obj " + JSON.stringify(pattern_obj));
+              break;
+
             default:
               local_error = "Unhandled GTT pattern type: " + pattern_data["$"].Type;
               break;
@@ -459,10 +479,331 @@ Meteor.my_functions = {
     // Pattern data has been read in from a .gtt file and the header information analysed
     // pattern_data is the file data converted to JSON
     // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
-    //console.log(JSON.stringify(pattern_obj));
     var error;
     pattern_obj.tags.push("threaded-in");
 
+    // build threading chart and palette colors
+    var result = Meteor.my_functions.analyse_gtt_colors(pattern_data, pattern_obj);
+    pattern_obj = result.pattern_obj;
+    var number_of_tablets = result.number_of_tablets;
+    var tablet_colors = result.tablet_colors;
+    var style_lookup = result.style_lookup;
+    /*var tablets_data = pattern_data.Cards[0].Card;
+    var number_of_tablets = tablets_data.length;
+    pattern_obj.orientation = [];
+    pattern_obj.threading = [
+      [], // hole A
+      [], // hole B
+      [], // hole C
+      [] // hole D
+    ];
+    // colours records the thread colour for the hole. This will need to be translated into styles showing direction and orientation.
+    var tablet_colors = [
+      [], // hole A
+      [], // hole B
+      [], // hole C
+      [] // hole D
+    ];
+    var unique_colours_counter = {}; // for counting occurrences of colours
+    var unique_colors_list = [];
+    pattern_obj.weaving = []; // TODO fill in
+    pattern_obj.styles = [];
+    for (var i=0; i<32; i++)
+    {
+      pattern_obj.styles.push({
+        background_color: "#FFFFFF",
+        line_color: "#000000",
+        warp: "none"
+      });
+    }
+
+    // list all thread colors used in tablets, and map each color to a tablet
+    for (var i=0; i< number_of_tablets; i++)
+    {
+      pattern_obj.orientation.push(tablets_data[i].Threading[0]);
+
+      var tablet_styles = tablets_data[i].Holes[0].Colour; // should be an array with 4 elements
+      if (tablet_styles.length != 4)
+      {
+        return {error: "tablet with index " + (i) + " does not have four Colours"};
+      }
+      else
+      {
+        for (var j=0; j<4; j++)
+        {
+          // arrange the colours for each tablet
+          var colour_index = tablet_styles[j];
+          tablet_colors[j].push(colour_index);
+
+          // count how many times each colour is used
+          if (!unique_colours_counter[colour_index])
+            unique_colours_counter[colour_index] = 1;
+
+          else
+            unique_colours_counter[colour_index] +=1;         
+        }
+      }
+    }
+    for (var property in unique_colours_counter) {
+      if (unique_colours_counter.hasOwnProperty(property)) {
+        unique_colors_list.push(parseInt(property));
+      }
+    }
+    unique_colors_list.sort(function(a, b){return unique_colours_counter[b]-unique_colours_counter[a]}); // Sort colours by usage, most used first
+
+    // turning patterns can only handle 8 colors because there are 4 variants of each for a total of 32 styles
+    // so replace any colours past the first 8 with the 8th colour
+    if (unique_colors_list.length > 8)
+    {
+      for (var i=0; i< number_of_tablets; i++)
+      {
+        for (var j=0; j<4; j++)
+        {
+          if (unique_colors_list.indexOf(tablet_colors[j][i]) > 7)
+            tablet_colors[j][i] = unique_colors_list[7];
+        }
+      }
+    }
+
+    ////////////////////////////////
+    // Build styles
+    // find the colours in the palette
+    var palette = pattern_data.Palette[0].Colour;
+    var number_of_colours = Math.min(palette.length, unique_colors_list.length, 8);
+
+    var style_lookup = {}; // find a style from thread Palette color index, orientation (S, Z) and turning direction (forwards, backwards)
+
+    for (var i=0; i<number_of_colours; i++)
+    {
+      var windows_color = parseInt(palette[unique_colors_list[i]]["_"]);
+
+      var line_color = Meteor.my_functions.convert_windows_color_to_hex_rgb(windows_color); // GTT uses Windows color picker
+
+      // lookup style by palette index, orientation, forwards
+      // e.g. style_lookup[0]["S"][true] will return the style that corresponds to Palette colour 0 (i.e. the first in the XML), S threaded, turn forwards
+      var style_start = 2*i; // first style of set
+      if (i >= 4) // styles are built in two pages
+        style_start = 8 + (2*i);
+
+      style_lookup[unique_colors_list[i]] = {
+        S: {
+          true: style_start + 1, // forwards
+          false: style_start + 9 // backwards
+        },
+        Z: {
+          true: style_start + 2, // forwards
+          false: style_start + 10 // backwards
+        }
+      }
+
+      // S, turn forwards = forward warp, white bg
+      pattern_obj.styles[style_start] = {
+        background_color: "#FFFFFF",
+        line_color: line_color,
+        warp: "forward"
+      };
+
+      // Z, turn forwards = backward warp, white bg
+      pattern_obj.styles[style_start + 1] = {
+        background_color: "#FFFFFF",
+        line_color: line_color,
+        warp: "backward"
+      };
+
+      // S, turn backwards = backward warp, grey bg
+      pattern_obj.styles[style_start + 8] = {
+        background_color: "#666666",
+        line_color: line_color,
+        warp: "backward"
+      };
+
+      // Z, turn backwards = forward warp, grey bg
+      pattern_obj.styles[style_start + 9] = {
+        background_color: "#666666",
+        line_color: line_color,
+        warp: "forward"
+      };
+    }
+
+    /////////////////////////////////
+    // assign styles to threading
+    for (var i=0; i< number_of_tablets; i++)
+    {
+      var orientation = pattern_obj.orientation[i];
+
+      for (var j=0; j<4; j++)
+      {
+        var thread_color = tablet_colors[3-j][i]; // read holes D -> A
+        pattern_obj.threading[j].push(style_lookup[thread_color][orientation][true]);
+      }
+    }
+
+    //////////////////////////////////
+    // Use default special styles
+    pattern_obj.special_styles = Meteor.my_params.default_special_styles;*/
+
+    //////////////////////////////////
+    // build weaving chart
+
+    // note which thread is in the "A" position of each tablet at the start of weaving
+    var position_A_threads = [];
+    var current_turn_direction = [];
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      position_A_threads.push(0); // start all tablets with the "A" thread
+      current_turn_direction.push("F");
+    }
+
+    var picks = pattern_data.Picks[0].Pick; // weaving data
+
+    // check for multiple packs of cards
+    var uses_packs = false;
+    var packs = {};
+    try
+    {
+      var packs_data = pattern_data.Packs[0].Pack; // the files generally contain a Packs object but it may not have any nodes
+      if (packs_data.length > 0)
+        uses_packs = true;
+
+      for (var i=0; i<packs_data.length; i++) // build packs
+      {
+        var name = packs_data[i]["$"].Name;
+        var cards = packs_data[i].Cards[0].split(",");
+        var tablets = [];
+        for (var j=0; j<cards.length; j++)
+        {
+          tablets.push(parseInt(cards[j])-1); // cards in data are numbered from 1, but arrays start at 0
+        }
+        
+        packs[name] = tablets;
+      }
+    }
+    catch(err)
+    {
+
+    }
+
+    // method to handle turning a tablet forward or backward
+    this.turn_tablet = function(tablet, direction, distance) {
+      var position_A_thread = position_A_threads[tablet]; // visible thread for this tablet
+      if (typeof position_A_thread === "undefined")
+            return; // in case
+
+      if (direction == current_turn_direction[tablet])
+      {
+        // TODO check for distance == 3, 2 or 1
+
+        // update the visible thread
+        if (direction == "F")
+          position_A_thread -= distance;
+
+        else
+          position_A_thread += distance;
+
+        if (position_A_thread < 0)
+          position_A_thread += 4; // % operator is remainder not modulus
+
+        position_A_thread = position_A_thread % 4;
+        position_A_threads[tablet] = position_A_thread;
+        
+      }
+      else // reversing turning direction keeps the same thread
+      {
+        current_turn_direction[tablet] = direction;
+      }
+
+      var orientation = pattern_obj.orientation[tablet]; // orientation of tablet
+      var thread_color = tablet_colors[position_A_thread][tablet];
+
+      new_row[tablet] = style_lookup[thread_color][orientation][(action.Dir == "F")];
+
+      return;
+    };
+
+    // check which Special Style represents 'idle'
+    // each tablet is idle unless turned by an action
+    var idle_style = "S1"; // just so there is some value
+    for (var i=0; i<pattern_obj.special_styles.length; i++)
+    {
+      if (pattern_obj.special_styles[i].name == "idle")
+      {
+        idle_style = pattern_obj.special_styles[i].style;
+        break;
+      }
+
+    }
+
+    for (var i=0; i<picks.length; i++) // each weaving row
+    //for (var i=0; i<1; i++)
+    {
+      var new_row = []; // build a blank row for row styles
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        new_row.push(idle_style); // placeholder, will be overwritten by pack data
+      }
+      var actions = picks[i].Actions[0].Action;
+
+      for (var j=0; j<actions.length; j++)
+      {
+        var action = actions[j]["$"];
+
+        if (action.Type == "Turn")
+        {
+          var distance = parseInt(action.Dist); // usually 1 (quarter turn)
+          var direction = action.Dir; //  "F" or "B"
+
+          if (action.Target == "Pack") // turn all tablets in a pack
+          {
+            
+            var target_pack = packs[action.TargetID];
+            if (typeof target_pack === "undefined")
+                return {error: "no pack " + (action.TargetID) + " has been defined"};
+
+            for (var k=0; k<target_pack.length; k++) // each tablet in pack
+            {
+              var tablet = target_pack[k];
+              this.turn_tablet(tablet, direction, distance);
+            }
+          }
+          else if (action.Target == "Card") // turn an individual tablet
+          {
+            var tablet = parseInt(action.TargetID) - 1;
+            if (typeof position_A_threads[tablet] === "undefined")
+                return {error: "no tablet " + tablet + " has been defined"};
+
+            this.turn_tablet(tablet, direction, distance);
+          }
+        }
+      }
+      pattern_obj.weaving.push(new_row);
+    }
+
+    return {result: pattern_obj};
+    // TODO back in loading file, find how to check file type make sure it's text not image
+
+    // Questions for Guntram
+    /*
+      Are selvedges important?
+      Other variations within threaded-in patterns over twist, packs?
+      How do you weave from double faced and 3/1 broken twill?
+    */
+  },
+  convert_gtt_3_1_twill_pattern_to_json: function(pattern_data, pattern_obj)
+  {
+    console.log(JSON.stringify(pattern_obj));
+    var error;
+    pattern_obj.tags.push("3/1 broken twill");
+
+    // build threading chart and palette colors
+    var result = Meteor.my_functions.analyse_gtt_colors(pattern_data, pattern_obj);
+    pattern_obj = result.pattern_obj;
+    var number_of_tablets = result.number_of_tablets;
+    var tablet_colors = result.tablet_colors;
+
+    return {result: pattern_obj};
+  },
+  analyse_gtt_colors: function(pattern_data, pattern_obj)
+  {
     // analyse tablet orientation and thread colour
     var tablets_data = pattern_data.Cards[0].Card;
     var number_of_tablets = tablets_data.length;
@@ -618,151 +959,8 @@ Meteor.my_functions = {
     // Use default special styles
     pattern_obj.special_styles = Meteor.my_params.default_special_styles;
 
-    //////////////////////////////////
-    // build weaving chart
-
-    // note which thread is in the "A" position of each tablet at the start of weaving
-    var position_A_threads = [];
-    var current_turn_direction = [];
-    for (var i=0; i<number_of_tablets; i++)
-    {
-      position_A_threads.push(0); // start all tablets with the "A" thread
-      current_turn_direction.push("F");
-    }
-
-    var picks = pattern_data.Picks[0].Pick; // weaving data
-
-    // check for multiple packs of cards
-    var uses_packs = false;
-    var packs = {};
-    try
-    {
-      var packs_data = pattern_data.Packs[0].Pack; // the files generally contain a Packs object but it may not have any nodes
-      if (packs_data.length > 0)
-        uses_packs = true;
-
-      for (var i=0; i<packs_data.length; i++) // build packs
-      {
-        var name = packs_data[i]["$"].Name;
-        var cards = packs_data[i].Cards[0].split(",");
-        var tablets = [];
-        for (var j=0; j<cards.length; j++)
-        {
-          tablets.push(parseInt(cards[j])-1); // cards in data are numbered from 1, but arrays start at 0
-        }
-        
-        packs[name] = tablets;
-      }
-    }
-    catch(err)
-    {
-
-    }
-
-    // method to handle turning a tablet forward or backward
-    this.turn_tablet = function(tablet, direction, distance) {
-      var position_A_thread = position_A_threads[tablet]; // visible thread for this tablet
-      if (typeof position_A_thread === "undefined")
-            return; // in case
-
-      if (direction == current_turn_direction[tablet])
-      {
-        // TODO check for distance == 3, 2 or 1
-
-        // update the visible thread
-        if (direction == "F")
-          position_A_thread -= distance;
-
-        else
-          position_A_thread += distance;
-
-        if (position_A_thread < 0)
-          position_A_thread += 4; // % operator is remainder not modulus
-
-        position_A_thread = position_A_thread % 4;
-        position_A_threads[tablet] = position_A_thread;
-        
-      }
-      else // reversing turning direction keeps the same thread
-      {
-        current_turn_direction[tablet] = direction;
-      }
-
-      var orientation = pattern_obj.orientation[tablet]; // orientation of tablet
-      var thread_color = tablet_colors[position_A_thread][tablet];
-
-      new_row[tablet] = style_lookup[thread_color][orientation][(action.Dir == "F")];
-
-      return;
-    };
-
-    // check which Special Style represents 'idle'
-    // each tablet is idle unless turned by an action
-    var idle_style = "S1"; // just so there is some value
-    for (var i=0; i<pattern_obj.special_styles.length; i++)
-    {
-      if (pattern_obj.special_styles[i].name == "idle")
-      {
-        idle_style = pattern_obj.special_styles[i].style;
-        break;
-      }
-
-    }
-
-    for (var i=0; i<picks.length; i++) // each weaving row
-    //for (var i=0; i<1; i++)
-    {
-      var new_row = []; // build a blank row for row styles
-      for (var j=0; j<number_of_tablets; j++)
-      {
-        new_row.push(idle_style); // placeholder, will be overwritten by pack data
-      }
-      var actions = picks[i].Actions[0].Action;
-
-      for (var j=0; j<actions.length; j++)
-      {
-        var action = actions[j]["$"];
-
-        if (action.Type == "Turn")
-        {
-          var distance = parseInt(action.Dist); // usually 1 (quarter turn)
-          var direction = action.Dir; //  "F" or "B"
-
-          if (action.Target == "Pack") // turn all tablets in a pack
-          {
-            
-            var target_pack = packs[action.TargetID];
-            if (typeof target_pack === "undefined")
-                return {error: "no pack " + (action.TargetID) + " has been defined"};
-
-            for (var k=0; k<target_pack.length; k++) // each tablet in pack
-            {
-              var tablet = target_pack[k];
-              this.turn_tablet(tablet, direction, distance);
-            }
-          }
-          else if (action.Target == "Card") // turn an individual tablet
-          {
-            var tablet = parseInt(action.TargetID) - 1;
-            if (typeof position_A_threads[tablet] === "undefined")
-                return {error: "no tablet " + tablet + " has been defined"};
-
-            this.turn_tablet(tablet, direction, distance);
-          }
-        }
-      }
-      pattern_obj.weaving.push(new_row);
-    }
-
-    return {result: pattern_obj};
-    // TODO back in loading file, find how to check file type make sure it's text not image
-
-    // Questions for Guntram
-    /*
-      Are selvedges important?
-      Other variations within threaded-in patterns over twist, packs?
-      How do you weave from double faced and 3/1 broken twill?
-    */
+    //return pattern_obj;
+    return {pattern_obj: pattern_obj, number_of_tablets: number_of_tablets, tablet_colors: tablet_colors, style_lookup: style_lookup};
   },
   store_pattern: function(pattern_id)
   {
