@@ -733,7 +733,7 @@ Meteor.my_functions = {
     // Pattern data has been read in from a .gtt file and the header information analysed
     // pattern_data is the file data converted to JSON
     // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
-
+pattern_data_temp = pattern_data;
     // build a simulation / manual pattern
     // set up basic pattern data structure
     pattern_obj.tags.push("3/1 broken twill");
@@ -800,6 +800,16 @@ Meteor.my_functions = {
       }
     }
 
+    // Weave pattern
+    // find twill direction
+    var background_twill = pattern_data.BackgroundTwill[0];
+    console.log(background_twill);
+
+    // TODO
+    // count rows
+    // weave background twill
+    // check design and change color
+    // check for long floats
     return {result: pattern_obj};  
   },
   analyse_gtt_colors: function(pattern_data, pattern_obj, max_colors)
