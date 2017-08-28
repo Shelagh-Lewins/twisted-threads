@@ -40,6 +40,25 @@ Meteor.methods({
         return false;
     }
   },
+  read_default_pattern: function() {
+    // return the default_turning_pattern.json
+    if (!Meteor.userId()) {
+      // Only logged in users can create patterns
+      throw new Meteor.Error("not-authorized", "You must be signed in to read default pattern data");
+    }
+
+    try {
+      var data = JSON.parse(Assets.getText("default_pattern_data.json"));
+    return data;
+      
+      
+    }
+    catch(e)
+    {
+      //return -1;
+      throw new Meteor.Error("file-load-failed", "File load error in read_default_pattern");
+    }
+  },
   new_pattern_from_json: function(options) {
     // options
     /* {
@@ -49,7 +68,7 @@ Meteor.methods({
     } */
 
     // if number_of_tablets and number_of_rows are both specified, a blank pattern will be built with style 1 for all weaving and threading cells
-console.log("options.data " + options.data);
+//console.log("options.data " + options.data);
     check(options, {
       edit_mode: Match.Optional(String),
       number_of_tablets: Match.Optional(String),

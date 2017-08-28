@@ -271,7 +271,8 @@ Meteor.my_functions = {
       number_of_tablets: params.number_of_tablets, // optional
       number_of_rows: params.number_of_rows, // optional
       name: params.name,
-      filename: 'default_turning_pattern.json'
+      //filename: 'default_pattern_data.json'
+      data:default_pattern_data
     };
 
     Meteor.call('new_pattern_from_json', options, function(error, result){
@@ -361,10 +362,11 @@ Meteor.my_functions = {
   },
   import_pattern_from_gtt: function(data, filename) {
     Session.set('loading', true);
-    console.log("typeof data " + typeof data);
-    console.log("data " + JSON.stringify(data));
+
+    //console.log("data " + JSON.stringify(data));
 
     Meteor.call('xml2js', data, function(error, result){
+
       Session.set('loading', false);
       var local_error; // don't overwrite any error from the server
 
@@ -454,7 +456,7 @@ Meteor.my_functions = {
                   local_error = "Error converting pattern " + result.error;
 
                 else pattern_obj = result.result;
-                console.log("pattern_obj " + JSON.stringify(pattern_obj));
+                //console.log("pattern_obj " + JSON.stringify(pattern_obj));
               break;
 
             default:
@@ -481,15 +483,6 @@ Meteor.my_functions = {
     // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
     var error;
     pattern_obj.tags.push("threaded-in");
-
-    // build threading chart and palette colors
-    var result = Meteor.my_functions.analyse_gtt_colors(pattern_data, pattern_obj);
-    pattern_obj = result.pattern_obj;
-    var number_of_tablets = result.number_of_tablets;
-    var tablet_colors = result.tablet_colors;
-    var style_lookup = result.style_lookup;
-    /*var tablets_data = pattern_data.Cards[0].Card;
-    var number_of_tablets = tablets_data.length;
     pattern_obj.orientation = [];
     pattern_obj.threading = [
       [], // hole A
@@ -497,16 +490,7 @@ Meteor.my_functions = {
       [], // hole C
       [] // hole D
     ];
-    // colours records the thread colour for the hole. This will need to be translated into styles showing direction and orientation.
-    var tablet_colors = [
-      [], // hole A
-      [], // hole B
-      [], // hole C
-      [] // hole D
-    ];
-    var unique_colours_counter = {}; // for counting occurrences of colours
-    var unique_colors_list = [];
-    pattern_obj.weaving = []; // TODO fill in
+    pattern_obj.weaving = [];
     pattern_obj.styles = [];
     for (var i=0; i<32; i++)
     {
@@ -517,53 +501,12 @@ Meteor.my_functions = {
       });
     }
 
-    // list all thread colors used in tablets, and map each color to a tablet
-    for (var i=0; i< number_of_tablets; i++)
-    {
-      pattern_obj.orientation.push(tablets_data[i].Threading[0]);
-
-      var tablet_styles = tablets_data[i].Holes[0].Colour; // should be an array with 4 elements
-      if (tablet_styles.length != 4)
-      {
-        return {error: "tablet with index " + (i) + " does not have four Colours"};
-      }
-      else
-      {
-        for (var j=0; j<4; j++)
-        {
-          // arrange the colours for each tablet
-          var colour_index = tablet_styles[j];
-          tablet_colors[j].push(colour_index);
-
-          // count how many times each colour is used
-          if (!unique_colours_counter[colour_index])
-            unique_colours_counter[colour_index] = 1;
-
-          else
-            unique_colours_counter[colour_index] +=1;         
-        }
-      }
-    }
-    for (var property in unique_colours_counter) {
-      if (unique_colours_counter.hasOwnProperty(property)) {
-        unique_colors_list.push(parseInt(property));
-      }
-    }
-    unique_colors_list.sort(function(a, b){return unique_colours_counter[b]-unique_colours_counter[a]}); // Sort colours by usage, most used first
-
-    // turning patterns can only handle 8 colors because there are 4 variants of each for a total of 32 styles
-    // so replace any colours past the first 8 with the 8th colour
-    if (unique_colors_list.length > 8)
-    {
-      for (var i=0; i< number_of_tablets; i++)
-      {
-        for (var j=0; j<4; j++)
-        {
-          if (unique_colors_list.indexOf(tablet_colors[j][i]) > 7)
-            tablet_colors[j][i] = unique_colors_list[7];
-        }
-      }
-    }
+    // build threading chart and palette colors
+    var result = Meteor.my_functions.analyse_gtt_colors(pattern_data, pattern_obj, 8);
+    //pattern_obj = result.pattern_obj;
+    var number_of_tablets = result.number_of_tablets;
+    var unique_colors_list = result.unique_colors_list;
+    var tablet_colors = result.tablet_colors;
 
     ////////////////////////////////
     // Build styles
@@ -640,7 +583,7 @@ Meteor.my_functions = {
 
     //////////////////////////////////
     // Use default special styles
-    pattern_obj.special_styles = Meteor.my_params.default_special_styles;*/
+    pattern_obj.special_styles = Meteor.my_params.default_special_styles;
 
     //////////////////////////////////
     // build weaving chart
@@ -730,11 +673,9 @@ Meteor.my_functions = {
         idle_style = pattern_obj.special_styles[i].style;
         break;
       }
-
     }
 
     for (var i=0; i<picks.length; i++) // each weaving row
-    //for (var i=0; i<1; i++)
     {
       var new_row = []; // build a blank row for row styles
       for (var j=0; j<number_of_tablets; j++)
@@ -753,8 +694,7 @@ Meteor.my_functions = {
           var direction = action.Dir; //  "F" or "B"
 
           if (action.Target == "Pack") // turn all tablets in a pack
-          {
-            
+          {         
             var target_pack = packs[action.TargetID];
             if (typeof target_pack === "undefined")
                 return {error: "no pack " + (action.TargetID) + " has been defined"};
@@ -790,23 +730,15 @@ Meteor.my_functions = {
   },
   convert_gtt_3_1_twill_pattern_to_json: function(pattern_data, pattern_obj)
   {
-    console.log(JSON.stringify(pattern_obj));
-    var error;
+    // Pattern data has been read in from a .gtt file and the header information analysed
+    // pattern_data is the file data converted to JSON
+    // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
+
+    // build a simulation / manual pattern
+    // set up basic pattern data structure
     pattern_obj.tags.push("3/1 broken twill");
-
-    // build threading chart and palette colors
-    var result = Meteor.my_functions.analyse_gtt_colors(pattern_data, pattern_obj);
-    pattern_obj = result.pattern_obj;
-    var number_of_tablets = result.number_of_tablets;
-    var tablet_colors = result.tablet_colors;
-
-    return {result: pattern_obj};
-  },
-  analyse_gtt_colors: function(pattern_data, pattern_obj)
-  {
-    // analyse tablet orientation and thread colour
-    var tablets_data = pattern_data.Cards[0].Card;
-    var number_of_tablets = tablets_data.length;
+    pattern_obj.edit_mode = "simulation";
+    pattern_obj.simulation_mode = "manual";
     pattern_obj.orientation = [];
     pattern_obj.threading = [
       [], // hole A
@@ -814,6 +746,68 @@ Meteor.my_functions = {
       [], // hole C
       [] // hole D
     ];
+    pattern_obj.weaving = [];
+    pattern_obj.styles = default_pattern_data.simulation_styles;
+    pattern_obj.special_styles = default_pattern_data.special_styles;
+
+    // analyse the GTT colors
+    var result = Meteor.my_functions.analyse_gtt_colors(pattern_data, pattern_obj, 7);
+    var number_of_tablets = result.number_of_tablets;
+    var unique_colors_list = result.unique_colors_list;
+    var tablet_colors = result.tablet_colors;
+
+    ////////////////////////////////
+    // Import palette colors to styles
+    // find the colours in the palette
+    var palette = pattern_data.Palette[0].Colour;
+    var number_of_colours = Math.min(palette.length, unique_colors_list.length, 7);
+    var style_lookup = {}; // find a style from thread Palette color index
+
+    for (var i=0; i<number_of_colours; i++)
+    {
+      var windows_color = parseInt(palette[unique_colors_list[i]]["_"]);
+      style_lookup[unique_colors_list[i]] = i+1;
+
+      var thread_color = Meteor.my_functions.convert_windows_color_to_hex_rgb(windows_color); // GTT uses Windows color picker
+
+      // add color to threading styles
+      pattern_obj.styles[i].background_color = thread_color;
+
+      // add color to weaving styles
+      var weaving_style = Meteor.my_functions.weaving_style_from_threading_style(i+1, "S", "F", 1);
+      pattern_obj.styles[weaving_style-1].line_color = thread_color;
+
+      weaving_style = Meteor.my_functions.weaving_style_from_threading_style(i+1, "Z", "F", 1);
+      pattern_obj.styles[weaving_style-1].line_color = thread_color;
+
+      weaving_style = Meteor.my_functions.weaving_style_from_threading_style(i+1, "Z", "B", 1);
+      pattern_obj.styles[weaving_style-1].line_color = thread_color;
+
+      weaving_style = Meteor.my_functions.weaving_style_from_threading_style(i+1, "S", "B", 1);
+      pattern_obj.styles[weaving_style-1].line_color = thread_color;
+    }
+
+    /////////////////////////////////
+    // assign styles to threading
+    for (var i=0; i< number_of_tablets; i++)
+    {
+      var orientation = pattern_obj.orientation[i];
+
+      for (var j=0; j<4; j++)
+      {
+        var thread_color = tablet_colors[3-j][i]; // read holes D -> A
+        pattern_obj.threading[j].push(style_lookup[thread_color]);
+      }
+    }
+
+    return {result: pattern_obj};  
+  },
+  analyse_gtt_colors: function(pattern_data, pattern_obj, max_colors)
+  {
+     // list all thread colors used in tablets, and map each color to a tablet
+    var tablets_data = pattern_data.Cards[0].Card;
+    var number_of_tablets = tablets_data.length;
+
     // colours records the thread colour for the hole. This will need to be translated into styles showing direction and orientation.
     var tablet_colors = [
       [], // hole A
@@ -823,18 +817,7 @@ Meteor.my_functions = {
     ];
     var unique_colours_counter = {}; // for counting occurrences of colours
     var unique_colors_list = [];
-    pattern_obj.weaving = []; // TODO fill in
-    pattern_obj.styles = [];
-    for (var i=0; i<32; i++)
-    {
-      pattern_obj.styles.push({
-        background_color: "#FFFFFF",
-        line_color: "#000000",
-        warp: "none"
-      });
-    }
 
-    // list all thread colors used in tablets, and map each color to a tablet
     for (var i=0; i< number_of_tablets; i++)
     {
       pattern_obj.orientation.push(tablets_data[i].Threading[0]);
@@ -868,99 +851,25 @@ Meteor.my_functions = {
     }
     unique_colors_list.sort(function(a, b){return unique_colours_counter[b]-unique_colours_counter[a]}); // Sort colours by usage, most used first
 
-    // turning patterns can only handle 8 colors because there are 4 variants of each for a total of 32 styles
-    // so replace any colours past the first 8 with the 8th colour
-    if (unique_colors_list.length > 8)
+    // simulation patterns can only handle 7 colors because there are only 8 possible thread styles, one of which is empty
+    // so replace any colours past the first 7 with the 7th colour
+    if (unique_colors_list.length > max_colors)
     {
       for (var i=0; i< number_of_tablets; i++)
       {
         for (var j=0; j<4; j++)
         {
-          if (unique_colors_list.indexOf(tablet_colors[j][i]) > 7)
-            tablet_colors[j][i] = unique_colors_list[7];
+          if (unique_colors_list.indexOf(tablet_colors[j][i]) > max_colors)
+            tablet_colors[j][i] = unique_colors_list[max_colors];
         }
       }
     }
 
-    ////////////////////////////////
-    // Build styles
-    // find the colours in the palette
-    var palette = pattern_data.Palette[0].Colour;
-    var number_of_colours = Math.min(palette.length, unique_colors_list.length, 8);
-
-    var style_lookup = {}; // find a style from thread Palette color index, orientation (S, Z) and turning direction (forwards, backwards)
-
-    for (var i=0; i<number_of_colours; i++)
-    {
-      var windows_color = parseInt(palette[unique_colors_list[i]]["_"]);
-
-      var line_color = Meteor.my_functions.convert_windows_color_to_hex_rgb(windows_color); // GTT uses Windows color picker
-
-      // lookup style by palette index, orientation, forwards
-      // e.g. style_lookup[0]["S"][true] will return the style that corresponds to Palette colour 0 (i.e. the first in the XML), S threaded, turn forwards
-      var style_start = 2*i; // first style of set
-      if (i >= 4) // styles are built in two pages
-        style_start = 8 + (2*i);
-
-      style_lookup[unique_colors_list[i]] = {
-        S: {
-          true: style_start + 1, // forwards
-          false: style_start + 9 // backwards
-        },
-        Z: {
-          true: style_start + 2, // forwards
-          false: style_start + 10 // backwards
-        }
-      }
-
-      // S, turn forwards = forward warp, white bg
-      pattern_obj.styles[style_start] = {
-        background_color: "#FFFFFF",
-        line_color: line_color,
-        warp: "forward"
-      };
-
-      // Z, turn forwards = backward warp, white bg
-      pattern_obj.styles[style_start + 1] = {
-        background_color: "#FFFFFF",
-        line_color: line_color,
-        warp: "backward"
-      };
-
-      // S, turn backwards = backward warp, grey bg
-      pattern_obj.styles[style_start + 8] = {
-        background_color: "#666666",
-        line_color: line_color,
-        warp: "backward"
-      };
-
-      // Z, turn backwards = forward warp, grey bg
-      pattern_obj.styles[style_start + 9] = {
-        background_color: "#666666",
-        line_color: line_color,
-        warp: "forward"
-      };
-    }
-
-    /////////////////////////////////
-    // assign styles to threading
-    for (var i=0; i< number_of_tablets; i++)
-    {
-      var orientation = pattern_obj.orientation[i];
-
-      for (var j=0; j<4; j++)
-      {
-        var thread_color = tablet_colors[3-j][i]; // read holes D -> A
-        pattern_obj.threading[j].push(style_lookup[thread_color][orientation][true]);
-      }
-    }
-
-    //////////////////////////////////
-    // Use default special styles
-    pattern_obj.special_styles = Meteor.my_params.default_special_styles;
-
-    //return pattern_obj;
-    return {pattern_obj: pattern_obj, number_of_tablets: number_of_tablets, tablet_colors: tablet_colors, style_lookup: style_lookup};
+    return {
+      number_of_tablets: number_of_tablets,
+      unique_colors_list: unique_colors_list,
+      tablet_colors: tablet_colors // GTT threading data
+    };
   },
   store_pattern: function(pattern_id)
   {

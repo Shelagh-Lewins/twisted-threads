@@ -21,6 +21,12 @@ if (Meteor.isClient) {
     });
 
     Session.set('display_min_tablets', 1);
+
+    // load in the default pattern data so it can be read by both client and server (client cannot read file)
+    Meteor.call('read_default_pattern', function(error, result){
+      default_pattern_data = result;
+      //console.log("data " + default_pattern_data);
+    });
   });
 
   reactive_recent_patterns = new ReactiveArray();
