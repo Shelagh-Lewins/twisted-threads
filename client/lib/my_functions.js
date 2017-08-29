@@ -574,6 +574,7 @@ Meteor.my_functions = {
     {
       var orientation = pattern_obj.orientation[i];
 
+
       for (var j=0; j<4; j++)
       {
         var thread_color = tablet_colors[3-j][i]; // read holes D -> A
@@ -747,6 +748,8 @@ pattern_data_temp = pattern_data;
       [] // hole D
     ];
     pattern_obj.weaving = [];
+    // TODO pattern_obj.manual_weaving_turns = 
+    // TODO pattern_obj.manual_weaving_threads = 
     pattern_obj.styles = default_pattern_data.simulation_styles;
     pattern_obj.special_styles = default_pattern_data.special_styles;
 
@@ -805,8 +808,43 @@ pattern_data_temp = pattern_data;
     var background_twill = pattern_data.BackgroundTwill[0];
     console.log(background_twill);
 
+    var number_of_rows = pattern_data.Length[0] * 2; // two rows per grid square in pattern draft
+
+    var twill_sequence = ["F", "F", "B", "B"]; // turning sequence for an individual tablet to weave background twill
+
+    var current_twill_position = []; // for each tablet, what stage is it at in the twill_sequence? 0, 1, 2, 3
+
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      switch (background_twill)
+      {
+        case "S":
+          current_twill_position[i] = i % 4;
+          break;
+
+        case "Z":
+          current_twill_position[i] = 3 - ((i + 3) % 4);
+          break;
+      }    
+    }
+    console.log("current_twill_position " + current_twill_position);
+
+
+    // weave the pattern
+    for (var i=o; i<number_of_rows; i++)
+    {
+      var data = {
+        number_of_tablets: number_of_tablets,
+        threading: pattern_obj.threading,
+        orientations: pattern_obj.orientation,
+        position_of_A: current_twill_position,
+        // TODO fill in data
+        // weave row
+        // construct new row
+      }
+    }
+
     // TODO
-    // count rows
     // weave background twill
     // check design and change color
     // check for long floats
@@ -830,6 +868,7 @@ pattern_data_temp = pattern_data;
 
     for (var i=0; i< number_of_tablets; i++)
     {
+      // note orientation of tablets
       pattern_obj.orientation.push(tablets_data[i].Threading[0]);
 
       var tablet_styles = tablets_data[i].Holes[0].Colour; // should be an array with 4 elements
