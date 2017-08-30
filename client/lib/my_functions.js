@@ -801,7 +801,6 @@ pattern_data_temp = pattern_data; // TODO delete
       }
     }
 
-    // Weave pattern
     // find twill direction
     var background_twill = pattern_data.BackgroundTwill[0];
 
@@ -829,15 +828,42 @@ pattern_data_temp = pattern_data; // TODO delete
     pattern_obj.position_of_A = current_twill_position;
     pattern_obj.manual_weaving_threads = [];
     pattern_obj.manual_weaving_turns = [];
-    //var pattern_chart = pattern_data.Data[0]["P2"][0].charAt(0)
+
+    // each row of Data corresponds to two picks, offset alternately
     var pattern_chart = [];
+
     for(var i=0; i<pattern_data.Length[0]; i++)
     {
       var identifier = "P" + (i+1);
-      pattern_chart.push(pattern_data.Data[0][identifier][0]);
-      pattern_chart.push(pattern_data.Data[0][identifier][0]); // each row of Data corresponds to two picks
+      var next_identifier = "P" + (i+2);
+
+      var even_row = [];
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        even_row.push(pattern_data.Data[0][identifier][0].charAt(j));
+      }
+
+      pattern_chart.push(even_row);
+
+      var odd_row = [];
+
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        if (i == (pattern_data.Length[0] - 1)) // last row of Data
+        {
+          odd_row.push(pattern_data.Data[0][identifier][0].charAt(j));
+        }
+        else
+        {
+          if (j%2 == 0)
+            odd_row.push(pattern_data.Data[0][identifier][0].charAt(j));
+          else
+            odd_row.push(pattern_data.Data[0][next_identifier][0].charAt(j));
+        }
+      }
+
+      pattern_chart.push(odd_row);
     }
-    console.log("pattern_chart " + pattern_chart);
     pattern_chart_temp = pattern_chart;
 
     // set up packs
@@ -862,47 +888,48 @@ pattern_data_temp = pattern_data; // TODO delete
       // put the tablets in the correct packs
       new_turn.tablets = [];
       
-      for (var j=1; j<=number_of_tablets; j++)
+      for (var j=0; j<number_of_tablets; j++)
       {
         // read the pattern chart
-        var current_color = pattern_chart[i].charAt(j-1);
+        var current_color = pattern_chart[i][j];
+        var next_color = current_color;
+        var next_but_one_color = current_color;
+        var last_color = current_color;
         var color_change = false;
 
         // check for color change
         // color change affects two rows
-        if (i>0) // first row with previous color
-          var last_color = pattern_chart[i-1].charAt(j-1);
+          if (i<(number_of_rows - 1)) // last row has no next row
+            var next_color = pattern_chart[i+1][j];
 
-        if (i>1) // first row with last-but-one color
-          var last_but_one_color = pattern_chart[i-2].charAt(j-1);
+          if (i<(number_of_rows - 2)) // next to last row has no next-but-one color
+            var next_but_one_color = pattern_chart[i+2][j];
 
-        if ((last_color != current_color) ||
-          (last_but_one_color != current_color) && (i>1))
-        {
-          color_change = true;
-        }
+          if (i > 0)
+            var last_color = pattern_chart[i-1][j];
 
-        var position = current_twill_position[j-1];
+          if (((next_color != current_color) ||
+            (last_color != current_color)) && (i<number_of_rows))
+          {
+            color_change = true;
+          }
+        
+        var position = current_twill_position[j];
         var direction = twill_sequence[position];
+
         var pack = (direction == "F") ? 1 : 2;
         new_turn.tablets.push(pack);
 
         if (!color_change)
-          current_twill_position[j-1] =  (current_twill_position[j-1] + 1) % 4;
+          current_twill_position[j] =  (current_twill_position[j] + 1) % 4;
       }
       pattern_obj.manual_weaving_turns[0] = new_turn;
       pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
     }
 
-    
-  
-  //console.log("pattern_obj.manual_weaving_threads " + pattern_obj.manual_weaving_threads);
-
     pattern_obj_temp = pattern_obj; // TODO delete
 
     // TODO
-    // weave background twill
-    // check design and change color
     // check for long floats
     return {result: pattern_obj};  
   },
@@ -3002,6 +3029,9 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
   is_style_special: function(style_value)
   {
     if (typeof style_value === "undefined")
+      return false;
+
+    if (style_value == null)
       return false;
 
     if (style_value.toString().charAt(0) == "S")
