@@ -734,7 +734,7 @@ Meteor.my_functions = {
     // Pattern data has been read in from a .gtt file and the header information analysed
     // pattern_data is the file data converted to JSON
     // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
-pattern_data_temp = pattern_data;
+//pattern_data_temp = pattern_data; // TODO delete
     // build a simulation / manual pattern
     // set up basic pattern data structure
     pattern_obj.tags.push("3/1 broken twill");
@@ -748,8 +748,6 @@ pattern_data_temp = pattern_data;
       [] // hole D
     ];
     pattern_obj.weaving = [];
-    // TODO pattern_obj.manual_weaving_turns = 
-    // TODO pattern_obj.manual_weaving_threads = 
     pattern_obj.styles = default_pattern_data.simulation_styles;
     pattern_obj.special_styles = default_pattern_data.special_styles;
 
@@ -806,7 +804,6 @@ pattern_data_temp = pattern_data;
     // Weave pattern
     // find twill direction
     var background_twill = pattern_data.BackgroundTwill[0];
-    console.log(background_twill);
 
     var number_of_rows = pattern_data.Length[0] * 2; // two rows per grid square in pattern draft
 
@@ -827,22 +824,69 @@ pattern_data_temp = pattern_data;
           break;
       }    
     }
-    console.log("current_twill_position " + current_twill_position);
-
 
     // weave the pattern
-    for (var i=o; i<number_of_rows; i++)
-    {
-      var data = {
-        number_of_tablets: number_of_tablets,
-        threading: pattern_obj.threading,
-        orientations: pattern_obj.orientation,
-        position_of_A: current_twill_position,
-        // TODO fill in data
-        // weave row
-        // construct new row
-      }
+    pattern_obj.position_of_A = current_twill_position;
+    pattern_obj.manual_weaving_threads = [];
+    pattern_obj.manual_weaving_turns = [];
+    var new_turn = {
+      tablets: [], // for each tablet, the pack number
+      packs: [] // turning info for each pack
     }
+
+    for (var i=1; i<=Meteor.my_params.number_of_packs; i++)
+    {
+      var pack = {
+        pack_number: i,
+        direction: (i == 2) ? "B" : "F", // second pack goes backwards
+        number_of_turns: 1
+      }
+      new_turn.packs.push(pack);
+    }
+
+    // weave the pattern row by row
+    for (var i=0; i<number_of_rows; i++)
+    {
+      // put the tablets in the correct packs
+      new_turn.tablets = [];
+      
+      for (var j=1; j<=number_of_tablets; j++)
+      {
+        var position = current_twill_position[j-1];
+        var direction = twill_sequence[position];
+
+       /* 
+      if (j == 1)
+      {
+        console.log("***");
+        console.log("row " + i);
+        console.log("twill position " + current_twill_position);
+        console.log("direction " + direction);
+      }*/
+
+        var pack = (direction == "F") ? 1 : 2;
+        new_turn.tablets.push(pack);
+        current_twill_position[j-1] =  (current_twill_position[j-1] + 1) % 4;
+      }
+      pattern_obj.manual_weaving_turns[0] = new_turn;
+
+      //console.log("row " + i);
+      //console.log("twill position " + current_twill_position);
+      //console.log("new turn " + JSON.stringify(new_turn));
+
+      //pattern_obj.manual_weaving_turns[0] = new_turn;
+      
+      
+      pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
+
+      //console.log("pattern_obj.manual_weaving_turns " + JSON.stringify(pattern_obj.manual_weaving_turns));
+    }
+
+    
+  
+  //console.log("pattern_obj.manual_weaving_threads " + pattern_obj.manual_weaving_threads);
+
+    pattern_obj_temp = pattern_obj; // TODO delete
 
     // TODO
     // weave background twill
@@ -2455,7 +2499,9 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
     var tablet_turns = []; // for each tablet, number of turns
     var threading_row = [];
     var new_threads_row = [];
-
+    //console.log("weave row, position_of_A: " + data.position_of_A);
+//console.log("weave row, data: " + JSON.stringify(data));
+//console.log("weave row, new_row_sequence: " + JSON.stringify(new_row_sequence));
     // turn tablets
     for (var i=0; i<data.number_of_tablets; i++)
     {
@@ -2492,9 +2538,11 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
     data.manual_weaving_threads.push(new_threads_row);
 
     // save the new row turning sequence
+    //console.log("new_row_sequence " + JSON.stringify(new_row_sequence));
+
     data.manual_weaving_turns.push(new_row_sequence);
     data.manual_weaving_turns[0] = new_row_sequence; // retain current packs UI
-
+    //console.log("data.manual_weaving_turns " + JSON.stringify(data.manual_weaving_turns));
     return data;
   },
   build_weaving_chart_row: function(number_of_tablets, threading_row, orientations, tablet_directions, tablet_turns)
