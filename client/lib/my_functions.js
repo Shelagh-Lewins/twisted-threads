@@ -734,7 +734,7 @@ Meteor.my_functions = {
     // Pattern data has been read in from a .gtt file and the header information analysed
     // pattern_data is the file data converted to JSON
     // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
-//pattern_data_temp = pattern_data; // TODO delete
+pattern_data_temp = pattern_data; // TODO delete
     // build a simulation / manual pattern
     // set up basic pattern data structure
     pattern_obj.tags.push("3/1 broken twill");
@@ -829,6 +829,18 @@ Meteor.my_functions = {
     pattern_obj.position_of_A = current_twill_position;
     pattern_obj.manual_weaving_threads = [];
     pattern_obj.manual_weaving_turns = [];
+    //var pattern_chart = pattern_data.Data[0]["P2"][0].charAt(0)
+    var pattern_chart = [];
+    for(var i=0; i<pattern_data.Length[0]; i++)
+    {
+      var identifier = "P" + (i+1);
+      pattern_chart.push(pattern_data.Data[0][identifier][0]);
+      pattern_chart.push(pattern_data.Data[0][identifier][0]); // each row of Data corresponds to two picks
+    }
+    console.log("pattern_chart " + pattern_chart);
+    pattern_chart_temp = pattern_chart;
+
+    // set up packs
     var new_turn = {
       tablets: [], // for each tablet, the pack number
       packs: [] // turning info for each pack
@@ -852,34 +864,34 @@ Meteor.my_functions = {
       
       for (var j=1; j<=number_of_tablets; j++)
       {
+        // read the pattern chart
+        var current_color = pattern_chart[i].charAt(j-1);
+        var color_change = false;
+
+        // check for color change
+        // color change affects two rows
+        if (i>0) // first row with previous color
+          var last_color = pattern_chart[i-1].charAt(j-1);
+
+        if (i>1) // first row with last-but-one color
+          var last_but_one_color = pattern_chart[i-2].charAt(j-1);
+
+        if ((last_color != current_color) ||
+          (last_but_one_color != current_color) && (i>1))
+        {
+          color_change = true;
+        }
+
         var position = current_twill_position[j-1];
         var direction = twill_sequence[position];
-
-       /* 
-      if (j == 1)
-      {
-        console.log("***");
-        console.log("row " + i);
-        console.log("twill position " + current_twill_position);
-        console.log("direction " + direction);
-      }*/
-
         var pack = (direction == "F") ? 1 : 2;
         new_turn.tablets.push(pack);
-        current_twill_position[j-1] =  (current_twill_position[j-1] + 1) % 4;
+
+        if (!color_change)
+          current_twill_position[j-1] =  (current_twill_position[j-1] + 1) % 4;
       }
       pattern_obj.manual_weaving_turns[0] = new_turn;
-
-      //console.log("row " + i);
-      //console.log("twill position " + current_twill_position);
-      //console.log("new turn " + JSON.stringify(new_turn));
-
-      //pattern_obj.manual_weaving_turns[0] = new_turn;
-      
-      
       pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
-
-      //console.log("pattern_obj.manual_weaving_turns " + JSON.stringify(pattern_obj.manual_weaving_turns));
     }
 
     
