@@ -809,17 +809,18 @@ pattern_data_temp = pattern_data; // TODO delete
     var twill_sequence = ["F", "F", "B", "B"]; // turning sequence for an individual tablet to weave background twill
 
     var current_twill_position = []; // for each tablet, what stage is it at in the twill_sequence? 0, 1, 2, 3
+    // tablets start with the previous row, so that if there is a color change in row 1, they will continue as in the non-existent previous row
 
     for (var i=0; i<number_of_tablets; i++)
     {
       switch (background_twill)
       {
         case "S":
-          current_twill_position[i] = i % 4;
+          current_twill_position[i] = (i + 3) % 4;
           break;
 
         case "Z":
-          current_twill_position[i] = 3 - ((i + 3) % 4);
+          current_twill_position[i] = 3 - ((i + 0) % 4)
           break;
       }    
     }
@@ -893,35 +894,38 @@ pattern_data_temp = pattern_data; // TODO delete
         // read the pattern chart
         var current_color = pattern_chart[i][j];
         var next_color = current_color;
-        var next_but_one_color = current_color;
-        var last_color = current_color;
+        var last_color = ".";
         var color_change = false;
 
         // check for color change
         // color change affects two rows
-          if (i<(number_of_rows - 1)) // last row has no next row
-            var next_color = pattern_chart[i+1][j];
+        if (i<(number_of_rows - 1)) // last row has no next row
+          next_color = pattern_chart[i+1][j];
 
-          if (i<(number_of_rows - 2)) // next to last row has no next-but-one color
-            var next_but_one_color = pattern_chart[i+2][j];
+        if (i > 0)
+          last_color = pattern_chart[i-1][j];
 
-          if (i > 0)
-            var last_color = pattern_chart[i-1][j];
+        if (i<number_of_rows)
+        {
+          if (next_color != current_color)
+            color_change = true;
 
-          if (((next_color != current_color) ||
-            (last_color != current_color)) && (i<number_of_rows))
+          if (last_color != current_color)
           {
             color_change = true;
+            if (i == 0) // tablet starts with foreground color
+              current_twill_position[j] =  (current_twill_position[j] + 3) % 4; // go back an extra turn
           }
-        
+        }
+
+        if (!color_change)
+          current_twill_position[j] =  (current_twill_position[j] + 1) % 4;
+       
         var position = current_twill_position[j];
         var direction = twill_sequence[position];
 
         var pack = (direction == "F") ? 1 : 2;
         new_turn.tablets.push(pack);
-
-        if (!color_change)
-          current_twill_position[j] =  (current_twill_position[j] + 1) % 4;
       }
       pattern_obj.manual_weaving_turns[0] = new_turn;
       pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
