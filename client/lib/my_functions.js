@@ -761,37 +761,31 @@ Meteor.my_functions = {
     // Import palette colors to styles
     // find the colours in the palette
     // GTT 1.11 does not include Palette data
-    // TODO use default colors
-    /*if (typeof pattern_data.Palette === "undefined")
-      pattern_data.Palette = "<Palette Name="" Size="16">
-      <Colour Index="1">0</Colour>
-      <Colour Index="2">128</Colour>
-      <Colour Index="3">32768</Colour>
-      <Colour Index="4">32896</Colour>
-      <Colour Index="5">8388608</Colour>
-      <Colour Index="6">8388736</Colour>
-      <Colour Index="7">8421376</Colour>
-      <Colour Index="8">8421504</Colour>
-      <Colour Index="9">12632256</Colour>
-      <Colour Index="10">255</Colour>
-      <Colour Index="11">65280</Colour>
-      <Colour Index="12">65535</Colour>
-      <Colour Index="13">16711680</Colour>
-      <Colour Index="14">16711935</Colour>
-      <Colour Index="15">16776960</Colour>
-      <Colour Index="16">16777215</Colour>
-    </Palette>"*/
 
-    var palette = pattern_data.Palette[0].Colour;
+    var palette = [0,128,32768,32896,8388608,8388736,8421376,8421504,12632256,255,65280,65535,16711680,16711935,16776960,16777215];
+
     var number_of_colours = Math.min(palette.length, unique_colors_list.length, 7);
     var style_lookup = {}; // find a style from thread Palette color index
 
+    if (typeof pattern_data.Palette !== "undefined")
+    {
+      palette = [];
+      for (var i=0; i<pattern_data.Palette[0].Colour.length; i++)
+      {
+        palette[i] = pattern_data.Palette[0].Colour[i]["_"];
+      }
+    }
+
     for (var i=0; i<number_of_colours; i++)
     {
-      var windows_color = parseInt(palette[unique_colors_list[i]]["_"]);
+      //var windows_color = parseInt(palette[unique_colors_list[i]]["_"]);
+      //console.log
+      var windows_color = parseInt(palette[unique_colors_list[i]]);
+      //console.log("windows_color " + windows_color);
       style_lookup[unique_colors_list[i]] = i+1;
 
       var thread_color = Meteor.my_functions.convert_windows_color_to_hex_rgb(windows_color); // GTT uses Windows color picker
+      //console.log("thread_color " + thread_color);
 
       // add color to threading styles
       pattern_obj.styles[i].background_color = thread_color;
@@ -824,7 +818,10 @@ Meteor.my_functions = {
     }
 
     // find twill direction
-    var background_twill = pattern_data.BackgroundTwill[0];
+    // GTT 1.11 does not store twill direction
+    var background_twill = "S";
+    if (typeof pattern_data.BackgroundTwill !== "undefined")
+      background_twill = pattern_data.BackgroundTwill[0];
 
     var number_of_rows = pattern_data.Length[0] * 2; // two rows per grid square in pattern draft
 
@@ -888,10 +885,24 @@ Meteor.my_functions = {
 
       pattern_chart.push(odd_row);
     }
-    pattern_chart_temp = pattern_chart;
 
     // Analyse long floats data
     var long_floats_chart = [];
+
+    // GTT 1.11 calls long floats "Reversals" and has them in reverse order
+    if (typeof pattern_data.LongFloats === "undefined")
+    {
+      var temp = {};
+
+      for (var i=0; i<pattern_data.Length[0]; i++)
+      {
+        var identifier = "P" + (i+1);
+        var reverser = "P" + (pattern_data.Length[0] - i)
+        temp[identifier] = pattern_data.Reversals[0][reverser];
+      }
+      pattern_data.LongFloats = [];
+      pattern_data.LongFloats[0] = temp;
+    }
 
     for(var i=0; i<pattern_data.Length[0]; i++)
     {
@@ -936,7 +947,6 @@ Meteor.my_functions = {
 
       long_floats_chart.push(odd_row);
     }
-    long_floats_temp = long_floats_chart;
 
     // set up packs
     var new_turn = {
