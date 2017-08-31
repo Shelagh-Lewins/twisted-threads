@@ -734,7 +734,7 @@ Meteor.my_functions = {
     // Pattern data has been read in from a .gtt file and the header information analysed
     // pattern_data is the file data converted to JSON
     // pattern_obj is the unfinished JSON pattern object which needs to be filled in with pattern details
-pattern_data_temp = pattern_data; // TODO delete
+
     // build a simulation / manual pattern
     // set up basic pattern data structure
     pattern_obj.tags.push("3/1 broken twill");
@@ -760,6 +760,28 @@ pattern_data_temp = pattern_data; // TODO delete
     ////////////////////////////////
     // Import palette colors to styles
     // find the colours in the palette
+    // GTT 1.11 does not include Palette data
+    // TODO use default colors
+    /*if (typeof pattern_data.Palette === "undefined")
+      pattern_data.Palette = "<Palette Name="" Size="16">
+      <Colour Index="1">0</Colour>
+      <Colour Index="2">128</Colour>
+      <Colour Index="3">32768</Colour>
+      <Colour Index="4">32896</Colour>
+      <Colour Index="5">8388608</Colour>
+      <Colour Index="6">8388736</Colour>
+      <Colour Index="7">8421376</Colour>
+      <Colour Index="8">8421504</Colour>
+      <Colour Index="9">12632256</Colour>
+      <Colour Index="10">255</Colour>
+      <Colour Index="11">65280</Colour>
+      <Colour Index="12">65535</Colour>
+      <Colour Index="13">16711680</Colour>
+      <Colour Index="14">16711935</Colour>
+      <Colour Index="15">16776960</Colour>
+      <Colour Index="16">16777215</Colour>
+    </Palette>"*/
+
     var palette = pattern_data.Palette[0].Colour;
     var number_of_colours = Math.min(palette.length, unique_colors_list.length, 7);
     var style_lookup = {}; // find a style from thread Palette color index
@@ -825,11 +847,12 @@ pattern_data_temp = pattern_data; // TODO delete
       }    
     }
 
-    // weave the pattern
+    // set up the pattern
     pattern_obj.position_of_A = current_twill_position;
     pattern_obj.manual_weaving_threads = [];
     pattern_obj.manual_weaving_turns = [];
 
+    // analyse color change Data
     // each row of Data corresponds to two picks, offset alternately
     var pattern_chart = [];
 
@@ -866,6 +889,54 @@ pattern_data_temp = pattern_data; // TODO delete
       pattern_chart.push(odd_row);
     }
     pattern_chart_temp = pattern_chart;
+
+    // Analyse long floats data
+    var long_floats_chart = [];
+
+    for(var i=0; i<pattern_data.Length[0]; i++)
+    {
+      var identifier = "P" + (i+1);
+      var next_identifier = "P" + (i+2);
+
+      var even_row = [];
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        even_row.push(pattern_data.LongFloats[0][identifier][0].charAt(j));
+
+        // replace X with Y in second row so we can identify first and second row of long float
+        if ((j%2 == 1))
+          if (even_row[j] == "X")
+            even_row[j] = "Y";
+      }
+
+      long_floats_chart.push(even_row);
+
+      var odd_row = [];
+
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        if (i == (pattern_data.Length[0] - 1)) // last row of LongFloats
+        {
+          odd_row.push(pattern_data.LongFloats[0][identifier][0].charAt(j));
+        }
+        else
+        {
+          if (j%2 == 0)
+            odd_row.push(pattern_data.LongFloats[0][identifier][0].charAt(j));
+          else
+            odd_row.push(pattern_data.LongFloats[0][next_identifier][0].charAt(j));
+        }
+
+        // replace X with Y in second row so we can identify first and second row of long float
+        if ((j%2 == 0))
+        if (odd_row[j] == "X")
+          odd_row[j] = "Y";
+        
+      }
+
+      long_floats_chart.push(odd_row);
+    }
+    long_floats_temp = long_floats_chart;
 
     // set up packs
     var new_turn = {
@@ -916,11 +987,28 @@ pattern_data_temp = pattern_data; // TODO delete
             if (i == 0) // tablet starts with foreground color
               current_twill_position[j] =  (current_twill_position[j] + 3) % 4; // go back an extra turn
           }
-        }
+        }        
 
-        if (!color_change)
-          current_twill_position[j] =  (current_twill_position[j] + 1) % 4;
-       
+        var long_float = long_floats_chart[i][j];
+
+        var previous_long_float = ".";
+        if (i != 0)
+          previous_long_float = long_floats_chart[i-1][j];
+
+        var next_long_float = ".";
+
+        if ((i < number_of_rows - 1))
+          next_long_float = long_floats_chart[i+1][j];     
+
+        // handle long floats
+
+        // advance in turning sequence
+        if ((!color_change))
+           current_twill_position[j] =  (current_twill_position[j] + 1) % 4;        
+
+        if ((long_float == "Y")) // second pick of long float
+          current_twill_position[j] =  (current_twill_position[j] + 2) % 4;
+
         var position = current_twill_position[j];
         var direction = twill_sequence[position];
 
@@ -931,10 +1019,6 @@ pattern_data_temp = pattern_data; // TODO delete
       pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
     }
 
-    pattern_obj_temp = pattern_obj; // TODO delete
-
-    // TODO
-    // check for long floats
     return {result: pattern_obj};  
   },
   analyse_gtt_colors: function(pattern_data, pattern_obj, max_colors)
