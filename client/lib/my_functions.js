@@ -2281,6 +2281,16 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
     Meteor.my_functions.build_pattern_display_data(pattern_id);
 
     Session.set('edited_pattern', true);
+
+    // set session variables to avoid checking db every time
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
+
+    Session.set("edit_mode", pattern.edit_mode);
+
+    if (pattern.edit_mode == "simulation")
+      Session.set("simulation_mode", pattern.simulation_mode);
+
+    Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id));
   
     // intialise the 'undo' stack
     // ideally the undo stack would be maintained over server refreshes but I'm not sure a session var could hold multiple patterns, and nothing else except the database is persistent. Also it doesn't need to be reactive so a session var might be a performance hit.

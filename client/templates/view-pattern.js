@@ -49,14 +49,14 @@ Template.view_pattern.onCreated(function(){
   // set session variables to avoid checking db every time
   if (Meteor.my_functions.pattern_exists(pattern_id));
   {
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
+    /*var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
 
     Session.set("edit_mode", pattern.edit_mode);
 
     if (pattern.edit_mode == "simulation")
       Session.set("simulation_mode", pattern.simulation_mode);
 
-    Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id));
+    Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id));*/
 
     Meteor.my_functions.view_pattern_created(pattern_id);
 
