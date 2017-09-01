@@ -1814,9 +1814,6 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
 
     Meteor.call('save_weaving_to_db', pattern_id, JSON.stringify(weaving_array), number_of_rows, number_of_tablets, function(error, result){
         Meteor.my_functions.store_pattern(pattern_id);
-
-        if (typeof error !== "undefined")
-          alert(error);
         
         Session.set("number_of_rows", number_of_rows);
         Session.set("number_of_tablets", number_of_tablets);
@@ -1839,6 +1836,7 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
         {
           Meteor.my_functions.update_after_tablet_change();
         }
+
         Meteor.my_functions.save_preview_as_text(pattern_id);
       });
     
@@ -2278,6 +2276,7 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
   //////////////////////////////////
   // set up and draw the view pattern. This must be refreshed if the user switches pattern without switching view: e.g. using copy, import
   view_pattern_created: function(pattern_id) {
+
     Meteor.my_functions.build_pattern_display_data(pattern_id);
 
     Session.set('edited_pattern', true);
@@ -2529,7 +2528,7 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
   },
   reset_simulation_weaving: function(pattern_id, simulation_mode) {
     Session.set("hide_preview", true); // force a clean refresh of the preview
-    
+
     // remove and rebuild the current simulation pattern weaving
     var pattern = Patterns.findOne({_id: pattern_id});
 
@@ -2635,6 +2634,8 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
         Session.set("number_of_rows", pattern.number_of_rows);
         Meteor.my_functions.set_repeats(pattern_id);
         Meteor.my_functions.build_pattern_display_data(pattern_id);
+        
+        // TODO investigate whether this is required when it's not the user's pattern. No data will be saved to the db but the callbacks may be needed.
         Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, number_of_tablets);
         Meteor.my_functions.save_preview_as_text(pattern_id);
         Session.set("hide_preview", false);
