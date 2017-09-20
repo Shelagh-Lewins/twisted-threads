@@ -17,10 +17,12 @@
 
 <button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">Interactive weaving chart</button>
 
+{{#if show_editable_field weaving_notes _id}}
 <div class="pattern_info">
   <h2>Weaving notes</h2>
   {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
 </div>
+{{/if}}
 
 {{#if session_equals "hide_preview" false}}
 {{> auto_preview}}
@@ -174,7 +176,10 @@ Loading preview...
   <div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
   </div>{{/if}}
 
+  {{#if show_editable_field description _id}}
+  <h2>Description</h2>
   {{> editable_field extendContext collection="patterns" property="description" data=description multiple=true button_text="Edit description" placeholder_text="Tap \"Edit description\" to enter a description"}}
+  {{/if}}
 
   </div>
 
@@ -256,9 +261,12 @@ Loading preview...
   </div>
   {{/if}}
 
+  {{#if show_editable_field threading_notes _id}}
   <div class="pattern_info {{rendered_manual}}">
+    <h2>Threading notes</h2>
     {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
   </div>
+  {{/if}}
 
   <h2>Tablet labels</h2>
   <div class="notation">

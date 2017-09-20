@@ -80,6 +80,20 @@ if (Meteor.isClient) {
       return true;
   });
 
+  UI.registerHelper('show_editable_field', function (field_value, _id) {
+    // editable field such as pattern description is shown if:
+    // the user can edit the pattern, or
+    // a string value exists and is not empty
+    if (Meteor.my_functions.can_edit_pattern(_id))
+      return true;
+
+    return Meteor.my_functions.string_exists(field_value);
+  });
+
+  UI.registerHelper('string_exists', function (value) {
+      return Meteor.my_functions.string_exists(value);
+  });
+
   // used by connection_status template and also to apply class to div#width
   UI.registerHelper('connection_status', function () {
     /* meteor.status().status can have these values:

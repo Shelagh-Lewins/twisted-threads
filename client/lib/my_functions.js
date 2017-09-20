@@ -3209,6 +3209,17 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
     else
       Session.set('show_special_styles', false);
   },
+  string_exists(value)
+  {
+    // checks whether a string exists and is not empty
+    if (typeof value !== "string")
+      return false;
+
+    if (value == "")
+      return false;
+
+    return true;
+  },
   ///////////////////////////////////
   // navigation
   // The router doesn't show the 'loading' template for these actions because only the data changes, not the route. So here we manually trigger a simple "Loading..." display to help the user when switching between view pattern and weave.

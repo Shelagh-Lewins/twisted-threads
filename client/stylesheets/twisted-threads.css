@@ -696,3 +696,7 @@ body.loading {
 p {
   margin-bottom: 4px;
 }
+
+.text.markdown {
+  white-space: pre-line;
+}

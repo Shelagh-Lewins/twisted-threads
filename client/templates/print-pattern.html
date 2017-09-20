@@ -11,6 +11,11 @@
 <p class="url">Printed from {{hostname}}{{pathFor route='pattern'}}</p>
 <p class="created_by">Created by {{created_by_username}}</p>
 
+{{#if string_exists description}}
+<h2>Description</h2>
+<span class="text markdown">{{#markdown}}{{{description}}}{{/markdown}}</span>
+{{/if}}
+
 <h2>Weaving chart</h2>
 {{#if equals edit_mode "simulation"}}
 {{#if equals simulation_mode "auto"}}
@@ -35,17 +40,26 @@
 </div>
 {{/unless}}
 
+{{#if string_exists weaving_notes}}
+<h2>Weaving notes</h2>
+<span class="text markdown">{{#markdown}}{{{weaving_notes}}}{{/markdown}}</span>
+{{/if}}
+
 <h2>Threading chart</h2>
 <div class="tablets">{{> column_numbers}}
 {{#each hole_indexes}}
   {{> threading_row}}
 {{/each}}
 {{> orientation}}
-
 </div>
+
 <br/>
 <div class="notation">
 <img src="../../images/tablet_labels.png" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
 </div>
+{{#if string_exists threading_notes}}
+<h2>Threading notes</h2>
+<span class="text markdown">{{#markdown}}{{{threading_notes}}}{{/markdown}}</span>
+{{/if}}
 <br/>
 </template>
