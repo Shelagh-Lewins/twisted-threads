@@ -17,19 +17,6 @@
 
 <button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.start_weaving('{{no_weaving_rows}}');">Interactive weaving chart</button>
 
-{{#if show_editable_field weaving_notes _id}}
-<div class="pattern_info">
-  <h2>Weaving notes</h2>
-  {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
-</div>
-{{/if}}
-
-{{#if session_equals "hide_preview" false}}
-{{> auto_preview}}
-{{else}}
-Loading preview...
-{{/if}}
-
 <div id="main_tabs">
 <ul>
   <li class="charts {{is_selected_main_tab "charts"}}" ><a>Pattern design</a></li>
@@ -40,6 +27,19 @@ Loading preview...
 </div>
 
 {{#if equals view_pattern_mode "charts"}}
+  {{#if show_editable_field weaving_notes _id}}
+  <div class="pattern_info">
+    <h2>Weaving notes</h2>
+    {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
+  </div>
+  {{/if}}
+
+  {{#if session_equals "hide_preview" false}}
+  {{> auto_preview}}
+  {{else}}
+  Loading preview...
+  {{/if}}
+
   {{#if equals edit_mode "simulation"}}
   <h2>Weaving instructions</h2>
     {{#if can_edit_pattern _id}}
