@@ -466,7 +466,10 @@ if (Meteor.isClient) {
         // load more docs for usersIndex only
         usersIndex.getComponentMethods().loadMore(8);
       }
-
+    },
+    'click #search .pattern_results': function(event) {
+      event.preventDefault(); // to make router work from Home, not sure why but this is necessary when not already in pattern route
+      Meteor.my_functions.search_result_clicked(this._id);
     }
   });
 

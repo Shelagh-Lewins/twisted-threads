@@ -257,6 +257,16 @@ Meteor.my_functions = {
       }
     });
   },
+  search_result_clicked: function(_id)
+  {
+    // required to force preview to reload if the user searches when in a pattern
+    Session.set('loading', true);
+    Router.go('pattern', { _id: _id });
+    setTimeout(function(){ 
+      Session.set('loading', false); 
+      Meteor.my_functions.refresh_view_pattern(_id);}, 
+      100);
+  },
   new_pattern: function(params)
   {
     Session.set('loading', true);
