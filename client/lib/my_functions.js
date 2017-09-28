@@ -1573,6 +1573,18 @@ Meteor.my_functions = {
     var number_of_tablets = Session.get("number_of_tablets");
     var number_of_rows = Session.get("number_of_rows");
 
+    if (typeof num_new_rows !== "number")
+      var num_new_rows = 1;
+
+    if (number_of_rows == 0)
+      position = 1;
+
+    if (position == -1) // -1 is a shorthand meaning add row at end
+      position = number_of_rows+1;
+
+    if (position < 0) // -1 is a shorthand meaning add row at end
+      position = 1;
+
     // must be an integer between 1 and number of tablets + 1 (new row at end)
     position = Math.floor(position);
     position = Math.max(position, 1);
@@ -1582,15 +1594,6 @@ Meteor.my_functions = {
     num_new_rows = Math.floor(num_new_rows);
     num_new_rows = Math.max(num_new_rows, 1);
     num_new_rows = Math.min(num_new_rows, 20);
-
-    if (number_of_rows == 0)
-      var position = 1;
-
-    if (position == -1) // -1 is a shorthand meaning add row at end
-      var position = number_of_rows+1;
-
-    if (position < 0) // -1 is a shorthand meaning add row at end
-      var position = 1;
 
     for (var k=0; k<num_new_rows; k++)
     {
@@ -1614,7 +1617,7 @@ Meteor.my_functions = {
 
       current_row_indexes.unshift(number_of_rows+1); //  rows are reversed
     }
-console.log("add row, rows " + (number_of_rows + num_new_rows));
+
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows + num_new_rows, number_of_tablets);
   },
   remove_weaving_row: function(pattern_id, position){
@@ -1627,14 +1630,12 @@ console.log("add row, rows " + (number_of_rows + num_new_rows));
     // remove deleted row
     for (var j=0; j<number_of_tablets; j++)
     {
-
       delete current_weaving_data[(position) + "_" + (j + 1)];
     }
 
     // decrement row number of cells in subsequent rows
     for (var i=position; i<=number_of_rows-1; i++)
     {
-
       for (var j=0; j<number_of_tablets; j++)
       {
         var cell_style = current_weaving_data[(i + 1) + "_" + (j + 1)].get();
