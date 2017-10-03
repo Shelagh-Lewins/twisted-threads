@@ -248,7 +248,8 @@ Meteor.my_functions = {
 
       if (error)
       {
-        throw new Meteor.Error("new-pattern-error", "error running new_pattern_from_json: " + error.reason);
+        toastr.error("Unable to copy pattern: " + error.reason);
+        console.log("error running new_pattern_from_json from copy_pattern: " + error.reason);
       }
       else
       {
@@ -291,7 +292,8 @@ Meteor.my_functions = {
       // automatically view new pattern
       if (error)
       {
-        throw new Meteor.Error("new-pattern-error", "error running new_pattern_from_json: " + error.reason);
+        console.log("error running new_pattern_from_json from new_pattern: " + error.reason);
+        toastr.error("Unable to create pattern. " + error.message);
       }
       else
       {
@@ -360,7 +362,8 @@ Meteor.my_functions = {
       
       if (error)
       {
-        throw new Meteor.Error("new-pattern-error", "error running new_pattern_from_json: " + error.reason);
+        console.log("Unable to import pattern: " + error.message);
+        toastr.error("Unable to import pattern: " + error.message);
       }
       else
       {
