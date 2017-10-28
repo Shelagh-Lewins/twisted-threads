@@ -282,7 +282,6 @@ Meteor.my_functions = {
       number_of_tablets: params.number_of_tablets, // optional
       number_of_rows: params.number_of_rows, // optional
       name: params.name,
-      //filename: 'default_pattern_data.json'
       data:default_pattern_data
     };
 
@@ -1576,7 +1575,7 @@ Meteor.my_functions = {
     var number_of_tablets = Session.get("number_of_tablets");
     var number_of_rows = Session.get("number_of_rows");
 
-    if (typeof num_new_rows !== "number")
+    if (typeof num_new_rows === "undefined") // default to 1 row
       var num_new_rows = 1;
 
     if (number_of_rows == 0)

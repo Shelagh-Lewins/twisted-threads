@@ -39,7 +39,8 @@ Meteor.methods({
       else 
         return false;
     }
-  },
+  },/*
+  // this is no longer used because the file read seemed to fail sometimes. The function is left in as a reference for reading a JSON file.
   read_default_pattern: function() {
     // return the default_turning_pattern.json
     if (!Meteor.userId()) {
@@ -58,24 +59,23 @@ Meteor.methods({
       //return -1;
       throw new Meteor.Error("file-load-failed", "File load error in read_default_pattern");
     }
-  },
+  },*/
   new_pattern_from_json: function(options) {
     // options
     /* {
       name: "pattern name", //optional
       data: json data object,
-      filename: "pattern.json" // one of filename or data is required
     } */
 
     // if number_of_tablets and number_of_rows are both specified, a blank pattern will be built with style 1 for all weaving and threading cells
-//console.log("options.data " + options.data);
+
     check(options, {
       edit_mode: Match.Optional(String),
       number_of_tablets: Match.Optional(String),
       number_of_rows: Match.Optional(String),
       name: Match.Optional(String),
-      data: Match.Optional(Object),
-      filename: Match.Optional(String) 
+      data: Object,
+
     });
 
     if (!Meteor.isServer) // minimongo cannot simulate loading data with Assets
@@ -127,6 +127,13 @@ Meteor.methods({
       } 
     }
 
+    // edit_mode "freehand" (default) or "simulation"
+    if((options.edit_mode == "") || (typeof options.edit_mode === "undefined"))
+      options.edit_mode = "freehand"; // earlier data version
+
+    if((data.edit_mode == "") || (typeof data.edit_mode === "undefined"))
+      data.edit_mode = options.edit_mode;
+
     // Numbers of rows and tablets
     // have both rows and tablets been specified as positive integers less than 100?
     var build_new = true; // whether to build a blank pattern using a specified number of tablets and rows
@@ -162,7 +169,6 @@ Meteor.methods({
         data.weaving[i] = new Array();
         for (var j=0; j<options.number_of_tablets; j++)
         {
-          //data.weaving[i][j] = (j >= options.number_of_tablets/2) ? 19 :20; // warp twined
           data.weaving[i][j] = ((j % 2) == 0) ? 5 :6;
         }
       }
@@ -175,7 +181,11 @@ Meteor.methods({
         data.threading[i] = new Array(options.number_of_tablets);
         for (var j=0; j<options.number_of_tablets; j++)
         {
-          data.threading[i][j] = 2; // plain yellow in default pattern
+          if (data.edit_mode == "freehand")
+            data.threading[i][j] = ((j % 2) == 0) ? 5 :6; // manually set threading to show warp direction
+
+          else if (data.edit_mode == "simulation")
+            data.threading[i][j] = 2; // plain yellow in default pattern
         }
       }
 
@@ -205,13 +215,6 @@ Meteor.methods({
       options.name = Meteor.my_params.default_pattern_name;
 
     data.name = options.name;
-
-    // edit_mode "freehand" (default) or "simulation"
-    if((options.edit_mode == "") || (typeof options.edit_mode === "undefined"))
-      options.edit_mode = "freehand"; // earlier data version
-
-    if((data.edit_mode == "") || (typeof data.edit_mode === "undefined"))
-      data.edit_mode = options.edit_mode;
 
     // tags
     if (typeof data.tags === "undefined")
@@ -245,7 +248,6 @@ Meteor.methods({
       weft_color: weft_color,
       threading_notes: threading_notes,
       private: true, // patterns are private by default so the user can edit them before revealing them to the world
-      // TODO add specific thumbnails for patterns
       number_of_rows: number_of_rows,
       number_of_tablets: number_of_tablets,
       created_at: moment().valueOf(),            // current time

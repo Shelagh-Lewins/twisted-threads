@@ -1,8 +1,6 @@
 Meteor.startup(function () {
-
-  process.env.MAIL_URL = 'smtp://postmaster%40sandbox6680005cdc0a4cc4b9550bf1026d7205.mailgun.org:43127wtf@smtp.mailgun.org:587';
-
-  process.env.ROOT_URL = 'http://twistedthreads.org';
+  process.env.MAIL_URL = Meteor.settings['private'].MAIL_URL;
+  process.env.ROOT_URL = Meteor.settings['private'].ROOT_URL;
 
   // Accounts
   Accounts.config({
@@ -23,8 +21,6 @@ Meteor.startup(function () {
   // make sure the current user has correct role based on whether their email address is verified
   Meteor.users.find().observeChanges({
     changed: function(id, fields) {
-      //console.log("changed ");
-      //console.log("fields " + JSON.stringify(fields));
       Meteor.call('update_user_roles', id);
     }
   });
