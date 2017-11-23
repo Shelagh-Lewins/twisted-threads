@@ -79,6 +79,14 @@ background: #fff; /* set desired hover color */
   clear: both;
 }
 
+.view_pattern .loading {
+  float: left;
+  color: #FFFFFF;
+  background: #7580ac;
+  border-radius: 16px;
+  padding: 16px 32px 16px 32px;
+}
+
 #pattern_preview {
   width:100%;
   float:left;
