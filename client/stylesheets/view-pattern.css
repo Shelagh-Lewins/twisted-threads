@@ -193,6 +193,10 @@ background: #fff; /* set desired hover color */
   display: inline;
 }
 
+.pattern_info .tags .tags .label-tag:not(:last-child)::after {
+  content: ",";
+}
+
 button.styled_button {
   padding: 4px 16px 4px 16px;
   line-height: 1.5;

@@ -142,11 +142,13 @@
   </div>
   <br>
 
+{{#if session_equals "hide_preview" false}}
   {{#if can_edit_pattern _id}}
   <div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
   {{else}}
   <div class="box tags">{{> tags}}</div>
   {{/if}}
+{{/if}}
 
   {{#if can_edit_pattern _id}}
     {{#if isInRole 'verified' 'users'}}
