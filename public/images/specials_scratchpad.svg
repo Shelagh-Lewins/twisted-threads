@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg id="svg2" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="256" viewBox="0 0 256 256" width="256" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+ <g stroke="#000">
+  <ellipse id="path4163" rx="154.46" ry="77.231" transform="rotate(-45)" cy="180.19" cx="-.87198" stroke-width="2.9512"/>
+  <path id="path3352" stroke-width="1px" fill="none" d="m173.75-209.68z"/>
+  <ellipse id="path4137" fill-opacity="0" rx="158.31" ry="62.964" transform="rotate(-45)" cy="-36.827" cx="218.98" stroke-width="3.4167"/>
+  <ellipse id="path4137-9" fill-opacity="0" rx="109.13" ry="43.403" transform="rotate(-45)" cy="-35.883" cx="218.44" stroke-width="2.3553"/>
+ </g>
+ <g>
+  <ellipse id="path4163-3" rx="125.16" ry="62.579" stroke="#000" transform="rotate(-45)" cy="180.19" cx="-.87197" stroke-width="2.3913" fill="#fff"/>
+  <text id="text4180" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="141.27px" y="174.5654" x="80.155426" font-family="sans-serif" line-height="125%" fill="#000000"><tspan id="tspan4182" x="80.155426" y="174.5654">4</tspan></text>
+  <ellipse id="path4163-4" rx="154.46" ry="77.231" stroke="#000" transform="rotate(-45)" cy="-143.32" cx="-312.27" stroke-width="2.9512"/>
+  <ellipse id="path4163-3-7" rx="125.16" ry="62.579" stroke="#000" transform="rotate(-45)" cy="-143.32" cx="-312.27" stroke-width="2.3913" fill="#fff"/>
+  <text id="text4180-1" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="141.27px" y="168.57742" x="-361.80774" font-family="sans-serif" line-height="125%" fill="#000000"><tspan id="tspan4182-6" x="-361.80774" y="168.57742">3</tspan></text>
+  <g stroke="#000">
+   <ellipse id="path4163-4-0" rx="154.46" ry="77.231" transform="rotate(-45)" cy="-441.62" cx="-604.07" stroke-width="2.9512"/>
+   <ellipse id="path4163-3-7-4" rx="104.07" ry="52.036" transform="rotate(-45)" cy="-441.62" cx="-604.07" stroke-width="1.9884" fill="#fff"/>
+   <ellipse id="path4163-4-4" rx="154.46" ry="77.231" transform="rotate(-45)" cy="466.31" cx="286.51" stroke-width="2.9512"/>
+   <ellipse id="path4163-3-7-5" rx="125.16" ry="62.579" transform="rotate(-45)" cy="466.31" cx="286.51" stroke-width="2.3913" fill="#fff"/>
+  </g>
+  <text id="text4180-1-1" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="141.27px" y="175.57581" x="490.39081" font-family="sans-serif" line-height="125%" fill="#000000"><tspan id="tspan4182-6-2" x="490.39081" y="175.57581">2</tspan></text>
+ </g>
+</svg>

@@ -1,0 +1,207 @@
+<template name="home">
+{{#if Template.subscriptionsReady}}
+{{> left_column}}
+<div id="main_column">
+{{> home_patterns}}
+</div>
+{{/if}}
+</template>
+
+<template name="left_column">
+<div id="left_column">
+<ul class="left_menu">
+<li class="{{selected "home"}}"><a href="{{pathFor route='home'}}"><span>Home</span></a></li>
+{{#with recent_patterns}}{{#if this.length}}
+<li class="{{selected "recent_patterns"}}"><a href="{{pathFor route='recent_patterns'}}"><span>Recently viewed</span></a></li>
+{{/if}}{{/with}}
+<li class="{{selected "new_patterns"}}"><a href="{{pathFor route='new_patterns'}}"><span>New patterns</span></a></li>
+{{#if currentUser}} 
+<li class="{{selected "my_patterns"}}"><a href="{{pathFor route='my_patterns'}}"><span>My patterns</span></a></li>
+{{/if}}
+<li class="{{selected "all_patterns"}}"><a href="{{pathFor route='all_patterns'}}"><span>All patterns</span></a></li>
+<li class="{{selected "users"}}"><a href="{{pathFor route='users'}}"><span>People</span></a></li>
+</ul>
+</div>
+</template>
+
+<template name="home_patterns">
+  <div class="introduction">
+    <p><strong>This is a temporary test version of Twisted Threads, to allow testing of an architecture upgrade. DO NOT USE IT to design any patterns you want to keep! But please do have a play and let me know about anything that doesn't work, especially if it works in the live version of TWT.</strong></p>
+  <!--<p><strong>Welcome to Twisted Threads, the online app for tablet weaving.<br>You can use this site to design, weave and share patterns.</strong><br /></p>-->
+  <p class="notice">The copyright of any pattern designed using Twisted Threads rests with the designer of the pattern, not with the creator or owner of the software.</p>
+  <p>Choose a pattern to see the threading and weaving charts. Then choose "Interactive weaving chart" to step through the rows one by one as you weave.</p>
+  <p>Tablet weaving is an ancient craft known around the world by different names including card weaving, brettchen weberei, brikvævning and tissage &agrave; carton.</p>
+  {{> donate_paypal}}
+  <p>Join our <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss Twisted Threads with other users, request new features or share feedback with the app developer. <a href="{{pathFor route='about'}}" >More information</a></p>
+  <p class="notice">Twisted Threads doesn't work reliably in Safari. If you're using an Apple product, please try the Chrome browser.</p>
+</div>
+
+{{> create_new_pattern}}
+
+
+{{#with recent_patterns true}}{{#if this.length}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="patterns">
+{{#each this}}
+{{> pattern_thumbnail}}
+{{/each}}
+</ul>
+</div>
+{{else}}
+<p>Select a pattern and start weaving.</p>
+{{/if}}{{/with}}
+
+{{#with new_patterns true}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='new_patterns'}}"><span class="text">New patterns</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="patterns">
+{{#each this}}
+{{> pattern_thumbnail}}
+{{/each}}
+</ul></div>
+{{/if}}{{/with}}
+
+{{#if currentUser}}
+{{#with my_patterns true}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='my_patterns'}}"><span class="text">My patterns</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="patterns">
+{{#each this}}
+{{> pattern_thumbnail}}
+{{/each}}
+</ul></div>
+{{/if}}{{/with}}
+{{/if}}
+
+{{#with not_recent_patterns true}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='all_patterns'}}"><span class="text">All patterns</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="patterns">
+{{#each this}}
+{{> pattern_thumbnail}}
+{{/each}}
+</ul></div>
+{{/if}}{{/with}}
+
+{{#with users true}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='users'}}"><span class="text">People</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="users">
+{{#each this}}
+{{> user_thumbnail}}
+{{/each}}
+</ul></div>
+{{/if}}{{/with}}
+</template>
+
+<template name="create_new_pattern">
+<div id="new_pattern">
+{{#if currentUser}}
+{{#if can_create_pattern}}
+
+  <h2>Create a new pattern</h2>
+  <form action="">
+    <label for="pattern_name">Name:</label>
+    <input type="text" placeholder="Pattern name..." id="pattern_name" size="100" ><br/>
+
+    <label for="num_tablets">Tablets:</label>
+    <input type="number" placeholder="Tablets..." id="num_tablets" min="1" max="100" size="3" value="12" ><br/>
+
+    <div class="edit_mode {{is_selected_edit_mode "simulation"}}">
+      <div class="top">
+        <h3>Simulation</h3>
+        <div class="hint">Weave your pattern, row by row.</div>
+      </div>
+      <input name="simulation" value="Create simulation pattern" type="submit">
+    </div>
+
+    <div class="edit_mode {{is_selected_edit_mode "freehand"}}">
+      <div class="top">
+        <h3>Freehand</h3>
+        <div class="hint">Draw your pattern chart on virtual graph paper.</div>
+        <label for="num_rows">Rows:</label>
+        <input type="number" placeholder="Rows..." id="num_rows" min="1" max="100" value="8" ><br/>
+      </div>
+      <input name="freehand" value="Create freehand pattern" type="submit">
+    </div>
+  </form> 
+
+{{else}}
+  {{#if isInRole 'verified' 'users'}}
+    <p class="instruction">You have created the maximum allowed number of patterns.</p>
+  {{else}}
+    <p class="instruction">In order to create more patterns, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a></p>
+  {{/if}}
+{{/if}}
+{{else}}
+  <p class="instruction"><span class="additional_login">{{> loginButtons}}</span> to create and share patterns.</p>
+{{/if}}
+</div>
+</template>
+
+<template name="pattern_thumbnail"><li class="pattern_thumbnail {{#if private}}private{{/if}}" style="width: {{width}}; margin-right: {{rmargin}}" >
+<div class="main">
+<a href="{{pathFor route='pattern'}}">
+<h3 title="{{name}}">{{name}}</h3>
+<div class="description">{{description}}</div>
+
+{{#if tags.length}}
+<div class="tags" title="{{tags}}">{{#each tags}}<span>{{this}}</span>{{/each}}</div>
+{{/if}}
+
+<div class="stats"><span class="number_of_tablets" title="Number of tablets"><span class="icon"></span><span class="text">{{number_of_tablets}}</span></span></div>
+<!--<img src="{{auto_preview_svg}}" />-->
+<div class="image auto_preview {{auto_preview_rotation}}" style="background-image: url('{{auto_preview_svg}}')"></div>
+<!--<div class="image" style="background-image: url('{{preview_url}}')"></div>-->
+</a></div>
+<div class="footer"><a href="{{pathFor route='user' _id=created_by}}" class="created_by">{{created_by_username}}</a>{{#if can_edit_pattern _id}}
+<a href="#" class="delete" title="Delete this pattern"><span></span></a>
+{{#if private}}
+<a href="#" class="toggle_private private" title="Private: nobody else can see this pattern"><span></span></a>
+{{else}}
+<a href="#" class="toggle_private public" title="Public: other people can see this pattern but they can't edit it"><span></span></a>
+{{/if}}{{/if}}</div>
+</li>
+</template>
+
+
+<template name="user_thumbnail"><li class="user_thumbnail" style="width: {{width}}; margin-right: {{rmargin}}" >
+<div class="main">
+<a href="{{pathFor route='user' _id=_id}}">
+<h3>{{username}}</h3>
+<div class="description">{{profile.description}}</div>
+<div class="stats">
+<span class="number_of_patterns" title="Number of patterns"><span class="icon"></span><span class="text">{{number_of_patterns}}</span></span>
+</div>
+<div class="image"><img src="{{thumbnail_url}}" class="thumbnail" width="108" height="108" style="background-color:{{background _id}};" /></div>
+
+</a>
+</div>
+</li>
+</template>
+
+<template name="filter_on_tablets">
+<div class="filter"><p>
+Show patterns with between
+<input type="number" placeholder="Number" id="min_tablets" min="1" max="500" size="3" value="{{min_tablets}}">and
+<input type="number" placeholder="Number" id="max_tablets" min="1" max="500" size="3" value="{{max_tablets}}">tablets
+<span id="reload_pages">(refresh list)</span>
+</p></div>
+</template>
+
+<template name="donate_paypal">
+  
+  <div class="donate_paypal">
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+">
+<input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online.">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1">
+</form>
+
+</div>
+</template>
+
+

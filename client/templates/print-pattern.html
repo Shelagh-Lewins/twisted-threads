@@ -1,0 +1,65 @@
+<template name="print_pattern">
+  {{> warp_svgs}}
+<div id="print_hint" class="visible"><div class="inner_tube">
+<input type="button" class="close" value="Close" >
+<h2>Check your print settings</h2>
+<p>Look at the print preview to see if your browser is set up to print background colours.</p>
+<p>If you're not sure how to change the print settings, try searching the web for instructions, for example "Firefox print background color" or "Internet Explorer 10 print background color".</p>
+<p>Important! After printing your pattern, you may want to change the settings back so you won't waste ink when printing standard web pages.</p>
+</div></div>
+<h1>{{name}}</h1>
+<p class="url">Printed from {{hostname}}{{pathFor route='pattern'}}</p>
+<p class="created_by">Created by {{created_by_username}}</p>
+
+{{#if string_exists description}}
+<h2>Description</h2>
+<span class="text markdown">{{#markdown}}{{{description}}}{{/markdown}}</span>
+{{/if}}
+
+<h2>Weaving chart</h2>
+{{#if equals edit_mode "simulation"}}
+{{#if equals simulation_mode "auto"}}
+  <p>Turn all tablets together, forward or backward, following the sequence shown below:</p>
+  {{> auto_sequence}}
+{{/if}}
+{{/if}}
+
+{{#unless equals simulation_mode "auto"}}
+<div class="pattern view">{{> column_numbers}}
+{{#each row_indexes}}
+<div class="row"><span class="row_number">{{this}}</span><ul>
+
+{{#each tablet_indexes}}
+    {{#with row=.. tablet=this}}
+      {{> pattern_cell}}
+    {{/with}}
+  {{/each}}
+
+</ul></div>
+{{/each}}
+</div>
+{{/unless}}
+
+{{#if string_exists weaving_notes}}
+<h2>Weaving notes</h2>
+<span class="text markdown">{{#markdown}}{{{weaving_notes}}}{{/markdown}}</span>
+{{/if}}
+
+<h2>Threading chart</h2>
+<div class="tablets">{{> column_numbers}}
+{{#each hole_indexes}}
+  {{> threading_row}}
+{{/each}}
+{{> orientation}}
+</div>
+
+<br/>
+<div class="notation">
+<img src="../../images/tablet_labels.png" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
+</div>
+{{#if string_exists threading_notes}}
+<h2>Threading notes</h2>
+<span class="text markdown">{{#markdown}}{{{threading_notes}}}{{/markdown}}</span>
+{{/if}}
+<br/>
+</template>

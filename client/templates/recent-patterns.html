@@ -1,0 +1,23 @@
+<template name="recent_patterns">
+{{#if Template.subscriptionsReady}}
+{{> left_column}}
+<div id="main_column">
+<h2>Recently viewed patterns</h2>
+{{#with recent_patterns}}
+{{#if this.length}}
+	<div class="results">
+	<ul class="patterns">
+	{{#each this}}
+	{{> pattern_thumbnail}}
+	{{/each}}
+	</ul>
+	</div>
+	{{else}}
+	<p>You havent yet viewed any patterns</p>
+	{{/if}}{{/with}}
+	</div>
+{{else}}
+  Loading...
+{{/if}}
+</template>
+

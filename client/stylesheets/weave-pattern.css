@@ -1,0 +1,159 @@
+.weave #header {
+  background-color: #7580ac;
+  color: #FFFFFF;
+}
+
+body.weave,
+.weave #width {
+  color: #FFFFFF;
+  background-color: #333333;
+}
+
+.weave .row_controls {
+  margin: 16px 0 16px 0;
+}
+
+.weave.pattern div.row.column_number ul {
+  border-bottom: 1px solid black;
+}
+
+.tablets div.row:nth-child(2) ul {
+  border-top: none;
+}
+
+.weave .select_row {
+  overflow: hidden;
+}
+
+.pattern.weave span.row_number {
+  background-color: #333333;
+  color: #FFFFFF;
+  border-bottom: 1px solid #333333;
+}
+
+.weave #current_row_input {
+  width: 3em;
+}
+
+.pattern.weave div.row.selected ul {
+  outline: 3px solid #6666FF;
+  position: relative;
+  z-index: 100;
+}
+
+.pattern.weave div.row .highlight {
+  position: absolute;
+  width: 100%;
+  height: 32px;
+  top: 0;
+  left: 0;
+}
+
+.pattern.weave div.row:nth-child(2) .highlight {
+  height: 33px;
+}
+
+.pattern.weave div.row .highlight .inner_tube {
+  position: relative;
+  height: 100%;
+  margin-left: 32px;
+  background-color: rgba(0,0,0,0.7);
+}
+
+.pattern.weave div.row.selected .highlight .inner_tube {
+  background-color: rgba(0,0,0,0);
+}
+
+/* padding-right creates space for next / previous buttons */
+.pattern.weave div.row {
+  padding: 0 0 0 0;
+}
+
+.pattern.weave div.row .buttons {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  padding-left: 4px;
+  width: 50px;
+  height: 146px;
+  z-index: 100;
+  display: inline-block;
+}
+
+.pattern.weave div.row.selected .buttons {
+  z-index: 100;
+  display: inline-block;
+}
+
+.pattern.weave div.row .buttons .inner_tube {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  bottom: -50%;
+  left: -9px; /* (button width /2) - cell width / 2) = 25 -16 = -9px to allow for row numbers and centre on pattern columns */
+}
+
+.pattern.weave div.row .buttons input {
+  display: none;
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background: transparent left top no-repeat;
+  border: none;
+}
+
+.pattern.weave div.row .buttons input:active,
+.pattern.weave div.row .buttons input:focus {
+  background-position: 0 -50px;
+  outline: none;
+}
+
+.pattern.weave div.row .buttons input.next_row {
+  top: 0;
+  background-image: url("../images/next_row.png");
+}
+
+.pattern.weave div.row .buttons input.previous_row {
+  top: 46px;
+  background-image: url("../images/previous_row.png");
+}
+
+.pattern.weave div.row.selected .buttons input {
+  display: block;
+  visibility: visible;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pattern.weave div.row.selected .buttons input.previous_row {
+  visibility: visible;
+}
+
+.pattern.weave div.row.selected:last-child .buttons input.previous_row {
+  visibility: hidden;
+}
+
+/* Colour changes for weaving */
+.pattern.weave {
+  position: relative;
+  background-color: #333333;
+}
+
+.pattern.weave div.row {
+  background-color: #333333;
+  color: #FFFFFF;
+  font-size: 0px; /* avoid space between inline-block elements row number and inner_tube */
+}
+
+.pattern.weave div.row.column_number {
+  background-color: transparent;
+  z-index: 99;
+}
+
+.pattern.weave div.row.column_number ul {
+  color: #FFFFFF;
+}
+
+.pattern.weave div.row.column_number ul li {
+  border-left: 1px solid #333333;
+}

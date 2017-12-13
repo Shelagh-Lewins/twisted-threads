@@ -1,0 +1,149 @@
+<template name="loading">
+{{> spinner}}
+</template>
+
+<template name="main_layout">
+<div id="width" class="{{#if currentUser }}signed_in{{/if}} {{edit_mode}} {{#if can_edit_pattern}}editable{{/if}} {{connection_status}}  ">
+
+<div id="spinner_box" class="{{loading}}"><div class="inner_tube">
+<p>Loading...</p>
+</div></div>
+
+{{> header}}
+{{> import_pattern_dialog}}
+<div id="connection_status_holder">{{> connection_status}}</div>
+<div id="content"><div class="inner_tube">{{> import_file_picker}}{{> yield}}</div></div>
+</div>
+{{> yield region="footer"}}
+</template>
+
+<template name="print_layout">
+{{> yield}}
+</template>
+
+<template name="header">
+<div id="header">
+  <div class="inner_tube">
+    <div class="header_left">
+      {{#if app_name_in_header}}<a class="home_link {{rendered_manual}}" href="{{pathFor route='home'}}"><span class="logo"></span><span class="app_name">Twisted Threads</span></a>{{/if}}
+
+      {{#if equals route_name "user"}}<a href="{{pathFor route='home'}}">Home</a>{{/if}}
+
+      {{#if equals route_name "account_settings"}}
+      <a href="{{pathFor route='home'}}" id="home">Home</a>{{/if}}
+
+      {{#if equals route_name "pattern"}}
+      <a href="{{pathFor route='home'}}" id="home">Home</a>
+        {{#if currentUser}}
+        <a href="{{pathFor route='my_patterns'}}" id="my_patterns">My patterns</a>
+        {{/if}}
+      {{/if}}
+
+      {{#if equals route_name "about"}}<a href="{{pathFor route='home'}}">Home</a>{{/if}}
+    </div>
+    <div class="header_right">{{#if Template.subscriptionsReady}}{{> search}}{{/if}}{{> loginButtons}}{{> menu}}</div>
+  </div>
+</div>
+</template>
+
+<template name="search">
+<div id="search" class="{{css_class}}">
+<div class="input-wrapper">
+{{> EasySearch.Input indexes=indexes attributes=attributes }}
+<div class="results-wrapper {{#unless search_term}}hide{{/unless}}">
+{{#EasySearch.IfInputEmpty index=patternsIndex }}
+{{else}}
+  {{#if pattern_results_count}}
+    <h2>Patterns ({{pattern_results_count}})</h2>
+  {{/if}}
+
+  <ul class="results">
+  {{#EasySearch.Each index=patternsIndex}}
+    <li class="pattern_results"><a href="#"><span class="main_icon"></span><span class="name">{{name}}</span><span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a></li>
+    {{/EasySearch.Each}}
+  </ul>
+
+  {{#if more_patterns}}
+    <a href="#" id="load_more_patterns" class="load_more"><span class="icon"></span>Find more patterns</a>
+  {{/if}}
+
+  {{#if users_results_count}}
+    <h2>People ({{users_results_count}})</h2>
+  {{/if}}
+
+  <ul class="results">
+    {{#EasySearch.Each index=usersIndex}}
+    <li class="user_results"><a href="{{pathFor route='user' _id=_id}}"><span class="main_icon"></span><span class="username">{{username}}</span></a></li>
+    {{/EasySearch.Each}}
+  </ul>
+
+  {{#if more_users}}
+    <a href="#" id="load_more_users" class="load_more"><span class="icon"></span>Find more people</a>
+  {{/if}}
+
+  <!--the more obvious method, {{#EasySearch.IfNoResults index=patternsIndex}} does not seem to work inside the IfInputEmpty condition -->
+  {{#unless pattern_results_count}}
+  {{#unless users_results_count}}
+  <span class="no_results">No results found for <span class="     search_term">{{search_term}}</span></span>
+  {{/unless}}
+  {{/unless}}
+{{/EasySearch.IfInputEmpty}}
+</div></div></div>
+</template>
+
+<template name="menu">
+  {{#if show_menu Template.subscriptionsReady route_name _id}}
+<div id="menu" class="{{menu_open}}" title="Menu" >
+<input type="button" id="menu_button" class="menu_button" value="">
+<div class="menu_list">{{#if currentUser }}<ul>
+{{#if is_file_loading_supported}}<li><a href="#" id="import_pattern" >Import pattern from file</a></li>{{/if}}
+<li><a href="{{pathFor route='account_settings'}}" >Account settings</a></li>
+</ul>{{/if}}
+{{#if Template.subscriptionsReady}}{{#if equals route_name "pattern"}}{{#if pattern_exists _id}}<ul>
+<li><a href="{{pathFor route='pattern' mode='print'}}" target="_blank" id="print_pattern" >Printer-friendly pattern</a></li>
+{{#if currentUser}}{{#if can_create_pattern}}<li><a href="#" id="copy_pattern" >Copy pattern</a></li>{{/if}}{{/if}}
+<li><a href="#" id="export_pattern" >Export pattern to JSON</a></li>
+</ul>
+{{/if}}{{/if}}{{/if}}
+<ul>
+  <li><a href="{{pathFor route='about'}}" >About Twisted Threads</a></li>
+</ul>
+</div></div>{{/if}}
+</template>
+
+<template name="import_pattern_dialog">
+<div id="import_pattern_dialog" class="{{show_import_pattern}}"><div class="inner_tube">
+<div class="buttons">
+  <input type="button" class="close" value="Close" >
+</div>
+<h2>Import pattern</h2>
+<p>Choose the type of pattern file you want to import.</p>
+
+  <div class="radio_button"><input type="radio" id="json" name="file_type" value="JSON" checked="{{checked "JSON"}}" />
+  <label for="json">Twisted Threads (JSON)</label></div>
+  <div class="radio_button"><input type="radio" id="gtt" name="file_type" value="GTT" checked="{{checked "GTT"}}" />
+  <label for="gtt">Guntram's Tablet-Weaving Thingy (GTT/text)</label></div>
+  <p>Simple warp-twined patterns and 3/1 broken twill patterns can be imported from GTT</p>
+
+<div class="buttons continue_holder">
+  <input type="button" class="continue" value="Continue" {{disabled}}>
+</div>
+</div></div>
+</template>
+
+<template name="import_file_picker">
+<div id="import_file_holder">
+<input type="file" id="file_picker" name="file_picker" />
+</div>
+</template>
+
+<!--https://github.com/webtempest/meteor-animate-->
+<template name="connection_status">
+{{#if equals connection_status "trying_to_connect"}}
+{{#transition in="slideInDown" out="slideOutUp"}}<div id="connection_status" class="animated out"><div class="text">
+Connection lost...trying to reconnect...
+</div></div>{{/transition}}
+{{/if}}
+</template>
+
+

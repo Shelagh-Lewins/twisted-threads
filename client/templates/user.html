@@ -1,0 +1,33 @@
+<template name="user">
+{{#if Template.subscriptionsReady}}
+{{> left_column}}
+<div id="main_column">
+{{#if show_description _id}}
+<h1>{{username}}</h1>
+<div class="user_info">
+{{> editable_field extendContext collection="users" property="description" data=profile.description multiple=true button_text="Edit profile" placeholder_text="Tap \"Edit description\" to enter a description"}}
+</div>
+{{/if}}
+
+{{#if user_patterns_exist _id}}
+<h2>{{username}}'s patterns</h2>
+{{> filter_on_tablets}}
+<div class="results">
+<ul class="patterns">
+{{> pages}}
+</ul>
+</div>
+{{> pagesNav}}
+
+{{else}}
+{{username}} has not created any patterns yet.
+{{/if}}
+</div>
+{{/if}}
+</template>
+
+<template name="user_not_found">
+  <h2>User not found: {{id}}</h2>
+</template>
+
+

@@ -1,0 +1,38 @@
+<template name="weave_pattern">
+{{> pattern_as_text}}
+{{#if Template.subscriptionsReady}}
+{{> warp_svgs}}
+
+<button class="styled_button" disabled="{{no_weaving_rows}}" onclick="Meteor.my_functions.printer_friendly_pattern('{{no_weaving_rows}}');">Printer-friendly pattern</button>
+
+<button class="styled_button" onclick="Meteor.my_functions.stop_weaving();">Close weaving chart</button>
+
+
+<div class="row_controls"><label for="current_row_input">Row: </label><input type="text" id="current_row_input" value={{selected_row}}>
+<input type="button" id="first_row" value="First row" />
+<input type="button" id="last_row" value="Last row" /></div>
+<div class="pattern weave">
+{{> column_numbers}}
+{{#each row_indexes}}
+{{> weave_row}}
+{{/each}}
+</div>
+{{/if}}
+</template>
+
+<template name="weave_row">
+  <div class="row {{selected_class this}}">{{> row_number}}
+    <ul>
+  {{#each tablet_indexes}}
+    {{#with row=.. tablet=this}}
+      {{> pattern_cell}}
+    {{/with}}
+  {{/each}}
+  </ul>
+  {{> weave_row_buttons}}
+  </div>
+</template>
+
+<template name="weave_row_buttons">
+{{#if is_selected_row this}}<div class="buttons"><div class="inner_tube"><input type="button" class="next_row" /><input type="button" class="previous_row" /></div></div>{{/if}}<div class="highlight"><div class="inner_tube"></div></div>
+</template>

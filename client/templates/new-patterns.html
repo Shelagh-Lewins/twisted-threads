@@ -1,0 +1,21 @@
+<template name="new_patterns">
+{{#if Template.subscriptionsReady}}
+{{> left_column}}
+<div id="main_column">
+{{#with new_patterns}}
+{{#if this.count}}
+<h2>New patterns</h2>
+{{> filter_on_tablets}}
+<div class="results">
+<ul class="patterns">
+{{> pages}}
+</ul>
+</div>
+{{> pagesNav}}
+{{/if}}{{/with}}
+</div>
+{{else}}
+  Loading...
+{{/if}}
+</template>
+

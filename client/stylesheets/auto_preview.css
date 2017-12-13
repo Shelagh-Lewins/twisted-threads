@@ -1,0 +1,235 @@
+body.view_pattern .auto_preview {
+  width: 100%;
+  /*max-width: 600px;*/
+  overflow-x: auto;
+  overflow-y: hidden;
+  clear: both;
+}
+
+#auto_preview_spacer {
+  height: 8px;
+}
+
+.auto_preview.down,
+.auto_preview.up {
+    float:right;
+}
+
+#auto_preview_wrapper {
+  position: relative;
+}
+
+body.view_pattern .auto_preview.left {
+  margin-top: 0;
+}
+
+body.view_pattern .auto_preview svg { 
+    -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+
+    -webkit-transform-origin: 0 0;
+    -moz-transform-origin: 0 0;
+    -o-transform-origin: 0 0;
+    transform-origin: 0 0;
+
+    position: relative;
+
+    /*max-width: 600px;*/
+}
+
+body.view_pattern .auto_preview.left svg { 
+    -ms-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+
+.auto_preview.up svg { 
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+
+.auto_preview.down svg { 
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    
+    left: 100%;
+    position: relative;
+    top: 100%;
+}
+
+.auto_preview .holder {
+    position: relative;
+    overflow: hidden;
+}
+
+.auto_preview.left .holder {
+    float: left;
+}
+
+.auto_preview.right .holder {
+    float: right;
+}
+
+.auto_preview.right.show_tablets .holder {
+    margin-right: 36px;
+}
+
+/* repeat borders must not be inside .holder, as this is saved for Home page */
+.auto_preview .border_holder {
+  position: absolute !important;
+}
+
+.auto_preview.left .border_holder {
+    left: 0;
+}
+
+.auto_preview.right .border_holder {
+    right: 0;
+    margin-right: 0 !important;
+}
+
+.auto_preview.left.show_tablets .border_holder {
+    left: 36px;
+}
+
+.auto_preview.right.show_tablets .border_holder {
+    right: 36px;
+}
+
+.auto_preview .repeat_border {
+  display: none;
+}
+
+.auto_preview.auto .repeat_border:not(:first-child) {
+  display: block;
+  border-left: 1px dotted #666666;
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  z-index: 10;
+}
+
+/* *** Weft color *** */
+#weft_color {
+  clear: both;
+  width: 160px;
+  margin: 0 0 10px 0;
+  float: left;
+  display: none;
+}
+
+#weft_color.visible {
+  display: block;
+  clear: both;
+}
+
+#weft_color .text {
+  float: left;
+  margin: 0 10px 0 0;
+  line-height: 24px;
+}
+
+#weft_color .colorpicker_holder {
+  display: inline-block;
+}
+
+/* weft colour and rotate preview */
+
+#preview_controls {
+  clear: both;
+  margin-top: 0;
+}
+
+#preview_controls .hint {
+  line-height: 26px;
+  margin-left: 8px;
+}
+
+button.rotate_preview {
+  display: none;
+}
+
+button.rotate_preview.visible {
+  display: inline;
+}
+
+/* *** Tablets to show weaving direction & tablet position *** */
+/* Numbers */
+.tablet_numbers {
+  display: none;
+}
+
+.auto_preview.show_tablets .tablet_numbers {
+  display: block;
+  width: 12px;
+  /*transform: scale(1, 0.75);*/
+}
+
+.auto_preview.left.show_tablets .tablet_numbers {
+  float: left;
+  margin-right: 5px;
+  margin-left: 0;
+}
+
+.auto_preview.right.show_tablets .tablet_numbers {
+  position: absolute;
+  right: 0;
+}
+
+.tablet_numbers .tablet_number {
+  display: block;
+  width: 12px;
+  height: 9px;
+  margin-top: 1px;
+  font-size: 9px;
+  background-color: transparent;
+  color: #424A6C;
+  text-align: left;
+  line-height: 9px;
+}
+
+.auto_preview.left .tablet_numbers .tablet_number {
+  text-align: right;
+}
+
+/* Positions */
+.tablet_positions {
+  display: none;
+}
+
+.auto_preview.show_tablets .tablet_positions {
+  display: block;
+  width: 12px;
+  /*transform: scale(1, 0.75);*/
+}
+
+.auto_preview.left.show_tablets .tablet_positions {
+  float: left;
+  margin-right: 5px;
+  margin-left: 0;
+}
+
+.auto_preview.right.show_tablets .tablet_positions {
+  position: absolute;
+  right: 18px;
+}
+
+.tablet_positions .position {
+  display: block;
+  width: 12px;
+  height: 9px;
+  margin-top: 1px;
+  font-size: 8px;
+  background-color: #666666;
+  color: #FFFFFF;
+  text-align: center;
+  line-height: 9px;
+ }
+
+.tablet_positions .position.start {
+  background-color: #6aa84f;
+}
+

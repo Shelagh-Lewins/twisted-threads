@@ -1,0 +1,59 @@
+.image_uploader {
+  padding: 16px;
+  margin: 0 0 16px 0;
+  border: 1px solid #424A6C;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  background: #FFFFFF;
+  overflow:hidden;
+}
+
+.image_uploader .form-group {
+  overflow: hidden;
+}
+
+.image_uploader .input_holder {
+  float:left;
+}
+
+.image_uploader .close {
+  float:right;
+}
+
+.image_uploader .progress_holder {
+  width: 200px;
+  margin: 0 auto
+}
+
+.image_uploader .progress_holder .progress {
+  float:left;
+  width:200px;
+  height:10px;
+  margin:6px 0 0 0;
+}
+
+/* Preview of uploaded image, used to get dimensions */
+.image_uploader .dropzone_holder {
+  position: relative;
+}
+
+.image_uploader .preview {
+  margin-top: 8px;
+  position: relative;
+  float: left;
+  left: 50%;
+  top: 0;
+}
+
+.image_uploader .preview img {
+  max-width: 200px;
+  max-height: 200px;
+  margin-left: -50%;
+  border: 1px solid #7580ac;
+}
+
+.image_uploader .preview img.hidden {
+  position: absolute;
+  visibility: hidden;
+}

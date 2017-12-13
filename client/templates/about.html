@@ -1,0 +1,47 @@
+<template name="about">
+<div class="section">
+<h2>About Twisted Threads</h2>
+<p>Twisted Threads is an open source, free to use web app for creating, weaving and sharing patterns for tablet weaving.</p>
+<p>Please don't share copyrighted patterns without the owner's permission. Any patterns that violate copyright may be unshared without notice.</p>
+<p><strong>If you would like to support the project, you can donate via PayPal.</strong></p>
+
+{{> donate_paypal}}
+
+<h2>Using Twisted Threads</h2>
+<p>The <a href="{{pathFor route='home'}}">Home</a> page shows patterns that people have shared. You can search for patterns by name, owner or tag, and filter them by number of tablets.</p>
+<p>To create your own patterns, first click 'Sign in' and create an account. To create more than one pattern and to add pictures to your patterns, you'll need to {{#if currentUser}}<a href="{{pathFor route='account_settings'}}" >verify your email address</a>
+{{else}}
+verify your email address
+{{/if}}.</p>
+<p>You can create patterns as either Simulation or Freehand.</p>
+<p>Simulation patterns take your threading and automatically generate a weaving chart according to your turning instructions. By default the tablets are turned 4F, 4B, but you can change this sequence, or you can switch to "Manual" and weave each row individually by assigning tablets to different packs.</p>
+<p>Freehand patterns are drawn by hand on virtual graph paper. If you follow the charting convention from Applesies and Fox Noses, you should see a preview showing how your band will look.</p>
+
+</div>
+
+<div class="section">
+<h2>Development</h2>
+<p>Twisted Threads is being developed by me, Shelagh Lewins, because I got fed up with trying to keep track of patterns on bits of paper while I weave. Unfortunately I've had very little time for weaving since I started work on Twisted Threads...oops...</p>
+
+<h2>Contact</h2>
+<p>I'd like to hear your feedback and feature requests. There is a <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss the app, or you can send me an email - see below.</p>
+
+{{> contact_info}}
+
+</div>
+</template>
+
+<template name="contact_info">
+<div class="contact_info">
+  {{#if show_contact_info}}
+    <input type="checkbox" id="checkbox" >I am interested in tablet weaving<br>
+
+    {{#if isChecked}}
+    <p>Email: <a href="mailto:twistedthreadsapp@gmail.com?subject=Twisted%20Threads" target="_top">twistedthreadsapp@gmail.com</a></p>
+    {{/if}}
+  {{else}}
+    <input type="button" id="button" value="Show me how to get in touch">
+  {{/if}}
+</div>
+</template>
+

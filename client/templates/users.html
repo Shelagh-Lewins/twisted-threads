@@ -1,0 +1,22 @@
+<template name="users">
+{{#if Template.subscriptionsReady}}
+{{> left_column}}
+<div id="main_column">
+{{#with users}}{{#if this.count}}
+<h2>People</h2>
+<div class="results">
+<ul class="users">
+{{> pages}}
+</ul>
+</div>
+{{> pagesNav}}
+{{else}}
+<p>There are no people with published patterns</p>
+{{/if}}{{/with}}
+</div>
+{{else}}
+  Loading...
+{{/if}}
+</template>
+
+

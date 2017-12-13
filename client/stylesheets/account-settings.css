@@ -1,0 +1,16 @@
+/* *** Account Settings *** */
+.user_info {
+  max-width: 600px;
+  width: 100%;
+}
+
+.user_info .box {
+  /*clear: both;*/
+  overflow: hidden;
+  margin: 0 0 16px 0;
+}
+
+.status {
+  color: #666666;
+  font-size: 90%;
+}
