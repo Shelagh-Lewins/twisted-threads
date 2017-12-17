@@ -433,7 +433,7 @@ body.weave button.styled_button:disabled {
   float: left;
 }
 
-.simulation #toolbar.manual #weave {
+.simulation #toolbar.manual #weave:not(.disabled) {
   background-color: #458027;
   border-color: #458027;
 }

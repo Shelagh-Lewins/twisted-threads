@@ -153,7 +153,7 @@ Template.view_pattern.helpers({
   },
   weave_disabled: function() {
     // cannot add a row to manual simulation pattern
-    if (current_manual_weaving_turns.length > 100)
+    if (current_manual_weaving_turns.length > 300)
       return "disabled";
   },
   add_tablet_positions: function() {
