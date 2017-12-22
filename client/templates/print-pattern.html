@@ -11,11 +11,6 @@
 <p class="url">Printed from {{hostname}}{{pathFor route='pattern'}}</p>
 <p class="created_by">Created by {{created_by_username}}</p>
 
-{{#if string_exists description}}
-<h2>Description</h2>
-<span class="text markdown">{{#markdown}}{{{description}}}{{/markdown}}</span>
-{{/if}}
-
 <h2>Weaving chart</h2>
 {{#if equals edit_mode "simulation"}}
 {{#if equals simulation_mode "auto"}}
