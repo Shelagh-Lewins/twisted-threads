@@ -49,14 +49,6 @@ UI.registerHelper('hole_label', function(hole) {
 
 ///////////////////////////
 // Helpers for styles
-/*UI.registerHelper('style_orientation', function(orientation) {
-  if (orientation == "Z")
-      return "orientation_z";
-
-  else
-      return "orientation_s";
-});*/
-
 UI.registerHelper('is_selected_style', function() {
   var special = false;
 
@@ -111,7 +103,7 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
 
     if (typeof pattern === "undefined")
         return;
-
+      
     if (pattern.edit_mode == "simulation")
     {
       var mapped_styles = Meteor.my_functions.map_weaving_styles(style_ref);

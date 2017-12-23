@@ -123,7 +123,7 @@ Meteor.my_functions = {
     for (var i=0; i<number_of_tablets; i++)
     {
       //pattern_obj.orientation[i] = current_orientation[i].orientation;
-      pattern_obj.orientation[i] = current_orientation[(i+1).toString()].get();
+      pattern_obj.orientation[i] = current_orientation[i+1].get();
     }
 
     // Threading of tablet holes
@@ -1336,7 +1336,6 @@ Meteor.my_functions = {
   },
   build_pattern_display_data:  function(pattern_id)
   {
-    console.log("build_pattern_display_data");
     // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
 
     // elements in reactive arrays need to be updated with arr.splice(pos, 1 new_value) to be reactive
@@ -1383,7 +1382,7 @@ Meteor.my_functions = {
     //////////////////////////////
     // build the orientation data
 
-    // it seems that deleting and recreating the reactiveVars here breaks reactivity in Simulation patterns
+    // it seems that deleting and recreating the reactiveVars here breaks reactivity in Simulation patterns, so only remove if not previously created
     if (typeof current_orientation === "undefined")
       current_orientation = {};
 
@@ -1392,30 +1391,17 @@ Meteor.my_functions = {
     for (var i=0; i<number_of_tablets; i++)
     {
       if (typeof current_orientation[i + 1] === "undefined")
-      current_orientation[i + 1] = new ReactiveVar();
-      current_orientation[i + 1].set(orientation_data[i])
+        current_orientation[i + 1] = new ReactiveVar();
+
+      current_orientation[i + 1].set(orientation_data[i]);
     }
 
-    // TODO prune any extra entries, there must be one per tablet.
-    // TODO clear out the ).toString() which doesn't seem to be required.
-    // TODO clear out test, testreact helpers & session vars
-
-
-    console.log("typeof session testreact " + typeof Session.get("testreact"));
-    if (typeof Session.get("testreact") === "undefined")
+    // prune any tablet entries leftover when tablets were deleted
+    for (var i=number_of_tablets; i<Object.keys(current_orientation).length; i++)
     {
-      Session.set("testreact", "S");
-      //
+      delete current_orientation[i];
     }
-
-    if (typeof testreact === "undefined")
-    {
-      testreact = new ReactiveVar(Session.get("testreact"));
-      //
-    }
-
-    testreact.set(Session.get("testreact"));    
-
+ 
     //////////////////////////////
     // build the styles data
     // Regular styles - editable by user
@@ -1729,7 +1715,7 @@ Meteor.my_functions = {
     {
       console.log("remove tablet, processing " + j);
 
-      current_orientation[j.toString()].set(current_orientation[(j+1).toString()].get());
+      current_orientation[j].set(current_orientation[j+1].get());
       console.log("new orientation " + current_orientation[j].get());
     }
     //current_orientation.splice(position-1, 1);
@@ -1892,9 +1878,9 @@ Meteor.my_functions = {
 
     for (var i=0; i<number_of_tablets; i++)
     {
-      orientation_array.push(current_orientation[(i + 1).toString()].get());
+      orientation_array.push(current_orientation[i + 1].get());
     }
-//console.log("orientation array " + JSON.stringify(orientation_array));
+
     return orientation_array;
   },
   save_orientation_to_db: function(pattern_id)

@@ -238,22 +238,12 @@
 
   <h2>Threading chart</h2>  
 
-TESTREACT {{testreact}} 
-<ul>{{#each tablet_indexes}}
-  <!--{{#with testreact}}-->
-<li class="no_select"><span class="line">test: {{testreact}}</span></li>
-<!--{{/with}}-->
-{{/each}}
-</ul>
-
   <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
     {{> column_numbers}}
     {{#each hole_indexes}}
       {{> threading_row}}
     {{/each}}
-    {{> orientation}}
-
-    
+    {{> orientation}}  
 
     {{/if}}
 
@@ -380,11 +370,6 @@ TESTREACT {{testreact}}
 <template name="orientation">
 <div class="row orientation {{#if can_edit_pattern _id}}editable{{/if}}"><span class="spacer"></span><ul>{{#each tablet_indexes}}
 <li class="no_select {{style_orientation this}}" title="Click to change orientation"><span class="line"></span></li>
-{{/each}}
-</ul>
-<br>
-<ul>{{#each tablet_indexes}}
-<li class="no_select"><span class="line">{{testreact this}}</span></li>
 {{/each}}
 </ul>
 </div>

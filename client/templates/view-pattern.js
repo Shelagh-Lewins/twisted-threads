@@ -273,19 +273,12 @@ Template.view_pattern.helpers({
 
 Template.orientation.helpers({
   'style_orientation': function(tablet) {
-console.log("style_orientation for tablet " + tablet);
-console.log("orientation is " + current_orientation[tablet.toString()].get());
-    if (current_orientation[tablet.toString()].get() == "Z")
+
+    if (current_orientation[tablet].get() == "Z")
         return "orientation_z";
 
     else
         return "orientation_s";
-  },
-  'testorient': function(tablet) {
-    console.log("test. Tablet: " + tablet);
-    //return current_orientation[tablet.toString()].get();
-    //return current_orientation["1"].get();
-    return testreact.get();
   }
 });
 
@@ -679,22 +672,7 @@ Template.view_pattern.events({
       new_orientation = "Z";
     }
 
-    //console.log("testreact.get() " + testreact.get())
-    if (testreact.get() == "S")
-    {
-      Session.set("testreact", "Z");
-      testreact.set("Z");
-      //console.log("setting testreact to Z");
-    }
-    else
-    {
-      Session.set("testreact", "S");
-      testreact.set("S");
-      //console.log("setting testreact to S");
-    }
-    console.log("new testreact.get() " + testreact.get())
-
-    current_orientation[this.toString()].set(new_orientation);
+    current_orientation[this].set(new_orientation);
 
     Meteor.my_functions.save_orientation_to_db(pattern_id);
 
