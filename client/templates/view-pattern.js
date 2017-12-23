@@ -31,6 +31,9 @@ Template.view_pattern.rendered = function() {
     Session.set("hide_while_loading", false);
   }, 1);
 
+
+
+
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll
@@ -269,17 +272,20 @@ Template.view_pattern.helpers({
 });
 
 Template.orientation.helpers({
-  'tablet_orientation': function()
-  {
-    if (typeof current_orientation !== "undefined")
-      return current_orientation.list();   
-  },
-  'style_orientation': function(orientation) {
-    if (orientation == "Z")
+  'style_orientation': function(tablet) {
+console.log("style_orientation for tablet " + tablet);
+console.log("orientation is " + current_orientation[tablet.toString()].get());
+    if (current_orientation[tablet.toString()].get() == "Z")
         return "orientation_z";
 
     else
         return "orientation_s";
+  },
+  'testorient': function(tablet) {
+    console.log("test. Tablet: " + tablet);
+    //return current_orientation[tablet.toString()].get();
+    //return current_orientation["1"].get();
+    return testreact.get();
   }
 });
 
@@ -296,7 +302,7 @@ Template.styles_palette.onRendered(function(){
 
   if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
-  //Meteor.my_functions.initialize_weft_color_picker();
+
   Meteor.my_functions.initialize_warp_color_picker();
   Meteor.my_functions.initialize_background_color_picker();
 
@@ -621,7 +627,7 @@ Template.view_pattern.events({
     var number_of_tablets = pattern.number_of_tablets;
     var new_style = Meteor.my_functions.get_selected_style();
 
-    Meteor.my_functions.set_preview_cell_style(this.row, this.tablet, new_style);
+    Meteor.my_functions.set_weaving_cell_style(this.row, this.tablet, new_style);
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
   },
   'click .tablets li.cell': function(event, template) {
@@ -645,7 +651,7 @@ Template.view_pattern.events({
 
     if (pattern.edit_mode == "simulation")
     {
-      var old_style = current_threading_data[this.hole.toString() + "_" + this.tablet.toString()].get();
+      var old_style = current_threading[this.hole.toString() + "_" + this.tablet.toString()].get();
       Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, this.hole, old_style, new_style);
     }
 
@@ -667,14 +673,28 @@ Template.view_pattern.events({
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
     var new_orientation = "S";
-    if (this.orientation == "S")
+    
+    if (current_orientation[this].get() == "S")
     {
       new_orientation = "Z";
     }
 
-    var obj = current_orientation[this.tablet-1];
-    obj.orientation = new_orientation;
-    current_orientation.splice(this.tablet-1, 1, obj);
+    //console.log("testreact.get() " + testreact.get())
+    if (testreact.get() == "S")
+    {
+      Session.set("testreact", "Z");
+      testreact.set("Z");
+      //console.log("setting testreact to Z");
+    }
+    else
+    {
+      Session.set("testreact", "S");
+      testreact.set("S");
+      //console.log("setting testreact to S");
+    }
+    console.log("new testreact.get() " + testreact.get())
+
+    current_orientation[this.toString()].set(new_orientation);
 
     Meteor.my_functions.save_orientation_to_db(pattern_id);
 

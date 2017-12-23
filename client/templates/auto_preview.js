@@ -297,7 +297,7 @@ Template.auto_preview_element.helpers({
     ////////////////////
     // KNOWN ISSUE: reversal during idling shows an error.
     // This is proving hard to fix and is a very unusual situation, so I'm parking it for now.
-    var cell = current_weaving_data[(row) + "_" + (tablet)];
+    var cell = current_weaving[(row) + "_" + (tablet)];
 
     if (typeof cell === "undefined")
         return; // may happen when rows or tablets are added or removed
@@ -323,10 +323,10 @@ Template.auto_preview_element.helpers({
 
       if (Session.get("number_of_repeats") > 1)
         // for first row, use last row as previous row so pattern repeats correctly
-        previous_style_value = current_weaving_data[Session.get("number_of_rows") + "_" + (tablet)].get();
+        previous_style_value = current_weaving[Session.get("number_of_rows") + "_" + (tablet)].get();
       
       else
-        previous_style_value = current_weaving_data[row + "_" + (tablet)].get();
+        previous_style_value = current_weaving[row + "_" + (tablet)].get();
 
       var previous_style = Meteor.my_functions.find_style(previous_style_value);
     }
@@ -358,7 +358,8 @@ Template.auto_preview_element.helpers({
       {
         // use direction from last non-idle turn to find which thread shows
         // tablet orientation determines which way thread is angled
-        if (current_orientation[tablet-1].orientation == "S")
+        //if (current_orientation[tablet].curValue == "S")
+        if (current_orientation[tablet.toString()].get() == "S")
           direction = (previous_style.warp == "forward")? "F": "B";
         else
           direction = (previous_style.warp == "forward")? "B": "F";
@@ -371,9 +372,9 @@ Template.auto_preview_element.helpers({
       for (var i=0; i<4; i++)
       {
         var identifier = (Meteor.my_functions.modular_add(i, threads_to_show[tablet-1], 4) + 1) + "_" + tablet;
-        if (typeof current_threading_data[identifier] === "undefined")
+        if (typeof current_threading[identifier] === "undefined")
             return; // can happen after insert tablet, this is temporary
-        var thread_style = current_threading_data[identifier].get();
+        var thread_style = current_threading[identifier].get();
 
         var index = i;
         if (direction == "B") // threads appear in opposite order, and thread D shows not thread A
@@ -416,7 +417,7 @@ Template.auto_preview_element.helpers({
       if (simulation)
       {
         show_empty = false;
-        var orientation = current_orientation[tablet-1].orientation;
+        var orientation = current_orientation[tablet.toString()].get();
         style_value = Meteor.my_functions.weaving_style_from_threading_style(thread_styles[0], orientation, direction, 1);
         style = Meteor.my_functions.find_style(style_value);
       }

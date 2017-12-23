@@ -26,6 +26,15 @@ UI.registerHelper('row_indexes', function() {
   return row_indexes;
 });
 
+UI.registerHelper('testreact', function(tablet) {
+  //return Session.get("testreact");
+  if (typeof testreact === "undefined")
+    return;
+  
+  console.log("testreact helper " + testreact.get());
+  return testreact.get();
+});
+
 //////////////////////////
 // Tablets
 UI.registerHelper('hole_indexes', function() {
@@ -40,13 +49,13 @@ UI.registerHelper('hole_label', function(hole) {
 
 ///////////////////////////
 // Helpers for styles
-UI.registerHelper('style_orientation', function(orientation) {
+/*UI.registerHelper('style_orientation', function(orientation) {
   if (orientation == "Z")
       return "orientation_z";
 
   else
       return "orientation_s";
-});
+});*/
 
 UI.registerHelper('is_selected_style', function() {
   var special = false;
@@ -87,7 +96,7 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   }
   else if (type == "threading")
   {
-    var cell = current_threading_data[(row) + "_" + (tablet)];
+    var cell = current_threading[(row) + "_" + (tablet)];
     if (typeof cell === "undefined")
     {
       return;
@@ -106,7 +115,10 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
     if (pattern.edit_mode == "simulation")
     {
       var mapped_styles = Meteor.my_functions.map_weaving_styles(style_ref);
-      if (current_orientation[this.tablet-1].orientation == "S")
+
+      //console.log("orientation for tablet " + this.tablet);
+
+      if (current_orientation[this.tablet].get() == "S")
         style_ref = mapped_styles[0];
       else
         style_ref = mapped_styles[1];
@@ -114,7 +126,7 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   }
   else // weaving cell
   {
-    var cell = current_weaving_data[(row) + "_" + (tablet)];
+    var cell = current_weaving[(row) + "_" + (tablet)];
     if (typeof cell === "undefined")
     {
       return;
