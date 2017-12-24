@@ -144,7 +144,8 @@
 <div class="main">
 <a href="{{pathFor route='pattern'}}">
 <h3 title="{{name}}">{{name}}</h3>
-<div class="description">{{description}}</div>
+<!--<div class="description">{{description}}</div>-->
+<div class="description"><span>{{#markdown}}{{{description}}}{{/markdown}}</span></div>
 
 {{#if tags.length}}
 <div class="tags" title="{{tags}}">{{#each tags}}<span>{{this}}</span>{{/each}}</div>

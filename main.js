@@ -150,7 +150,7 @@ if (Meteor.isClient) {
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
 
-    if (pattern.number_of_rows < 1) // row 0 is for workiing
+    if (pattern.number_of_rows < 1)
       return "disabled";
   });
 
@@ -290,7 +290,6 @@ if (Meteor.isClient) {
 
     if (limit)
       obj["limit"] = parseInt(Session.get('thumbnails_in_row'));
-    //console.log(Patterns.find({}, obj).map( function(u) { return u.created_at; } ));
 
     return Patterns.find({}, obj);
     // This is a cursor use use .count in template to find number of items
@@ -510,7 +509,6 @@ if (Meteor.isClient) {
     if (Session.equals('menu_open', true))
       return "open";
   });
-
 
   UI.registerHelper('can_edit_pattern', function(pattern_id) {
     return Meteor.my_functions.can_edit_pattern(pattern_id);

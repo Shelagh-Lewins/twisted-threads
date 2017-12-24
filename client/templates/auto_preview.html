@@ -1,6 +1,22 @@
 <template name="auto_preview">
 <div id="auto_preview_spacer"></div>
 
+{{#if equals no_weaving_rows "disabled"}}
+  {{#if can_edit_pattern _id}}
+    {{#if equals edit_mode "simulation"}}
+    <div class="preview_no_weaving warning">  
+      <p>Manual patterns must be woven row by row.</p>
+      <p>To weave a row, click the 'Weave' button.</p>
+    </div>
+    {{/if}}
+  {{else}}
+  <div class="preview_no_weaving error">
+    <p>This pattern has no weaving chart.</p>
+    <p>It is probably a work in progress.</p>
+  </div>
+  {{/if}}
+{{else}}
+
 <div id="preview_controls">
   <div id="weft_color" class="{{#if equals view_pattern_mode "charts"}}visible{{/if}}
   {{#if equals view_pattern_mode "summary"}}visible{{/if}}">
@@ -57,7 +73,6 @@
     {{else}}
 
     <svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{viewbox_width}} {{repeat_viewbox_height}}"  shape-rendering="geometricPrecision" width="{{total_width}}">
-
     
       {{#each repeats}}
       row indexes {{row_indexes}}
@@ -83,6 +98,7 @@
 
 </div>
 </div>
+{{/if}}
 </template>
 
 <template name="auto_preview_row">
@@ -218,6 +234,7 @@
 <path d="m0.41211 28.73v13.62l25.705 34.99 5.012-6.799-30.717-41.811z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
 <path d="m0.41211 14.596v13.619l30.908 42.068 5.01-6.797-35.918-48.89z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
 <path d="m0.41211 0.72656v13.617l36.012 49.017 5.01-6.799-41.022-55.835z" stroke="#000" stroke-width="1.015" fill="#ffffff"></path>
+
 </template>
 
 

@@ -210,7 +210,8 @@ ul.patterns .pattern_thumbnail h3 {
   cursor: pointer;
 }
 
-ul.patterns .pattern_thumbnail .description {
+ul.patterns .pattern_thumbnail .description p,
+ul.patterns .pattern_thumbnail .description p strong {
   display: block;
   height: 32px;
   font-size: 14px;
