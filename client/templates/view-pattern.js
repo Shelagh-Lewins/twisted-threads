@@ -32,8 +32,6 @@ Template.view_pattern.rendered = function() {
   }, 1);
 
 
-
-
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll

@@ -17,6 +17,7 @@ Template.print_pattern.onCreated(function(){
       Session.set("simulation_mode", pattern.simulation_mode);
   }
 
+  Meteor.my_functions.clear_pattern_display_data();
   Meteor.my_functions.build_pattern_display_data(pattern_id);
 });
 

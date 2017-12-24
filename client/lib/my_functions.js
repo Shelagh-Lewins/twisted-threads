@@ -1,6 +1,9 @@
 Meteor.my_functions = {
   accept_click: function()
   {
+    if (Session.get('change_tablets_latch'))
+        return false;
+
     var accept_click = false;
 
     if (Session.equals('click_latch', false))
@@ -1333,7 +1336,20 @@ Meteor.my_functions = {
     else
       return Session.get("selected_style");
   },
-  build_pattern_display_data:  function(pattern_id)
+  clear_pattern_display_data: function()
+  {
+    // prevent leftover data from previous pattern causing problems
+    // reset orientation ReactiveVars
+    if (typeof current_orientation !== "undefined")
+    {
+      for (var variableKey in current_orientation){
+        if (current_orientation.hasOwnProperty(variableKey)){
+          delete current_orientation[variableKey];
+        }
+      }
+    }
+  },
+  build_pattern_display_data: function(pattern_id)
   {
     // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
 
@@ -1599,6 +1615,14 @@ Meteor.my_functions = {
   },
   add_tablet: function(pattern_id, position, style)
   {
+    if (Session.get('change_tablets_latch'))
+        return;
+
+    Session.set('change_tablets_latch', true);
+
+    // ensure the latch is cleared even if there is an error in the function
+    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
     var number_of_tablets = Session.get("number_of_tablets");
@@ -1663,6 +1687,14 @@ Meteor.my_functions = {
   },
   remove_tablet: function(pattern_id, position)
   {
+    if (Session.get('change_tablets_latch'))
+        return;
+
+    Session.set('change_tablets_latch', true);
+
+    // ensure the latch is cleared even if there is an error in the function
+    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
     var number_of_tablets = Session.get("number_of_tablets");
@@ -1829,6 +1861,9 @@ Meteor.my_functions = {
 
       for (var j=0; j<number_of_tablets; j++)
       {
+        // during updates, the object may be undefined e.g. if a tablet was removed
+        //if (typeof current_threading[(i + 1) + "_" + (j + 1)] undefined continue);
+
         threading_array[i][j] = current_threading[(i + 1) + "_" + (j + 1)].get();
       }
     }
@@ -2240,6 +2275,7 @@ Meteor.my_functions = {
   // set up and draw the view pattern. This must be refreshed if the user switches pattern without switching view: e.g. using copy, import
   view_pattern_created: function(pattern_id) {
 
+    Meteor.my_functions.clear_pattern_display_data();
     Meteor.my_functions.build_pattern_display_data(pattern_id);
 
     Session.set('edited_pattern', true);
@@ -2264,6 +2300,9 @@ Meteor.my_functions = {
 
     if (pattern.edit_mode === "simulation")
       Meteor.my_functions.reset_simulation_weaving(pattern_id);
+
+    // ensure successive add / remove tablet operations don't interfere with each other
+    Session.set('change_tablets_latch', false);
   },
   view_pattern_render: function(pattern_id) {
     Session.set('edit_style', false);
