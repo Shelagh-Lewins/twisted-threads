@@ -210,13 +210,16 @@ ul.patterns .pattern_thumbnail h3 {
   cursor: pointer;
 }
 
-ul.patterns .pattern_thumbnail .description p,
-ul.patterns .pattern_thumbnail .description p strong {
+ul.patterns .pattern_thumbnail .description {
   display: block;
   height: 32px;
-  font-size: 14px;
-  margin: 0 0 4px 0;
   overflow: hidden;
+  margin: 0 0 4px 0;
+}
+
+ul.patterns .pattern_thumbnail .description p,
+ul.patterns .pattern_thumbnail .description p strong {
+  font-size: 14px;
   white-space: pre-line;
   color: #333333;
   line-height: 1.2;
@@ -489,7 +492,5 @@ ul.users .user_thumbnail .image {
 
 .home .filter #reload_pages,
 .user .filter #reload_pages {
-  margin-left: 10px;
-  text-decoration: underline;
-  cursor: pointer;
+  margin-left: 10px;;
 }

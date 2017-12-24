@@ -3,9 +3,16 @@ Router.configure({
   loadingTemplate: 'loading'
 });
 
+//Router.onBeforeAction('loading');
+
 Router.route('/', {
   name: 'home',
   loadingTemplate: 'loading',
+  waitOn: function () {
+  return [
+      Meteor.subscribe('patterns')
+    ];
+  },
   template: 'home'
 });
 
@@ -18,30 +25,55 @@ Router.route('/about', {
 Router.route('/recent-patterns', {
   name: 'recent_patterns',
   loadingTemplate: 'loading',
+  waitOn: function () {
+  return [
+      Meteor.subscribe('patterns')
+    ];
+  },
   template: 'recent_patterns'
 });
 
 Router.route('/new-patterns', {
   name: 'new_patterns',
   loadingTemplate: 'loading',
+  waitOn: function () {
+  return [
+      Meteor.subscribe('patterns')
+    ];
+  },
   template: 'new_patterns'
 });
 
 Router.route('/my-patterns', {
   name: 'my_patterns',
   loadingTemplate: 'loading',
+  waitOn: function () {
+  return [
+      Meteor.subscribe('patterns')
+    ];
+  },
   template: 'my_patterns'
 });
 
 Router.route('/all-patterns', {
   name: 'all_patterns',
   loadingTemplate: 'loading',
+  waitOn: function () {
+  return [
+      Meteor.subscribe('patterns')
+    ];
+  },
   template: 'all_patterns'
 });
 
 Router.route('/users', {
   name: 'users',
   loadingTemplate: 'loading',
+  waitOn: function () {
+  return [
+      Meteor.subscribe('user_info')
+    ];
+  },
   template: 'users'
 });
 
