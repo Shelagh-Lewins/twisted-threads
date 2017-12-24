@@ -122,7 +122,6 @@ Meteor.my_functions = {
 
     for (var i=0; i<number_of_tablets; i++)
     {
-      //pattern_obj.orientation[i] = current_orientation[i].orientation;
       pattern_obj.orientation[i] = current_orientation[i+1].get();
     }
 
@@ -1382,7 +1381,7 @@ Meteor.my_functions = {
     //////////////////////////////
     // build the orientation data
 
-    // it seems that deleting and recreating the reactiveVars here breaks reactivity in Simulation patterns, so only remove if not previously created
+    // deleting and recreating the reactiveVars here breaks reactivity in Simulation patterns, so only create vars if they did not already exist.
     if (typeof current_orientation === "undefined")
       current_orientation = {};
 
@@ -1396,7 +1395,7 @@ Meteor.my_functions = {
       current_orientation[i + 1].set(orientation_data[i]);
     }
 
-    // prune any tablet entries leftover when tablets were deleted
+    // prune any leftover tablet entries
     for (var i=number_of_tablets; i<Object.keys(current_orientation).length; i++)
     {
       delete current_orientation[i];
@@ -1638,21 +1637,17 @@ Meteor.my_functions = {
     }
 
     // orientation
-    // old reactivearray
-/*    for (var i=number_of_tablets-1; i>= position-1; i--)
+    // add a new tablet at the end
+    current_orientation[number_of_tablets + 1] = new ReactiveVar();
+
+    // move the values above the inserted tablet up by one
+    for (var j=number_of_tablets; j>=position; j--)
     {
-      // current_orientation[i].tablet += 1; 
+      current_orientation[j+1].set(current_orientation[j].get());
     }
-
-    var obj = {
-      tablet: position,
-      orientation: "S"
-    }
-
-    current_orientation.splice(position-1, 0, obj);*/
-
-// TODO update for new object system
-    current_orientation.splice(position-1, 0, "S");
+     
+    // set the value of the new tablet to default "S"
+    current_orientation[position].set("S");
 
     // manual_weaving_turns
     if (pattern.edit_mode == "simulation")
@@ -1704,21 +1699,13 @@ Meteor.my_functions = {
     }
 
     // orientation
-    /*for (var j=number_of_tablets-1; j>= position; j--)
-    {
-      //current_orientation[j].tablet -= 1;
-      console.log("remove tablet, processing " + j);
-      current_orientation[j].set(current_orientation[j+1].get());
-    }*/
-
+    // move the values above the deleted tablet down by one
     for (var j=position; j<number_of_tablets; j++)
     {
-      console.log("remove tablet, processing " + j);
-
       current_orientation[j].set(current_orientation[j+1].get());
-      console.log("new orientation " + current_orientation[j].get());
     }
-    //current_orientation.splice(position-1, 1);
+
+    // remove the last tablet
     delete current_orientation[number_of_tablets];
 
     if (pattern.edit_mode == "simulation")
