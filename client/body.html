@@ -50,43 +50,45 @@
 <div id="search" class="{{css_class}}">
 <div class="input-wrapper">
 {{> EasySearch.Input indexes=indexes attributes=attributes }}
-</div>
+<div class="results-wrapper {{#unless search_term}}hide{{/unless}}">
+{{#EasySearch.IfInputEmpty index=patternsIndex }}
+{{else}}
+  {{#if pattern_results_count}}
+    <h2>Patterns ({{pattern_results_count}})</h2>
+  {{/if}}
 
-{{#EasySearch.IfInputEmpty index=patternsIndex}}
-{{else}}
-<div class="results-wrapper">
-{{#if is_searching}}
-<span class="no_results">Searching...</span>
-{{else}}
-{{#if no_results}}
-<span class="no_results">No results found for <span class="search_term">{{search_term}}</span></span>
-{{else}}
-
-{{#EasySearch.IfNoResults index=usersIndex}}
-{{else}}
-<h2>People</h2>
   <ul class="results">
-{{#EasySearch.Each index=usersIndex}}
-<li class="user_results"><a href="{{pathFor route='user' _id=_id}}"><span class="main_icon"></span><span class="username">{{username}}</span></a></li>
-{{/EasySearch.Each}}
-</ul>
-{{/EasySearch.IfNoResults}}
+  {{#EasySearch.Each index=patternsIndex}}
+    <li class="pattern_results"><a href="#"><span class="main_icon"></span><span class="name">{{name}}</span><span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a></li>
+    {{/EasySearch.Each}}
+  </ul>
 
-{{#EasySearch.IfNoResults index=patternsIndex}}
-{{else}}
-<h2>Patterns</h2>
-<ul class="results">
-{{#EasySearch.Each index=patternsIndex}}
-<li class="pattern_results"><a href="#"><span class="main_icon"></span><span class="name">{{name}}</span><span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a></li>
-{{/EasySearch.Each}}
-</ul>
-{{#if more_documents}}
-<a href="#" id="load_more"><span class="icon"></span>Find more results for <span class="search_term">{{search_term}}</span></a>
-{{/if}}
-{{/EasySearch.IfNoResults}}{{/if}}{{/if}}
-</div>
+  {{#if more_patterns}}
+    <a href="#" id="load_more_patterns" class="load_more"><span class="icon"></span>Find more patterns</a>
+  {{/if}}
+
+  {{#if users_results_count}}
+    <h2>People ({{users_results_count}})</h2>
+  {{/if}}
+
+  <ul class="results">
+    {{#EasySearch.Each index=usersIndex}}
+    <li class="user_results"><a href="{{pathFor route='user' _id=_id}}"><span class="main_icon"></span><span class="username">{{username}}</span></a></li>
+    {{/EasySearch.Each}}
+  </ul>
+
+  {{#if more_users}}
+    <a href="#" id="load_more_users" class="load_more"><span class="icon"></span>Find more people</a>
+  {{/if}}
+
+  <!--the more obvious method, {{#EasySearch.IfNoResults index=patternsIndex}} does not seem to work inside the IfInputEmpty condition -->
+  {{#unless pattern_results_count}}
+  {{#unless users_results_count}}
+  <span class="no_results">No results found for <span class="     search_term">{{search_term}}</span></span>
+  {{/unless}}
+  {{/unless}}
 {{/EasySearch.IfInputEmpty}}
-</div>
+</div></div></div>
 </template>
 
 <template name="menu">

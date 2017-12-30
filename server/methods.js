@@ -1157,20 +1157,7 @@ Meteor.methods({
     
     s3.deleteObject(params, Meteor.bindEnvironment(function (error, data){
       if (!error) {
-        var new_preview_needed = false;
-        if (image.role == "preview")
-        {
-          new_preview_needed = true;
-          var pattern_id = image.used_by;
-        }
-
         Images.remove({_id: image_id});
-
-        if (new_preview_needed)
-        {
-          var new_preview_id = Images.findOne({used_by:pattern_id})._id;
-          Meteor.call("make_preview", new_preview_id);
-        }
       }
     }));
   },
@@ -1185,7 +1172,7 @@ Meteor.methods({
     check(property, NonEmptyString);
     check(value, String);
 
-    if (value.length > 3000)
+    if (value.length > 6000)
       throw new Meteor.Error("not-authorized", "Value is too long");
 
     if (collection == "patterns")

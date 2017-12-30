@@ -1,24 +1,38 @@
-UI.registerHelper('tablet_indexes', function() {
-  return current_tablet_indexes.list();
-});
-
 UI.registerHelper('tablet_indexes_reverse', function() {
-  var source = current_tablet_indexes.list();
-  var my_array = [];
-  for (var i=source.length - 1; i >= 0; i--)
+  var tablet_indexes = [];
+  for (var i=Session.get("number_of_tablets"); i>=1; i--)
   {
-    my_array.push(source[i]);
+    tablet_indexes.push(i);
   }
-
-  return my_array;
+  return tablet_indexes;
 });
 
 UI.registerHelper('tablet_indexes', function() {
-  return current_tablet_indexes.list();
+  var tablet_indexes = [];
+  for (var i=1; i<=Session.get("number_of_tablets"); i++)
+  {
+    tablet_indexes.push(i);
+  }
+  return tablet_indexes;
 });
 
 UI.registerHelper('row_indexes', function() {
-  return current_row_indexes.list();
+  // row 1 is at bottom of chart
+  var row_indexes = [];
+  for (var i=Session.get("number_of_rows"); i>=1; i--)
+  {
+    row_indexes.push(i);
+  }
+  return row_indexes;
+});
+
+UI.registerHelper('testreact', function(tablet) {
+  //return Session.get("testreact");
+  if (typeof testreact === "undefined")
+    return;
+  
+  console.log("testreact helper " + testreact.get());
+  return testreact.get();
 });
 
 //////////////////////////
@@ -28,8 +42,6 @@ UI.registerHelper('hole_indexes', function() {
 });
 
 UI.registerHelper('hole_label', function(hole) {
-    //var pattern_id = Router.current().params._id;
-
     // holes are numbered 1, 2, 3, 4
     var labels = ["A", "B", "C", "D"];
     return labels[hole-1];
@@ -37,14 +49,6 @@ UI.registerHelper('hole_label', function(hole) {
 
 ///////////////////////////
 // Helpers for styles
-UI.registerHelper('style_orientation', function(orientation) {
-  if (orientation == "Z")
-      return "orientation_z";
-
-  else
-      return "orientation_s";
-});
-
 UI.registerHelper('is_selected_style', function() {
   var special = false;
 
@@ -84,7 +88,7 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   }
   else if (type == "threading")
   {
-    var cell = current_threading_data[(row) + "_" + (tablet)];
+    var cell = current_threading[(row) + "_" + (tablet)];
     if (typeof cell === "undefined")
     {
       return;
@@ -99,11 +103,14 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
 
     if (typeof pattern === "undefined")
         return;
-
+      
     if (pattern.edit_mode == "simulation")
     {
       var mapped_styles = Meteor.my_functions.map_weaving_styles(style_ref);
-      if (current_orientation[this.tablet-1].orientation == "S")
+
+      //console.log("orientation for tablet " + this.tablet);
+
+      if (current_orientation[this.tablet].get() == "S")
         style_ref = mapped_styles[0];
       else
         style_ref = mapped_styles[1];
@@ -111,7 +118,7 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   }
   else // weaving cell
   {
-    var cell = current_weaving_data[(row) + "_" + (tablet)];
+    var cell = current_weaving[(row) + "_" + (tablet)];
     if (typeof cell === "undefined")
     {
       return;

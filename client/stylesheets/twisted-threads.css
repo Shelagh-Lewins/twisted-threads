@@ -175,6 +175,10 @@ body {
   box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.38);
 }
 
+/* avoid an empty results div */
+#header #search .hide {
+  display: none;
+}
 
 #header #search div.results-wrapper .no_results {
   line-height: 2;
@@ -269,7 +273,7 @@ body {
   background: url("../images/created_by.png") transparent no-repeat left top;
 }
 
-#header #search div.results-wrapper a#load_more {
+#header #search div.results-wrapper a.load_more {
   text-decoration: none;
   color: #424A6C;
   float: left;
@@ -277,13 +281,13 @@ body {
   width: 100%;
 }
 
-#header #search div.results-wrapper a#load_more:hover,
-#header #search div.results-wrapper a#load_more:focus {
+#header #search div.results-wrapper a.load_more:hover,
+#header #search div.results-wrapper a.load_more:focus {
   background-color: #424A6C;
   color: #FFFFFF;
 }
 
-#header #search div.results-wrapper a#load_more span.icon {
+#header #search div.results-wrapper a.load_more span.icon {
   float: left;
   width: 32px;
   height: 32px;
@@ -291,12 +295,12 @@ body {
   background: url("../images/load_more.png") transparent no-repeat left top;
 }
 
-#header #search div.results-wrapper a#load_more:hover span.icon,
-#header #search div.results-wrapper a#load_more:focus span.icon {
+#header #search div.results-wrapper a.load_more:hover span.icon,
+#header #search div.results-wrapper a.load_more:focus span.icon {
   background-position: 0 -32px;
 }
 
-#header #search div.results-wrapper a#load_more span.search_term {
+#header #search div.results-wrapper a.load_more span.search_term {
   font-weight: bold;
 }
 
@@ -479,7 +483,7 @@ body {
 }
 
 /* *** content *** */
-h2 {
+h1 {
   font-weight: bold;
   font-size: 24px;
   margin-top: 16px;

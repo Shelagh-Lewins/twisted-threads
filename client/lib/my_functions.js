@@ -1,6 +1,9 @@
 Meteor.my_functions = {
   accept_click: function()
   {
+    if (Session.get('change_tablets_latch'))
+        return false;
+
     var accept_click = false;
 
     if (Session.equals('click_latch', false))
@@ -122,7 +125,7 @@ Meteor.my_functions = {
 
     for (var i=0; i<number_of_tablets; i++)
     {
-      pattern_obj.orientation[i] = current_orientation[i].orientation;
+      pattern_obj.orientation[i] = current_orientation[i+1].get();
     }
 
     // Threading of tablet holes
@@ -134,7 +137,7 @@ Meteor.my_functions = {
 
       for (var j=0; j<number_of_tablets; j++)
       {
-        pattern_obj.threading[i][j] = current_threading_data[(i+1) + "_" + (j+1)].get();
+        pattern_obj.threading[i][j] = current_threading[(i+1) + "_" + (j+1)].get();
       }
     }
 
@@ -147,7 +150,7 @@ Meteor.my_functions = {
 
       for (var j=0; j<number_of_tablets; j++)
       {
-        pattern_obj.weaving[i][j] = current_weaving_data[(i+1) + "_" + (j+1)].get();
+        pattern_obj.weaving[i][j] = current_weaving[(i+1) + "_" + (j+1)].get();
       }
     }
 
@@ -467,8 +470,8 @@ Meteor.my_functions = {
                 if (result.error)
                   local_error = "Error converting pattern " + result.error;
 
-                else pattern_obj = result.result;
-                //console.log("pattern_obj " + JSON.stringify(pattern_obj));
+                else
+                  pattern_obj = result.result;
               break;
 
             default:
@@ -1333,7 +1336,20 @@ Meteor.my_functions = {
     else
       return Session.get("selected_style");
   },
-  build_pattern_display_data:  function(pattern_id)
+  clear_pattern_display_data: function()
+  {
+    // prevent leftover data from previous pattern causing problems
+    // reset orientation ReactiveVars
+    if (typeof current_orientation !== "undefined")
+    {
+      for (var variableKey in current_orientation){
+        if (current_orientation.hasOwnProperty(variableKey)){
+          delete current_orientation[variableKey];
+        }
+      }
+    }
+  },
+  build_pattern_display_data: function(pattern_id)
   {
     // maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
 
@@ -1345,32 +1361,6 @@ Meteor.my_functions = {
     var number_of_rows = pattern.number_of_rows;
     Session.set("number_of_rows", number_of_rows);
     Session.set("number_of_tablets", number_of_tablets);
-
-    //////////////////////////////
-    // tablet numbers (tablet_indexes)
-    // if rebuilding, clearing the array forces helpers to rerun
-    if (typeof current_tablet_indexes !== "undefined")
-      current_tablet_indexes.clear();
-
-    var indexes = new Array(number_of_tablets);
-    for (var i=0; i<number_of_tablets; i++)
-    {
-      indexes[i] = i+1; // row 1 at bottom
-    }
-    current_tablet_indexes = new ReactiveArray(indexes);
-
-    //////////////////////////////
-    // row numbers (row_indexes)
-    // if rebuilding, clearing the array forces helpers to rerun
-    if (typeof current_row_indexes !== "undefined")
-      current_row_indexes.clear();
-
-    var indexes = new Array(number_of_rows);
-    for (var i=0; i<number_of_rows; i++)
-    {
-      indexes[i] = number_of_rows-i; // row 1 at bottom
-    }
-    current_row_indexes = new ReactiveArray(indexes);
 
     // Client-side weaving data is an object which references a ReactiveVar for each cell data point
     var weaving_data = JSON.parse(pattern.weaving);
@@ -1384,7 +1374,7 @@ Meteor.my_functions = {
       }
     }
 
-    current_weaving_data = temp;
+    current_weaving = temp;
 
     // client-side weft color is a ReactiveVar
     var color = (typeof pattern.weft_color !== "undefined") ? pattern.weft_color : "#76a5af"; // older version pattern does not have weft_color
@@ -1402,29 +1392,31 @@ Meteor.my_functions = {
       }
     }
 
-    current_threading_data = temp;
+    current_threading = temp;
 
     //////////////////////////////
     // build the orientation data
-    // if rebuilding, clearing the array forces helpers to rerun
-    if (typeof current_orientation !== "undefined")
-      current_orientation.clear();
 
-    var blank_arr = new Array(number_of_tablets)
-    current_orientation = new ReactiveArray(blank_arr);
+    // deleting and recreating the reactiveVars here breaks reactivity in Simulation patterns, so only create vars if they did not already exist.
+    if (typeof current_orientation === "undefined")
+      current_orientation = {};
 
     var orientation_data = JSON.parse(pattern.orientation);
 
     for (var i=0; i<number_of_tablets; i++)
     {
-      var obj = {
-        tablet: i+1,
-        orientation: orientation_data[i]
-      }
+      if (typeof current_orientation[i + 1] === "undefined")
+        current_orientation[i + 1] = new ReactiveVar();
 
-      current_orientation[i] = obj;
+      current_orientation[i + 1].set(orientation_data[i]);
     }
 
+    // prune any leftover tablet entries
+    for (var i=number_of_tablets; i<Object.keys(current_orientation).length; i++)
+    {
+      delete current_orientation[i];
+    }
+ 
     //////////////////////////////
     // build the styles data
     // Regular styles - editable by user
@@ -1533,32 +1525,6 @@ Meteor.my_functions = {
     number_of_tablets = data.number_of_tablets;
     number_of_rows = data.number_of_rows;
 
-    //////////////////////////////
-    // tablet numbers (tablet_indexes)
-    // if rebuilding, clearing the array forces helpers to rerun
-    if (typeof current_tablet_indexes !== "undefined")
-      current_tablet_indexes.clear();
-
-    var indexes = new Array(number_of_tablets);
-    for (var i=0; i<number_of_tablets; i++)
-    {
-      indexes[i] = i+1; // row 1 at bottom
-    }
-    current_tablet_indexes = new ReactiveArray(indexes);
-
-    //////////////////////////////
-    // row numbers (row_indexes)
-    // if rebuilding, clearing the array forces helpers to rerun
-    if (typeof current_row_indexes !== "undefined")
-      current_row_indexes.clear();
-
-    var indexes = new Array(number_of_rows);
-    for (var i=0; i<number_of_rows; i++)
-    {
-      indexes[i] = number_of_rows-i; // row 1 at bottom
-    }
-    current_row_indexes = new ReactiveArray(indexes);
-
     // restore
     var data = stored_patterns[stored_patterns.length-1];
 
@@ -1606,18 +1572,16 @@ Meteor.my_functions = {
         {
           // delete the existing ReactiveVar
           // recreate a new one with the same style but greater row
-          var cell_style = current_weaving_data[(i + 1) + "_" + (j + 1)].get();
-          delete current_weaving_data[(i + 1) + "_" + (j + 1)];
-          current_weaving_data[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_style);
+          var cell_style = current_weaving[(i + 1) + "_" + (j + 1)].get();
+          delete current_weaving[(i + 1) + "_" + (j + 1)];
+          current_weaving[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_style);
         }
       }
       // add new row
       for (var j=0; j<number_of_tablets; j++)
       {
-        current_weaving_data[position + "_" + (j + 1)] = new ReactiveVar(style);
+        current_weaving[position + "_" + (j + 1)] = new ReactiveVar(style);
       }
-
-      current_row_indexes.unshift(number_of_rows+1); //  rows are reversed
     }
 
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows + num_new_rows, number_of_tablets);
@@ -1632,7 +1596,7 @@ Meteor.my_functions = {
     // remove deleted row
     for (var j=0; j<number_of_tablets; j++)
     {
-      delete current_weaving_data[(position) + "_" + (j + 1)];
+      delete current_weaving[(position) + "_" + (j + 1)];
     }
 
     // decrement row number of cells in subsequent rows
@@ -1640,18 +1604,25 @@ Meteor.my_functions = {
     {
       for (var j=0; j<number_of_tablets; j++)
       {
-        var cell_style = current_weaving_data[(i + 1) + "_" + (j + 1)].get();
-        delete current_weaving_data[(i + 1) + "_" + (j + 1)];
-        current_weaving_data[(i) + "_" + (j + 1)] = new ReactiveVar(cell_style);
+        var cell_style = current_weaving[(i + 1) + "_" + (j + 1)].get();
+        delete current_weaving[(i + 1) + "_" + (j + 1)];
+        current_weaving[(i) + "_" + (j + 1)] = new ReactiveVar(cell_style);
       }
     }
 
-    current_row_indexes.shift(); // rows are reversed
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows - 1, number_of_tablets);
     return;
   },
   add_tablet: function(pattern_id, position, style)
   {
+    if (Session.get('change_tablets_latch'))
+        return;
+
+    Session.set('change_tablets_latch', true);
+
+    // ensure the latch is cleared even if there is an error in the function
+    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
     var number_of_tablets = Session.get("number_of_tablets");
@@ -1667,13 +1638,13 @@ Meteor.my_functions = {
       {
         // delete the existing ReactiveVar
         // recreate a new one with the same style but greater tablet
-        var cell_style = current_weaving_data[(i + 1) + "_" + (j + 1)].get();
-        delete current_weaving_data[(i + 1) + "_" + (j + 1)];
-        current_weaving_data[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_style);
+        var cell_style = current_weaving[(i + 1) + "_" + (j + 1)].get();
+        delete current_weaving[(i + 1) + "_" + (j + 1)];
+        current_weaving[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_style);
       }
 
       // add new tablet to row
-      current_weaving_data[(i + 1) + "_" + position] = new ReactiveVar(style);
+      current_weaving[(i + 1) + "_" + position] = new ReactiveVar(style);
     }
 
     // threading
@@ -1681,26 +1652,26 @@ Meteor.my_functions = {
     {
       for (var j=number_of_tablets-1; j>= position-1; j--)
       {
-        var cell_style = current_threading_data[(i + 1) + "_" + (j + 1)].get();
-        delete current_threading_data[(i + 1) + "_" + (j + 1)];
-        current_threading_data[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_style);
+        var cell_style = current_threading[(i + 1) + "_" + (j + 1)].get();
+        delete current_threading[(i + 1) + "_" + (j + 1)];
+        current_threading[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_style);
       }
 
-      current_threading_data[(i + 1) + "_" + position] = new ReactiveVar(style);
+      current_threading[(i + 1) + "_" + position] = new ReactiveVar(style);
     }
 
     // orientation
-    for (var i=number_of_tablets-1; i>= position-1; i--)
+    // add a new tablet at the end
+    current_orientation[number_of_tablets + 1] = new ReactiveVar();
+
+    // move the values above the inserted tablet up by one
+    for (var j=number_of_tablets; j>=position; j--)
     {
-      current_orientation[i].tablet += 1;
+      current_orientation[j+1].set(current_orientation[j].get());
     }
-
-    var obj = {
-      tablet: position,
-      orientation: "S"
-    }
-
-    current_orientation.splice(position-1, 0, obj);
+     
+    // set the value of the new tablet to default "S"
+    current_orientation[position].set("S");
 
     // manual_weaving_turns
     if (pattern.edit_mode == "simulation")
@@ -1711,14 +1682,19 @@ Meteor.my_functions = {
       }
     }
 
-    // add new tablet to indexes
-    current_tablet_indexes.push(number_of_tablets+1);
-
     // save to database
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets + 1);
   },
   remove_tablet: function(pattern_id, position)
   {
+    if (Session.get('change_tablets_latch'))
+        return;
+
+    Session.set('change_tablets_latch', true);
+
+    // ensure the latch is cleared even if there is an error in the function
+    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
     var number_of_tablets = Session.get("number_of_tablets");
@@ -1731,54 +1707,46 @@ Meteor.my_functions = {
     for (var i=0; i<number_of_rows; i++)
     {
       // remove deleted tablet
-      delete current_weaving_data[(i + 1) + "_" + position];
+      delete current_weaving[(i + 1) + "_" + position];
 
       for (var j=position; j<=number_of_tablets-1; j++)
       {
-        var cell_style = current_weaving_data[(i + 1) + "_" + (j + 1)].get();
-        delete current_weaving_data[(i + 1) + "_" + (j + 1)];
-        current_weaving_data[(i + 1) + "_" + (j)] = new ReactiveVar(cell_style);
+        var cell_style = current_weaving[(i + 1) + "_" + (j + 1)].get();
+        delete current_weaving[(i + 1) + "_" + (j + 1)];
+        current_weaving[(i + 1) + "_" + (j)] = new ReactiveVar(cell_style);
       }
     }
 
     // threading
     for (var i=0; i<4; i++)
     {
-      delete current_threading_data[(i + 1) + "_" + position];
+      delete current_threading[(i + 1) + "_" + position];
 
       for (var j=position; j<=number_of_tablets-1; j++)
       {
-        var cell_style = current_threading_data[(i + 1) + "_" + (j + 1)].get();
-        delete current_threading_data[(i + 1) + "_" + (j + 1)];
-        current_threading_data[(i + 1) + "_" + (j)] = new ReactiveVar(cell_style);
+        var cell_style = current_threading[(i + 1) + "_" + (j + 1)].get();
+        delete current_threading[(i + 1) + "_" + (j + 1)];
+        current_threading[(i + 1) + "_" + (j)] = new ReactiveVar(cell_style);
       }
     }
 
     // orientation
-    for (var j=number_of_tablets-1; j>= position-1; j--)
+    // move the values above the deleted tablet down by one
+    for (var j=position; j<number_of_tablets; j++)
     {
-      current_orientation[j].tablet -= 1;
+      current_orientation[j].set(current_orientation[j+1].get());
     }
-    current_orientation.splice(position-1, 1);
-//console.log("current_manual_weaving_turns " + JSON.stringify(current_manual_weaving_turns.list()))
-    // manual_weaving_turns
+
+    // remove the last tablet
+    delete current_orientation[number_of_tablets];
+
     if (pattern.edit_mode == "simulation")
     {
       for (var i=0;i<current_manual_weaving_turns.list().length; i++)
       {
-        //console.log(" ")
-        //console.log("i " + i);
-        //console.log("current_manual_weaving_turns before " + current_manual_weaving_turns.list()[i].tablets);
-        //console.log("position: " + position);
         current_manual_weaving_turns.list()[i].tablets.splice(position-1, 1);
-        //console.log("current_manual_weaving_turns after " + current_manual_weaving_turns.list()[i].tablets);
-
-        //console.log("current_manual_weaving_turns check " + JSON.stringify(current_manual_weaving_turns.list()))
       }
     }
-
-    // remove tablet from indexes
-    current_tablet_indexes.pop();
 
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets - 1);
   },
@@ -1793,17 +1761,31 @@ Meteor.my_functions = {
 
       for (var j=0; j<number_of_tablets; j++)
       {
-        // TODO find why this code sometimes gives an error and fix it
-        var identifier = (i+1) + "_" + (j+1);
+        var item = current_weaving[(i+1) + "_" + (j+1)];
+        if (typeof item !== "undefined")
+        {
+          weaving_array[i][j] = item.get();
+        }
 
-        if (typeof current_weaving_data[identifier] === "undefined")
+        else
+        {
+          console.log("non-existent item in get_weaving_as_array");
+          console.log("identifier " + (i+1) + "_" + (j+1));
+        }
+
+        // TODO find why this code sometimes gives an error and fix it
+        /*var identifier = (i+1) + "_" + (j+1);
+
+        if (typeof current_weaving[identifier] === "undefined")
         {
           console.log("get_weaving_as_array error");
           console.log("identifier " + identifier);
         }
-        var value = current_weaving_data[identifier].get();
+        else
+        {
+        var value = current_weaving[identifier].get();
         
-        weaving_array[i][j] = current_weaving_data[(i+1) + "_" + (j+1)].get();
+        weaving_array[i][j] = current_weaving[(i+1) + "_" + (j+1)].get();*/
       }
     }
 
@@ -1879,7 +1861,10 @@ Meteor.my_functions = {
 
       for (var j=0; j<number_of_tablets; j++)
       {
-        threading_array[i][j] = current_threading_data[(i + 1) + "_" + (j + 1)].get();
+        // during updates, the object may be undefined e.g. if a tablet was removed
+        //if (typeof current_threading[(i + 1) + "_" + (j + 1)] undefined continue);
+
+        threading_array[i][j] = current_threading[(i + 1) + "_" + (j + 1)].get();
       }
     }
 
@@ -1908,13 +1893,14 @@ Meteor.my_functions = {
   },
   get_orientation_as_array: function()
   {
-    var number_of_tablets = current_orientation.length;
+    // this can be called while a tablet is being deleted, so don't use the Session var
+    number_of_tablets = Object.keys(current_orientation).length;
 
-    var orientation_array = new Array(number_of_tablets);
+    var orientation_array = new Array();
 
     for (var i=0; i<number_of_tablets; i++)
     {
-      orientation_array[i] = current_orientation[i].orientation;
+      orientation_array.push(current_orientation[i + 1].get());
     }
 
     return orientation_array;
@@ -1964,7 +1950,6 @@ Meteor.my_functions = {
     // Set the #weft_colorpicker to the selected style's weft colour
     var pattern_id = Router.current().params._id;
 
-    //if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
     // pattern not loaded or preview not built
     if (!Meteor.my_functions.pattern_exists(pattern_id) ||
       ($("#weft_colorpicker").length == 0))
@@ -2290,6 +2275,7 @@ Meteor.my_functions = {
   // set up and draw the view pattern. This must be refreshed if the user switches pattern without switching view: e.g. using copy, import
   view_pattern_created: function(pattern_id) {
 
+    Meteor.my_functions.clear_pattern_display_data();
     Meteor.my_functions.build_pattern_display_data(pattern_id);
 
     Session.set('edited_pattern', true);
@@ -2314,6 +2300,9 @@ Meteor.my_functions = {
 
     if (pattern.edit_mode === "simulation")
       Meteor.my_functions.reset_simulation_weaving(pattern_id);
+
+    // ensure successive add / remove tablet operations don't interfere with each other
+    Session.set('change_tablets_latch', false);
   },
   view_pattern_render: function(pattern_id) {
     Session.set('edit_style', false);
@@ -2976,7 +2965,7 @@ Meteor.my_functions = {
     for (var i=0; i<number_of_rows; i++)
     {
       var weaving_cell_index = (i+1) + "_" + tablet;
-      var cell_style = current_weaving_data[weaving_cell_index].get();
+      var cell_style = current_weaving[weaving_cell_index].get();
       var thread_to_show = threads[i][tablet-1];
 
       if (thread_to_show + 1 == hole)
@@ -2984,7 +2973,7 @@ Meteor.my_functions = {
         for (var k=0; k<4; k++)
         {
           if (cell_style == old_weaving_styles[k])
-            current_weaving_data[weaving_cell_index].set(new_weaving_styles[k]);
+            current_weaving[weaving_cell_index].set(new_weaving_styles[k]);
         }
       }
 
@@ -3110,14 +3099,14 @@ Meteor.my_functions = {
   },
   //////////////////////////////////////////
   // Preview data as client-side object
-  set_preview_cell_style: function(row, tablet, style)
+  set_weaving_cell_style: function(row, tablet, style)
   {
-    current_weaving_data[(row) + "_" + (tablet)].set(style);
+    current_weaving[(row) + "_" + (tablet)].set(style);
   },
   // threading data as client-side object
   set_threading_cell_style: function(hole, tablet, style)
   {
-    current_threading_data[(hole) + "_" + (tablet)].set(style);
+    current_threading[(hole) + "_" + (tablet)].set(style);
   },
   find_style: function(style_value) // e,g, 2, "S1", may be regular or special
   {
@@ -3164,11 +3153,11 @@ Meteor.my_functions = {
   },
   last_non_idle_style: function(row, tablet) // find the most recent non-idle style before this row.
   {
-    var previous_style_value = current_weaving_data[row + "_" + (tablet)].get();
+    var previous_style_value = current_weaving[row + "_" + (tablet)].get();
 
     for (var i = row-1; i> 0; i--)
     {
-      var previous_style_value = current_weaving_data[i + "_" + (tablet)].get();
+      var previous_style_value = current_weaving[i + "_" + (tablet)].get();
 
       if (!Meteor.my_functions.is_style_special(previous_style_value))
       {

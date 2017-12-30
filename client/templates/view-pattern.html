@@ -37,7 +37,7 @@
   {{#if session_equals "hide_preview" false}}
   {{> auto_preview}}
   {{else}}
-  <p class="loading">Loading preview...</p>
+  <p class="loading_preview">Loading preview...</p>
   {{/if}}
 
   {{#if equals edit_mode "simulation"}}
@@ -236,13 +236,15 @@
 
   {{/unless}}
 
-  <h2>Threading chart</h2>   
+  <h2>Threading chart</h2>  
+
   <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
     {{> column_numbers}}
     {{#each hole_indexes}}
       {{> threading_row}}
     {{/each}}
-    {{> orientation}}
+    {{> orientation}}  
+
     {{/if}}
 
     {{#if can_edit_pattern _id}}
@@ -284,7 +286,7 @@
     {{/if}}
     {{/unless}}
   </div>
-  
+  <span class="done_loading {{rendered_manual}}"></span>
   
 {{/if}}
 
@@ -366,10 +368,11 @@
 </template>
 
 <template name="orientation">
-<div class="row orientation {{#if can_edit_pattern _id}}editable{{/if}}"><span class="spacer"></span><ul>
-{{#each tablet_orientation}}
-<li class="no_select {{style_orientation orientation}}" title="Click to change orientation"><span class="line"></span></li>
-{{/each}}</ul></div>
+<div class="row orientation {{#if can_edit_pattern _id}}editable{{/if}}"><span class="spacer"></span><ul>{{#each tablet_indexes}}
+<li class="no_select {{style_orientation this}}" title="Click to change orientation"><span class="line"></span></li>
+{{/each}}
+</ul>
+</div>
 <div class="hint"><span class="spacer"></span>Slope of line = angle of tablet viewed from above</div>
 </template>
 

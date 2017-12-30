@@ -1,5 +1,7 @@
 <template name="user">
 {{#if Template.subscriptionsReady}}
+{{> left_column}}
+<div id="main_column">
 {{#if show_description _id}}
 <h1>{{username}}</h1>
 <div class="user_info">
@@ -20,9 +22,12 @@
 {{else}}
 {{username}} has not created any patterns yet.
 {{/if}}
+</div>
 {{/if}}
 </template>
 
 <template name="user_not_found">
   <h2>User not found: {{id}}</h2>
 </template>
+
+

@@ -3,13 +3,10 @@ Template.user.rendered = function() {
   Meteor.my_functions.initialize_route();
 
   // configure pagination
-  var filter = jQuery.extend({}, AllPatterns.filters);
   var user_id = Router.current().params._id;
   var filter = jQuery.extend({}, UserPatterns.filters);
-  //console.log("test " + user_id);
 
   UserPatterns.set({
-    //filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
     filters: Meteor.my_functions.set_created_by_filter(filter, user_id)
   });
 }

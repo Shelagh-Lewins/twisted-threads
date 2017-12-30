@@ -212,12 +212,12 @@ button.rotate_preview.visible {
   margin-left: 0;
 }
 
-.auto_preview.right.show_tablets .tablet_positions {
+.right.show_tablets .tablet_positions {
   position: absolute;
   right: 18px;
 }
 
-.tablet_positions .position {
+.auto_preview .tablet_positions .position {
   display: block;
   width: 12px;
   height: 9px;
@@ -233,3 +233,24 @@ button.rotate_preview.visible {
   background-color: #6aa84f;
 }
 
+.preview_no_weaving {
+  max-width: 600px;
+  width: 100%;
+  border-radius: 16px;
+  padding: 16px 0 16px 0;
+}
+
+.preview_no_weaving.warning {
+  color: #FFFFFF;
+  background: #7580ac;
+}
+
+.preview_no_weaving.error {
+  color: #FFFFFF;
+  background: #660000;
+}
+
+.preview_no_weaving p {
+  padding: 0 16px 0 16px;
+  text-align: center;
+}

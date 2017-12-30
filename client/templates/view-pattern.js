@@ -31,6 +31,7 @@ Template.view_pattern.rendered = function() {
     Session.set("hide_while_loading", false);
   }, 1);
 
+
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll
@@ -112,7 +113,7 @@ Template.view_pattern.helpers({
         number_of_turns: data.packs[i].number_of_turns
       }
 
-      for (var j=0; j<current_tablet_indexes.length; j++)
+      for (var j=0; j<Session.get("number_of_tablets"); j++)
       {
         var obj = {
           pack: i+1,
@@ -153,7 +154,7 @@ Template.view_pattern.helpers({
   },
   weave_disabled: function() {
     // cannot add a row to manual simulation pattern
-    if (current_manual_weaving_turns.length > 100)
+    if (current_manual_weaving_turns.length > 300)
       return "disabled";
   },
   add_tablet_positions: function() {
@@ -269,13 +270,9 @@ Template.view_pattern.helpers({
 });
 
 Template.orientation.helpers({
-  'tablet_orientation': function()
-  {
-    if (typeof current_orientation !== "undefined")
-      return current_orientation.list();   
-  },
-  'style_orientation': function(orientation) {
-    if (orientation == "Z")
+  'style_orientation': function(tablet) {
+
+    if (current_orientation[tablet].get() == "Z")
         return "orientation_z";
 
     else
@@ -296,7 +293,7 @@ Template.styles_palette.onRendered(function(){
 
   if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
         return;
-  //Meteor.my_functions.initialize_weft_color_picker();
+
   Meteor.my_functions.initialize_warp_color_picker();
   Meteor.my_functions.initialize_background_color_picker();
 
@@ -605,6 +602,10 @@ Template.view_pattern.events({
     Meteor.my_functions.remove_tablet(pattern_id, parseInt(this));
   },
   'click .pattern li.cell': function(event, template){
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
     if (!Meteor.my_functions.accept_click())
         return;
 
@@ -617,17 +618,17 @@ Template.view_pattern.events({
     var number_of_tablets = pattern.number_of_tablets;
     var new_style = Meteor.my_functions.get_selected_style();
 
-    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
-      return;
-
-    Meteor.my_functions.set_preview_cell_style(this.row, this.tablet, new_style);
+    Meteor.my_functions.set_weaving_cell_style(this.row, this.tablet, new_style);
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
   },
   'click .tablets li.cell': function(event, template) {
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+
     if (!Meteor.my_functions.accept_click())
         return;
-   
-    var pattern_id = Router.current().params._id;
+
     if (!Meteor.my_functions.pattern_exists(pattern_id))
         return;
 
@@ -641,7 +642,7 @@ Template.view_pattern.events({
 
     if (pattern.edit_mode == "simulation")
     {
-      var old_style = current_threading_data[this.hole.toString() + "_" + this.tablet.toString()].get();
+      var old_style = current_threading[this.hole.toString() + "_" + this.tablet.toString()].get();
       Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, this.hole, old_style, new_style);
     }
 
@@ -653,24 +654,23 @@ Template.view_pattern.events({
   },
   'click .tablets .row.orientation li': function(event, template)
   {
-    if (!Meteor.my_functions.accept_click())
-        return;
-
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
-
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
 
+    if (!Meteor.my_functions.accept_click())
+        return;
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+
     var new_orientation = "S";
-    if (this.orientation == "S")
+    
+    if (current_orientation[this].get() == "S")
     {
       new_orientation = "Z";
     }
 
-    var obj = current_orientation[this.tablet-1];
-    obj.orientation = new_orientation;
-    current_orientation.splice(this.tablet-1, 1, obj);
+    current_orientation[this].set(new_orientation);
 
     Meteor.my_functions.save_orientation_to_db(pattern_id);
 
@@ -696,12 +696,15 @@ Template.view_pattern.events({
   // Simulation patterns
   // tabs
   'click #toolbar .tabs li': function(event) {
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
     if (!Meteor.my_functions.accept_click())
         return;
 
     Session.set("loading", true);
 
-    var pattern_id = Router.current().params._id;
     var simulation_mode = "auto";
 
     if ($(event.currentTarget).hasClass("manual"))
@@ -714,10 +717,12 @@ Template.view_pattern.events({
   {
     // change number of turns in auto_turn_sequence for simulation pattern
     // timeout because event fires on keyup and otherwise causes a double update if you type a 2-digit number and resets all turns to "F"
+    var pattern_id = Router.current().params._id
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
     if (!Meteor.my_functions.accept_click())
         return;
-
-    var pattern_id = Router.current().params._id;
 
     if (event.currentTarget.value != Math.floor(event.currentTarget.value))
       event.currentTarget.value = Math.floor(event.currentTarget.value); // user pastes in a non-integer value
@@ -787,6 +792,10 @@ Template.view_pattern.events({
   },
   // manual
   'click .manual .direction': function() {
+    var pattern_id = Router.current().params._id
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
     if (!Meteor.my_functions.accept_click())
         return;
 
@@ -806,8 +815,9 @@ Template.view_pattern.events({
     // change number of turns for a pack in manual simulation pattern
     //if (!Meteor.my_functions.accept_click())
         //return;
-
-    var pattern_id = Router.current().params._id;
+    var pattern_id = Router.current().params._id
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
 
     if (event.currentTarget.value != Math.floor(event.currentTarget.value))
       event.currentTarget.value = Math.floor(event.currentTarget.value); // user pastes in a non-integer value
@@ -830,6 +840,10 @@ Template.view_pattern.events({
     //}, 300);    
   },
   'click .manual .tablets li': function(event) {
+    var pattern_id = Router.current().params._id
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
     if (!Meteor.my_functions.accept_click())
         return;
 
@@ -848,17 +862,23 @@ Template.view_pattern.events({
     current_manual_weaving_turns.splice(0, 1, obj);
   },
   'click #weave': function () {
+    var pattern_id = Router.current().params._id
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
     if (!Meteor.my_functions.accept_click())
         return;
 
-    var pattern_id = Router.current().params._id;
     Meteor.my_functions.weave_button(pattern_id);
   },
   'click #unweave': function () {
+    var pattern_id = Router.current().params._id
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
     if (!Meteor.my_functions.accept_click())
         return;
 
-    var pattern_id = Router.current().params._id;
     Meteor.my_functions.unweave_button(pattern_id);
   },
   'click #add_tablet': function () {

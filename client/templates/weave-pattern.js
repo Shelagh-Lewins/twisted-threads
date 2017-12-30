@@ -6,6 +6,8 @@ Template.weave_pattern.rendered = function() {
 
 Template.weave_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
+
+  Meteor.my_functions.clear_pattern_display_data();
   Meteor.my_functions.build_pattern_display_data(pattern_id);
 });
 

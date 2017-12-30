@@ -4,8 +4,6 @@
 <div id="main_column">
 {{> home_patterns}}
 </div>
-{{else}}
-  Loading...
 {{/if}}
 </template>
 
@@ -28,7 +26,8 @@
 
 <template name="home_patterns">
   <div class="introduction">
-  <p><strong>Welcome to Twisted Threads, the online app for tablet weaving.<br>You can use this site to design, weave and share patterns.</strong><br /></p>
+    <p><strong>This is a temporary test version of Twisted Threads, to allow testing of an architecture upgrade. DO NOT USE IT to design any patterns you want to keep! But please do have a play and let me know about anything that doesn't work, especially if it works in the live version of TWT.</strong></p>
+  <!--<p><strong>Welcome to Twisted Threads, the online app for tablet weaving.<br>You can use this site to design, weave and share patterns.</strong><br /></p>-->
   <p class="notice">The copyright of any pattern designed using Twisted Threads rests with the designer of the pattern, not with the creator or owner of the software.</p>
   <p>Choose a pattern to see the threading and weaving charts. Then choose "Interactive weaving chart" to step through the rows one by one as you weave.</p>
   <p>Tablet weaving is an ancient craft known around the world by different names including card weaving, brettchen weberei, brikvævning and tissage &agrave; carton.</p>
@@ -145,7 +144,7 @@
 <div class="main">
 <a href="{{pathFor route='pattern'}}">
 <h3 title="{{name}}">{{name}}</h3>
-<div class="description">{{description}}</div>
+<div class="description"><span>{{#markdown}}{{{description}}}{{/markdown}}</span></div>
 
 {{#if tags.length}}
 <div class="tags" title="{{tags}}">{{#each tags}}<span>{{this}}</span>{{/each}}</div>
@@ -184,9 +183,11 @@
 
 <template name="filter_on_tablets">
 <div class="filter"><p>
-Only show patterns with between
+Show patterns with between
 <input type="number" placeholder="Number" id="min_tablets" min="1" max="500" size="3" value="{{min_tablets}}">and
 <input type="number" placeholder="Number" id="max_tablets" min="1" max="500" size="3" value="{{max_tablets}}">tablets
+<!--<span id="reload_pages">(refresh list)</span>-->
+<button id="reload_pages" class="styled_button">Update list</button>
 </p></div>
 </template>
 

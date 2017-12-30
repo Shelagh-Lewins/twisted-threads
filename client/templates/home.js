@@ -33,9 +33,6 @@ Template.all_patterns.rendered = function() {
 }
 
 Template.create_new_pattern.events({
-  /*"click div.edit_mode": function(event) {
-    Session.set('edit_mode', event.currentTarget.getAttribute("name"))
-  },*/
   "click input[type=submit]": function(event){""
     event.preventDefault();
     var edit_mode = event.currentTarget.name;
@@ -239,6 +236,28 @@ Template.filter_on_tablets.events({
     }
     Session.set('display_max_tablets', max);
     event.target.value = max; // session var may not have changed, e.g. if user entered 0, then -1. So force the input to display the right value
+  },
+  "click #reload_pages": function() {
+    // this is a workaround for pagination not reloading reliably when filters are changed. If a better fix is found, the 'reload' button should be removed.
+    // https://github.com/alethes/meteor-pages/issues/228
+    switch(Router.current().route.getName())
+    {
+      case "my_patterns":
+        MyPatterns.reload();
+        break;
+
+      case "all_patterns":
+        AllPatterns.reload();
+        break;
+
+      case "new_patterns":
+        NewPatterns.reload();
+        break;
+
+      case "user":
+        UserPatterns.reload();
+        break;
+    }
   }
 });
 

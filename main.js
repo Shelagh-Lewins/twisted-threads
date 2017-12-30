@@ -150,7 +150,7 @@ if (Meteor.isClient) {
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { number_of_rows: 1}});
 
-    if (pattern.number_of_rows < 1) // row 0 is for workiing
+    if (pattern.number_of_rows < 1)
       return "disabled";
   });
 
@@ -196,6 +196,24 @@ if (Meteor.isClient) {
 
   //////////////////////////////////
   // provide lists of patterns in different categories
+  // requestPage(1) works around a bug in alethes-pages introduced with the Meteor 1.3 upgrade, in which if you have more than 2 or 3 paginated objects, only the first few that were defined will work.
+  // https://github.com/alethes/meteor-pages/issues/208
+  Template.new_patterns.onRendered(function() {
+    NewPatterns.requestPage(1);
+  });
+
+  Template.my_patterns.onRendered(function() {
+    MyPatterns.requestPage(1);
+  });
+
+  Template.all_patterns.onRendered(function() {
+    AllPatterns.requestPage(1);
+  });
+
+  Template.user.onRendered(function() {
+    UserPatterns.requestPage(1);
+  });
+
   UI.registerHelper('recent_patterns', function(limit){
     if (Meteor.userId()) // user is signed in
       var pattern_ids = Recent_Patterns.find({}, {sort: {accessed_at: -1}}).map(function(pattern){ return pattern.pattern_id});
@@ -272,7 +290,6 @@ if (Meteor.isClient) {
 
     if (limit)
       obj["limit"] = parseInt(Session.get('thumbnails_in_row'));
-    //console.log(Patterns.find({}, obj).map( function(u) { return u.created_at; } ));
 
     return Patterns.find({}, obj);
     // This is a cursor use use .count in template to find number of items
@@ -366,8 +383,13 @@ if (Meteor.isClient) {
         return { 'class': 'easy-search-input', 'placeholder': 'Search...' };
     },
     search_term: function() {
-      //return $('input.easy-search-input').val();
       return patternsIndex.getComponentDict().get('searchDefinition');
+    },
+    pattern_results_count: function() {
+      return patternsIndex.getComponentDict().get('count');
+    },
+    users_results_count: function() {
+      return usersIndex.getComponentDict().get('count');
     },
     css_class: function() {
       if (Session.get('window_width') > 650)
@@ -376,16 +398,12 @@ if (Meteor.isClient) {
       else if (Session.get('window_width') < 460)
         return "narrow";
     },
-    is_searching: function() {
-      if (patternsIndex.getComponentMethods().isSearching() && usersIndex.getComponentMethods().isSearching())
+    more_patterns: function() {
+      if (patternsIndex.getComponentMethods().hasMoreDocuments())
         return true;
     },
-    no_results: function() {
-      if (patternsIndex.getComponentMethods().hasNoResults() && usersIndex.getComponentMethods().hasNoResults())
-        return true;
-    },
-    more_documents: function() {
-      if (patternsIndex.getComponentMethods().hasMoreDocuments() || usersIndex.getComponentMethods().hasMoreDocuments())
+    more_users: function() {
+      if (usersIndex.getComponentMethods().hasMoreDocuments())
         return true;
     }
   });
@@ -439,28 +457,13 @@ if (Meteor.isClient) {
       $('input.easy-search-input').val("");
       Meteor.my_functions.hide_search_results();
     },
-    'click #load_more': function(event) {
-      event.preventDefault();
-
+    'click #load_more_patterns': function(event) {
       if (patternsIndex.getComponentMethods().hasMoreDocuments())
-      {
-        if (usersIndex.getComponentMethods().hasMoreDocuments())
-        {
-          // load more docs from both indexes
-          usersIndex.getComponentMethods().loadMore(4);
-          patternsIndex.getComponentMethods().loadMore(4);
-        }
-        else
-        {
-          // load more docs for patternsIndex only
-          patternsIndex.getComponentMethods().loadMore(8);
-        }
-      }
-      else if (usersIndex.getComponentMethods().hasMoreDocuments())
-      {
-        // load more docs for usersIndex only
+        patternsIndex.getComponentMethods().loadMore(8);
+    },
+    'click #load_more_users': function(event) {
+      if (usersIndex.getComponentMethods().hasMoreDocuments())
         usersIndex.getComponentMethods().loadMore(8);
-      }
     },
     'click #search .pattern_results': function(event) {
       event.preventDefault(); // to make router work from Home, not sure why but this is necessary when not already in pattern route
@@ -507,12 +510,7 @@ if (Meteor.isClient) {
       return "open";
   });
 
-
   UI.registerHelper('can_edit_pattern', function(pattern_id) {
-    // Session var is quicker in pattern view
-    if (Router.current().route.getName() == "pattern")
-      return (Session.get("can_edit_pattern"));
- 
     return Meteor.my_functions.can_edit_pattern(pattern_id);
   });
 
@@ -793,7 +791,7 @@ if (Meteor.isClient) {
 
       NewPatterns.set({
         filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
-      });
+      });  
 
       // My Patterns
       var filter = jQuery.extend({}, MyPatterns.filters);
@@ -806,13 +804,6 @@ if (Meteor.isClient) {
       var filter = jQuery.extend({}, UserPatterns.filters);
 
       UserPatterns.set({
-        filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
-      });
-
-      // Users
-      var filter = jQuery.extend({}, Users.filters);
-
-      Users.set({
         filters: Meteor.my_functions.set_tablets_filter(filter, min, max)
       });
     }
