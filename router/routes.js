@@ -3,16 +3,17 @@ Router.configure({
   loadingTemplate: 'loading'
 });
 
-//Router.onBeforeAction('loading');
+// waitOn makes initial page render very slow, maybe 15 seconds. On pages like Home that list patterns, it's better to see the page sooner and watch the patterns appear.
 
 Router.route('/', {
   name: 'home',
   loadingTemplate: 'loading',
-  waitOn: function () {
+ /* waitOn: function () {
   return [
       Meteor.subscribe('patterns')
     ];
-  },
+  },*/
+  fastRender: true,
   template: 'home'
 });
 
@@ -25,55 +26,60 @@ Router.route('/about', {
 Router.route('/recent-patterns', {
   name: 'recent_patterns',
   loadingTemplate: 'loading',
-  waitOn: function () {
+  /*waitOn: function () {
   return [
       Meteor.subscribe('patterns')
     ];
-  },
+  },*/
+  fastRender: true,
   template: 'recent_patterns'
 });
 
 Router.route('/new-patterns', {
   name: 'new_patterns',
   loadingTemplate: 'loading',
-  waitOn: function () {
+  /*waitOn: function () {
   return [
       Meteor.subscribe('patterns')
     ];
-  },
+  },*/
+  fastRender: true,
   template: 'new_patterns'
 });
 
 Router.route('/my-patterns', {
   name: 'my_patterns',
   loadingTemplate: 'loading',
-  waitOn: function () {
+  /*waitOn: function () {
   return [
       Meteor.subscribe('patterns')
     ];
-  },
+  },*/
+  fastRender: true,
   template: 'my_patterns'
 });
 
 Router.route('/all-patterns', {
   name: 'all_patterns',
   loadingTemplate: 'loading',
-  waitOn: function () {
+  /*waitOn: function () {
   return [
       Meteor.subscribe('patterns')
     ];
-  },
+  },*/
+  fastRender: true,
   template: 'all_patterns'
 });
 
 Router.route('/users', {
   name: 'users',
   loadingTemplate: 'loading',
-  waitOn: function () {
+  /*waitOn: function () {
   return [
       Meteor.subscribe('user_info')
     ];
-  },
+  },*/
+  fastRender: true,
   template: 'users'
 });
 
@@ -101,6 +107,7 @@ Router.route('/pattern/:_id/:mode?', {
       
     ];
   },
+  fastRender: true,
   action: function() {
     var pattern_id = this.params._id;
 
@@ -154,6 +161,7 @@ Router.route('/user/:_id', {
       Meteor.subscribe('patterns', user_id)
     ]
   },
+  fastRender: true,
   action: function() {
     var user_id = this.params._id;
 
@@ -177,6 +185,7 @@ Router.route('/account-settings', {
       Meteor.subscribe('user_info')
     ]
   },
+  fastRender: true,
   action: function() {
     var user_id = this.params._id;
     this.render("account_settings");

@@ -374,7 +374,7 @@ if (Meteor.isClient) {
     },
     attributes: function () {
       if (Session.get('window_width') > 650)
-        return { 'class': 'easy-search-input', 'placeholder': 'Search for patterns...' };
+        return { 'class': 'easy-search-input', 'placeholder': 'Search...' };
 
       else if (Session.get('window_width') < 460)
         return { 'class': 'easy-search-input', 'placeholder': '' };

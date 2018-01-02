@@ -41,13 +41,20 @@
 
       {{#if equals route_name "about"}}<a href="{{pathFor route='home'}}">Home</a>{{/if}}
     </div>
-    <div class="header_right">{{#if Template.subscriptionsReady}}{{> search}}{{/if}}{{> loginButtons}}{{> menu}}</div>
+    <div class="header_right">
+      {{#if Template.subscriptionsReady}}{{> search ready=true}}
+
+      {{else}}{{> search ready=false}}
+      {{/if}}
+      {{> loginButtons}}{{> menu}}</div>
   </div>
 </div>
 </template>
 
 <template name="search">
+
 <div id="search" class="{{css_class}}">
+{{#if ready}}
 <div class="input-wrapper">
 {{> EasySearch.Input indexes=indexes attributes=attributes }}
 <div class="results-wrapper {{#unless search_term}}hide{{/unless}}">
@@ -88,7 +95,9 @@
   {{/unless}}
   {{/unless}}
 {{/EasySearch.IfInputEmpty}}
-</div></div></div>
+</div></div>
+{{else}}<input class="easy-search-input disabled" placeholder="Loading search data..." type="text" disabled>
+{{/if}}</div>
 </template>
 
 <template name="menu">

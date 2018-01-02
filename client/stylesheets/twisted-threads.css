@@ -141,6 +141,10 @@ body {
   line-height: 1.5;
 }
 
+#header #search input.easy-search-input.disabled {
+  background-color: #DDDDDD;
+}
+
 #header #search.narrow input.easy-search-input {
   position: absolute;
   right: 0;
