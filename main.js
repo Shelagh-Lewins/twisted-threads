@@ -409,6 +409,7 @@ if (Meteor.isClient) {
   });
 
   Template.search.onRendered(function () {
+    // do not remove these handlers with $('body').off("click") or $(window).off("keyup"), as it prevents these being registered on any elements directly attached to body such as the "email just verified" dialog in accounts-ui-unstyled
     $('body').on("click", function(event){
       // close the results list if the user clicks outside it
 
@@ -443,12 +444,6 @@ if (Meteor.isClient) {
         Meteor.my_functions.hide_search_results();
       }
     })
-  });
-
-  Template.search.onDestroyed(function () {
-    $('body').off("click");
-
-    $(window).off("keyup");
   });
 
   Template.search.events({
