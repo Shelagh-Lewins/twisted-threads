@@ -1,6 +1,6 @@
 // Publish pattern data, checking that the user has permission to view the pattern
-Meteor.publish('patterns', function(created_by){
-  check(created_by, Match.Optional(String));
+Meteor.publish('patterns', function(created_by, test){
+  check(created_by, Match.Maybe(String));
 
   if (typeof created_by === "string")
     return Patterns.find({

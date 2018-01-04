@@ -8,11 +8,6 @@ Router.configure({
 Router.route('/', {
   name: 'home',
   loadingTemplate: 'loading',
- /* waitOn: function () {
-  return [
-      Meteor.subscribe('patterns')
-    ];
-  },*/
   fastRender: true,
   template: 'home'
 });
@@ -26,11 +21,6 @@ Router.route('/about', {
 Router.route('/recent-patterns', {
   name: 'recent_patterns',
   loadingTemplate: 'loading',
-  /*waitOn: function () {
-  return [
-      Meteor.subscribe('patterns')
-    ];
-  },*/
   fastRender: true,
   template: 'recent_patterns'
 });
@@ -38,11 +28,6 @@ Router.route('/recent-patterns', {
 Router.route('/new-patterns', {
   name: 'new_patterns',
   loadingTemplate: 'loading',
-  /*waitOn: function () {
-  return [
-      Meteor.subscribe('patterns')
-    ];
-  },*/
   fastRender: true,
   template: 'new_patterns'
 });
@@ -50,11 +35,6 @@ Router.route('/new-patterns', {
 Router.route('/my-patterns', {
   name: 'my_patterns',
   loadingTemplate: 'loading',
-  /*waitOn: function () {
-  return [
-      Meteor.subscribe('patterns')
-    ];
-  },*/
   fastRender: true,
   template: 'my_patterns'
 });
@@ -62,11 +42,6 @@ Router.route('/my-patterns', {
 Router.route('/all-patterns', {
   name: 'all_patterns',
   loadingTemplate: 'loading',
-  /*waitOn: function () {
-  return [
-      Meteor.subscribe('patterns')
-    ];
-  },*/
   fastRender: true,
   template: 'all_patterns'
 });
@@ -74,11 +49,6 @@ Router.route('/all-patterns', {
 Router.route('/users', {
   name: 'users',
   loadingTemplate: 'loading',
-  /*waitOn: function () {
-  return [
-      Meteor.subscribe('user_info')
-    ];
-  },*/
   fastRender: true,
   template: 'users'
 });
@@ -96,7 +66,9 @@ Router.route('/pattern/:_id/:mode?', {
     var pattern_id = this.params._id;
     
     return [
-      Meteor.subscribe('patterns', {
+
+      // since upgrade from 1.2 to 1.6, it seems to be necessary to pass an undefined created_by parameter, otherwise {} is passed which fails Check in publish.js
+      Meteor.subscribe('patterns', undefined, {
         onReady: function(){
           var pattern_id = Router.current().params._id;
         }
@@ -155,10 +127,9 @@ Router.route('/user/:_id', {
   },
   waitOn: function(){
     var user_id = this.params._id;
-    
     return [
       Meteor.subscribe('user_info'),
-      Meteor.subscribe('patterns', user_id)
+      Meteor.subscribe('patterns', user_id, "susan")
     ]
   },
   fastRender: true,

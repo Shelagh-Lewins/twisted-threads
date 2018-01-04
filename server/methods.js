@@ -585,6 +585,8 @@ Meteor.methods({
   },
   save_threading_to_db: function(pattern_id, text)
   {
+    //console.log("saving threading to db");
+    //console.log("text " + text);
     check(pattern_id, String);
     check(text, String);
 

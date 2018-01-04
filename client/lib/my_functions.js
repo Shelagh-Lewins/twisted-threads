@@ -1,10 +1,15 @@
 Meteor.my_functions = {
   accept_click: function()
   {
+    //
     if (Session.get('change_tablets_latch'))
         return false;
 
-    var accept_click = false;
+      else return true;
+
+   // using a timer at all introduces random long delays, presumably because the client is busy updating client side data. This version only makes sure that the number of tablets is not being changed.
+
+    /*var accept_click = false;
 
     if (Session.equals('click_latch', false))
     {
@@ -13,9 +18,9 @@ Meteor.my_functions = {
 
       setTimeout(function(){
         Session.set('click_latch', false);
-      }, 300);
+      }, 10);
     }
-    return accept_click;
+    return accept_click;*/
   },
   pattern_exists: function(pattern_id)
   {
@@ -1538,6 +1543,14 @@ Meteor.my_functions = {
   },
   add_weaving_row: function(pattern_id, position, style, num_new_rows)
   {
+    if (Session.get('change_tablets_latch'))
+        return;
+
+    Session.set('change_tablets_latch', true);
+
+    // ensure the latch is cleared even if there is an error in the function
+    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
+
     var number_of_tablets = Session.get("number_of_tablets");
     var number_of_rows = Session.get("number_of_rows");
 
@@ -1587,6 +1600,14 @@ Meteor.my_functions = {
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows + num_new_rows, number_of_tablets);
   },
   remove_weaving_row: function(pattern_id, position){
+    if (Session.get('change_tablets_latch'))
+        return;
+
+    Session.set('change_tablets_latch', true);
+
+    // ensure the latch is cleared even if there is an error in the function
+    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
+    
     var number_of_tablets = Session.get("number_of_tablets");
     var number_of_rows = Session.get("number_of_rows");
 

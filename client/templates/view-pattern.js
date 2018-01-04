@@ -604,7 +604,7 @@ Template.view_pattern.events({
   'click .pattern li.cell': function(event, template){
     var pattern_id = Router.current().params._id;
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
-      return;
+        return;
 
     if (!Meteor.my_functions.accept_click())
         return;
@@ -622,21 +622,17 @@ Template.view_pattern.events({
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
   },
   'click .tablets li.cell': function(event, template) {
+    //console.log("clicked threading " + this.tablet + ", hole " + this.hole);
+     if (!Meteor.my_functions.accept_click())
+        return;
+//console.log("can accept click");
     var pattern_id = Router.current().params._id;
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
-        return;
-
-    if (!Meteor.my_functions.accept_click())
-        return;
-
-    if (!Meteor.my_functions.pattern_exists(pattern_id))
         return;
 
     var new_style = Meteor.my_functions.get_selected_style();
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
 
-    if (typeof pattern === "undefined")
-      return;
 
     var number_of_tablets = pattern.number_of_tablets;
 
@@ -647,6 +643,7 @@ Template.view_pattern.events({
     }
 
     Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
+    //console.log("save threading");
     Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets);
 
     if (pattern.edit_mode != "simulation")
