@@ -1,6 +1,8 @@
 // Publish pattern data, checking that the user has permission to view the pattern
 Meteor.publish('patterns', function(created_by){
-  check(created_by, Match.Optional(String));
+  check(created_by, Match.Optional(String)); // fastrender causes this check to fail by passing in an empty object on page refresh. This seems to be the cause of app crashing on server and causing "incomplete response from application" error. A workaround is to modify the core package minifier.js
+  // https://github.com/abecks/meteor-fast-render/issues/2
+  // it is not clear why, but the check seems to be necessary to avoid crashes on the production server.
 
   if (typeof created_by === "string")
     return Patterns.find({
