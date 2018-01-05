@@ -77,7 +77,7 @@ Router.route('/pattern/:_id/:mode?', {
       
     ];
   },
-  // fastRender: true, // fastrender here is problematic. Even with the change to minifier.js recommended here https://github.com/abecks/meteor-fast-render/issues/2 it still causes intermittend "incomplete response from application" errors which probably mean the app crashed. Keep an eye on this and consider removing it, and logging an issue.
+  fastRender: true, // fastrender here is problematic. Even with the change to minifier.js recommended here https://github.com/abecks/meteor-fast-render/issues/2 it still causes intermittend "incomplete response from application" errors which probably mean the app crashed. Keep an eye on this and consider removing it, and logging an issue.
   action: function() {
     var pattern_id = this.params._id;
 
@@ -125,7 +125,6 @@ Router.route('/user/:_id', {
   },
   waitOn: function(){
     var user_id = this.params._id;
-    
     return [
       Meteor.subscribe('user_info'),
       Meteor.subscribe('patterns', user_id)
