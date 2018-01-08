@@ -1,14 +1,27 @@
 // Publish pattern data, checking that the user has permission to view the pattern
-Meteor.publish('patterns', function(created_by){
-  check(created_by, Match.Optional(String)); // fastrender causes this check to fail by passing in an empty object on page refresh. This seems to be the cause of app crashing on server and causing "incomplete response from application" error. A workaround is to modify the core package minifier.js
-  // https://github.com/abecks/meteor-fast-render/issues/2
-  // it is not clear why, but the check seems to be necessary to avoid crashes on the production server.
+Meteor.publish('patterns', function(params){
+// with fastrender, params are passed in as an object.
 
-  if (typeof created_by === "string")
+  // there is a subscription that passes in [] as params and I can't find where it is called. The current version of Match avoids error when this empty array is passed in, and everything seems to work. The issue occurs at first load or page refresh, not on navigating routes.
+  check(params, Match.Optional(Match.OneOf(Object, [String])));
+
+  // fastrender causes the production server to show "incomplete response from application" error. A workaround is to modify the core package minifier.js to reserve keywords
+  // https://github.com/abecks/meteor-fast-render/issues/2
+
+  // update: meteor --production --settings settings.json should simulate the minification locally where the server output can be viewed. However the app does not crash, it just generates the same Match failure in publish.js.
+
+  var single_user = false; // by default return all patterns the current user can see
+
+  if (typeof params !== "undefined")
+    if (typeof params._id === "string")
+      single_user = true; // return only those patterns created by this user
+
+
+  if (single_user)
     return Patterns.find({
       $and: [
         { private: {$ne: true} },
-        { created_by: created_by }
+        { created_by: params._id }
       ]
     });
 

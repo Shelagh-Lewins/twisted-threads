@@ -66,19 +66,18 @@ Router.route('/pattern/:_id/:mode?', {
     var pattern_id = this.params._id;
     
     return [
+
       Meteor.subscribe('patterns', {
         onReady: function(){
           var pattern_id = Router.current().params._id;
         }
       }),
       Meteor.subscribe('tags'),
-
       Meteor.subscribe('recent_patterns') // to check for current_weave_row
       
     ];
   },
-  fastRender: true, // fastrender here is problematic. Even with the change to minifier.js recommended here https://github.com/abecks/meteor-fast-render/issues/2 it still causes intermittend "incomplete response from application" errors which probably mean the app crashed. Keep an eye on this and consider removing it, and logging an issue.
-  // update: meteor --production --settings settings.json should simulate the minification locally where the server output can be viewed. However the app does not crash, it just generates the same Match failure in publish.js. Need to check server logs to see what's really going on here.
+  fastRender: true,  
   action: function() {
     var pattern_id = this.params._id;
 
@@ -126,9 +125,10 @@ Router.route('/user/:_id', {
   },
   waitOn: function(){
     var user_id = this.params._id;
-    return [
+
+    return [   
       Meteor.subscribe('user_info'),
-      Meteor.subscribe('patterns', user_id)
+      Meteor.subscribe('patterns', this.params)
     ]
   },
   fastRender: true,
