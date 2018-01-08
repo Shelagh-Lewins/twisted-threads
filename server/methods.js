@@ -534,7 +534,7 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {number_of_tablets: number_of_tablets}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id);
+    Meteor.call("save_pattern_edit_time", pattern_id, "save_weaving_to_db");
   },
   save_number_of_tablets: function(pattern_id, number_of_tablets)
   {
@@ -583,10 +583,10 @@ Meteor.methods({
         Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
     }
   },
-  save_threading_to_db: function(pattern_id, text)
+ save_threading_to_db: function(pattern_id, text, tablet, hole)
+ // save_threading_to_db: function(pattern_id, text)
   {
-    //console.log("saving threading to db");
-    //console.log("text " + text);
+    console.log("starting save_threading_to_db. Tablet " + tablet + ", hole " + hole);
     check(pattern_id, String);
     check(text, String);
 
@@ -600,7 +600,9 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: { threading: text}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id);
+    Meteor.call("save_pattern_edit_time", pattern_id, "save_threading_to_db");
+console.log("finished save_threading_to_db");
+    return;
   },
   save_weft_color_to_db: function(pattern_id, text)
   {
@@ -617,7 +619,7 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: { weft_color: text}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id);
+    Meteor.call("save_pattern_edit_time", pattern_id, "save_weft_color_to_db");
   },
   save_orientation_to_db: function(pattern_id, text)
   {
@@ -634,7 +636,7 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: { orientation: text}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id);
+    Meteor.call("save_pattern_edit_time", pattern_id, "save_orientation_to_db");
   },
   save_styles_to_db: function(pattern_id, text)
   {
@@ -651,7 +653,7 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: { styles: text}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id);
+    Meteor.call("save_pattern_edit_time", pattern_id, "save_styles_to_db");
   },
   save_manual_weaving_turns: function(pattern_id, text)
   {
@@ -699,9 +701,10 @@ Meteor.methods({
 
     return;
   },
-  save_pattern_edit_time: function(pattern_id)
+  save_pattern_edit_time: function(pattern_id, called_by)
   {
     check(pattern_id, String);
+
     Patterns.update({_id: pattern_id}, {$set: {pattern_edited_at: moment().valueOf()}});
   },
   ///////////////////////////////

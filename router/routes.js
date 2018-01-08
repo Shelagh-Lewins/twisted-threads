@@ -78,7 +78,7 @@ Router.route('/pattern/:_id/:mode?', {
     ];
   },
   fastRender: true, // fastrender here is problematic. Even with the change to minifier.js recommended here https://github.com/abecks/meteor-fast-render/issues/2 it still causes intermittend "incomplete response from application" errors which probably mean the app crashed. Keep an eye on this and consider removing it, and logging an issue.
-  // update: meteor --production --settings settings.json should simulate the minification locally where the server output can be viewed. However the app does nto crash, it just generates the same Match failure in publish.js. Need to check server logs to see what's really going on here.
+  // update: meteor --production --settings settings.json should simulate the minification locally where the server output can be viewed. However the app does not crash, it just generates the same Match failure in publish.js. Need to check server logs to see what's really going on here.
   action: function() {
     var pattern_id = this.params._id;
 

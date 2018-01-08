@@ -798,14 +798,11 @@ Meteor.my_functions = {
 
     for (var i=0; i<number_of_colours; i++)
     {
-      //var windows_color = parseInt(palette[unique_colors_list[i]]["_"]);
-      //console.log
       var windows_color = parseInt(palette[unique_colors_list[i]]);
-      //console.log("windows_color " + windows_color);
+
       style_lookup[unique_colors_list[i]] = i+1;
 
       var thread_color = Meteor.my_functions.convert_windows_color_to_hex_rgb(windows_color); // GTT uses Windows color picker
-      //console.log("thread_color " + thread_color);
 
       // add color to threading styles
       pattern_obj.styles[i].background_color = thread_color;
@@ -1902,11 +1899,15 @@ Meteor.my_functions = {
 
     return auto_turn_sequence;
   },
-  save_threading_to_db: function(pattern_id, number_of_tablets)
+  save_threading_to_db: function(pattern_id, number_of_tablets, tablet, hole)
+  // save_threading_to_db: function(pattern_id, number_of_tablets)
   {
-    
     var threading_array = Meteor.my_functions.get_threading_as_array(number_of_tablets);
-    Meteor.call('save_threading_to_db', pattern_id, JSON.stringify(threading_array));
+    // Meteor.call('save_threading_to_db', pattern_id, JSON.stringify(threading_array), function(error, result){
+    Meteor.call('save_threading_to_db', pattern_id, JSON.stringify(threading_array), tablet, hole, function(error, result){
+      if (error)
+        console.log("Error from server " + error);
+    });
   },
   save_weft_color_to_db: function(pattern_id, color)
   {
@@ -2670,9 +2671,7 @@ Meteor.my_functions = {
     var tablet_turns = []; // for each tablet, number of turns
     var threading_row = [];
     var new_threads_row = [];
-    //console.log("weave row, position_of_A: " + data.position_of_A);
-//console.log("weave row, data: " + JSON.stringify(data));
-//console.log("weave row, new_row_sequence: " + JSON.stringify(new_row_sequence));
+
     // turn tablets
     for (var i=0; i<data.number_of_tablets; i++)
     {
@@ -2709,11 +2708,9 @@ Meteor.my_functions = {
     data.manual_weaving_threads.push(new_threads_row);
 
     // save the new row turning sequence
-    //console.log("new_row_sequence " + JSON.stringify(new_row_sequence));
-
     data.manual_weaving_turns.push(new_row_sequence);
     data.manual_weaving_turns[0] = new_row_sequence; // retain current packs UI
-    //console.log("data.manual_weaving_turns " + JSON.stringify(data.manual_weaving_turns));
+
     return data;
   },
   build_weaving_chart_row: function(number_of_tablets, threading_row, orientations, tablet_directions, tablet_turns)
@@ -2996,10 +2993,10 @@ Meteor.my_functions = {
           if (cell_style == old_weaving_styles[k])
             current_weaving[weaving_cell_index].set(new_weaving_styles[k]);
         }
-      }
-
-      Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
+      }     
     }
+
+    Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
   },
   map_weaving_styles: function(style_value)
   {
