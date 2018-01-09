@@ -1,5 +1,6 @@
 Router.configure({
   layoutTemplate: 'main_layout',
+  fastRender: true,
   loadingTemplate: 'loading'
 });
 
@@ -7,56 +8,42 @@ Router.configure({
 
 Router.route('/', {
   name: 'home',
-  loadingTemplate: 'loading',
-  fastRender: true,
   template: 'home'
 });
 
 Router.route('/about', {
   name: 'about',
-  loadingTemplate: 'loading',
   template: 'about'
 });
 
 Router.route('/recent-patterns', {
   name: 'recent_patterns',
-  loadingTemplate: 'loading',
-  fastRender: true,
   template: 'recent_patterns'
 });
 
 Router.route('/new-patterns', {
   name: 'new_patterns',
-  loadingTemplate: 'loading',
-  fastRender: true,
   template: 'new_patterns'
 });
 
 Router.route('/my-patterns', {
   name: 'my_patterns',
-  loadingTemplate: 'loading',
-  fastRender: true,
   template: 'my_patterns'
 });
 
 Router.route('/all-patterns', {
   name: 'all_patterns',
-  loadingTemplate: 'loading',
-  fastRender: true,
   template: 'all_patterns'
 });
 
 Router.route('/users', {
   name: 'users',
-  loadingTemplate: 'loading',
-  fastRender: true,
   template: 'users'
 });
 
 
 Router.route('/pattern/:_id/:mode?', {
   name: 'pattern',
-  loadingTemplate: 'loading',
   data: function(){
     var pattern_id = this.params._id;
 
@@ -80,7 +67,6 @@ Router.route('/pattern/:_id/:mode?', {
       
     ];
   },
-  fastRender: true,  
   action: function() {
     var pattern_id = this.params._id;
 
@@ -120,7 +106,6 @@ Router.route('/pattern/:_id/:mode?', {
 
 Router.route('/user/:_id', {
   name: 'user',
-  loadingTemplate: 'loading',
   data: function(){
     var user_id = this.params._id;
 
@@ -134,7 +119,6 @@ Router.route('/user/:_id', {
       Meteor.subscribe('patterns', this.params)
     ]
   },
-  fastRender: true,
   action: function() {
     var user_id = this.params._id;
 
@@ -148,7 +132,6 @@ Router.route('/user/:_id', {
 
 Router.route('/account-settings', {
   name: 'account_settings',
-  loadingTemplate: 'loading',
   data: function() {
     var user_id = this.params._id;
     return Meteor.users.findOne({ _id: user_id });
@@ -158,7 +141,6 @@ Router.route('/account-settings', {
       Meteor.subscribe('user_info')
     ]
   },
-  fastRender: true,
   action: function() {
     var user_id = this.params._id;
     this.render("account_settings");

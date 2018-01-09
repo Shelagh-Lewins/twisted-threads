@@ -348,6 +348,8 @@ if (Meteor.isClient) {
 
   ////////////////////////////////////
   Template.header.onRendered(function() {
+    Session.set('patterns_ready', false);
+    Session.set('recents_ready', false);
     this.subscribe('patterns', {
         onReady: function () { 
           Session.set('patterns_ready', true);
@@ -736,13 +738,15 @@ if (Meteor.isClient) {
     // The publish functions don't automatically update queries to other collections. So the client resubscribes to pattern-related collections whenever the list of patterns that the user can see changes.
     // my_pattern_ids detects that Patterns has changed. Math.random triggers the re-subscription, otherwise Meteor refuses to run it.
 //console.log(" autorun number of patterns " + Patterns.find().count());
-    var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
-    if (my_pattern_ids)
+    if (Session.equals('patterns_ready', true)) // don't rerun while patterns load for the first time
     {
-      Meteor.subscribe('recent_patterns', Math.random());
-      Meteor.subscribe('weaving_cells', Math.random());
+      var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
+      if (my_pattern_ids)
+      {
+        Meteor.subscribe('recent_patterns', Math.random());
+        Meteor.subscribe('weaving_cells', Math.random());
+      }
     }
-    
     if (Session.equals('patterns_ready', true) && Session.equals('recents_ready', true))
       Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
 
