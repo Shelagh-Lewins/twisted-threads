@@ -534,7 +534,7 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: {number_of_tablets: number_of_tablets}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id, "save_weaving_to_db");
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   save_number_of_tablets: function(pattern_id, number_of_tablets)
   {
@@ -585,6 +585,7 @@ Meteor.methods({
   },
  save_threading_to_db: function(pattern_id, text, tablet, hole)
  // save_threading_to_db: function(pattern_id, text)
+ // tablet, hole are only here for the debug text, they should be removed once the code is working.
   {
     console.log("starting save_threading_to_db. Tablet " + tablet + ", hole " + hole);
     check(pattern_id, String);
@@ -600,8 +601,8 @@ Meteor.methods({
     Patterns.update({_id: pattern_id}, {$set: { threading: text}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id, "save_threading_to_db");
-console.log("finished save_threading_to_db");
+    Meteor.call("save_pattern_edit_time", pattern_id);
+
     return;
   },
   save_weft_color_to_db: function(pattern_id, text)
@@ -619,10 +620,11 @@ console.log("finished save_threading_to_db");
     Patterns.update({_id: pattern_id}, {$set: { weft_color: text}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id, "save_weft_color_to_db");
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   save_orientation_to_db: function(pattern_id, text)
   {
+    console.log("start save_orientation_to_db");
     check(pattern_id, String);
     check(text, String);
 
@@ -636,7 +638,7 @@ console.log("finished save_threading_to_db");
     Patterns.update({_id: pattern_id}, {$set: { orientation: text}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id, "save_orientation_to_db");
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   save_styles_to_db: function(pattern_id, text)
   {
@@ -653,7 +655,7 @@ console.log("finished save_threading_to_db");
     Patterns.update({_id: pattern_id}, {$set: { styles: text}});
 
     // Record the edit time
-    Meteor.call("save_pattern_edit_time", pattern_id, "save_styles_to_db");
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   save_manual_weaving_turns: function(pattern_id, text)
   {
@@ -701,7 +703,7 @@ console.log("finished save_threading_to_db");
 
     return;
   },
-  save_pattern_edit_time: function(pattern_id, called_by)
+  save_pattern_edit_time: function(pattern_id)
   {
     check(pattern_id, String);
 

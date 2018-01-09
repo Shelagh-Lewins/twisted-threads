@@ -64,10 +64,13 @@ Router.route('/pattern/:_id/:mode?', {
   },
   waitOn: function(){
     var pattern_id = this.params._id;
+    var params = {
+      pattern_id: pattern_id
+    };
     
     return [
 
-      Meteor.subscribe('patterns', {
+      Meteor.subscribe('patterns', params, {
         onReady: function(){
           var pattern_id = Router.current().params._id;
         }

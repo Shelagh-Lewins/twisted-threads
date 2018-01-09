@@ -10,14 +10,20 @@ Meteor.publish('patterns', function(params){
 
   // update: meteor --production --settings settings.json should simulate the minification locally where the server output can be viewed. However the app does not crash, it just generates the same Match failure in publish.js.
 
-  var single_user = false; // by default return all patterns the current user can see
+  // by default return all patterns the current user can see
+  var single_user = false;
+  var single_pattern = false;
 
   if (typeof params !== "undefined")
+  {
     if (typeof params._id === "string")
       single_user = true; // return only those patterns created by this user
 
+    if (typeof params.pattern_id === "string")
+      single_pattern = true;
+  }
 
-  if (single_user)
+  if (single_user) // all visible patterns created by a user
     return Patterns.find({
       $and: [
         { private: {$ne: true} },
@@ -25,7 +31,18 @@ Meteor.publish('patterns', function(params){
       ]
     });
 
-  else
+  else if (single_pattern) // view pattern
+    return Patterns.find({
+      $and: [
+        {_id: params.pattern_id},
+        { $or: [
+          { private: {$ne: true} },
+          { created_by: this.userId }
+        ]}
+      ]
+    });
+
+  else // all patterns visible to this user
     return Patterns.find({
       $or: [
         { private: {$ne: true} },
