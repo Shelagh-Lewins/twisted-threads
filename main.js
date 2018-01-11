@@ -188,12 +188,6 @@ if (Meteor.isClient) {
     return Meteor.my_functions.does_pattern_repeat(pattern_id);
   });
 
-  Template.header.events({
-    "click #home": function() {
-      Session.set("loading", true);  
-    }
-  });
-
   //////////////////////////////////
   // provide lists of patterns in different categories
   // requestPage(1) works around a bug in alethes-pages introduced with the Meteor 1.3 upgrade, in which if you have more than 2 or 3 paginated objects, only the first few that were defined will work.
@@ -214,6 +208,23 @@ if (Meteor.isClient) {
     UserPatterns.requestPage(1);
   });
 
+  // check for subscriptions to be ready
+  UI.registerHelper('patterns_ready', function() {
+    if (Session.get("patterns_ready"))
+        return true;
+  });
+
+  UI.registerHelper('recents_ready', function() {
+    if (Session.get("recents_ready"))
+        return true;
+  });
+
+  UI.registerHelper('user_info_ready', function() {
+    if (Session.get("user_info_ready"))
+        return true;
+  });
+
+  // info for Home page lists
   UI.registerHelper('recent_patterns', function(limit){
     if (Meteor.userId()) // user is signed in
       var pattern_ids = Recent_Patterns.find({}, {sort: {accessed_at: -1}}).map(function(pattern){ return pattern.pattern_id});
@@ -262,7 +273,7 @@ if (Meteor.isClient) {
 
     if (limit)
       obj["limit"] = Session.get('thumbnails_in_row');
-      
+
     return Patterns.find({_id: {$nin: pattern_ids}}, obj);
     // This is a cursor use use .count in template to find number of items
   });
@@ -350,15 +361,23 @@ if (Meteor.isClient) {
   Template.header.onRendered(function() {
     Session.set('patterns_ready', false);
     Session.set('recents_ready', false);
+    Session.set('user_info_ready', false);
     this.subscribe('patterns', {
         onReady: function () { 
+          //console.log("patterns_ready");
           Session.set('patterns_ready', true);
-          Meteor.subscribe('user_info');
+          Meteor.subscribe('user_info', {
+            onReady: function() {
+              //console.log("user_info_ready");
+              Session.set('user_info_ready', true);
+            }
+          });
           Meteor.subscribe('weaving_cells');
         }
       });
     this.subscribe('recent_patterns', {
       onReady: function() {
+        //console.log("recents_ready");
         Session.set('recents_ready', true);
       }
     });
@@ -734,11 +753,11 @@ if (Meteor.isClient) {
   ///////////////////////////////////
   // reacting to database changes
   Tracker.autorun(function (computation) {
-    
+
     // The publish functions don't automatically update queries to other collections. So the client resubscribes to pattern-related collections whenever the list of patterns that the user can see changes.
     // my_pattern_ids detects that Patterns has changed. Math.random triggers the re-subscription, otherwise Meteor refuses to run it.
 //console.log(" autorun number of patterns " + Patterns.find().count());
-    if (Session.equals('patterns_ready', true)) // don't rerun while patterns load for the first time
+    if (Session.equals('patterns_ready', true)) // wait until patterns are loaded
     {
       var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
       if (my_pattern_ids)

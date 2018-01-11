@@ -1,10 +1,8 @@
 <template name="home">
-{{#if Template.subscriptionsReady}}
 {{> left_column}}
 <div id="main_column">
 {{> home_patterns}}
 </div>
-{{/if}}
 </template>
 
 <template name="left_column">
@@ -38,7 +36,7 @@
 
 {{> create_new_pattern}}
 
-
+{{#if patterns_ready}}{{#if recents_ready}}
 {{#with recent_patterns true}}{{#if this.length}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
@@ -51,7 +49,9 @@
 {{else}}
 <p>Select a pattern and start weaving.</p>
 {{/if}}{{/with}}
+{{/if}}{{/if}}
 
+{{#if patterns_ready}}
 {{#with new_patterns true}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='new_patterns'}}"><span class="text">New patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
@@ -61,8 +61,10 @@
 {{/each}}
 </ul></div>
 {{/if}}{{/with}}
+{{/if}}
 
 {{#if currentUser}}
+{{#if patterns_ready}}
 {{#with my_patterns true}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='my_patterns'}}"><span class="text">My patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
@@ -73,7 +75,9 @@
 </ul></div>
 {{/if}}{{/with}}
 {{/if}}
+{{/if}}
 
+{{#if patterns_ready}}{{#if recents_ready}}
 {{#with not_recent_patterns true}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='all_patterns'}}"><span class="text">All patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
@@ -83,7 +87,9 @@
 {{/each}}
 </ul></div>
 {{/if}}{{/with}}
+{{/if}}{{/if}}
 
+{{#if patterns_ready}}{{#if user_info_ready}}
 {{#with users true}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='users'}}"><span class="text">People</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
@@ -93,6 +99,7 @@
 {{/each}}
 </ul></div>
 {{/if}}{{/with}}
+{{/if}}{{/if}}
 </template>
 
 <template name="create_new_pattern">

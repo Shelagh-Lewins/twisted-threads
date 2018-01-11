@@ -1,6 +1,5 @@
 // Publish pattern data, checking that the user has permission to view the pattern
 Meteor.publish('patterns', function(params){
-  console.log("params " + JSON.stringify(params));
 // with fastrender, params are passed in as an object.
 
   // there is a subscription that passes in [] as params and I can't find where it is called. The current version of Match avoids error when this empty array is passed in, and everything seems to work. The issue occurs at first load or page refresh, not on navigating routes.
