@@ -224,6 +224,11 @@ if (Meteor.isClient) {
         return true;
   });
 
+  // used to check page is sufficiently rendered for number of thumbnails to have been calculated
+  UI.registerHelper('thumbnails_in_row', function() {
+    return Session.get('thumbnails_in_row');
+  });
+
   // info for Home page lists
   UI.registerHelper('recent_patterns', function(limit){
     if (Meteor.userId()) // user is signed in
@@ -364,11 +369,9 @@ if (Meteor.isClient) {
     Session.set('user_info_ready', false);
     this.subscribe('patterns', {
         onReady: function () { 
-          //console.log("patterns_ready");
           Session.set('patterns_ready', true);
           Meteor.subscribe('user_info', {
             onReady: function() {
-              //console.log("user_info_ready");
               Session.set('user_info_ready', true);
             }
           });
@@ -377,7 +380,6 @@ if (Meteor.isClient) {
       });
     this.subscribe('recent_patterns', {
       onReady: function() {
-        //console.log("recents_ready");
         Session.set('recents_ready', true);
       }
     });

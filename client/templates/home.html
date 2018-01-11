@@ -9,9 +9,9 @@
 <div id="left_column">
 <ul class="left_menu">
 <li class="{{selected "home"}}"><a href="{{pathFor route='home'}}"><span>Home</span></a></li>
-{{#with recent_patterns}}{{#if this.length}}
+{{#if recent_patterns.length}}
 <li class="{{selected "recent_patterns"}}"><a href="{{pathFor route='recent_patterns'}}"><span>Recently viewed</span></a></li>
-{{/if}}{{/with}}
+{{/if}}
 <li class="{{selected "new_patterns"}}"><a href="{{pathFor route='new_patterns'}}"><span>New patterns</span></a></li>
 {{#if currentUser}} 
 <li class="{{selected "my_patterns"}}"><a href="{{pathFor route='my_patterns'}}"><span>My patterns</span></a></li>
@@ -26,17 +26,18 @@
   <div class="introduction">
     <p><strong>This is a temporary test version of Twisted Threads, to allow testing of an architecture upgrade. DO NOT USE IT to design any patterns you want to keep! But please do have a play and let me know about anything that doesn't work, especially if it works in the live version of TWT.</strong></p>
   <!--<p><strong>Welcome to Twisted Threads, the online app for tablet weaving.<br>You can use this site to design, weave and share patterns.</strong><br /></p>-->
-  <p class="notice">The copyright of any pattern designed using Twisted Threads rests with the designer of the pattern, not with the creator or owner of the software.</p>
+  <!--<p class="notice">The copyright of any pattern designed using Twisted Threads rests with the designer of the pattern, not with the creator or owner of the software.</p>
   <p>Choose a pattern to see the threading and weaving charts. Then choose "Interactive weaving chart" to step through the rows one by one as you weave.</p>
   <p>Tablet weaving is an ancient craft known around the world by different names including card weaving, brettchen weberei, brikvævning and tissage &agrave; carton.</p>
   {{> donate_paypal}}
   <p>Join our <a href="https://www.facebook.com/groups/927805953974190/">Facebook group</a> if you'd like to discuss Twisted Threads with other users, request new features or share feedback with the app developer. <a href="{{pathFor route='about'}}" >More information</a></p>
-  <p class="notice">Twisted Threads doesn't work reliably in Safari. If you're using an Apple product, please try the Chrome browser.</p>
+  <p class="notice">Twisted Threads doesn't work reliably in Safari. If you're using an Apple product, please try the Chrome browser.</p>-->
 </div>
 
-{{> create_new_pattern}}
+<!--{{> create_new_pattern}}-->
 
-{{#if patterns_ready}}{{#if recents_ready}}
+{{#if thumbnails_in_row}}
+
 {{#with recent_patterns true}}{{#if this.length}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
@@ -46,10 +47,7 @@
 {{/each}}
 </ul>
 </div>
-{{else}}
-<p>Select a pattern and start weaving.</p>
 {{/if}}{{/with}}
-{{/if}}{{/if}}
 
 {{#if patterns_ready}}
 {{#with new_patterns true}}{{#if this.count}}
@@ -100,6 +98,8 @@
 </ul></div>
 {{/if}}{{/with}}
 {{/if}}{{/if}}
+
+{{/if}}
 </template>
 
 <template name="create_new_pattern">
