@@ -587,7 +587,7 @@ Meteor.methods({
  // save_threading_to_db: function(pattern_id, text)
  // tablet, hole are only here for the debug text, they should be removed once the code is working.
   {
-    console.log("starting save_threading_to_db. Tablet " + tablet + ", hole " + hole);
+    // console.log("starting save_threading_to_db. Tablet " + tablet + ", hole " + hole);
     check(pattern_id, String);
     check(text, String);
 
