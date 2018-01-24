@@ -86,8 +86,7 @@ Template.editable_field.events({
     event.preventDefault();
 
     if (!template.down)
-      //template.toggle_edit(template, this.collection, this.property);
-    template.toggle_edit(template);
+      template.toggle_edit(template);
   },
   'mousedown button.edit': function(event, template) {
     template.down = true;
@@ -97,7 +96,6 @@ Template.editable_field.events({
 
     if (template.down && !template.blur)
       template.toggle_edit(template);
-    //template.toggle_edit(template, this.collection, this.property);
     
     var that = template;
     setTimeout(function(){
@@ -119,7 +117,7 @@ Template.editable_field.events({
         template.blur = true;
 
       template.toggle_edit(template);
-      //template.toggle_edit(template, this.collection, this.property);
+
       var that = template;
       setTimeout(function(){ that.change_latch = false}, 20);
     }
