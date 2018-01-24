@@ -17,6 +17,15 @@
   {{> auto_sequence}}
 {{else}}
 	<h2>Weaving chart</h2>
+	<div class="info">
+	{{#if equals edit_mode "simulation"}}
+	  <div class="key">
+	    <h3>Key: </h3>
+	    <p><span class="cell forward"></span>Turn tablet forward</p>
+	    <p><span class="cell backward"></span>Turn tablet backward</p>
+	  </div>
+	{{/if}}
+	</div>
   <div class="pattern view">{{> column_numbers}}
 	{{#each row_indexes}}
 	<div class="row"><span class="row_number">{{this}}</span><ul>

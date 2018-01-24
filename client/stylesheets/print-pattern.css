@@ -24,3 +24,40 @@ body.print p {
   text-align: left;
   margin: 0 0 8px 0;
 }
+
+/* info section - key, weaving notes */
+.print .info {
+  margin: 16px 0 0 0;
+}
+
+.print .info .key h3 {
+  display: inline-block;
+  line-height: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.print .info .key p {
+  display: inline-block;
+  line-height: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.print .info .key .cell {
+  float:left;
+  width: 32px;
+  height: 32px;
+  margin: 0 8px 0 8px;
+  background: #FFFFFF;
+  border: 1px solid #999999;
+  line-height: 32px;
+}
+
+.print .info .key .cell.backward {
+  background: #BBBBBB;
+}
+
+.print .info .key p:not(:first-of-type) {
+  padding-left: 16px;
+}

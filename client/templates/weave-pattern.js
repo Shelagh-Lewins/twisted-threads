@@ -3,23 +3,9 @@ Template.weave_pattern.rendered = function() {
   Meteor.my_functions.initialize_weave();
   Meteor.my_functions.initialize_route();
 
-  $('body').on('keyup', function(event) {
-    // step through weaving rows using up and down arrow keys
-    switch(event.keyCode)
-    {
-      // up arrow
-      case 38:
-        var row_number = Session.get('current_weave_row') + 1;
-        Meteor.my_functions.set_current_weave_row(row_number);
-        break;
-
-      // down arrow
-      case 40:
-        var row_number = Session.get('current_weave_row') - 1;
-        Meteor.my_functions.set_current_weave_row(row_number);
-        break;
-    }
-  })
+  // avoid adding a duplicate event every time the template is rendered
+  $('body').unbind('keyup', Meteor.my_functions.weave_arrow_click);
+  $('body').bind('keyup', Meteor.my_functions.weave_arrow_click);
 }
 
 Template.weave_pattern.onCreated(function(){

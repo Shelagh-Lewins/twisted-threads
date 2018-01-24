@@ -185,7 +185,7 @@ body.weave,
   height: 32px;
   margin: 0 8px 0 8px;
   background: #FFFFFF;
-  border-left: 1px solid #999999;
+  border: 1px solid #999999;
   line-height: 32px;
   outline: 3px solid #6666FF;
 }

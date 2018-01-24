@@ -2465,6 +2465,23 @@ Meteor.my_functions = {
       Meteor.my_functions.set_pattern_data_from_local_storage(pattern_id, data);
     }
   },
+  weave_arrow_click: function(event)
+  {
+    switch(event.keyCode)
+    {
+      // up arrow
+      case 38:
+        var row_number = Session.get('current_weave_row') + 1;
+        Meteor.my_functions.set_current_weave_row(row_number);
+        break;
+
+      // down arrow
+      case 40:
+        var row_number = Session.get('current_weave_row') - 1;
+        Meteor.my_functions.set_current_weave_row(row_number);
+        break;
+    }
+  },
   get_pattern_data_from_local_storage: function(pattern_id)
   {
     var data = localStorage.getItem("pattern_" + pattern_id);
