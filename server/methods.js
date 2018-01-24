@@ -624,7 +624,6 @@ Meteor.methods({
   },
   save_orientation_to_db: function(pattern_id, text)
   {
-    console.log("start save_orientation_to_db");
     check(pattern_id, String);
     check(text, String);
 
