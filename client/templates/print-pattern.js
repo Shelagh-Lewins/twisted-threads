@@ -25,13 +25,20 @@ Template.print_pattern.helpers({
   hostname: function(){
     return location.hostname;
   },
-  created_by: function(){
+  is_sim_auto: function() {
     var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({ _id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1 }});
+
     if (typeof pattern === "undefined")
         return;
 
-    var created_by_id = Patterns.findOne({ _id: pattern_id}, {fields: {created_by: 1 }}).created_by;
-    return Meteor.users.findOne({ _id: created_by_id}).username;
+    var is_sim_auto = false;
+
+    if (pattern.edit_mode == "simulation")
+      if (pattern.simulation_mode == "auto") // freehand patterns can come up with simulation_mode 'auto' even though edit_mode is "freehand"
+        is_sim_auto = true;
+
+    return is_sim_auto;
   }
 });
 

@@ -7,6 +7,16 @@
 
 <button class="styled_button" onclick="Meteor.my_functions.stop_weaving();">Close weaving chart</button>
 
+<div class="info">
+{{#if equals edit_mode "simulation"}}
+  <div class="key">
+    <h3>Key: </h3>
+    <p><span class="cell forward"></span>Turn tablet forward</p>
+    <p><span class="cell backward"></span>Turn tablet backward</p>
+  </div>
+{{/if}}
+</div>
+
 
 <div class="row_controls"><label for="current_row_input">Row: </label><input type="text" id="current_row_input" value={{selected_row}}>
 <input type="button" id="first_row" value="First row" />

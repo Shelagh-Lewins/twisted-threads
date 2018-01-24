@@ -449,7 +449,7 @@ Meteor.my_functions = {
                 pattern_obj.description = "A threaded-in pattern imported from Guntram's Tabletweaving Thingy (GTT)";
 
               if (typeof pattern_obj.weaving_notes === "undefined")
-                pattern_obj.weaving_notes = "Weaving chart key:\nWhite background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread";
+                pattern_obj.weaving_notes = "";
 
               if (typeof pattern_obj.threading_notes === "undefined")
                 pattern_obj.threading_notes = "Cell colour = thread colour for that hole\nX = empty hole";
@@ -466,7 +466,7 @@ Meteor.my_functions = {
                 pattern_obj.description = "A 3/1 broken twill pattern imported from Guntram's Tabletweaving Thingy (GTT)";
 
               if (typeof pattern_obj.weaving_notes === "undefined")
-                pattern_obj.weaving_notes = "Weaving chart key:\nWhite background = turn tablet forwards\nGrey background = turn tablet backwards\nColour = visible pattern thread";
+                pattern_obj.weaving_notes = "";
 
               if (typeof pattern_obj.threading_notes === "undefined")
                 pattern_obj.threading_notes = "Cell colour = thread colour for that hole";

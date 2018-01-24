@@ -10,7 +10,7 @@ body.weave,
 }
 
 .weave .row_controls {
-  margin: 16px 0 16px 0;
+  margin: 16px 0 0 0;
 }
 
 .weave.pattern div.row.column_number ul {
@@ -137,6 +137,8 @@ body.weave,
 .pattern.weave {
   position: relative;
   background-color: #333333;
+  padding-top: 0;
+  margin-top: 0;
 }
 
 .pattern.weave div.row {
@@ -156,4 +158,42 @@ body.weave,
 
 .pattern.weave div.row.column_number ul li {
   border-left: 1px solid #333333;
+}
+
+/* info section - key, weaving notes */
+.weave .info {
+  margin: 16px 0 0 0;
+}
+
+.weave .info .key h3 {
+  display: inline-block;
+  line-height: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.weave .info .key p {
+  display: inline-block;
+  line-height: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.weave .info .key .cell {
+  float:left;
+  width: 32px;
+  height: 32px;
+  margin: 0 8px 0 8px;
+  background: #FFFFFF;
+  border-left: 1px solid #999999;
+  line-height: 32px;
+  outline: 3px solid #6666FF;
+}
+
+.weave .info .key .cell.backward {
+  background: #BBBBBB;
+}
+
+.weave .info .key p:not(:first-of-type) {
+  padding-left: 16px;
 }

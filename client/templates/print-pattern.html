@@ -11,29 +11,26 @@
 <p class="url">Printed from {{hostname}}{{pathFor route='pattern'}}</p>
 <p class="created_by">Created by {{created_by_username}}</p>
 
-<h2>Weaving chart</h2>
-{{#if equals edit_mode "simulation"}}
-{{#if equals simulation_mode "auto"}}
-  <p>Turn all tablets together, forward or backward, following the sequence shown below:</p>
+{{#if is_sim_auto}}
+	<h2>Weaving directions</h2>
+	<p>Turn all tablets together, forward or backward, following the sequence shown below:</p>
   {{> auto_sequence}}
-{{/if}}
-{{/if}}
+{{else}}
+	<h2>Weaving chart</h2>
+  <div class="pattern view">{{> column_numbers}}
+	{{#each row_indexes}}
+	<div class="row"><span class="row_number">{{this}}</span><ul>
 
-{{#unless equals simulation_mode "auto"}}
-<div class="pattern view">{{> column_numbers}}
-{{#each row_indexes}}
-<div class="row"><span class="row_number">{{this}}</span><ul>
-
-{{#each tablet_indexes}}
+	{{#each tablet_indexes}}
     {{#with row=.. tablet=this}}
       {{> pattern_cell}}
     {{/with}}
   {{/each}}
 
-</ul></div>
-{{/each}}
-</div>
-{{/unless}}
+	</ul></div>
+	{{/each}}
+	</div>
+{{/if}}
 
 {{#if string_exists weaving_notes}}
 <h2>Weaving notes</h2>
