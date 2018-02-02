@@ -58,6 +58,12 @@ body.print p {
   background: #BBBBBB;
 }
 
+.print .info .key .cell.idle {
+  background-color: #FFFFFF;
+  background-image: url('/images/special_idle.svg');
+  background-size: 32px 32px;
+}
+
 .print .info .key p:not(:first-of-type) {
   padding-left: 16px;
 }

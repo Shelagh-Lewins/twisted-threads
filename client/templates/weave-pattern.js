@@ -11,6 +11,17 @@ Template.weave_pattern.rendered = function() {
 Template.weave_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
 
+  // set session variables to avoid checking db every time
+  if (Meteor.my_functions.pattern_exists(pattern_id));
+  {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
+
+    Session.set("edit_mode", pattern.edit_mode);
+
+    if (pattern.edit_mode == "simulation")
+      Session.set("simulation_mode", pattern.simulation_mode);
+  }
+
   Meteor.my_functions.clear_pattern_display_data();
   Meteor.my_functions.build_pattern_display_data(pattern_id);
 });

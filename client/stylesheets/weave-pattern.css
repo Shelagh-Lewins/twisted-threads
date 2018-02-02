@@ -163,6 +163,7 @@ body.weave,
 /* info section - key, weaving notes */
 .weave .info {
   margin: 16px 0 0 0;
+  padding: 8px 0 0 0;
 }
 
 .weave .info .key h3 {
@@ -177,6 +178,7 @@ body.weave,
   line-height: 32px;
   height: 32px;
   font-size: 16px;
+  margin-bottom: 8px;
 }
 
 .weave .info .key .cell {
@@ -192,6 +194,12 @@ body.weave,
 
 .weave .info .key .cell.backward {
   background: #BBBBBB;
+}
+
+.weave .info .key .cell.idle {
+  background-color: #FFFFFF;
+  background-image: url('/images/special_idle.svg');
+  background-size: 32px 32px;
 }
 
 .weave .info .key p:not(:first-of-type) {

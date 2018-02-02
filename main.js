@@ -154,6 +154,22 @@ if (Meteor.isClient) {
       return "disabled";
   });
 
+  UI.registerHelper('includes_idle', function() {
+    // does the pattern contain any idle tablets? Used in key
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+        return;
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving: 1
+    }});
+
+    if (pattern.weaving.indexOf("S15") != -1) // idle tablet special style
+      return true;
+
+    else
+      return false;
+  })
+
   //////////////////////////////////
   // Used in header to display correct buttons and title depending on route and params
   // Used in menu to determine menu entries

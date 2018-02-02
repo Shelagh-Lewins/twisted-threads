@@ -7,16 +7,6 @@
 
 <button class="styled_button" onclick="Meteor.my_functions.stop_weaving();">Close weaving chart</button>
 
-<div class="info">
-{{#if equals edit_mode "simulation"}}
-  <div class="key">
-    <h3>Key: </h3>
-    <p><span class="cell forward"></span>Turn tablet forward</p>
-    <p><span class="cell backward"></span>Turn tablet backward</p>
-  </div>
-{{/if}}
-</div>
-
 <div class="row_controls"><label for="current_row_input">Row: </label><input type="text" id="current_row_input" value={{selected_row}}>
 <input type="button" id="first_row" value="First row" />
 <input type="button" id="last_row" value="Last row" /></div>
@@ -27,6 +17,9 @@
 {{/each}}
 </div>
 {{/if}}
+
+{{> weaving_key}}
+
 </template>
 
 <template name="weave_row">
@@ -44,4 +37,17 @@
 
 <template name="weave_row_buttons">
 {{#if is_selected_row this}}<div class="buttons"><div class="inner_tube"><input type="button" class="next_row" /><input type="button" class="previous_row" /></div></div>{{/if}}<div class="highlight"><div class="inner_tube"></div></div>
+</template>
+
+<template name="weaving_key">
+{{#if equals edit_mode "simulation"}}
+<div class="info clearing">
+  <div class="key">
+    <h3>Key: </h3>
+    <p><span class="cell forward"></span>Turn tablet forward</p>
+    <p><span class="cell backward"></span>Turn tablet backward</p>
+    {{#if includes_idle}}<p><span class="cell idle"></span>Idle</p>{{/if}}
+  </div>
+</div>
+{{/if}}
 </template>

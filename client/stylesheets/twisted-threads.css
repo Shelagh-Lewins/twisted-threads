@@ -220,6 +220,10 @@ body {
   width: 100%;
 }
 
+#header #search div.results-wrapper ul li a div {
+  margin-left: 56px;
+}
+
 #header #search div.results-wrapper ul li a:focus,
 #header #search div.results-wrapper ul li a:hover {
   background-color: #A8E1FF;
@@ -244,9 +248,9 @@ body {
 #header #search div.results-wrapper ul li a .name {
   display: block;
   margin: 7px 8px 0 0;
-  white-space: nowrap; 
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /*white-space: nowrap; */
+  /*overflow: hidden;*/
+  /*text-overflow: ellipsis;*/
   font-size: 95%;
   font-weight: bold;
 }

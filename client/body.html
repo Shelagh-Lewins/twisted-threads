@@ -66,7 +66,10 @@
 
   <ul class="results">
   {{#EasySearch.Each index=patternsIndex}}
-    <li class="pattern_results"><a href="#"><span class="main_icon"></span><span class="name">{{name}}</span><span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a></li>
+    <li class="pattern_results"><a href="#"><span class="main_icon"></span>
+      <div>
+      <span class="name">{{name}}</span><span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></div></a>
+  </li>
     {{/EasySearch.Each}}
   </ul>
 
