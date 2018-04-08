@@ -105,3 +105,38 @@ Meteor.publish('actions_log', function() {
 });
 
 
+// rate limit subscriptions
+const patternsPublication = {
+    type: 'subscription',
+    name: 'patterns',
+};
+
+DDPRateLimiter.addRule(patternsPublication, 3, 1000);
+
+const tagsPublication = {
+    type: 'subscription',
+    name: 'tags',
+};
+
+DDPRateLimiter.addRule(tagsPublication, 3, 1000);
+
+const recent_patternsPublication = {
+    type: 'subscription',
+    name: 'recent_patterns',
+};
+
+DDPRateLimiter.addRule(recent_patternsPublication, 3, 1000);
+
+const user_infoPublication = {
+    type: 'subscription',
+    name: 'user_info',
+};
+
+DDPRateLimiter.addRule(user_infoPublication, 3, 1000);
+
+const actions_logPublication = {
+    type: 'subscription',
+    name: 'actions_log',
+};
+
+DDPRateLimiter.addRule(actions_logPublication, 3, 1000);
