@@ -5,6 +5,8 @@ Meteor.publish('patterns', function(params){
   // there is a subscription that passes in [] as params and I can't find where it is called. The current version of Match avoids error when this empty array is passed in, and everything seems to work. The issue occurs at first load or page refresh, not on navigating routes.
   check(params, Match.Optional(Match.OneOf(Object, [String])));
 
+// if (typeof params !== "undefined") console.log(`i ${params.i}`); // test rate limit DO NOT SHIP THIS
+
   // fastrender causes the production server to show "incomplete response from application" error. A workaround is to modify the core package minifier.js to reserve keywords
   // https://github.com/abecks/meteor-fast-render/issues/2
 
@@ -104,39 +106,38 @@ Meteor.publish('actions_log', function() {
   return ActionsLog.find();
 });
 
-
-// rate limit subscriptions
+// Rate limit subscriptions
 const patternsPublication = {
     type: 'subscription',
     name: 'patterns',
 };
 
-// DDPRateLimiter.addRule(patternsPublication, 3, 1000);
+// DDPRateLimiter.addRule(patternsPublication, 1, 100);
 
 const tagsPublication = {
     type: 'subscription',
     name: 'tags',
 };
 
-// DDPRateLimiter.addRule(tagsPublication, 3, 1000);
+// DDPRateLimiter.addRule(tagsPublication, 1, 100);
 
 const recent_patternsPublication = {
     type: 'subscription',
     name: 'recent_patterns',
 };
 
-// DDPRateLimiter.addRule(recent_patternsPublication, 3, 1000);
+// DDPRateLimiter.addRule(recent_patternsPublication, 1, 100);
 
 const user_infoPublication = {
     type: 'subscription',
     name: 'user_info',
 };
 
-// DDPRateLimiter.addRule(user_infoPublication, 3, 1000);
+// DDPRateLimiter.addRule(user_infoPublication, 1, 100);
 
 const actions_logPublication = {
     type: 'subscription',
     name: 'actions_log',
 };
 
-// DDPRateLimiter.addRule(actions_logPublication, 3, 1000);
+// DDPRateLimiter.addRule(actions_logPublication, 1, 100);

@@ -399,6 +399,12 @@ if (Meteor.isClient) {
         Session.set('recents_ready', true);
       }
     });
+
+    // test rate limit
+    /* for (let i = 0; i < 250; i++) {
+      console.log(`i ${i}`);
+      Meteor.subscribe('patterns', {'i': i});
+    } */
   });
 
   Template.search.helpers({
