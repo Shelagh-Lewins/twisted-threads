@@ -780,7 +780,7 @@ if (Meteor.isClient) {
 
     // The publish functions don't automatically update queries to other collections. So the client resubscribes to pattern-related collections whenever the list of patterns that the user can see changes.
     // my_pattern_ids detects that Patterns has changed. Math.random triggers the re-subscription, otherwise Meteor refuses to run it.
-//console.log(" autorun number of patterns " + Patterns.find().count());
+
     if (Session.equals('patterns_ready', true)) // wait until patterns are loaded
     {
       var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
@@ -818,7 +818,6 @@ if (Meteor.isClient) {
     var max = Session.get('display_max_tablets');
     var min = Session.get('display_min_tablets');
 
-    //if (display_max_tablets || display_min_tablets)
     if (min || max)
     {
       // All Patterns

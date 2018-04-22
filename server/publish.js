@@ -107,7 +107,7 @@ Meteor.publish('actions_log', function() {
 });
 
 // Rate limit subscriptions
-const patternsPublication = {
+/* const patternsPublication = {
     type: 'subscription',
     name: 'patterns',
 };
@@ -141,3 +141,5 @@ const actions_logPublication = {
 };
 
 // DDPRateLimiter.addRule(actions_logPublication, 1, 100);
+
+ */
