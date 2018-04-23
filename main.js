@@ -391,7 +391,6 @@ if (Meteor.isClient) {
               Session.set('user_info_ready', true);
             }
           });
-          Meteor.subscribe('weaving_cells');
         }
       });
     this.subscribe('recent_patterns', {
@@ -787,7 +786,6 @@ if (Meteor.isClient) {
       if (my_pattern_ids)
       {
         Meteor.subscribe('recent_patterns', Math.random());
-        Meteor.subscribe('weaving_cells', Math.random());
       }
     }
     if (Session.equals('patterns_ready', true) && Session.equals('recents_ready', true))
