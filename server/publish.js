@@ -65,11 +65,9 @@ Meteor.publish('tags', function(){
 
 // trigger is there to force a resubscription when pattern ids or private have changed, otherwise Meteor is "smart" and doesn't run it.
 
-//Meteor.publish('recent_patterns', function(){
-  Meteor.publish('recent_patterns', function(trigger){
+Meteor.publish('recent_patterns', function(trigger){
   // return details of patterns the user has viewed / woven
   // check the pattern is viewable by this user
-  // trigger is there to force a resubscription when pattern ids or private have changed, otherwise Meteor is "smart" and doesn't run it.
   check(trigger, Match.Optional(Number));
 
   var my_patterns = Patterns.find({
@@ -92,6 +90,8 @@ Meteor.publish('user_info', function(trigger){
   }).map(function(pattern) {return pattern.created_by});
 
   // the user's emails will be returned but for other users, only public information should be shown.
+  // return [];
+  // return Meteor.users.find();
   return Meteor.users.find({ $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}});
 });
 
@@ -99,47 +99,8 @@ Meteor.publish('user_info', function(trigger){
 // to access this, subscribe in the client with:
 // Meteor.subscribe('actions_log')
 Meteor.publish('actions_log', function() {
-
   if (!Meteor.settings.private.debug)
-      return;
+    return;
 
   return ActionsLog.find();
 });
-
-// Rate limit subscriptions
-/* const patternsPublication = {
-    type: 'subscription',
-    name: 'patterns',
-};
-
-// DDPRateLimiter.addRule(patternsPublication, 1, 100);
-
-const tagsPublication = {
-    type: 'subscription',
-    name: 'tags',
-};
-
-// DDPRateLimiter.addRule(tagsPublication, 1, 100);
-
-const recent_patternsPublication = {
-    type: 'subscription',
-    name: 'recent_patterns',
-};
-
-// DDPRateLimiter.addRule(recent_patternsPublication, 1, 100);
-
-const user_infoPublication = {
-    type: 'subscription',
-    name: 'user_info',
-};
-
-// DDPRateLimiter.addRule(user_infoPublication, 1, 100);
-
-const actions_logPublication = {
-    type: 'subscription',
-    name: 'actions_log',
-};
-
-// DDPRateLimiter.addRule(actions_logPublication, 1, 100);
-
- */

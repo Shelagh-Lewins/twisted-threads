@@ -902,10 +902,12 @@ Meteor.methods({
   },
   maintain_recent_patterns: function() {
     // remove any patterns that no longer exist or are now hidden from the user
-
-    // Publish only returns the patterns the user has permission to see
+    // this operation is on the server so results must be filtered
     var my_patterns = Patterns.find({
-
+      $or: [
+        { private: {$ne: true} },
+        { created_by: Meteor.userId() }
+      ]
     }).map(function(pattern) {return pattern._id});
 
     Recent_Patterns.remove({pattern_id: {$nin:my_patterns}});
