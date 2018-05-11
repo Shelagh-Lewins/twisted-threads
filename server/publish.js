@@ -35,10 +35,8 @@ Meteor.publish('patterns', function(params){
         ]
       },
       {
-        sort: {"name": 1}
-      },
-      {
-        limit: limit
+        limit: limit,
+        sort: {"name": 1},
       }
     );
 
@@ -54,7 +52,7 @@ Meteor.publish('patterns', function(params){
         ]
       },
       {
-        limit: limit
+        limit: 1
       }
     );
 
@@ -65,10 +63,8 @@ Meteor.publish('patterns', function(params){
         { created_by: this.userId }
       ]},
       {
-        sort: {"name": 1}
-      },
-      {
-        limit: limit
+        limit: limit,
+        sort: {"name": 1},
       }
     );
 });
@@ -101,11 +97,9 @@ Meteor.publish('recent_patterns', function(params, trigger){
       ]
     },
     {
+      limit: limit,
       sort: {"created_at": -1}
     },
-    {
-      limit: limit
-    }
   ).map(function(pattern) {return pattern._id});
 
   return Recent_Patterns.find({ $and: [{pattern_id: {$in:my_patterns}}, {user_id: this.userId}]});
@@ -131,11 +125,10 @@ Meteor.publish('user_info', function(params, trigger){
       $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}
     },
     {
+      limit: limit,
       sort: {"profile.name_sort": 1}
-    },
-    {
-      limit: limit
-    });
+    }
+  );
 });
 
 // Debug only - show log of user actions
