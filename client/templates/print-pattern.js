@@ -1,6 +1,6 @@
 Template.print_pattern.rendered = function() {
   $('body').attr("class", "print");
-  Meteor.subscribe('user_info');
+  // Meteor.subscribe('user_info');
 }
 
 Template.print_pattern.onCreated(function(){

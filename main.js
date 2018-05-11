@@ -270,9 +270,8 @@ if (Meteor.isClient) {
       var pattern = Patterns.findOne({_id: id});
       if (typeof pattern === "undefined") continue;
 
-      if (limit)
-        if (i >= Session.get('thumbnails_in_row'))
-          break;
+      if (i >= Session.get('thumbnails_in_row') && limit) // home page
+        break;
       
       patterns.push(pattern);
     }
@@ -280,7 +279,7 @@ if (Meteor.isClient) {
     return patterns; // Note this is an array because order is important, so in the template use .length to find number of items, not .count
   });
 
-  UI.registerHelper('not_recent_patterns', function(limit){
+  UI.registerHelper('not_recent_patterns', function(){
     // any visible pattern that is not shown in Recent Patterns
     if (Meteor.userId()) // user is signed in
       var pattern_ids = Recent_Patterns.find().map(function(pattern){ return pattern.pattern_id});
@@ -288,64 +287,53 @@ if (Meteor.isClient) {
     else
       var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
 
-    var obj = {};     
-    obj["sort"] = {};
-    obj["sort"]["name"] = 1;
-
-    if (limit)
-      obj["limit"] = Session.get('thumbnails_in_row');
+    var obj = {
+      'sort': { 'name': 1 },
+      'limit': Session.get('thumbnails_in_row')
+    }
 
     return Patterns.find({_id: {$nin: pattern_ids}}, obj);
     // This is a cursor use use .count in template to find number of items
   });
 
-  UI.registerHelper('my_patterns', function(limit){
+  UI.registerHelper('my_patterns', function(){
     if (!Meteor.userId())
       return;
 
-    var obj = {};
-      
-    obj["sort"] = {};
-    obj["sort"]["name"] = 1;
-
-    if (limit)
-      obj["limit"] = Session.get('thumbnails_in_row');
+    var obj = {
+      'sort': { 'name': 1 },
+      'limit': Session.get('thumbnails_in_row')
+    }
 
     return Patterns.find({created_by: Meteor.userId()}, obj);
     // This is a cursor use use .count in template to find number of items
   });
 
-  UI.registerHelper('new_patterns', function(limit){
-    var obj = {};
-    obj["sort"] = {};
-    obj["sort"]["created_at"] = -1;
-
-    if (limit)
-      obj["limit"] = parseInt(Session.get('thumbnails_in_row'));
+  UI.registerHelper('new_patterns', function(){
+    var obj = {
+      'sort': { 'created_at': -1 },
+      'limit': Session.get('thumbnails_in_row')
+    }
 
     return Patterns.find({}, obj);
     // This is a cursor use use .count in template to find number of items
   });
 
-  UI.registerHelper('all_patterns', function(limit){
-    var obj = {};
-    obj["sort"] = {};
-    obj["sort"]["created_at"] = -1;
-
-    if (limit)
-      obj["limit"] = Session.get('thumbnails_in_row');
+  UI.registerHelper('all_patterns', function(){
+    var obj = {
+      'sort': { 'name': 1 },
+      'limit': Session.get('thumbnails_in_row')
+    }
 
     return Patterns.find({}, obj);
     // This is a cursor use use .count in template to find number of items
   });
 
-  UI.registerHelper('users', function(limit){
-    var obj = {};
-    obj["sort"] = {};
-    obj["sort"]["profile.name_sort"] = 1;
-
-    if (limit)
-      obj["limit"] = Session.get('thumbnails_in_row');
+  UI.registerHelper('users', function(){
+    var obj = {
+      'sort': { 'profile.name_sort': 1 },
+      'limit': Session.get('thumbnails_in_row')
+    }
 
     return Meteor.users.find({}, obj);
     // This is a cursor use use .count in template to find number of items
@@ -383,17 +371,23 @@ if (Meteor.isClient) {
     Session.set('patterns_ready', false);
     Session.set('recents_ready', false);
     Session.set('user_info_ready', false);
-    this.subscribe('patterns', {
-        onReady: function () { 
-          Session.set('patterns_ready', true);
-          Meteor.subscribe('user_info', {
-            onReady: function() {
-              Session.set('user_info_ready', true);
-            }
-          });
-        }
-      });
-    this.subscribe('recent_patterns', {
+
+    var params = {
+      limit: Session.get('thumbnails_in_row')
+    }; // otherwise the server won't know how many docs to return
+
+    this.subscribe('patterns', params, {
+      onReady: function () { 
+        Session.set('patterns_ready', true);
+        Meteor.subscribe('user_info', params, {
+          onReady: function() {
+            Session.set('user_info_ready', true);
+          }
+        });
+      }
+    });
+
+    this.subscribe('recent_patterns', params, {
       onReady: function() {
         Session.set('recents_ready', true);
       }
@@ -780,12 +774,16 @@ if (Meteor.isClient) {
     // The publish functions don't automatically update queries to other collections. So the client resubscribes to pattern-related collections whenever the list of patterns that the user can see changes.
     // my_pattern_ids detects that Patterns has changed. Math.random triggers the re-subscription, otherwise Meteor refuses to run it.
 
+    var params = {
+      limit: Session.get('thumbnails_in_row')
+    };
+
     if (Session.equals('patterns_ready', true)) // wait until patterns are loaded
     {
       var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
       if (my_pattern_ids)
       {
-        Meteor.subscribe('recent_patterns', Math.random());
+        Meteor.subscribe('recent_patterns', params, Math.random());
       }
     }
     if (Session.equals('patterns_ready', true) && Session.equals('recents_ready', true))

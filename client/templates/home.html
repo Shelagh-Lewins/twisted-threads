@@ -51,7 +51,7 @@
 {{/if}}{{/with}}
 
 {{#if patterns_ready}}
-{{#with new_patterns true}}{{#if this.count}}
+{{#with new_patterns}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='new_patterns'}}"><span class="text">New patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="patterns">
@@ -64,7 +64,7 @@
 
 {{#if currentUser}}
 {{#if patterns_ready}}
-{{#with my_patterns true}}{{#if this.count}}
+{{#with my_patterns}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='my_patterns'}}"><span class="text">My patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="patterns">
@@ -77,7 +77,7 @@
 {{/if}}
 
 {{#if patterns_ready}}{{#if recents_ready}}
-{{#with not_recent_patterns true}}{{#if this.count}}
+{{#with not_recent_patterns}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='all_patterns'}}"><span class="text">All patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="patterns">
@@ -89,7 +89,7 @@
 {{/if}}{{/if}}
 
 {{#if patterns_ready}}{{#if user_info_ready}}
-{{#with users true}}{{#if this.count}}
+{{#with users}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='users'}}"><span class="text">People</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="users">

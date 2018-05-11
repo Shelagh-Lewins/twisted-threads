@@ -3,7 +3,7 @@ Meteor.publish('patterns', function(params){
 // with fastrender, params are passed in as an object.
 
   // there is a subscription that passes in [] as params and I can't find where it is called. The current version of Match avoids error when this empty array is passed in, and everything seems to work. The issue occurs at first load or page refresh, not on navigating routes.
-  check(params, Match.Optional(Match.OneOf(Object, [String])));
+  check(params, Object);
 
 // if (typeof params !== "undefined") console.log(`i ${params.i}`); // test rate limit DO NOT SHIP THIS
 
@@ -15,6 +15,7 @@ Meteor.publish('patterns', function(params){
   // by default return all patterns the current user can see
   var single_user = false;
   var single_pattern = false;
+  limit = params.limit;
 
   if (typeof params !== "undefined")
   {
@@ -26,31 +27,50 @@ Meteor.publish('patterns', function(params){
   }
 
   if (single_user) // all visible patterns created by a user
-    return Patterns.find({
-      $and: [
-        { private: {$ne: true} },
-        { created_by: params._id }
-      ]
-    });
+    return Patterns.find(
+      {
+        $and: [
+          { private: {$ne: true} },
+          { created_by: params._id }
+        ]
+      },
+      {
+        sort: {"name": 1}
+      },
+      {
+        limit: limit
+      }
+    );
 
   else if (single_pattern) // view pattern
-    return Patterns.find({
-      $and: [
-        {_id: params.pattern_id},
-        { $or: [
-          { private: {$ne: true} },
-          { created_by: this.userId }
-        ]}
-      ]
-    });
+    return Patterns.find(
+      {
+        $and: [
+          {_id: params.pattern_id},
+          { $or: [
+            { private: {$ne: true} },
+            { created_by: this.userId }
+          ]}
+        ]
+      },
+      {
+        limit: limit
+      }
+    );
 
   else // all patterns visible to this user
-    return Patterns.find({
-      $or: [
+    return Patterns.find(
+      {$or: [
         { private: {$ne: true} },
         { created_by: this.userId }
-      ]
-    });
+      ]},
+      {
+        sort: {"name": 1}
+      },
+      {
+        limit: limit
+      }
+    );
 });
 
 // Publish images uploaded by the user
@@ -65,25 +85,39 @@ Meteor.publish('tags', function(){
 
 // trigger is there to force a resubscription when pattern ids or private have changed, otherwise Meteor is "smart" and doesn't run it.
 
-Meteor.publish('recent_patterns', function(trigger){
+Meteor.publish('recent_patterns', function(params, trigger){
   // return details of patterns the user has viewed / woven
   // check the pattern is viewable by this user
+  check(params, Object);
   check(trigger, Match.Optional(Number));
 
-  var my_patterns = Patterns.find({
-    $or: [
-      { private: {$ne: true} },
-      { created_by: this.userId }
-    ]
-  }).map(function(pattern) {return pattern._id});
+  limit = params.limit;
+
+  var my_patterns = Patterns.find(
+    {
+      $or: [
+        { private: {$ne: true} },
+        { created_by: this.userId }
+      ]
+    },
+    {
+      sort: {"created_at": -1}
+    },
+    {
+      limit: limit
+    }
+  ).map(function(pattern) {return pattern._id});
 
   return Recent_Patterns.find({ $and: [{pattern_id: {$in:my_patterns}}, {user_id: this.userId}]});
 });
 
-Meteor.publish('user_info', function(trigger){
+Meteor.publish('user_info', function(params, trigger){
   // show only the current user and any users who have public patterns
 
+  check(params, Object);
   check(trigger, Match.Optional(Number));
+
+  limit = params.limit;
 
   var my_patterns = Patterns.find({
     private: {$ne: true}
@@ -92,7 +126,16 @@ Meteor.publish('user_info', function(trigger){
   // the user's emails will be returned but for other users, only public information should be shown.
   // return [];
   // return Meteor.users.find();
-  return Meteor.users.find({ $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}});
+  return Meteor.users.find(
+    {
+      $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}
+    },
+    {
+      sort: {"profile.name_sort": 1}
+    },
+    {
+      limit: limit
+    });
 });
 
 // Debug only - show log of user actions

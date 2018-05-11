@@ -52,7 +52,8 @@ Router.route('/pattern/:_id/:mode?', {
   waitOn: function(){
     var pattern_id = this.params._id;
     var params = {
-      pattern_id: pattern_id
+      pattern_id: pattern_id,
+      limit: 1,
     };
     
     return [
@@ -63,7 +64,7 @@ Router.route('/pattern/:_id/:mode?', {
         }
       }),
       Meteor.subscribe('tags'),
-      Meteor.subscribe('recent_patterns') // to check for current_weave_row
+      Meteor.subscribe('recent_patterns', {limit: 1}) // to check for current_weave_row
       
     ];
   },
@@ -111,14 +112,14 @@ Router.route('/user/:_id', {
 
     return Meteor.users.findOne({ _id: user_id });
   },
-  waitOn: function(){
+  /* waitOn: function(){
     var user_id = this.params._id;
 
     return [   
-      Meteor.subscribe('user_info'),
-      Meteor.subscribe('patterns', this.params)
+      // Meteor.subscribe('user_info', {limit: 1}),
+      // Meteor.subscribe('patterns', this.params),
     ]
-  },
+  }, */
   action: function() {
     var user_id = this.params._id;
 
