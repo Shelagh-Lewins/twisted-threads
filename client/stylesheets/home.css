@@ -151,7 +151,8 @@
 /* *** Patterns list *** */
 .home .wrapper {
   width: 100%;
-  float: left
+  overflow: hidden;
+  height: 232px;
 }
 
 .home .results {

@@ -1,5 +1,21 @@
+ Meteor.publish('patterns', function(params){
+  check(params, Object);
+
+  var limit = params.limit;
+
+  return Patterns.find(
+    {$or: [
+      { private: {$ne: true} },
+      { created_by: this.userId }
+    ]},
+    {
+      limit: limit,
+    }
+  );
+}); 
+
 // Publish pattern data, checking that the user has permission to view the pattern
-Meteor.publish('patterns', function(params){
+/* Meteor.publish('patterns', function(params){
 // with fastrender, params are passed in as an object.
 
   // there is a subscription that passes in [] as params and I can't find where it is called. The current version of Match avoids error when this empty array is passed in, and everything seems to work. The issue occurs at first load or page refresh, not on navigating routes.
@@ -26,19 +42,40 @@ Meteor.publish('patterns', function(params){
       single_pattern = true;
   }
 
+  console.log(`single user ${single_user}`);
+
   if (single_user) // all visible patterns created by a user
-    return Patterns.find(
-      {
-        $and: [
-          { private: {$ne: true} },
-          { created_by: params._id }
-        ]
-      },
-      {
-        limit: limit,
-        sort: {"name": 1},
-      }
-    );
+    if (params._id === this.userId)
+    {
+      console.log("my patterns");
+    // the user's own patterns: show all
+      return Patterns.find(
+        {
+          created_by: params._id,
+        },
+        {
+          limit: limit,
+          sort: {"name": 1},
+        }
+      );
+    }
+    else
+    {
+      console.log("your patterns");
+      // another user's patterns: only show public
+      return Patterns.find(
+        {
+          $and: [
+            { private: {$ne: true} },
+            { created_by: params._id }
+          ]
+        },
+        {
+          limit: limit,
+          sort: {"name": 1},
+        }
+      );
+    }
 
   else if (single_pattern) // view pattern
     return Patterns.find(
@@ -67,7 +104,7 @@ Meteor.publish('patterns', function(params){
         sort: {"name": 1},
       }
     );
-});
+}); */
 
 // Publish images uploaded by the user
 Meteor.publish('images', function() {

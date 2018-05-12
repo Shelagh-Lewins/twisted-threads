@@ -55,9 +55,10 @@
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='new_patterns'}}"><span class="text">New patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="patterns">
-{{#each this}}
+{{> new_patterns_home}}
+<!--{{#each this}}
 {{> pattern_thumbnail}}
-{{/each}}
+{{/each}}-->
 </ul></div>
 {{/if}}{{/with}}
 {{/if}}
@@ -68,22 +69,24 @@
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='my_patterns'}}"><span class="text">My patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="patterns">
-{{#each this}}
+{{> my_patterns_home}}
+<!--{{#each this}}
 {{> pattern_thumbnail}}
-{{/each}}
+{{/each}}-->
 </ul></div>
 {{/if}}{{/with}}
 {{/if}}
 {{/if}}
 
 {{#if patterns_ready}}{{#if recents_ready}}
-{{#with not_recent_patterns}}{{#if this.count}}
+{{#with all_patterns}}{{#if this.count}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='all_patterns'}}"><span class="text">All patterns</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="patterns">
-{{#each this}}
+{{> all_patterns_home}}
+<!--{{#each this}}
 {{> pattern_thumbnail}}
-{{/each}}
+{{/each}} -->
 </ul></div>
 {{/if}}{{/with}}
 {{/if}}{{/if}}
@@ -148,7 +151,7 @@
 </div>
 </template>
 
-<template name="pattern_thumbnail"><li class="pattern_thumbnail {{#if private}}private{{/if}}" style="width: {{width}}; margin-right: {{rmargin}}" >
+<template name="pattern_thumbnail"><li class="pattern_thumbnail {{#if private}}private{{/if}}" style="width: {{width}}; margin-right: {{rmargin}}" >{{test}}
 <div class="main">
 <a href="{{pathFor route='pattern'}}">
 <h3 title="{{name}}">{{name}}</h3>
@@ -159,9 +162,7 @@
 {{/if}}
 
 <div class="stats"><span class="number_of_tablets" title="Number of tablets"><span class="icon"></span><span class="text">{{number_of_tablets}}</span></span></div>
-<!--<img src="{{auto_preview_svg}}" />-->
 <div class="image auto_preview {{auto_preview_rotation}}" style="background-image: url('{{auto_preview_svg}}')"></div>
-<!--<div class="image" style="background-image: url('{{preview_url}}')"></div>-->
 </a></div>
 <div class="footer"><a href="{{pathFor route='user' _id=created_by}}" class="created_by">{{created_by_username}}</a>{{#if can_edit_pattern _id}}
 <a href="#" class="delete" title="Delete this pattern"><span></span></a>
@@ -212,4 +213,14 @@ Show patterns with between
 </div>
 </template>
 
+<template name="my_patterns_home">
+{{> pages}}
+</template>
 
+<template name="new_patterns_home">
+{{> pages}}
+</template>
+
+<template name="all_patterns_home">
+{{> pages}}
+</template>

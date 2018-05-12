@@ -224,6 +224,22 @@ if (Meteor.isClient) {
     UserPatterns.requestPage(1);
   });
 
+  ////////////////////
+
+  Template.new_patterns_home.onRendered(function() {
+    NewPatternsHome.requestPage(1);
+  });
+
+  Template.my_patterns_home.onRendered(function() {
+    MyPatternsHome.requestPage(1);
+  });
+
+  Template.all_patterns_home.onRendered(function() {
+    AllPatternsHome.requestPage(1);
+  });
+
+  ///////////////
+
   // check for subscriptions to be ready
   UI.registerHelper('patterns_ready', function() {
     if (Session.get("patterns_ready"))
@@ -279,7 +295,7 @@ console.log(`Edited list ${JSON.stringify(patterns)}`);
     return patterns; // Note this is an array because order is important, so in the template use .length to find number of items, not .count
   });
 
-  UI.registerHelper('not_recent_patterns', function(){
+  /* UI.registerHelper('not_recent_patterns', function(){
     // any visible pattern that is not shown in Recent Patterns
     if (Meteor.userId()) // user is signed in
       var pattern_ids = Recent_Patterns.find().map(function(pattern){ return pattern.pattern_id});
@@ -293,8 +309,8 @@ console.log(`Edited list ${JSON.stringify(patterns)}`);
     }
 
     return Patterns.find({_id: {$nin: pattern_ids}}, obj);
-    // This is a cursor use use .count in template to find number of items
-  });
+    // This is a cursor use .count in template to find number of items
+  }); */
 
   UI.registerHelper('my_patterns', function(){
     if (!Meteor.userId())
@@ -306,7 +322,7 @@ console.log(`Edited list ${JSON.stringify(patterns)}`);
     }
 
     return Patterns.find({created_by: Meteor.userId()}, obj);
-    // This is a cursor use use .count in template to find number of items
+    // This is a cursor use .count in template to find number of items
   });
 
   UI.registerHelper('new_patterns', function(){
@@ -316,7 +332,7 @@ console.log(`Edited list ${JSON.stringify(patterns)}`);
     }
 
     return Patterns.find({}, obj);
-    // This is a cursor use use .count in template to find number of items
+    // This is a cursor use .count in template to find number of items
   });
 
   UI.registerHelper('all_patterns', function(){
@@ -326,7 +342,9 @@ console.log(`Edited list ${JSON.stringify(patterns)}`);
     }
 
     return Patterns.find({}, obj);
-    // This is a cursor use use .count in template to find number of items
+
+    // return Patterns.find({}, obj);
+    // This is a cursor use .count in template to find number of items
   });
 
   UI.registerHelper('users', function(){
@@ -336,7 +354,7 @@ console.log(`Edited list ${JSON.stringify(patterns)}`);
     }
 
     return Meteor.users.find({}, obj);
-    // This is a cursor use use .count in template to find number of items
+    // This is a cursor use .count in template to find number of items
   });
 
   // *** has the user permission to create a new pattern? *** //
@@ -371,6 +389,8 @@ console.log(`Edited list ${JSON.stringify(patterns)}`);
     Session.set('patterns_ready', false);
     Session.set('recents_ready', false);
     Session.set('user_info_ready', false);
+
+    Session.set('pattern_subscriptions', 0);
 
     var params = {
       limit: Session.get('thumbnails_in_row')

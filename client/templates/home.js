@@ -74,6 +74,9 @@ Template.home_patterns.helpers({
 
 /* *** Individual pattern in list *** */
 Template.pattern_thumbnail.helpers({
+  test: function() {
+console.log(`this ${Object.getOwnPropertyNames(this)}`);
+  },
   width: function() {
     return Meteor.my_params.pattern_thumbnail_width + "px";
   },
