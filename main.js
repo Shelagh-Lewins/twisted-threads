@@ -268,7 +268,7 @@ if (Meteor.isClient) {
 
     else
       var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
-console.log(`recent_patterns helper. ids ${pattern_ids}`);
+
     // stored for "recent patterns" route pagination
     reactive_recent_patterns.clear();
     reactive_recent_patterns = new ReactiveArray(pattern_ids);
@@ -284,33 +284,17 @@ console.log(`recent_patterns helper. ids ${pattern_ids}`);
       if (typeof id === "undefined") continue;
       
       var pattern = Patterns.findOne({_id: id});
+
       if (typeof pattern === "undefined") continue;
 
       if (i >= Session.get('thumbnails_in_row') && limit) // home page
         break;
-      
-      patterns.push(id);
+
+      patterns.push(pattern);
     }
-console.log(`Edited list ${JSON.stringify(patterns)}`);
+
     return patterns; // Note this is an array because order is important, so in the template use .length to find number of items, not .count
   });
-
-  /* UI.registerHelper('not_recent_patterns', function(){
-    // any visible pattern that is not shown in Recent Patterns
-    if (Meteor.userId()) // user is signed in
-      var pattern_ids = Recent_Patterns.find().map(function(pattern){ return pattern.pattern_id});
-
-    else
-      var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
-
-    var obj = {
-      'sort': { 'name': 1 },
-      'limit': Session.get('thumbnails_in_row')
-    }
-
-    return Patterns.find({_id: {$nin: pattern_ids}}, obj);
-    // This is a cursor use .count in template to find number of items
-  }); */
 
   UI.registerHelper('my_patterns', function(){
     if (!Meteor.userId())

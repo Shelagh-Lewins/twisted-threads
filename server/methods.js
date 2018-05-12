@@ -896,7 +896,6 @@ Meteor.methods({
 
     if (Recent_Patterns.find({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
     {
-      console.log(`add ${pattern_id} to recents`);
       // the pattern is not in the list, so add it
       Recent_Patterns.insert({
         pattern_id: pattern_id,
@@ -907,7 +906,6 @@ Meteor.methods({
     else
     {
       // the pattern is already in the list, so update it
-      console.log(`update ${pattern_id} in recents`);
       Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, { $set: {accessed_at: moment().valueOf()}});
     }
 
@@ -925,15 +923,10 @@ Meteor.methods({
         {},
         {sort: {accessed_at: -1}},
     ).map(function(pattern) {return pattern._id});
-console.log(`counted_patterns before ${counted_patterns}`);
 
     counted_patterns.slice(0, Meteor.my_params.max_recents);
 
-    console.log(`after ${counted_patterns}`);
-    console.log(`Recent_Patterns.count 1 ${Recent_Patterns.find({}).count()}`);
-
     Recent_Patterns.remove({_id: {$nin:counted_patterns}});
-    console.log(`Recent_Patterns.count 2 ${Recent_Patterns.find({}).count()}`);
 
     var my_patterns = Patterns.find(
       {
@@ -944,12 +937,6 @@ console.log(`counted_patterns before ${counted_patterns}`);
       }, 
       {fields: { _id: 1 }},
     ).map(function(pattern) {return pattern._id});
-
-    console.log(`my_patterns.length ${my_patterns.length}`);
-
-    // Recent_Patterns.remove({_id: {$nin:my_patterns}});
-
-    console.log(`Recent_Patterns.count 3 ${Recent_Patterns.find({}).count()}`);
   },
   set_current_weave_row: function(pattern_id, index) {
     check(pattern_id, String);

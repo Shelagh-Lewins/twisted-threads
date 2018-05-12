@@ -14,12 +14,9 @@
     {$or: [
       { private: {$ne: true} },
       { created_by: this.userId }
-    ]},
-    {
-      limit: 1, // for any list of patterns, use Pages. This publication is only for single patterns.
-    }
+    ]} // to keep queries quick, use findOne in the client
   );
-}); 
+});
 
 // Publish images uploaded by the user
 Meteor.publish('images', function() {

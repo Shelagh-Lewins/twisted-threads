@@ -53,7 +53,6 @@ Router.route('/pattern/:_id/:mode?', {
     var pattern_id = this.params._id;
     var params = {
       pattern_id: pattern_id,
-      limit: 1,
     };
     
     return [
@@ -63,9 +62,7 @@ Router.route('/pattern/:_id/:mode?', {
           var pattern_id = Router.current().params._id;
         }
       }),
-      Meteor.subscribe('tags'),
-      // Meteor.subscribe('recent_patterns', {limit: 1}) // to check for current_weave_row
-      
+      Meteor.subscribe('tags'),     
     ];
   },
   action: function() {
@@ -112,14 +109,6 @@ Router.route('/user/:_id', {
 
     return Meteor.users.findOne({ _id: user_id });
   },
-  /* waitOn: function(){
-    var user_id = this.params._id;
-
-    return [   
-      // Meteor.subscribe('user_info', {limit: 1}),
-      // Meteor.subscribe('patterns', this.params),
-    ]
-  }, */
   action: function() {
     var user_id = this.params._id;
 

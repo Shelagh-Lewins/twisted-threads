@@ -27,7 +27,7 @@ Meteor.startup(function () {
 
   
   // TODO remove this! It should only run once
-  Meteor.users.find().forEach( function(user) {
+  /* Meteor.users.find().forEach( function(user) {
     var num = Patterns.find({
     $and: [
       { private: {$ne: true} },
@@ -36,7 +36,7 @@ Meteor.startup(function () {
 
 
     Meteor.call("count_public_patterns", user._id);
-  });
+  }); */
 
   // data migration to remove thumbnail_url // DO THIS WHEN MIGRATING TO HAVING IMAGES FOR PATTERNS
   /*Patterns.find().forEach( function(myDoc) {

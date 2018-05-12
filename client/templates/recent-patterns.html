@@ -1,8 +1,8 @@
 <template name="recent_patterns">
-{{#if Template.subscriptionsReady}}
 {{> left_column}}
 <div id="main_column">
 <h2>Recently viewed patterns</h2>
+{{#if patterns_ready}}
 {{#if recent_patterns.length}}
 {{#with recent_patterns}}
 	<div class="results">
@@ -14,11 +14,9 @@
 	</div>
 {{/with}}
 {{else}}
-<p>You havent yet viewed any patterns</p>
+<p>You haven't yet viewed any patterns</p>
+{{/if}}
 {{/if}}
 	</div>
-{{else}}
-  Loading...
-{{/if}}
 </template>
 
