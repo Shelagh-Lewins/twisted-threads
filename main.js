@@ -392,13 +392,15 @@ console.log(`Edited list ${JSON.stringify(patterns)}`);
 
     Session.set('pattern_subscriptions', 0);
 
+    // how many docs to return
     var params = {
       limit: Session.get('thumbnails_in_row')
-    }; // otherwise the server won't know how many docs to return
+    }; 
 
-    this.subscribe('patterns', params, {
+    this.subscribe('patterns', {
       onReady: function () { 
         Session.set('patterns_ready', true);
+
         Meteor.subscribe('user_info', params, {
           onReady: function() {
             Session.set('user_info_ready', true);
