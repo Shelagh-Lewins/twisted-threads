@@ -108,32 +108,19 @@ Meteor.publish('recent_patterns', function(params, trigger){
 });
 
 Meteor.publish('user_info', function(params, trigger){
-  // show only the current user and any users who have public patterns
-
+  // show the current user and any users who have public patterns
   check(params, Object);
   check(trigger, Match.Optional(Number));
 
   limit = params.limit;
 
-  /* var my_patterns = Patterns.find({
-    private: {$ne: true}
-  }).map(function(pattern) {return pattern.created_by}); */
-
-  /* var visible_users = Meteor.users.find({
-    profile.public_patterns_count: {$gt: 0}
-  }).map(function(user) {return user._id}); */
-
   // the user's emails will be returned but for other users, only public information should be shown.
-  var obj = {
-    profile: {
-      public_patterns_count: "{$gt: 0}"
-    }
-  };
+  var update = {};
+  update["profile.public_patterns_count"] = {$gt: 0}; // this construction is required to query a child property
 
   return Meteor.users.find(
-    {
-      $or: [{obj}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}
-    },
+    {$or: [update, {_id: this.userId}]},
+    {fields: {_id: 1, username: 1, profile: 1}},
     {
       limit: limit,
       sort: {"profile.name_sort": 1}

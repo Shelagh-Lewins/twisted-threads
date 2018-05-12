@@ -499,11 +499,10 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized", "You can only change the privacy on a pattern you created");
  
     Patterns.update(pattern_id, { $set: { private: set_to_private } });
-
-    // update the count of how many public patterns the user has
     Meteor.call("count_public_patterns", pattern.created_by);
   },
   count_public_patterns: function (user_id) {
+    // maintain a count of the user's public patterns, so we can easily see which users have public patterns
     var num = Patterns.find({
     $and: [
       { private: {$ne: true} },
