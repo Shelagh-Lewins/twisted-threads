@@ -922,21 +922,12 @@ Meteor.methods({
     var counted_patterns = Recent_Patterns.find(
         {},
         {sort: {accessed_at: -1}},
-    ).map(function(pattern) {return pattern._id});
-
-    counted_patterns.slice(0, Meteor.my_params.max_recents);
-
+    ).map(function(pattern) {
+      return pattern._id;
+    });
+    
+    counted_patterns = counted_patterns.slice(0, Meteor.my_params.max_recents);
     Recent_Patterns.remove({_id: {$nin:counted_patterns}});
-
-    var my_patterns = Patterns.find(
-      {
-        $or: [
-          { private: {$ne: true} },
-          { created_by: Meteor.userId() }
-        ]
-      }, 
-      {fields: { _id: 1 }},
-    ).map(function(pattern) {return pattern._id});
   },
   set_current_weave_row: function(pattern_id, index) {
     check(pattern_id, String);
