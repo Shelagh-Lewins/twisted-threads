@@ -87,6 +87,8 @@ Meteor.publish('recent_patterns', function(params, trigger){
   check(params, Object);
   check(trigger, Match.Optional(Number));
 
+  return Recent_Patterns.find({});
+
   limit = params.limit;
 
   var my_patterns = Patterns.find(
@@ -98,7 +100,7 @@ Meteor.publish('recent_patterns', function(params, trigger){
     },
     {
       limit: limit,
-      sort: {"created_at": -1}
+      sort: {"accessed_at": -1}
     },
   ).map(function(pattern) {return pattern._id});
 
@@ -113,16 +115,24 @@ Meteor.publish('user_info', function(params, trigger){
 
   limit = params.limit;
 
-  var my_patterns = Patterns.find({
+  /* var my_patterns = Patterns.find({
     private: {$ne: true}
-  }).map(function(pattern) {return pattern.created_by});
+  }).map(function(pattern) {return pattern.created_by}); */
+
+  /* var visible_users = Meteor.users.find({
+    profile.public_patterns_count: {$gt: 0}
+  }).map(function(user) {return user._id}); */
 
   // the user's emails will be returned but for other users, only public information should be shown.
-  // return [];
-  // return Meteor.users.find();
+  var obj = {
+    profile: {
+      public_patterns_count: "{$gt: 0}"
+    }
+  };
+
   return Meteor.users.find(
     {
-      $or: [{_id: {$in:my_patterns}}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}
+      $or: [{obj}, {_id: this.userId}]}, {fields: {_id: 1, username: 1, profile: 1}
     },
     {
       limit: limit,

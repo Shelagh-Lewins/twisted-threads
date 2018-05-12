@@ -252,7 +252,7 @@ if (Meteor.isClient) {
 
     else
       var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
-
+console.log(`recent_patterns helper. ids ${pattern_ids}`);
     // stored for "recent patterns" route pagination
     reactive_recent_patterns.clear();
     reactive_recent_patterns = new ReactiveArray(pattern_ids);
@@ -273,9 +273,9 @@ if (Meteor.isClient) {
       if (i >= Session.get('thumbnails_in_row') && limit) // home page
         break;
       
-      patterns.push(pattern);
+      patterns.push(id);
     }
-
+console.log(`Edited list ${JSON.stringify(patterns)}`);
     return patterns; // Note this is an array because order is important, so in the template use .length to find number of items, not .count
   });
 

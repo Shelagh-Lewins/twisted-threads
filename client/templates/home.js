@@ -172,13 +172,7 @@ Template.user_thumbnail.helpers({
       return "#CC9900";
   },
   number_of_patterns: function() {
-    var num = Patterns.find({
-    $and: [
-      { private: {$ne: true} },
-      { created_by: this._id }
-    ]}).count();
-    
-    return num;
+    return Meteor.users.findOne({_id: this._id}).profile.public_patterns_count;
   }
 });
 

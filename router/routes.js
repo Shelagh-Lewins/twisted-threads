@@ -64,7 +64,7 @@ Router.route('/pattern/:_id/:mode?', {
         }
       }),
       Meteor.subscribe('tags'),
-      Meteor.subscribe('recent_patterns', {limit: 1}) // to check for current_weave_row
+      // Meteor.subscribe('recent_patterns', {limit: 1}) // to check for current_weave_row
       
     ];
   },

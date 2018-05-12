@@ -25,6 +25,18 @@ Meteor.startup(function () {
     }
   });
 
+  Meteor.users.find().forEach( function(user) {
+    var num = Patterns.find({
+    $and: [
+      { private: {$ne: true} },
+      { created_by: user._id }
+    ]}).count();
+
+    console.log(`public patterns ${num}`);
+
+    Meteor.call("count_public_patterns", user._id);
+  });
+
   // data migration to remove thumbnail_url // DO THIS WHEN MIGRATING TO HAVING IMAGES FOR PATTERNS
   /*Patterns.find().forEach( function(myDoc) {
     Patterns.update({_id: myDoc._id}, {$unset: { thumbnail_url: "text"}});

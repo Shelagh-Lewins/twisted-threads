@@ -499,6 +499,24 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized", "You can only change the privacy on a pattern you created");
  
     Patterns.update(pattern_id, { $set: { private: set_to_private } });
+
+    // update the count of how many public patterns the user has
+    Meteor.call("count_public_patterns", pattern.created_by);
+  },
+  count_public_patterns: function (user_id) {
+    var num = Patterns.find({
+    $and: [
+      { private: {$ne: true} },
+      { created_by: user_id }
+    ]}).count();
+
+    var profile = Meteor.users.findOne({ _id: user_id}).profile;
+    if (typeof profile === "undefined")
+      profile = {};
+    
+    profile["public_patterns_count"] = num;
+
+    Meteor.users.update({_id: user_id}, {$set: {profile: profile}});
   },
   ///////////////////////////////
   // Stringify pattern data and save it
@@ -879,6 +897,7 @@ Meteor.methods({
 
     if (Recent_Patterns.find({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
     {
+      console.log(`add ${pattern_id} to recents`);
       // the pattern is not in the list, so add it
       Recent_Patterns.insert({
         pattern_id: pattern_id,
@@ -889,7 +908,7 @@ Meteor.methods({
     else
     {
       // the pattern is already in the list, so update it
-
+      console.log(`update ${pattern_id} in recents`);
       Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, { $set: {accessed_at: moment().valueOf()}});
     }
 
@@ -903,14 +922,35 @@ Meteor.methods({
   maintain_recent_patterns: function() {
     // remove any patterns that no longer exist or are now hidden from the user
     // this operation is on the server so results must be filtered
-    var my_patterns = Patterns.find({
-      $or: [
-        { private: {$ne: true} },
-        { created_by: Meteor.userId() }
-      ]
-    }).map(function(pattern) {return pattern._id});
+    var counted_patterns = Recent_Patterns.find(
+        {},
+        {sort: {accessed_at: -1}},
+    ).map(function(pattern) {return pattern._id});
+console.log(`counted_patterns before ${counted_patterns}`);
 
-    Recent_Patterns.remove({pattern_id: {$nin:my_patterns}});
+    counted_patterns.slice(0, Meteor.my_params.max_recents);
+
+    console.log(`after ${counted_patterns}`);
+    console.log(`Recent_Patterns.count 1 ${Recent_Patterns.find({}).count()}`);
+
+    Recent_Patterns.remove({_id: {$nin:counted_patterns}});
+    console.log(`Recent_Patterns.count 2 ${Recent_Patterns.find({}).count()}`);
+
+    var my_patterns = Patterns.find(
+      {
+        $or: [
+          { private: {$ne: true} },
+          { created_by: Meteor.userId() }
+        ]
+      }, 
+      {fields: { _id: 1 }},
+    ).map(function(pattern) {return pattern._id});
+
+    console.log(`my_patterns.length ${my_patterns.length}`);
+
+    // Recent_Patterns.remove({_id: {$nin:my_patterns}});
+
+    console.log(`Recent_Patterns.count 3 ${Recent_Patterns.find({}).count()}`);
   },
   set_current_weave_row: function(pattern_id, index) {
     check(pattern_id, String);
