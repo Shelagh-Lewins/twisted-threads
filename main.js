@@ -246,6 +246,12 @@ if (Meteor.isClient) {
         return true;
   });
 
+  // single pattern for view, print, weave
+  UI.registerHelper('pattern_ready', function() {
+    if (Session.get("pattern_ready"))
+        return true;
+  });
+
   UI.registerHelper('recents_ready', function() {
     if (Session.get("recents_ready"))
         return true;
@@ -377,7 +383,7 @@ if (Meteor.isClient) {
     Session.set('pattern_subscriptions', 0);
 
     // how many docs to return
-    var params = {
+    /* var params = {
       limit: Session.get('thumbnails_in_row')
     }; 
 
@@ -397,7 +403,7 @@ if (Meteor.isClient) {
       onReady: function() {
         Session.set('recents_ready', true);
       }
-    });
+    }); */
 
     // test rate limit
     /* for (let i = 0; i < 250; i++) {

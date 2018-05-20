@@ -1,4 +1,4 @@
- Meteor.publish('patterns', function(){
+ /*Meteor.publish('patterns', function(){
   // with fastrender, params are passed in as an object.
 
   // there is a subscription that passes in [] as params and I can't find where it is called. The current version of Match avoids error when this empty array is passed in, and everything seems to work. The issue occurs at first load or page refresh, not on navigating routes.
@@ -10,16 +10,39 @@
 
   // update: meteor --production --settings settings.json should simulate the minification locally where the server output can be viewed. However the app does not crash, it just generates the same Match failure in publish.js.
 
+  // return;
+
   return Patterns.find(
     {$or: [
       { private: {$ne: true} },
       { created_by: this.userId }
-    ]} // to keep queries quick, use findOne in the client
+    ]}, // to keep queries quick, use findOne in the client
+    // { fields: {name: 1, description: 1} }
   );
-});
+}); */
+
+ Meteor.publish('pattern', function(params){
+  check(params, Object);
+  check(params.pattern_id, String);
+
+  return Patterns.find(
+    { $and: 
+      [
+        { _id: params.pattern_id }, 
+        { $or: [
+          { private: {$ne: true} },
+          { created_by: this.userId }
+        ]}
+      ]
+    },
+    {
+      limit: 1
+    }
+  );
+ });
 
 // Publish images uploaded by the user
-Meteor.publish('images', function() {
+Meteor.publish('images', function(params) {
   return Images.find();
 });
 

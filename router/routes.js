@@ -54,15 +54,9 @@ Router.route('/pattern/:_id/:mode?', {
     var params = {
       pattern_id: pattern_id,
     };
-    
-    return [
 
-      Meteor.subscribe('patterns', params, {
-        onReady: function(){
-          var pattern_id = Router.current().params._id;
-        }
-      }),
-      Meteor.subscribe('tags'),     
+    return [  
+      Meteor.subscribe('pattern', params) 
     ];
   },
   action: function() {

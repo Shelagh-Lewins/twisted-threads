@@ -5,6 +5,28 @@ Template.home.rendered = function() {
 
   /* currently, there is a button per edit mode. But the code is in place so you can select a mode and then press a single button. */
   Session.set('edit_mode', 'simulation');
+
+  var params = {
+    limit: Session.get('thumbnails_in_row')
+  }; 
+
+  /* this.subscribe('patterns', {
+    onReady: function () { 
+      Session.set('patterns_ready', true);
+
+      Meteor.subscribe('user_info', params, {
+        onReady: function() {
+          Session.set('user_info_ready', true);
+        }
+      });
+    }
+  }); */
+
+  this.subscribe('recent_patterns', params, {
+    onReady: function() {
+      Session.set('recents_ready', true);
+    }
+  });
 }
 
 // Subsidiary 'home' pages

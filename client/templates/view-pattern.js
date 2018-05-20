@@ -31,6 +31,8 @@ Template.view_pattern.rendered = function() {
     Session.set("hide_while_loading", false);
   }, 1);
 
+  
+
 
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
@@ -46,17 +48,33 @@ Template.view_pattern.rendered = function() {
 
 Template.view_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
+  Meteor.my_functions.view_pattern_created(pattern_id);
 
-  if (Meteor.my_functions.pattern_exists(pattern_id));
-  {
-    Meteor.my_functions.view_pattern_created(pattern_id);
 
-    /////////
-    // Images
-    Tracker.autorun(function() {
-      Meteor.subscribe('images');
-    });
-  }
+  /* var pattern_id = Router.current().params._id;
+  Session.set('pattern_ready', false);
+
+  var params = { pattern_id: pattern_id };
+    console.log('subscribing');
+      this.subscribe('pattern', params, {
+        onReady: function() {
+          console.log('subscribed');
+          Session.set('pattern_ready', true);
+
+          if (Meteor.my_functions.pattern_exists(pattern_id));
+          {
+            Meteor.my_functions.view_pattern_created(pattern_id);
+
+        /////////
+        // Images
+        Tracker.autorun(function() {
+          Meteor.subscribe('images');
+        });
+      }
+    }
+  }); */
+
+  
 });
 
 Template.pattern_not_found.helpers({
