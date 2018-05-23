@@ -40,60 +40,14 @@
 {{#if thumbnails_in_row}}
 
 {{> recent_patterns_home}}
-<!-- {{#with recent_patterns true}}{{#if this.length}}
-<h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
-<div class="wrapper">
-<ul class="patterns">
-{{#each this}}
-{{> pattern_thumbnail}}
-{{/each}}
-</ul>
-</div>
-{{/if}}{{/with}} -->
 
-{{#if patterns_ready}}
-{{#with new_patterns}}{{#if this.count}}
-<h2 style="width: {{header_width}}px"><a href="{{pathFor route='new_patterns'}}"><span class="text">New patterns</span><span class="more">See more</span></a></h2>
-<div class="wrapper">
-<ul class="patterns">
 {{> new_patterns_home}}
-</ul></div>
-{{/if}}{{/with}}
-{{/if}}
 
-{{#if currentUser}}
-{{#if patterns_ready}}
-{{#with my_patterns}}{{#if this.count}}
-<h2 style="width: {{header_width}}px"><a href="{{pathFor route='my_patterns'}}"><span class="text">My patterns</span><span class="more">See more</span></a></h2>
-<div class="wrapper">
-<ul class="patterns">
 {{> my_patterns_home}}
-</ul></div>
-{{/if}}{{/with}}
-{{/if}}
-{{/if}}
 
-{{#if patterns_ready}}{{#if recents_ready}}
-{{#with all_patterns}}{{#if this.count}}
-<h2 style="width: {{header_width}}px"><a href="{{pathFor route='all_patterns'}}"><span class="text">All patterns</span><span class="more">See more</span></a></h2>
-<div class="wrapper">
-<ul class="patterns">
 {{> all_patterns_home}}
-</ul></div>
-{{/if}}{{/with}}
-{{/if}}{{/if}}
 
-{{#if patterns_ready}}{{#if user_info_ready}}
-{{#with users}}{{#if this.count}}
-<h2 style="width: {{header_width}}px"><a href="{{pathFor route='users'}}"><span class="text">People</span><span class="more">See more</span></a></h2>
-<div class="wrapper">
-<ul class="users">
-{{#each this}}
-{{> user_thumbnail}}
-{{/each}}
-</ul></div>
-{{/if}}{{/with}}
-{{/if}}{{/if}}
+{{> users_home}}
 
 {{/if}}
 </template>
@@ -207,7 +161,7 @@ Show patterns with between
 
 <template name="recent_patterns_home">
 {{#if Template.subscriptionsReady}}
-  {{#with recent_patterns}}{{#if this.length}}
+  {{#with recent_patterns_home}}{{#if this.length}}
   <h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
   <div class="wrapper">
   <ul class="patterns">
@@ -220,17 +174,58 @@ Show patterns with between
 {{/if}}
 </template>
 
-
-
-
-<template name="my_patterns_home">
-{{> pages}}
+<template name="new_patterns_home">
+{{#if Template.subscriptionsReady}}
+  {{#with new_patterns_home}}{{#if this.count}}
+  <h2 style="width: {{header_width}}px"><a href="{{pathFor route='new_patterns'}}"><span class="text">New patterns</span><span class="more">See more</span></a></h2>
+  <div class="wrapper">
+  <ul class="patterns">
+  {{#each this}}
+  {{> pattern_thumbnail}}
+  {{/each}}
+  </ul></div>
+  {{/if}}{{/with}}
+{{/if}}
 </template>
 
-<template name="new_patterns_home">
-{{> pages}}
+<template name="my_patterns_home">
+{{#if Template.subscriptionsReady}}
+  {{#with my_patterns_home}}{{#if this.count}}
+  <h2 style="width: {{header_width}}px"><a href="{{pathFor route='my_patterns'}}"><span class="text">My patterns</span><span class="more">See more</span></a></h2>
+  <div class="wrapper">
+  <ul class="patterns">
+  {{#each this}}
+  {{> pattern_thumbnail}}
+  {{/each}}
+  </ul></div>
+  {{/if}}{{/with}}
+{{/if}}
 </template>
 
 <template name="all_patterns_home">
-{{> pages}}
+{{#if Template.subscriptionsReady}}
+{{#with all_patterns_home}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='all_patterns'}}"><span class="text">All patterns</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="patterns">
+  {{#each this}}
+  {{> pattern_thumbnail}}
+  {{/each}}
+</ul></div>
+{{/if}}{{/with}}
+{{/if}}
+</template>
+
+<template name="users_home">
+{{#if Template.subscriptionsReady}}
+{{#with users_home}}{{#if this.count}}
+<h2 style="width: {{header_width}}px"><a href="{{pathFor route='users'}}"><span class="text">People</span><span class="more">See more</span></a></h2>
+<div class="wrapper">
+<ul class="users">
+{{#each this}}
+{{> user_thumbnail}}
+{{/each}}
+</ul></div>
+{{/if}}{{/with}}
+{{/if}}
 </template>

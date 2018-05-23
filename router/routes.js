@@ -41,7 +41,6 @@ Router.route('/users', {
   template: 'users'
 });
 
-
 Router.route('/pattern/:_id/:mode?', {
   name: 'pattern',
   data: function(){
@@ -103,6 +102,16 @@ Router.route('/user/:_id', {
 
     return Meteor.users.findOne({ _id: user_id });
   },
+  waitOn: function(){
+    var user_id = this.params._id;
+    var params = {
+      user_id: user_id,
+    };
+
+    return [  
+      Meteor.subscribe('user', params) 
+    ];
+  },
   action: function() {
     var user_id = this.params._id;
 
@@ -117,16 +126,23 @@ Router.route('/user/:_id', {
 Router.route('/account-settings', {
   name: 'account_settings',
   data: function() {
-    var user_id = this.params._id;
+    var user_id = Meteor.userId();
+
     return Meteor.users.findOne({ _id: user_id });
   },
   waitOn: function(){
-    return [
-      Meteor.subscribe('user_info')
-    ]
+    var user_id = Meteor.userId();
+
+    var params = {
+      user_id: user_id,
+    };
+
+    return [  
+      Meteor.subscribe('user', params) 
+    ];
   },
   action: function() {
-    var user_id = this.params._id;
+    // var user_id = this.params._id;
     this.render("account_settings");
   }
 })

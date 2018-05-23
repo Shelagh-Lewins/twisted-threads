@@ -225,82 +225,10 @@ if (Meteor.isClient) {
   });
 
   ////////////////////
-
-  Template.new_patterns_home.onRendered(function() {
-    NewPatternsHome.requestPage(1);
-  });
-
-  Template.my_patterns_home.onRendered(function() {
-    MyPatternsHome.requestPage(1);
-  });
-
-  Template.all_patterns_home.onRendered(function() {
-    AllPatternsHome.requestPage(1);
-  });
-
-  ///////////////
-
-  // check for subscriptions to be ready
-  UI.registerHelper('patterns_ready', function() {
-    if (Session.get("patterns_ready"))
-        return true;
-  });
-
-  // single pattern for view, print, weave
-  UI.registerHelper('pattern_ready', function() {
-    if (Session.get("pattern_ready"))
-        return true;
-  });
-/*
-  UI.registerHelper('recents_ready', function() {
-    if (Session.get("recents_ready"))
-        return true;
-  }); */
-
-  UI.registerHelper('user_info_ready', function() {
-    if (Session.get("user_info_ready"))
-        return true;
-  });
-
   // used to check page is sufficiently rendered for number of thumbnails to have been calculated
   UI.registerHelper('thumbnails_in_row', function() {
     return Session.get('thumbnails_in_row');
   });
-
-  // info for Home page lists
-  /* UI.registerHelper('recent_patterns', function(limit){
-    if (Meteor.userId()) // user is signed in
-      var pattern_ids = Recent_Patterns.find({}, {sort: {accessed_at: -1}}).map(function(pattern){ return pattern.pattern_id});
-
-    else
-      var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
-console.log(`recent patterns ${pattern_ids}`);
-    // stored for "recent patterns" route pagination
-    reactive_recent_patterns.clear();
-    reactive_recent_patterns = new ReactiveArray(pattern_ids);
-
-    // return the patterns in recency order
-    var patterns = [];
-
-    for (var i=0; i<pattern_ids.length; i++)
-    {
-      var id = pattern_ids[i];
-      // Check for null id or non-existent pattern
-      if (id == null) continue;
-      if (typeof id === "undefined") continue;
-      
-      var pattern = Patterns.findOne({_id: id});
-
-      if (typeof pattern === "undefined") continue;
-
-      if (i >= Session.get('thumbnails_in_row') && limit) // home page
-        break;
-
-      patterns.push(pattern);
-    }
-
-    return patterns; // Note this is an array because order is important, so in the template use .length to find number of items, not .count
-  }); */
 
   UI.registerHelper('my_patterns', function(){
     if (!Meteor.userId())
@@ -312,7 +240,6 @@ console.log(`recent patterns ${pattern_ids}`);
     }
 
     return Patterns.find({created_by: Meteor.userId()}, obj);
-    // This is a cursor use .count in template to find number of items
   });
 
   UI.registerHelper('new_patterns', function(){
@@ -322,7 +249,6 @@ console.log(`recent patterns ${pattern_ids}`);
     }
 
     return Patterns.find({}, obj);
-    // This is a cursor use .count in template to find number of items
   });
 
   UI.registerHelper('all_patterns', function(){
@@ -332,9 +258,6 @@ console.log(`recent patterns ${pattern_ids}`);
     }
 
     return Patterns.find({}, obj);
-
-    // return Patterns.find({}, obj);
-    // This is a cursor use .count in template to find number of items
   });
 
   UI.registerHelper('users', function(){
@@ -344,7 +267,6 @@ console.log(`recent patterns ${pattern_ids}`);
     }
 
     return Meteor.users.find({}, obj);
-    // This is a cursor use .count in template to find number of items
   });
 
   // *** has the user permission to create a new pattern? *** //
@@ -375,43 +297,6 @@ console.log(`recent patterns ${pattern_ids}`);
   });
 
   ////////////////////////////////////
-  Template.header.onRendered(function() {
-    Session.set('patterns_ready', false);
-    Session.set('recents_ready', false);
-    Session.set('user_info_ready', false);
-
-    Session.set('pattern_subscriptions', 0);
-
-    // how many docs to return
-    /* var params = {
-      limit: Session.get('thumbnails_in_row')
-    }; 
-
-    this.subscribe('patterns', {
-      onReady: function () { 
-        Session.set('patterns_ready', true);
-
-        Meteor.subscribe('user_info', params, {
-          onReady: function() {
-            Session.set('user_info_ready', true);
-          }
-        });
-      }
-    });
-
-    this.subscribe('recent_patterns', params, {
-      onReady: function() {
-        Session.set('recents_ready', true);
-      }
-    }); */
-
-    // test rate limit
-    /* for (let i = 0; i < 250; i++) {
-      console.log(`i ${i}`);
-      Meteor.subscribe('patterns', {'i': i});
-    } */
-  });
-
   Template.search.helpers({
     indexes: function () {
       return [patternsIndex, usersIndex];
@@ -782,25 +667,6 @@ console.log(`recent patterns ${pattern_ids}`);
   ///////////////////////////////////
   // reacting to database changes
   Tracker.autorun(function (computation) {
-
-    // The publish functions don't automatically update queries to other collections. So the client resubscribes to pattern-related collections whenever the list of patterns that the user can see changes.
-    // my_pattern_ids detects that Patterns has changed. Math.random triggers the re-subscription, otherwise Meteor refuses to run it.
-
-    var params = {
-      limit: Session.get('thumbnails_in_row')
-    };
-/*
-    if (Session.equals('patterns_ready', true)) // wait until patterns are loaded
-    {
-      var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
-      if (my_pattern_ids)
-      {
-        Meteor.subscribe('recent_patterns', params, Math.random());
-      }
-    } */
-    if (Session.equals('patterns_ready', true) && Session.equals('recents_ready', true))
-      Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
-
     // detect login / logout
     var currentUser = Meteor.user();
     if(currentUser){

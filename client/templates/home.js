@@ -7,10 +7,13 @@ Template.home.rendered = function() {
   Session.set('edit_mode', 'simulation');
 
   Session.set('recent_patterns_count', 0);
+
+  Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
 }
 
 // Short lists of first few patterns / users within each category, displayed on Home page
-Template.recent_patterns_home.created = function() {
+// Left column menu
+Template.left_column.created = function() {
   
   params = {
     pattern_ids: Meteor.my_functions.get_recent_pattern_ids(),
@@ -26,10 +29,27 @@ Template.recent_patterns_home.created = function() {
   });
 };
 
-// Used on Home page
+// Recent Patterns
+Template.recent_patterns_home.created = function() {
+  Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
+  
+  params = {
+    pattern_ids: Meteor.my_functions.get_recent_pattern_ids(),
+  };
+
+  this.subscribe('recent_patterns', params, {
+    onReady: function() {
+      Session.set('recent_patterns_count', Patterns.find(
+        { _id: {$in: params.pattern_ids} },
+        { fields: {_id: 1}},
+      ).count());
+    }
+  });
+};
+
 // Recent Patterns are limited in number and not paginated.
 Template.recent_patterns_home.helpers({
-  'recent_patterns': function(){
+  'recent_patterns_home': function(){
     var  pattern_ids = Meteor.my_functions.get_recent_pattern_ids();
 
     // return patterns in the original array order
@@ -43,25 +63,137 @@ Template.recent_patterns_home.helpers({
   }
 });
 
+// New Patterns preview
+Template.new_patterns_home.created = function() {
+  this.subscribe('new_patterns');
+};
+
+Template.new_patterns_home.helpers({
+  'new_patterns_home': function(){
+    return Patterns.find(
+      {
+        $or: [
+          { private: {$ne: true} },
+          { created_by: Meteor.userId() }
+        ]
+      },
+      {
+        limit: Meteor.my_params.max_recents,
+        sort: {created_at: -1},
+      }
+    );
+  }
+});
+
+// My Patterns preview
+Template.my_patterns_home.created = function() {
+  this.subscribe('my_patterns');
+};
+
+Template.my_patterns_home.helpers({
+  'my_patterns_home': function(){
+    return Patterns.find(
+      { created_by: Meteor.userId() },
+      {
+        limit: Session.get('thumbnails_in_row'),
+        sort: {name_sort: 1},
+      }
+    );
+  }
+});
+
+// All Patterns preview
+Template.all_patterns_home.created = function() {
+  this.subscribe('all_patterns');
+};
+
+Template.all_patterns_home.helpers({
+  'all_patterns_home': function(){
+    return Patterns.find(
+      {
+        $or: [
+          { private: {$ne: true} },
+          { created_by: Meteor.userId() },
+        ]
+      },
+      {
+        limit: Session.get('thumbnails_in_row'),
+        sort: {name_sort: 1},
+      }
+    );
+  }
+});
+
+// Users preview
+Template.users_home.created = function() {
+  this.subscribe('users_home');
+};
+
+Template.users_home.helpers({
+  'users_home': function(){
+    var obj = {
+      'sort': { 'profile.name_sort': 1 },
+      'limit': Session.get('thumbnails_in_row')
+    }
+
+    return Meteor.users.find({}, obj);
+  }
+});
+
 // Subsidiary 'home' pages. Paginated.
+// Recent Patterns page
 Template.recent_patterns.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();
   Session.set('thumbnails_in_row', Meteor.my_functions.thumbnails_in_row());
-}
+  Session.set('recent_patterns_count', 0);
+};
 
+Template.recent_patterns.created = function() {
+  params = {
+    pattern_ids: Meteor.my_functions.get_recent_pattern_ids(),
+  };
+
+  this.subscribe('recent_patterns', params, {
+    onReady: function() {
+      Session.set('recent_patterns_count', Patterns.find(
+        { _id: {$in: params.pattern_ids} },
+        { fields: {_id: 1}},
+      ).count());
+    }
+  });
+};
+
+Template.recent_patterns.helpers({
+  'recent_patterns': function(){
+    var  pattern_ids = Meteor.my_functions.get_recent_pattern_ids();
+
+    // return patterns in the original array order
+    var sorted_patterns = Patterns.find(
+        {_id: {$in:pattern_ids}}
+      ).fetch().sort((a,b) => {
+      return pattern_ids.indexOf(a._id) === pattern_ids.indexOf(b._id) ? 0 : (pattern_ids.indexOf(a._id) < pattern_ids.indexOf(b._id) ? -1 : 1);
+    });
+
+    return sorted_patterns;
+  }
+});
+
+// New Patterns page
 Template.new_patterns.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();
   Session.set('thumbnails_in_row', Meteor.my_functions.thumbnails_in_row());
-}
+};
 
+// My Patterns page
 Template.my_patterns.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();
   Session.set('thumbnails_in_row', Meteor.my_functions.thumbnails_in_row());
-}
+};
 
+// All Patterns page
 Template.all_patterns.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();

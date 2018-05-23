@@ -4,6 +4,7 @@
 <div id="main_column">
 {{#if currentUser}}
 {{#with currentUser}}
+<h1>{{username}}</h1>
 <div class="user_info">
 {{> editable_field extendContext collection="users" property="description" data=profile.description multiple=true button_text="Edit profile" placeholder_text="Tap \"Edit description\" to enter a description"}}
 </div>

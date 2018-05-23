@@ -1222,7 +1222,6 @@ Meteor.my_functions = {
   // Recent Patterns
   add_to_recent_patterns: function(pattern_id)
   {
-    
     if (pattern_id == null)
         return;
 
@@ -2407,14 +2406,25 @@ Meteor.my_functions = {
     if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
       return; // the pattern doesn't exist
 
-    if (Meteor.userId()) // the user is signed in
+    if (Meteor.userId()) // the user is signed in, look for the pattern in their profile
     {
-      if (Recent_Patterns.find({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, {fields: {_id: 1}}, {limit: 1}).count() != 0) // the pattern is in Recent_Patterns
+      // create an empty array if there is no existing list of recent patterns for this user
+      var recent_patterns = (typeof Meteor.user().profile.recent_patterns === "undefined") ? [] : Meteor.user().profile.recent_patterns;
+
+      // is the pattern already in the list?
+      var index = -1;
+      for (var i=0; i < recent_patterns.length; i++)
       {
-        var recent_pattern = Recent_Patterns.findOne({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]});
-        
-        if (typeof recent_pattern.current_weave_row !== "undefined")
-          current_weave_row = recent_pattern.current_weave_row;
+        if (recent_patterns[i].pattern_id == pattern_id)
+        {
+          index = i;
+          break;
+        }
+      }
+
+      if (index !== -1)
+      {
+        current_weave_row = typeof recent_patterns[i].current_weave_row !== "undefined" ? recent_patterns[i].current_weave_row : 1;
       }
     }
     else

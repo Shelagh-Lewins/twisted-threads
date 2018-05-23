@@ -923,16 +923,16 @@ Meteor.methods({
     var recent_pattern = {
       pattern_id: pattern_id,
       accessed_at: moment().valueOf(),            // current time
+      current_weave_row: 1,
     }
 
-    // recent patterns are stored as part of the user's info
+    // is the pattern already in the list?
     var index = -1;
     for (var i=0; i < recent_patterns.length; i++)
     {
       if (recent_patterns[i].pattern_id == pattern_id)
       {
         index = i;
-        recent_pattern.current_weave_row = recent_patterns[i].current_weave_row;
         break;
       }
     }
@@ -948,12 +948,16 @@ Meteor.methods({
     }
     // the pattern is in the list, so update it
     else {
+      // note the current weave row
+      var stored_weave_row = recent_patterns[index].current_weave_row;
+      if (typeof stored_weave_row === "number")
+        recent_pattern.current_weave_row = stored_weave_row;
+
       // remove the existing occurence of the pattern
-      recent_patterns.splice(index, 1);
+      recent_patterns.splice(index, 1);  
 
       // and add the pattern as the most recent i.e. first element
       recent_patterns.unshift(recent_pattern);
-      // recent_patterns[index] = recent_pattern;
     }
 
     var update = {};
@@ -965,7 +969,8 @@ Meteor.methods({
     // remove any patterns that no longer exist or are now hidden from the user
     var recent_patterns = (typeof Meteor.user().profile.recent_patterns === "undefined") ? [] : Meteor.user().profile.recent_patterns;
 
-    recent_patterns = counted_patterns.slice(0, Meteor.my_params.max_recents);
+    // don't store too many patterns
+    recent_patterns = recent_patterns.slice(0, Meteor.my_params.max_recents);
 
     var update = {};
     update["profile.recent_patterns"] = recent_patterns;
@@ -982,7 +987,7 @@ Meteor.methods({
     if (index < 1)
       return;
 
-    var pattern = Patterns.findOne({_id: pattern_id});
+    var pattern = Patterns.findOne({_id: pattern_id}, { fields: { _id : 1 }});
 
     if (typeof pattern === "undefined")
       return;
@@ -995,20 +1000,17 @@ Meteor.methods({
 
     var recent_patterns = (typeof Meteor.user().profile.recent_patterns === "undefined") ? [] : Meteor.user().profile.recent_patterns;
 
-    var index = -1;
     for (var i=0; i < recent_patterns.length; i++)
     {
-      if (recent_patternss[i].pattern_id == pattern_id)
+      if (recent_patterns[i].pattern_id == pattern_id)
       {
-        recent_patternss[i].current_weave_row = index;   
+        recent_patterns[i].current_weave_row = index;   
         var update = {};
         update["profile.recent_patterns"] = recent_patterns;
         Meteor.users.update({_id: Meteor.userId()}, {$set: update});   
         break;
       }
     }
-
-    // Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id:Meteor.userId()}]}, { $set: {current_weave_row: index}});
 
     return;
   },
