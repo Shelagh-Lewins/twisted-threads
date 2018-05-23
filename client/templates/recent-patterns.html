@@ -2,9 +2,8 @@
 {{> left_column}}
 <div id="main_column">
 <h2>Recently viewed patterns</h2>
-{{#if patterns_ready}}
-{{#if recent_patterns.length}}
-{{#with recent_patterns}}
+{{#if Template.subscriptionsReady}}
+{{#with recent_patterns}}{{#if this.length}}
 	<div class="results">
 	<ul class="patterns">
 	{{#each this}}
@@ -12,10 +11,10 @@
 	{{/each}}
 	</ul>
 	</div>
-{{/with}}
 {{else}}
-<p>You haven't yet viewed any patterns</p>
+	<p>You haven't yet viewed any patterns</p>
 {{/if}}
+{{/with}}
 {{/if}}
 	</div>
 </template>

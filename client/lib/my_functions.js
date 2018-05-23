@@ -1283,13 +1283,31 @@ Meteor.my_functions = {
       window.localStorage.setItem('recent_patterns', JSON.stringify(recent_patterns));
     }
   },
-  get_local_recent_pattern_ids: function(){
-    var pattern_ids = JSON.parse(window.localStorage.getItem('recent_patterns'));
+  get_recent_pattern_ids: function(){
+    var pattern_ids = [];
+
+    if (Meteor.userId()) // user is signed in
+    {
+
+      var recent_patterns = (typeof Meteor.user().profile.recent_patterns === "undefined") ? [] : Meteor.user().profile.recent_patterns;
+
+      for (var i=0; i < recent_patterns.length; i++)
+      {  
+        pattern_ids.push(recent_patterns[i].pattern_id);
+      }
+    }
+    else
+    {
+      // pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
+      pattern_ids = JSON.parse(window.localStorage.getItem('recent_patterns'));
+    }
+
+    // var pattern_ids = JSON.parse(window.localStorage.getItem('recent_patterns'));
 
     if (pattern_ids == null)
         return [];
 
-    // check the patterns exist / can be viewed
+    // check the pattern ids exist
     var checked_pattern_ids = [];
     for (var i=0; i<pattern_ids.length; i++)
     {
@@ -1297,7 +1315,7 @@ Meteor.my_functions = {
 
       if (id == null) continue;
       if (typeof id === "undefined") continue;
-      if (Patterns.find({_id: id}).count() == 0) continue;
+      // if (Patterns.find({_id: id}).count() == 0) continue;
 
       checked_pattern_ids.push(id);
     }

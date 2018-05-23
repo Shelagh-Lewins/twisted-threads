@@ -23,7 +23,7 @@ if (Meteor.isClient) {
     Session.set('display_min_tablets', 1);
   });
 
-  reactive_recent_patterns = new ReactiveArray();
+  // reactive_recent_patterns = new ReactiveArray();
 
   //////////////////////////////
   // Helpers for templates that may be used on multiple pages
@@ -251,11 +251,11 @@ if (Meteor.isClient) {
     if (Session.get("pattern_ready"))
         return true;
   });
-
+/*
   UI.registerHelper('recents_ready', function() {
     if (Session.get("recents_ready"))
         return true;
-  });
+  }); */
 
   UI.registerHelper('user_info_ready', function() {
     if (Session.get("user_info_ready"))
@@ -268,13 +268,13 @@ if (Meteor.isClient) {
   });
 
   // info for Home page lists
-  UI.registerHelper('recent_patterns', function(limit){
+  /* UI.registerHelper('recent_patterns', function(limit){
     if (Meteor.userId()) // user is signed in
       var pattern_ids = Recent_Patterns.find({}, {sort: {accessed_at: -1}}).map(function(pattern){ return pattern.pattern_id});
 
     else
       var pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
-
+console.log(`recent patterns ${pattern_ids}`);
     // stored for "recent patterns" route pagination
     reactive_recent_patterns.clear();
     reactive_recent_patterns = new ReactiveArray(pattern_ids);
@@ -300,7 +300,7 @@ if (Meteor.isClient) {
     }
 
     return patterns; // Note this is an array because order is important, so in the template use .length to find number of items, not .count
-  });
+  }); */
 
   UI.registerHelper('my_patterns', function(){
     if (!Meteor.userId())
@@ -789,7 +789,7 @@ if (Meteor.isClient) {
     var params = {
       limit: Session.get('thumbnails_in_row')
     };
-
+/*
     if (Session.equals('patterns_ready', true)) // wait until patterns are loaded
     {
       var my_pattern_ids = Patterns.find({}, {fields: {_id: 1}}).map(function(pattern) {return pattern._id});
@@ -797,7 +797,7 @@ if (Meteor.isClient) {
       {
         Meteor.subscribe('recent_patterns', params, Math.random());
       }
-    }
+    } */
     if (Session.equals('patterns_ready', true) && Session.equals('recents_ready', true))
       Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
 

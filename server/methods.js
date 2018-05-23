@@ -485,8 +485,32 @@ Meteor.methods({
     if (pattern.created_by != Meteor.userId())
       throw new Meteor.Error("not-authorized", "You can only remove patterns that you created");
 
+    // remove from Patterns collection
     Patterns.remove(pattern_id);
-    Recent_Patterns.remove({pattern_id: pattern_id});
+
+    // remove from Recent Patterns list
+    var recent_patterns = (typeof Meteor.user().profile.recent_patterns === "undefined") ? [] : Meteor.user().profile.recent_patterns;
+
+    var index = -1;
+    for (var i=0; i < recent_patterns.length; i++)
+    {
+      if (recent_patterns[i].pattern_id == pattern_id)
+      {
+        index = i;
+        break;
+      }
+    }
+
+    if (index > -1) {
+      recent_patterns.splice(index, 1);
+    }
+
+    var update = {};
+    update["profile.recent_patterns"] = recent_patterns;
+
+    Meteor.users.update({_id: Meteor.userId()}, {$set: update});
+
+    // remove list of associated images
     Images.remove({used_by: pattern_id});
   },
   set_private: function (pattern_id, set_to_private) {
@@ -883,51 +907,70 @@ Meteor.methods({
   //////////////////////////////////////
   // Recent patterns
   add_to_recent_patterns: function(pattern_id) {
-    // Add a pattern to the Recent_Patterns collection
-    // If it's already in the collection, update the accessed_at time
-    // Recent patterns are stored for each user separately
+    // Add a pattern to the Recent_Patterns list in the user's profile
+    // If it's already in the list, update the accessed_at time
     check(pattern_id, String);
 
     if (!Meteor.userId()) // user is not signed in
       return;
 
-    if (Patterns.find({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
+    if (typeof Patterns.findOne({_id: pattern_id}, {fields: {_id: 1}}, {limit: 1}) === "undefined")
       return; // the pattern doesn't exist
 
-    if (Recent_Patterns.find({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, {fields: {_id: 1}}, {limit: 1}).count() == 0)
-    {
-      // the pattern is not in the list, so add it
-      Recent_Patterns.insert({
-        pattern_id: pattern_id,
-        accessed_at: moment().valueOf(),            // current time
-        user_id: Meteor.userId()
-      });
-    }
-    else
-    {
-      // the pattern is already in the list, so update it
-      Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id: Meteor.userId()}]}, { $set: {accessed_at: moment().valueOf()}});
+    // create an empty array if there is no existing list of recent patterns for this user
+    var recent_patterns = (typeof Meteor.user().profile.recent_patterns === "undefined") ? [] : Meteor.user().profile.recent_patterns;
+
+    var recent_pattern = {
+      pattern_id: pattern_id,
+      accessed_at: moment().valueOf(),            // current time
     }
 
-    if (Recent_Patterns.find({user_id: Meteor.userId()}).count() > Meteor.my_params.max_recents) // don't store too many patterns for any one user
+    // recent patterns are stored as part of the user's info
+    var index = -1;
+    for (var i=0; i < recent_patterns.length; i++)
     {
-      var oldest_id = Recent_Patterns.find({user_id: Meteor.userId()}, {sort: {accessed_at: 1}}, {limit: 1}).fetch()[0]._id;
-
-      Recent_Patterns.remove({_id: oldest_id});
+      if (recent_patterns[i].pattern_id == pattern_id)
+      {
+        index = i;
+        recent_pattern.current_weave_row = recent_patterns[i].current_weave_row;
+        break;
+      }
     }
+
+    // the pattern is not in the list, so add it
+    if (index === -1)
+    {
+      recent_patterns.unshift(recent_pattern);
+
+      // don't store too many patterns
+      if (recent_patterns.length > Meteor.my_params.max_recents)
+        recent_patterns.pop();
+    }
+    // the pattern is in the list, so update it
+    else {
+      // remove the existing occurence of the pattern
+      recent_patterns.splice(index, 1);
+
+      // and add the pattern as the most recent i.e. first element
+      recent_patterns.unshift(recent_pattern);
+      // recent_patterns[index] = recent_pattern;
+    }
+
+    var update = {};
+    update["profile.recent_patterns"] = recent_patterns;
+
+    Meteor.users.update({_id: Meteor.userId()}, {$set: update});
   },
   maintain_recent_patterns: function() {
     // remove any patterns that no longer exist or are now hidden from the user
-    // this operation is on the server so results must be filtered
-    var counted_patterns = Recent_Patterns.find(
-        {},
-        {sort: {accessed_at: -1}},
-    ).map(function(pattern) {
-      return pattern._id;
-    });
-    
-    counted_patterns = counted_patterns.slice(0, Meteor.my_params.max_recents);
-    Recent_Patterns.remove({_id: {$nin:counted_patterns}});
+    var recent_patterns = (typeof Meteor.user().profile.recent_patterns === "undefined") ? [] : Meteor.user().profile.recent_patterns;
+
+    recent_patterns = counted_patterns.slice(0, Meteor.my_params.max_recents);
+
+    var update = {};
+    update["profile.recent_patterns"] = recent_patterns;
+
+    Meteor.users.update({_id: Meteor.userId()}, {$set: update});
   },
   set_current_weave_row: function(pattern_id, index) {
     check(pattern_id, String);
@@ -949,7 +992,23 @@ Meteor.methods({
     if (index > number_of_rows)
       return;
 
-    Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id:Meteor.userId()}]}, { $set: {current_weave_row: index}});
+
+    var recent_patterns = (typeof Meteor.user().profile.recent_patterns === "undefined") ? [] : Meteor.user().profile.recent_patterns;
+
+    var index = -1;
+    for (var i=0; i < recent_patterns.length; i++)
+    {
+      if (recent_patternss[i].pattern_id == pattern_id)
+      {
+        recent_patternss[i].current_weave_row = index;   
+        var update = {};
+        update["profile.recent_patterns"] = recent_patterns;
+        Meteor.users.update({_id: Meteor.userId()}, {$set: update});   
+        break;
+      }
+    }
+
+    // Recent_Patterns.update({ $and: [{pattern_id: pattern_id}, {user_id:Meteor.userId()}]}, { $set: {current_weave_row: index}});
 
     return;
   },

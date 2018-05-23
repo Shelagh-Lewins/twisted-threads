@@ -9,7 +9,7 @@
 <div id="left_column">
 <ul class="left_menu">
 <li class="{{selected "home"}}"><a href="{{pathFor route='home'}}"><span>Home</span></a></li>
-{{#if recent_patterns.length}}
+{{#if recent_patterns_count}}
 <li class="{{selected "recent_patterns"}}"><a href="{{pathFor route='recent_patterns'}}"><span>Recently viewed</span></a></li>
 {{/if}}
 <li class="{{selected "new_patterns"}}"><a href="{{pathFor route='new_patterns'}}"><span>New patterns</span></a></li>
@@ -39,7 +39,8 @@
 
 {{#if thumbnails_in_row}}
 
-{{#with recent_patterns true}}{{#if this.length}}
+{{> recent_patterns_home}}
+<!-- {{#with recent_patterns true}}{{#if this.length}}
 <h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
 <div class="wrapper">
 <ul class="patterns">
@@ -48,7 +49,7 @@
 {{/each}}
 </ul>
 </div>
-{{/if}}{{/with}}
+{{/if}}{{/with}} -->
 
 {{#if patterns_ready}}
 {{#with new_patterns}}{{#if this.count}}
@@ -203,6 +204,24 @@ Show patterns with between
 
 </div>
 </template>
+
+<template name="recent_patterns_home">
+{{#if Template.subscriptionsReady}}
+  {{#with recent_patterns}}{{#if this.length}}
+  <h2 style="width: {{header_width}}px"><a href="{{pathFor route='recent_patterns'}}"><span class="text">Recently viewed</span><span class="more">See more</span></a></h2>
+  <div class="wrapper">
+  <ul class="patterns">
+  {{#each this}}
+  {{> pattern_thumbnail}}
+  {{/each}}
+  </ul>
+  </div>
+  {{/if}}{{/with}}
+{{/if}}
+</template>
+
+
+
 
 <template name="my_patterns_home">
 {{> pages}}

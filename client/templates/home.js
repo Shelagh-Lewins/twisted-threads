@@ -6,30 +6,44 @@ Template.home.rendered = function() {
   /* currently, there is a button per edit mode. But the code is in place so you can select a mode and then press a single button. */
   Session.set('edit_mode', 'simulation');
 
-  var params = {
-    limit: Session.get('thumbnails_in_row')
-  }; 
+  Session.set('recent_patterns_count', 0);
+}
 
-  /* this.subscribe('patterns', {
-    onReady: function () { 
-      Session.set('patterns_ready', true);
-
-      Meteor.subscribe('user_info', params, {
-        onReady: function() {
-          Session.set('user_info_ready', true);
-        }
-      });
-    }
-  }); */
+// Short lists of first few patterns / users within each category, displayed on Home page
+Template.recent_patterns_home.created = function() {
+  
+  params = {
+    pattern_ids: Meteor.my_functions.get_recent_pattern_ids(),
+  };
 
   this.subscribe('recent_patterns', params, {
     onReady: function() {
-      Session.set('recents_ready', true);
+      Session.set('recent_patterns_count', Patterns.find(
+        { _id: {$in: params.pattern_ids} },
+        { fields: {_id: 1}},
+      ).count());
     }
   });
-}
+};
 
-// Subsidiary 'home' pages
+// Used on Home page
+// Recent Patterns are limited in number and not paginated.
+Template.recent_patterns_home.helpers({
+  'recent_patterns': function(){
+    var  pattern_ids = Meteor.my_functions.get_recent_pattern_ids();
+
+    // return patterns in the original array order
+    var sorted_patterns = Patterns.find(
+        {_id: {$in:pattern_ids}}
+      ).fetch().sort((a,b) => {
+      return pattern_ids.indexOf(a._id) === pattern_ids.indexOf(b._id) ? 0 : (pattern_ids.indexOf(a._id) < pattern_ids.indexOf(b._id) ? -1 : 1);
+    });
+
+    return sorted_patterns.slice(0, Session.get('thumbnails_in_row'));
+  }
+});
+
+// Subsidiary 'home' pages. Paginated.
 Template.recent_patterns.rendered = function() {
   $('body').attr("class", "home");
   Meteor.my_functions.initialize_route();
@@ -91,6 +105,12 @@ Template.home_patterns.helpers({
   header_width: function() {
     var number = Session.get('thumbnails_in_row');
     return (number * Meteor.my_params.pattern_thumbnail_width) + ((number - 1) * Meteor.my_params.pattern_thumbnail_rmargin);
+  }
+});
+
+Template.left_column.helpers({
+  recent_patterns_count: function() {
+    return Session.get('recent_patterns_count');
   }
 });
 
