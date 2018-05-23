@@ -9,6 +9,36 @@
 
   // update: meteor --production --settings settings.json should simulate the minification locally where the server output can be viewed. However the app does not crash, it just generates the same Match failure in publish.js.
 
+// Data for search
+Meteor.publish('search_patterns', function(){
+  return Patterns.find(
+    {
+      $or: [
+        { private: {$ne: true} },
+        { created_by: this.userId },
+      ]
+    },
+    {
+      fields: {
+        name_sort: 1,
+        tags: 1,
+        created_by_username: 1,
+        number_of_tablets: 1,
+      }
+    }
+  );
+});
+
+Meteor.publish('search_users', function(){
+  var update = {};
+  update["profile.public_patterns_count"] = {$gt: 0}; // this construction is required to query a child property
+
+  return Meteor.users.find(
+    {$or: [update, {_id: this.userId}]},
+    {fields: {_id: 1, name_sort: 1, profile: 1}},
+  );
+});
+
 // Single pattern
 Meteor.publish('pattern', function(params){
   check(params, Object);
@@ -74,7 +104,7 @@ Meteor.publish('my_patterns', function(){
     { created_by: this.userId },
     {
       limit: Meteor.my_params.max_home_thumbnails,
-      sort: {name: 1},
+      sort: {name_sort: 1},
     }
   );
 });
@@ -90,7 +120,7 @@ Meteor.publish('all_patterns', function(){
     },
     {
       limit: Meteor.my_params.max_home_thumbnails,
-      sort: {name: 1},
+      sort: {name_sort: 1},
     }
   );
 });
@@ -109,7 +139,7 @@ Meteor.publish('user', function(params){
     { $and: 
       [
         {$or: [update, {_id: this.userId}]},
-        {fields: {_id: 1, username: 1, profile: 1}},
+        
         { $or: [
           { private: {$ne: true} },
           { created_by: this.userId }
@@ -118,8 +148,9 @@ Meteor.publish('user', function(params){
     },
     {
       limit: 1,
-      sort: {"profile.name_sort": 1}
-    }
+      sort: {"profile.name_sort": 1},
+      fields: {_id: 1, username: 1, profile: 1},
+    },
   );
 });
 
@@ -134,10 +165,10 @@ Meteor.publish('users_home', function(trigger){
 
   return Meteor.users.find(
     {$or: [update, {_id: this.userId}]},
-    {fields: {_id: 1, username: 1, profile: 1}},
     {
       limit: Meteor.my_params.max_home_thumbnails,
-      sort: {"profile.name_sort": 1}
+      sort: {"profile.name_sort": 1},
+      fields: {_id: 1, username: 1, profile: 1},
     }
   );
 });

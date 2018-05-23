@@ -189,6 +189,7 @@ Show patterns with between
 </template>
 
 <template name="my_patterns_home">
+{{#if currentUser}}
 {{#if Template.subscriptionsReady}}
   {{#with my_patterns_home}}{{#if this.count}}
   <h2 style="width: {{header_width}}px"><a href="{{pathFor route='my_patterns'}}"><span class="text">My patterns</span><span class="more">See more</span></a></h2>
@@ -199,6 +200,7 @@ Show patterns with between
   {{/each}}
   </ul></div>
   {{/if}}{{/with}}
+{{/if}}
 {{/if}}
 </template>
 

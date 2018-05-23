@@ -23,7 +23,12 @@ if (Meteor.isClient) {
     Session.set('display_min_tablets', 1);
   });
 
-  // reactive_recent_patterns = new ReactiveArray();
+  //////////////////////////////
+  // enable search
+  Template.header.created = function() {
+    this.subscribe('search_patterns');
+    this.subscribe('search_users');
+  }
 
   //////////////////////////////
   // Helpers for templates that may be used on multiple pages
