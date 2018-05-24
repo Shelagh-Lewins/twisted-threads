@@ -20,10 +20,12 @@ Meteor.publish('search_patterns', function(){
     },
     {
       fields: {
-        name_sort: 1,
-        tags: 1,
+        _id: 1,
         created_by_username: 1,
+        name: 1,
+        name_sort: 1,
         number_of_tablets: 1,
+        tags: 1,
       }
     }
   );
@@ -35,7 +37,11 @@ Meteor.publish('search_users', function(){
 
   return Meteor.users.find(
     {$or: [update, {_id: this.userId}]},
-    {fields: {_id: 1, name_sort: 1, profile: 1}},
+    {fields: {
+      _id: 1,
+      profile: 1,
+      username: 1,
+    }},
   );
 });
 
@@ -78,6 +84,18 @@ Meteor.publish('recent_patterns', function(params){
     },
     {
       limit: Meteor.my_params.max_recents,
+      fields: {
+        _id: 1,
+        auto_preview: 1,
+        created_at: 1,
+        created_by: 1,
+        created_by_username: 1,
+        description: 1,
+        name: 1,
+        name_sort: 1,
+        number_of_tablets: 1,
+        private: 1,
+      }
     }
   );
 });
@@ -94,6 +112,18 @@ Meteor.publish('new_patterns', function(){
     {
       limit: Meteor.my_params.max_home_thumbnails,
       sort: {created_at: -1},
+      fields: {
+        _id: 1,
+        auto_preview: 1,
+        created_at: 1,
+        created_by: 1,
+        created_by_username: 1,
+        description: 1,
+        name: 1,
+        name_sort: 1,
+        number_of_tablets: 1,
+        private: 1,
+      }
     }
   );
 });
@@ -105,6 +135,18 @@ Meteor.publish('my_patterns', function(){
     {
       limit: Meteor.my_params.max_home_thumbnails,
       sort: {name_sort: 1},
+      fields: {
+        _id: 1,
+        auto_preview: 1,
+        created_at: 1,
+        created_by: 1,
+        created_by_username: 1,
+        description: 1,
+        name: 1,
+        name_sort: 1,
+        number_of_tablets: 1,
+        private: 1,
+      }
     }
   );
 });
@@ -121,6 +163,18 @@ Meteor.publish('all_patterns', function(){
     {
       limit: Meteor.my_params.max_home_thumbnails,
       sort: {name_sort: 1},
+      fields: {
+        _id: 1,
+        auto_preview: 1,
+        created_at: 1,
+        created_by: 1,
+        created_by_username: 1,
+        description: 1,
+        name: 1,
+        name_sort: 1,
+        number_of_tablets: 1,
+        private: 1,
+      }
     }
   );
 });
@@ -135,24 +189,15 @@ Meteor.publish('user', function(params){
   update["profile.public_patterns_count"] = {$gt: 0}; // this construction is required to query a child property
   update["id"] = params.user_id;
 
-  return Patterns.find(
-    { $and: 
-      [
-        {$or: [update, {_id: this.userId}]},
-        
-        { $or: [
-          { private: {$ne: true} },
-          { created_by: this.userId }
-        ]}
-      ]
-    },
+  return Meteor.users.find(
+    {$or: [update, {_id: this.userId}]},
     {
       limit: 1,
       sort: {"profile.name_sort": 1},
       fields: {_id: 1, username: 1, profile: 1},
     },
   );
-});
+}); 
 
 // Users for Home page
 Meteor.publish('users_home', function(trigger){

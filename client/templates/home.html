@@ -17,7 +17,7 @@
 <li class="{{selected "my_patterns"}}"><a href="{{pathFor route='my_patterns'}}"><span>My patterns</span></a></li>
 {{/if}}
 <li class="{{selected "all_patterns"}}"><a href="{{pathFor route='all_patterns'}}"><span>All patterns</span></a></li>
-<li class="{{selected "users"}}"><a href="{{pathFor route='users'}}"><span>People</span></a></li>
+<!--<li class="{{selected "users"}}"><a href="{{pathFor route='users'}}"><span>People</span></a></li>-->
 </ul>
 </div>
 </template>
@@ -47,7 +47,7 @@
 
 {{> all_patterns_home}}
 
-{{> users_home}}
+<!--{{> users_home}}-->
 
 {{/if}}
 </template>
@@ -121,7 +121,8 @@
 </template>
 
 
-<template name="user_thumbnail"><li class="user_thumbnail" style="width: {{width}}; margin-right: {{rmargin}}" >
+<template name="user_thumbnail">{{#if Template.subscriptionsReady}}
+  <li class="user_thumbnail" style="width: {{width}}; margin-right: {{rmargin}}" >
 <div class="main">
 <a href="{{pathFor route='user' _id=_id}}">
 <h3>{{username}}</h3>
@@ -134,6 +135,7 @@
 </a>
 </div>
 </li>
+{{/if}}
 </template>
 
 <template name="filter_on_tablets">
