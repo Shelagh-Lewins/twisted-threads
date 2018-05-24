@@ -346,9 +346,8 @@ Template.user_thumbnail.helpers({
       return "#CC9900";
   },
   number_of_patterns: function() {
-    console.log(`id ${this._id}`);
     var user = Meteor.users.findOne({_id: this._id});
-    console.log(`profile ${JSON.stringify(user)}`);
+    
     return Meteor.users.findOne({_id: this._id}).profile.public_patterns_count;
   }
 });
