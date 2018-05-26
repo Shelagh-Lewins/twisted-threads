@@ -347,8 +347,12 @@ Template.user_thumbnail.helpers({
   },
   number_of_patterns: function() {
     var user = Meteor.users.findOne({_id: this._id});
-    
-    return Meteor.users.findOne({_id: this._id}).profile.public_patterns_count;
+    var number_of_patterns = user.profile.public_patterns_count;
+
+    if (typeof number_of_patterns === "undefined")
+      number_of_patterns = 0;
+
+    return number_of_patterns;
   }
 });
 

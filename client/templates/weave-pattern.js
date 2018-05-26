@@ -82,6 +82,5 @@ Template.weave_pattern.events({
   },
   'keyup': function(event, template) {
     event.preventDefault();
-    console.log("keyup " + event.keyCode);
   }
 });
