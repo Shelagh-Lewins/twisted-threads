@@ -7,14 +7,12 @@ Template.home.rendered = function() {
   Session.set('edit_mode', 'simulation');
 
   Session.set('recent_patterns_count', 0);
-
-  Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
 }
 
 // Short lists of first few patterns / users within each category, displayed on Home page
+// left column and recent patterns list each have to subscribe to recent patterns
 // Left column menu
 Template.left_column.created = function() {
-  
   params = {
     pattern_ids: Meteor.my_functions.get_recent_pattern_ids(),
   };
@@ -25,14 +23,13 @@ Template.left_column.created = function() {
         { _id: {$in: params.pattern_ids} },
         { fields: {_id: 1}},
       ).count());
+      Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
     }
   });
 };
 
 // Recent Patterns
 Template.recent_patterns_home.created = function() {
-  Meteor.my_functions.maintain_recent_patterns(); // clean up the recent patterns list in case any has been changed
-  
   params = {
     pattern_ids: Meteor.my_functions.get_recent_pattern_ids(),
   };

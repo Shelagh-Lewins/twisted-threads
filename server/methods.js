@@ -420,6 +420,9 @@ Meteor.methods({
       orientation[i] = data.orientation[i];
     }
 
+    // count public patterns as a safety check.
+    Meteor.call("count_public_patterns", Meteor.userId());
+
     Patterns.update({_id: pattern_id}, {$set: {orientation: JSON.stringify(orientation)}});
 
     ///////////////////////////////////

@@ -25,32 +25,6 @@ Meteor.startup(function () {
     }
   });
 
-  
-  // TODO remove this! It should only run once
-  /* Meteor.users.find().forEach( function(user) {
-    var num = Patterns.find({
-    $and: [
-      { private: {$ne: true} },
-      { created_by: user._id }
-    ]}).count();
-
-
-    Meteor.call("count_public_patterns", user._id);
-  }); */
-
-  // data migration to remove thumbnail_url // DO THIS WHEN MIGRATING TO HAVING IMAGES FOR PATTERNS
-  /*Patterns.find().forEach( function(myDoc) {
-    Patterns.update({_id: myDoc._id}, {$unset: { thumbnail_url: "text"}});
-  }); */
-  // after running this, remove thumbnail_url from schema
-
-  // data migration to set role 'verified' for users who have a verified email address
-  // shouldn't do any harm but wastes cycles to rerun
-  /*Meteor.users.find().forEach( function(myDoc) {
-    Meteor.call('update_user_roles', myDoc._id);
-    // !important! at the end of methods.js, comment out the debug fn to set a user's email address to verified, this is just for testing and should not be released
-  });*/
- 
   ///////////////////////////////
   // Ongoing database updates
   // run this as desired

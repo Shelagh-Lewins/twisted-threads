@@ -1279,6 +1279,7 @@ Meteor.my_functions = {
           recent_patterns.splice(i, 1);
         }
       }
+
       window.localStorage.setItem('recent_patterns', JSON.stringify(recent_patterns));
     }
   },
@@ -1297,11 +1298,8 @@ Meteor.my_functions = {
     }
     else
     {
-      // pattern_ids = Meteor.my_functions.get_local_recent_pattern_ids();
       pattern_ids = JSON.parse(window.localStorage.getItem('recent_patterns'));
     }
-
-    // var pattern_ids = JSON.parse(window.localStorage.getItem('recent_patterns'));
 
     if (pattern_ids == null)
         return [];
@@ -1314,7 +1312,6 @@ Meteor.my_functions = {
 
       if (id == null) continue;
       if (typeof id === "undefined") continue;
-      // if (Patterns.find({_id: id}).count() == 0) continue;
 
       checked_pattern_ids.push(id);
     }
