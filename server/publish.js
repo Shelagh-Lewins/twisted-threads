@@ -11,38 +11,60 @@
 
 // Data for search
 Meteor.publish('search_patterns', function(){
-  return Patterns.find(
-    {
-      $or: [
-        { private: {$ne: true} },
-        { created_by: this.userId },
-      ]
-    },
-    {
-      fields: {
-        _id: 1,
-        created_by_username: 1,
-        name: 1,
-        name_sort: 1,
-        number_of_tablets: 1,
-        tags: 1,
+
+  fields = {
+    _id: 1,
+    created_by_username: 1,
+    name: 1,
+    name_sort: 1,
+    number_of_tablets: 1,
+    tags: 1,
+  }
+
+  if (this.userId)
+    return Patterns.find(
+      {
+        $or: [
+          { private: {$ne: true} },
+          { created_by: this.userId },
+        ]
+      },
+      {
+        fields: fields,
       }
-    }
-  );
+    );
+  else
+    return Patterns.find(
+      { private: {$ne: true} },
+      {
+        fields: fields,
+      }
+    );
 });
 
 Meteor.publish('search_users', function(){
+
   var update = {};
   update["profile.public_patterns_count"] = {$gt: 0}; // this construction is required to query a child property
 
-  return Meteor.users.find(
-    {$or: [update, {_id: this.userId}]},
-    {fields: {
-      _id: 1,
-      profile: 1,
-      username: 1,
-    }},
-  );
+  if (this.userId)
+    return Meteor.users.find(
+      {$or: [update, {_id: this.userId}]},
+      {fields: {
+        _id: 1,
+        profile: 1,
+        username: 1,
+      }},
+    );
+  else
+    return Meteor.users.find(
+      {$or: [update]},
+      {fields: {
+        _id: 1,
+        profile: 1,
+        username: 1,
+      }},
+    );
 });
 
 // Single pattern
@@ -50,20 +72,33 @@ Meteor.publish('pattern', function(params){
   check(params, Object);
   check(params.pattern_id, String);
 
-  return Patterns.find(
-    { $and: 
-      [
-        { _id: params.pattern_id }, 
-        { $or: [
+  if (this.userId)
+    return Patterns.find(
+      { $and: 
+        [
+          { _id: params.pattern_id }, 
+          { $or: [
+            { private: {$ne: true} },
+            { created_by: this.userId }
+          ]}
+        ]
+      },
+      {
+        limit: 1
+      }
+    );
+  else
+    return Patterns.find(
+      { $and: 
+        [
+          { _id: params.pattern_id },
           { private: {$ne: true} },
-          { created_by: this.userId }
-        ]}
-      ]
-    },
-    {
-      limit: 1
-    }
-  );
+        ]
+      },
+      {
+        limit: 1
+      }
+    );
 });
 
 // Recent Patterns for Home page
@@ -72,111 +107,159 @@ Meteor.publish('recent_patterns', function(params){
 
   var pattern_ids = typeof params.pattern_ids === "undefined" ? [] : params.pattern_ids;
 
-  return Patterns.find(
-    { $and: 
-      [
-        { _id: {$in:params.pattern_ids}}, 
-        { $or: [
-          { private: {$ne: true} },
-          { created_by: this.userId }
-        ]}
-      ]
-    },
-    {
-      limit: Meteor.my_params.max_recents,
-      fields: {
-        _id: 1,
-        auto_preview: 1,
-        created_at: 1,
-        created_by: 1,
-        created_by_username: 1,
-        description: 1,
-        name: 1,
-        name_sort: 1,
-        number_of_tablets: 1,
-        private: 1,
+  var fields = {
+    _id: 1,
+    auto_preview: 1,
+    created_at: 1,
+    created_by: 1,
+    created_by_username: 1,
+    description: 1,
+    name: 1,
+    name_sort: 1,
+    number_of_tablets: 1,
+    private: 1,
+  }
+
+  if (this.userId)
+    return Patterns.find(
+      { $and: 
+        [
+          { _id: {$in:params.pattern_ids}}, 
+          { $or: [
+            { private: {$ne: true} },
+            { created_by: this.userId }
+          ]}
+        ]
+      },
+      {
+        limit: Meteor.my_params.max_recents,
+        fields: fields,
       }
-    }
-  );
+    );
+  else
+    return Patterns.find(
+      { $and: 
+        [
+          { _id: {$in:params.pattern_ids}}, 
+          { private: {$ne: true}},
+        ]
+      },
+      {
+        limit: Meteor.my_params.max_recents,
+        fields: fields,
+      }
+    );
 });
 
 // New Patterns for Home page
 Meteor.publish('new_patterns', function(){
-  return Patterns.find(
-    {
-      $or: [
-        { private: {$ne: true} },
-        { created_by: this.userId },
-      ]
-    },
-    {
-      limit: Meteor.my_params.max_home_thumbnails,
-      sort: {created_at: -1},
-      fields: {
-        _id: 1,
-        auto_preview: 1,
-        created_at: 1,
-        created_by: 1,
-        created_by_username: 1,
-        description: 1,
-        name: 1,
-        name_sort: 1,
-        number_of_tablets: 1,
-        private: 1,
+  var fields = {
+    _id: 1,
+    auto_preview: 1,
+    created_at: 1,
+    created_by: 1,
+    created_by_username: 1,
+    description: 1,
+    name: 1,
+    name_sort: 1,
+    number_of_tablets: 1,
+    private: 1,
+  }
+
+  if (this.userId)
+    return Patterns.find(
+      {
+        $or: [
+          { private: {$ne: true} },
+          { created_by: this.userId },
+        ]
+      },
+      {
+        limit: Meteor.my_params.max_home_thumbnails,
+        sort: {created_at: -1},
+        fields: fields,
       }
-    }
-  );
+    );
+  else
+    return Patterns.find(
+      { private: {$ne: true} },
+      {
+        limit: Meteor.my_params.max_home_thumbnails,
+        sort: {created_at: -1},
+        fields: fields,
+      }
+    );
 });
 
 // My Patterns for Home page
 Meteor.publish('my_patterns', function(){
-  return Patterns.find(
-    { created_by: this.userId },
-    {
-      limit: Meteor.my_params.max_home_thumbnails,
-      sort: {name_sort: 1},
-      fields: {
-        _id: 1,
-        auto_preview: 1,
-        created_at: 1,
-        created_by: 1,
-        created_by_username: 1,
-        description: 1,
-        name: 1,
-        name_sort: 1,
-        number_of_tablets: 1,
-        private: 1,
-      }
-    }
-  );
+
+  var fields = {
+    _id: 1,
+    auto_preview: 1,
+    created_at: 1,
+    created_by: 1,
+    created_by_username: 1,
+    description: 1,
+    name: 1,
+    name_sort: 1,
+    number_of_tablets: 1,
+    private: 1,
+  }
+
+  if (this.userId)
+    return Patterns.find(
+      { created_by: this.userId },
+        {
+          limit: Meteor.my_params.max_home_thumbnails,
+          sort: {name_sort: 1},
+          fields: fields
+        }
+      );
+  else
+    return [];
+
 });
 
 // All Patterns for Home page
 Meteor.publish('all_patterns', function(){
-  return Patterns.find(
-    {
-      $or: [
-        { private: {$ne: true} },
-        { created_by: this.userId },
-      ]
-    },
-    {
-      limit: Meteor.my_params.max_home_thumbnails,
-      sort: {name_sort: 1},
-      fields: {
-        _id: 1,
-        auto_preview: 1,
-        created_at: 1,
-        created_by: 1,
-        created_by_username: 1,
-        description: 1,
-        name: 1,
-        name_sort: 1,
-        number_of_tablets: 1,
-        private: 1,
+
+  var fields = {
+    _id: 1,
+    auto_preview: 1,
+    created_at: 1,
+    created_by: 1,
+    created_by_username: 1,
+    description: 1,
+    name: 1,
+    name_sort: 1,
+    number_of_tablets: 1,
+    private: 1,
+  }
+
+  if (this.userId)
+    return Patterns.find(
+      {
+        $or: [
+          { private: {$ne: true} },
+          { created_by: this.userId },
+        ]
+      },
+      {
+        limit: Meteor.my_params.max_home_thumbnails,
+        sort: {name_sort: 1},
+        fields: fields,
       }
-    }
-  );
+    );
+  else
+    return Patterns.find(
+      { private: {$ne: true} },
+      {
+        limit: Meteor.my_params.max_home_thumbnails,
+        sort: {name_sort: 1},
+        fields: fields,
+      }
+    );
 });
 
 // Single user
@@ -201,6 +284,7 @@ Meteor.publish('user', function(params){
 
 // Users for Home page
 Meteor.publish('users_home', function(trigger){
+
   // show the current user and any users who have public patterns
   check(trigger, Match.Optional(Number));
 
@@ -208,14 +292,24 @@ Meteor.publish('users_home', function(trigger){
   var update = {};
   update["profile.public_patterns_count"] = {$gt: 0}; // this construction is required to query a child property
 
-  return Meteor.users.find(
-    {$or: [update, {_id: this.userId}]},
-    {
-      limit: Meteor.my_params.max_home_thumbnails,
-      sort: {"profile.name_sort": 1},
-      fields: {_id: 1, username: 1, profile: 1},
-    }
-  );
+  if (this.userId)
+    return Meteor.users.find(
+      {$or: [update, {_id: this.userId}]},
+      {
+        limit: Meteor.my_params.max_home_thumbnails,
+        sort: {"profile.name_sort": 1},
+        fields: {_id: 1, username: 1, profile: 1},
+      }
+    );
+  else
+    return Meteor.users.find(
+      {$or: [update]},
+      {
+        limit: Meteor.my_params.max_home_thumbnails,
+        sort: {"profile.name_sort": 1},
+        fields: {_id: 1, username: 1, profile: 1},
+      }
+    );
 });
 
 // Publish images uploaded by the user
