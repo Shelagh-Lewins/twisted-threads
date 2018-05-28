@@ -420,7 +420,7 @@ Meteor.methods({
       orientation[i] = data.orientation[i];
     }
 
-    // count public patterns as a safety check.
+    // count public patterns as a safety check (new patterns are private by default so it shouldn't make any difference).
     Meteor.call("count_public_patterns", Meteor.userId());
 
     Patterns.update({_id: pattern_id}, {$set: {orientation: JSON.stringify(orientation)}});
@@ -512,6 +512,9 @@ Meteor.methods({
     update["profile.recent_patterns"] = recent_patterns;
 
     Meteor.users.update({_id: Meteor.userId()}, {$set: update});
+
+    // update count of public patterns
+    Meteor.call("count_public_patterns", Meteor.userId());
 
     // remove list of associated images
     Images.remove({used_by: pattern_id});
