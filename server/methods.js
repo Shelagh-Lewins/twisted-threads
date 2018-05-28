@@ -516,7 +516,12 @@ Meteor.methods({
     // update count of public patterns
     Meteor.call("count_public_patterns", Meteor.userId());
 
-    // remove list of associated images
+    // remove associated images from AWS
+    Images.find({used_by: pattern_id}).map(function(image) {
+      Meteor.call("remove_image", image._id);
+    });
+
+    // update collection that lists associated images
     Images.remove({used_by: pattern_id});
   },
   set_private: function (pattern_id, set_to_private) {
