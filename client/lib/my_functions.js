@@ -1559,9 +1559,6 @@ Meteor.my_functions = {
 
     Session.set('change_tablets_latch', true);
 
-    // ensure the latch is cleared even if there is an error in the function
-    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
-
     var number_of_tablets = Session.get("number_of_tablets");
     var number_of_rows = Session.get("number_of_rows");
 
@@ -1615,10 +1612,7 @@ Meteor.my_functions = {
         return;
 
     Session.set('change_tablets_latch', true);
-
-    // ensure the latch is cleared even if there is an error in the function
-    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
-    
+ 
     var number_of_tablets = Session.get("number_of_tablets");
     var number_of_rows = Session.get("number_of_rows");
 
@@ -1651,9 +1645,6 @@ Meteor.my_functions = {
         return;
 
     Session.set('change_tablets_latch', true);
-
-    // ensure the latch is cleared even if there is an error in the function
-    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
@@ -1723,9 +1714,6 @@ Meteor.my_functions = {
         return;
 
     Session.set('change_tablets_latch', true);
-
-    // ensure the latch is cleared even if there is an error in the function
-    setTimeout(function() { Session.set('change_tablets_latch', false);}, 400);
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
@@ -1825,6 +1813,7 @@ Meteor.my_functions = {
   },
   save_weaving_to_db: function(pattern_id, number_of_rows, number_of_tablets)
   {
+    console.log('save_weaving_to_db 1');
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_tablets: 1, number_of_rows: 1, edit_mode: 1}});
     if (typeof pattern === "undefined")
         return;
@@ -1855,8 +1844,14 @@ Meteor.my_functions = {
           {
             Meteor.call("save_manual_weaving_turns", pattern_id, Meteor.my_functions.get_manual_weaving_as_array(pattern_id), function(){
                Meteor.my_functions.reset_simulation_weaving(pattern_id);
+               // do not reset change_tableets_latch because this function will be called again but without tablet_change. Must ensure no new tablet or row change is initiated until this is complete.
+               console.log('save_weaving_to_db 2a');
             })
+          } else {
+            Session.set('change_tablets_latch', false);
           }
+        } else {
+          Session.set('change_tablets_latch', false);
         }
 
         if (row_change)
