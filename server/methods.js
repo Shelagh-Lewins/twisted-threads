@@ -94,6 +94,7 @@ Meteor.methods({
     {
       var data = options.data;
     }
+    // TODO import 3/1 broken twill pattern from file
     else if (typeof options.filename !== "undefined")
     {
       try {
@@ -127,7 +128,7 @@ Meteor.methods({
       } 
     }
 
-    // edit_mode "freehand" (default) or "simulation"
+    // edit_mode "freehand" (default), "simulation" or "3-1-broken-twill"
     if((options.edit_mode == "") || (typeof options.edit_mode === "undefined"))
       options.edit_mode = "freehand"; // earlier data version
 
@@ -186,6 +187,10 @@ Meteor.methods({
 
           else if (data.edit_mode == "simulation")
             data.threading[i][j] = 2; // plain yellow in default pattern
+
+          // TODO set threading for 3/1 broken twill
+          else if (data.edit_mode == "3-1-broken-twill")
+            data.threading[i][j] = 2; // should be two light, two dark, offset along tablets
         }
       }
 
@@ -264,7 +269,8 @@ Meteor.methods({
     // Styles
     var styles_array = [];
 
-    if (data.edit_mode == "simulation") // palette shows 7 regular styles for threading. The other 32 are used to automatically build the weaving chart: 4 per threading styles to show S/Z and turn forwards, backwards
+    if (data.edit_mode == "simulation" || data.edit_mode == "3-1-broken-twill") // palette shows 7 regular styles for threading. The other 32 are used to automatically build the weaving chart: 4 per threading styles to show S/Z and turn forwards, backwards
+    // in 3/1 broken twill only two thread colours may be set but it's easier to stick with the same styles
     {
       var styles;
 
@@ -280,7 +286,7 @@ Meteor.methods({
         styles_array[i] = styles[i];
       }
     }
-    else // 32 visible styles for manually drawing threading and weaving charts
+    else if (data.edit_mode == "freehand") // 32 visible styles for manually drawing threading and weaving charts
     {
       for (var i=0; i<32; i++) // create 32 styles
       {
@@ -303,6 +309,7 @@ Meteor.methods({
           data.styles[i].warp = "none";
       }
     }
+
 
     Patterns.update({_id: pattern_id}, {$set: {styles: JSON.stringify(styles_array)}});
 

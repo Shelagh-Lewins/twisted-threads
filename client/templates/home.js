@@ -202,14 +202,29 @@ Template.create_new_pattern.events({
     event.preventDefault();
     var edit_mode = event.currentTarget.name;
     var number_of_rows = "0";
-    if(edit_mode != "simulation")
+    if(edit_mode != "simulation") // freehand, 3/1 twill
       number_of_rows = $('#num_rows').val();
 
     var params = {
-      edit_mode: edit_mode, // two submit buttons, simulation and freehand
+      edit_mode: edit_mode,
       number_of_tablets: $('#num_tablets').val(),
-      number_of_rows: number_of_rows, // only actually used by freehand patterns
+      number_of_rows: number_of_rows, // used by freehand and 3/1 broken twill patterns
       name: $('#pattern_name').val()
+    }
+
+    if (edit_mode == "3-1-broken-twill") {
+      var radios = document.getElementsByName('twill-direction');
+
+      for (var i = 0, length = radios.length; i < length; i++)
+      {
+       if (radios[i].checked)
+       {
+        params.twill_direction = radios[i].value;
+        console.log(`twill direction: ${params.twill_direction}`);
+
+        break;
+       }
+      }
     }
 
     Meteor.my_functions.new_pattern(params);
