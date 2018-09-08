@@ -75,7 +75,7 @@ Meteor.methods({
       number_of_rows: Match.Optional(String),
       name: Match.Optional(String),
       data: Object,
-
+      twill_direction: Match.Optional(String),
     });
 
     if (!Meteor.isServer) // minimongo cannot simulate loading data with Assets
@@ -128,7 +128,7 @@ Meteor.methods({
       } 
     }
 
-    // edit_mode "freehand" (default), "simulation" or "3-1-broken-twill"
+    // edit_mode "freehand" (default), "simulation" or "broken_twill"
     if((options.edit_mode == "") || (typeof options.edit_mode === "undefined"))
       options.edit_mode = "freehand"; // earlier data version
 
@@ -177,6 +177,13 @@ Meteor.methods({
       // threading
       data.threading = new Array(options.number_of_rows);
 
+      const broken_twill_threading = [
+        [2,2,1,2],
+        [2,1,1,1],
+        [1,1,2,1],
+        [1,2,2,2]
+      ]
+
       for (var i=0; i<4; i++)
       {
         data.threading[i] = new Array(options.number_of_tablets);
@@ -188,9 +195,12 @@ Meteor.methods({
           else if (data.edit_mode == "simulation")
             data.threading[i][j] = 2; // plain yellow in default pattern
 
-          // TODO set threading for 3/1 broken twill
-          else if (data.edit_mode == "3-1-broken-twill")
-            data.threading[i][j] = 2; // should be two light, two dark, offset along tablets
+          // two light, two dark, offset along tablets
+          else if (data.edit_mode == "broken_twill")
+          {
+            data.threading[i][j] = broken_twill_threading[i][j%4];
+          }
+
         }
       }
 
@@ -198,7 +208,10 @@ Meteor.methods({
       data.orientation = new Array(number_of_tablets);
       for (var i=0; i<options.number_of_tablets; i++)
       {
-        data.orientation[i] = (i % 2 == 0) ? "S" : "Z";
+        if (data.edit_mode == "broken_twill")
+          data.orientation[i] = "S";
+        else
+         data.orientation[i] = (i % 2 == 0) ? "S" : "Z";
       }
     }
     else if (typeof data.threading[0] === "undefined") // no rows of threading have been defined
@@ -269,7 +282,7 @@ Meteor.methods({
     // Styles
     var styles_array = [];
 
-    if (data.edit_mode == "simulation" || data.edit_mode == "3-1-broken-twill") // palette shows 7 regular styles for threading. The other 32 are used to automatically build the weaving chart: 4 per threading styles to show S/Z and turn forwards, backwards
+    if (data.edit_mode == "simulation" || data.edit_mode == "broken_twill") // palette shows 7 regular styles for threading. The other 32 are used to automatically build the weaving chart: 4 per threading styles to show S/Z and turn forwards, backwards
     // in 3/1 broken twill only two thread colours may be set but it's easier to stick with the same styles
     {
       var styles;
@@ -403,6 +416,38 @@ Meteor.methods({
 
       use this to build weaving chart dynamically
       */
+    } else if (data.edit_mode == "broken_twill") {
+
+      if (typeof options.twill_direction !== "undefined")
+        var twill_direction = options.twill_direction;
+      else
+        throw new Meteor.Error("no-twill-direction", "error creating pattern from JSON. No twill direction for 3/1 broken twill pattern");
+
+      Patterns.update({_id: pattern_id}, {$set: {twill_direction: twill_direction}});
+
+      // 3/1 twill must have an even number of rows
+      if (options.number_of_rows % 2 == 1)
+        throw new Meteor.Error("odd-twill-rows", "error creating pattern from JSON. 3/1 broken twill pattern must have even number of rows");
+
+      var twill_pattern_chart = []; // corresponds to Data in GTT pattern. This is the grid showing the two-colour design.
+
+      var long_floats_chart = []; // corresponds to LongFloats in GTT pattern. This is the grid showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
+
+      // for now, set up a plain grid for each, this will give just background twill
+      for (var i=0; i<options.number_of_rows / 2; i++)
+      {
+        twill_pattern_chart[i] = new Array();
+        long_floats_chart[i] = new Array();
+
+        for (var j=0; j<options.number_of_tablets; j++)
+        {
+          twill_pattern_chart[i][j] = ".";
+          long_floats_chart[i][j] = ".";
+        }
+      }
+
+      Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(twill_pattern_chart)}});
+      Patterns.update({_id: pattern_id}, {$set: {long_floats_chart: JSON.stringify(long_floats_chart)}});
     }
     /////////////////////////////////
 

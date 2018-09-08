@@ -9,7 +9,7 @@
   </div>
 
   <div class="hint">
-  Pattern type: {{#if equals edit_mode "simulation"}}simulation{{else}}freehand{{/if}}
+  Pattern type: {{#if equals edit_mode "simulation"}}Simulation{{else}}{{#if equals edit_mode "broken_twill"}}3/1 broken twill{{else}}Freehand{{/if}}{{/if}}
 </div>
 </div>
 
@@ -327,12 +327,16 @@
 <div class="styles">
 <div class="edit_style {{editing_style}}">
 {{#if equals edit_mode "simulation"}}
-<h2>Thread colour</h2>
+  <h2>Thread colour</h2>
 {{else}}
-<h2>Background</h2>
+  {{#if equals edit_mode "broken_twill"}}
+  <h2>Thread colour</h2>
+  {{else}}
+  <h2>Background</h2>
+  {{/if}}
 {{/if}}
 <div class="colorpicker_holder"><input type="text" id="background_colorpicker"></div>
-{{#unless equals edit_mode "simulation"}}
+{{#if equals edit_mode "freehand"}}
 <h2>Warp thread</h2>
 <div class="colorpicker_holder"><input type="text" id="line_colorpicker"></div>
 <ul class="warps">
@@ -344,19 +348,19 @@
     </li>
   {{/each}}
 </ul>
-{{/unless}}
+{{/if}}
 </div>
 <div class="pagination"><ul>
 {{#if single_column}}
 <li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_1');">Styles 1</a></li>
 <li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_2');">Styles 2</a></li>
 {{else}}
-<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">{{#if equals edit_mode "simulation"}}Threading styles{{else}}Styles{{/if}}</a></li>
+<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">{{#if equals edit_mode "simulation"}}Threading styles{{else}}{{#if equals edit_mode "broken_twill"}}Threading styles{{else}}Styles{{/if}}{{/if}}</a></li>
 {{/if}}
 <li class="special no_select {{is_selected_style_palette "special"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('special');">Special</a></li>
 </ul></div>
 
-<input type="button" id="edit_style_button" class=" {{editing_style}}" value="{{#if equals edit_mode "simulation"}}Edit colour{{else}}Edit style{{/if}}" onclick="Meteor.my_functions.edit_style_clicked();">
+<input type="button" id="edit_style_button" class=" {{editing_style}}" value="{{#if equals edit_mode "simulation"}}Edit colour{{else}}{{#if equals edit_mode "broken_twill"}}Edit colour{{else}}Edit style{{/if}}{{/if}}" onclick="Meteor.my_functions.edit_style_clicked();">
 <div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}
 <div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with weaving_cell_data 0 0 "special_styles"}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>

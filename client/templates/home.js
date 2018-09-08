@@ -212,7 +212,7 @@ Template.create_new_pattern.events({
       name: $('#pattern_name').val()
     }
 
-    if (edit_mode == "3-1-broken-twill") {
+    if (edit_mode == "broken_twill") {
       var radios = document.getElementsByName('twill-direction');
 
       for (var i = 0, length = radios.length; i < length; i++)
@@ -220,8 +220,6 @@ Template.create_new_pattern.events({
        if (radios[i].checked)
        {
         params.twill_direction = radios[i].value;
-        console.log(`twill direction: ${params.twill_direction}`);
-
         break;
        }
       }
@@ -230,7 +228,7 @@ Template.create_new_pattern.events({
     Meteor.my_functions.new_pattern(params);
 
     $('[name=pattern_name]').val(''); // reset pattern name
-    // however do not reset numbers, in case user wants to create another similar pattern?
+    // however do not reset numbers, in case user wants to create another similar pattern
   }
 });
 

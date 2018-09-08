@@ -104,11 +104,9 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
     if (typeof pattern === "undefined")
         return;
       
-    if (pattern.edit_mode == "simulation")
+    if (pattern.edit_mode == "simulation" || pattern.edit_mode == "broken_twill")
     {
       var mapped_styles = Meteor.my_functions.map_weaving_styles(style_ref);
-
-      //console.log("orientation for tablet " + this.tablet);
 
       if (current_orientation[this.tablet].get() == "S")
         style_ref = mapped_styles[0];

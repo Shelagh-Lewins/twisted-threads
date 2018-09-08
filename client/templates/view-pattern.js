@@ -48,33 +48,7 @@ Template.view_pattern.rendered = function() {
 
 Template.view_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
-  Meteor.my_functions.view_pattern_created(pattern_id);
-
-
-  /* var pattern_id = Router.current().params._id;
-  Session.set('pattern_ready', false);
-
-  var params = { pattern_id: pattern_id };
-    console.log('subscribing');
-      this.subscribe('pattern', params, {
-        onReady: function() {
-          console.log('subscribed');
-          Session.set('pattern_ready', true);
-
-          if (Meteor.my_functions.pattern_exists(pattern_id));
-          {
-            Meteor.my_functions.view_pattern_created(pattern_id);
-
-        /////////
-        // Images
-        Tracker.autorun(function() {
-          Meteor.subscribe('images');
-        });
-      }
-    }
-  }); */
-
-  
+  Meteor.my_functions.view_pattern_created(pattern_id); 
 });
 
 Template.pattern_not_found.helpers({
@@ -652,7 +626,7 @@ Template.view_pattern.events({
 
     var number_of_tablets = pattern.number_of_tablets;
 
-    if (pattern.edit_mode == "simulation")
+    if (pattern.edit_mode == "simulation" || pattern.edit_mode == "broken_twill")
     {
       var old_style = current_threading[this.hole.toString() + "_" + this.tablet.toString()].get();
       Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, this.hole, old_style, new_style);
@@ -661,9 +635,8 @@ Template.view_pattern.events({
     Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
 
     Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets, this.tablet, this.hole);
-    // Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets);
 
-    if (pattern.edit_mode != "simulation")
+    if (pattern.edit_mode == "freehand")
       Meteor.my_functions.store_pattern(pattern_id);
   },
   'click .tablets .row.orientation li': function(event, template)

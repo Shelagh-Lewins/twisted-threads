@@ -269,7 +269,7 @@ body.weave button.styled_button:disabled {
   margin-right: 0;
 }
 
-/* Simulation pattern */
+/* Simulation pattern toolbar */
 .simulation #toolbar {
   min-width: 600px;
   width: 100%;
@@ -613,6 +613,7 @@ body.weave button.styled_button:disabled {
   display: none;
 }
 
+/* Simulation styles_palette */
 #styles_palette.simulation .styles {
   width: 352px;
 }
@@ -624,7 +625,19 @@ body.weave button.styled_button:disabled {
   border-color: #999999;
 }
 
-/* Simulation styles */
+/* 3/1 Broken twill styles_palette */
+#styles_palette.broken_twill .styles {
+  width: 352px;
+}
+
+#styles_palette.broken_twill.show_special_styles #edit_style_button {
+  display: block;
+  background-color: #DDDDDD;
+  color: #999999;
+  border-color: #999999;
+}
+
+/* Simulation styles pagination */
 .simulation .styles .pagination ul li:nth-child(2) {
   display: none;
 }
@@ -689,6 +702,67 @@ body.weave button.styled_button:disabled {
     color: #FFFFFF;
 }
 
+/* 3/1 Broken twill styles pagination */
+.broken_twill .styles .pagination ul li:nth-child(2) {
+  display: none;
+}
+
+#styles_palette.broken_twill .styles .box {
+  display: block;
+  height: 45px;
+}
+
+.broken_twill .styles ul.row {
+  width: 308px;
+}
+
+
+.broken_twill .styles ul.row.special {
+  width: 36px;
+  margin-left: -4px; /* remove space between inline-block elements */
+}
+
+.broken_twill .styles ul.row:nth-child(2) {
+  display: none;
+}
+
+.broken_twill .styles ul.row li.cell {
+  display: none;
+}
+
+.broken_twill .styles ul.row.style li.cell:nth-child(-n+2) {
+  display: inline-block;
+}
+
+#styles_palette.show_special_styles.broken_twill .special_styles {
+  display: inline-block;
+}
+
+.broken_twill .styles .special_styles {
+  display: inline-block;
+}
+
+#styles_palette.show_special_styles.broken_twill .box > .row:first-child {
+  display: inline-block;
+}
+
+.broken_twill.show_special_styles .styles ul.row li.cell.selected {
+    border-color: #333333;
+}
+
+.broken_twill .styles ul.row.special li.cell.selected {
+    border-color: #333333;
+}
+
+.broken_twill.show_special_styles .styles ul.row.special li.cell.selected {
+    border-color: #5555FF;
+}
+
+.broken_twill .styles .pagination ul li a {
+    background-color: #424A6C;
+    color: #FFFFFF;
+}
+
 /* *** Edit Style *** */
 .edit_style {
   position: absolute;
@@ -704,6 +778,10 @@ body.weave button.styled_button:disabled {
 }
 
 .simulation .edit_style {
+  width: 100px;
+}
+
+.broken_twill .edit_style {
   width: 100px;
 }
 
@@ -763,4 +841,3 @@ body.weave button.styled_button:disabled {
 #edit_tablets {
   clear: both;
 }
-
