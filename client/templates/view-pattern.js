@@ -868,6 +868,34 @@ Template.view_pattern.events({
 
     Meteor.my_functions.unweave_button(pattern_id);
   },
+  ////////////////////////////////////////
+  // 3/1 Broken twill patterns
+  'click .broken_twill_chart li.cell': function(event, template){
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+
+    if (!Meteor.my_functions.accept_click())
+        return;
+
+    var pattern_id = Router.current().params._id;
+    if (!Meteor.my_functions.pattern_exists(pattern_id))
+        return;
+    
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1, number_of_tablets: 1}});
+    var number_of_rows = pattern.number_of_rows;
+    var number_of_tablets = pattern.number_of_tablets;
+    var new_style = Meteor.my_functions.get_selected_style();
+//console.log('clicked');
+  //console.log(`row ${this.row}`);
+  //console.log(`tablet ${this.tablet}`);
+    Meteor.my_functions.set_broken_twill_cell_style(this.row, this.tablet, new_style);
+    Meteor.my_functions.update_broken_twill_chart(pattern_id);
+
+    // Meteor.my_functions.set_weaving_cell_style(this.row, this.tablet, new_style);
+    // Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets);
+  },
+  ///////////////////////////////////////////////////
   'click #add_tablet': function () {
     // add tablet at indicated position, e.g. position 1 = new tablet is #1
     if (!Meteor.my_functions.accept_click())

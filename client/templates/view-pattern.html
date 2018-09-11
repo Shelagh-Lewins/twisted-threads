@@ -236,6 +236,21 @@
 
   {{/unless}}
 
+  {{#if equals edit_mode "broken_twill"}}
+  <h2>Broken Twill Design Chart</h2>
+
+  <div class="broken_twill_chart {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
+    {{> column_numbers}}
+    {{#each broken_twill_row_indexes}}
+      {{> broken_twill_row}}
+    {{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
+    {{#each tablet_indexes}}
+    {{> remove_tablet}}
+    {{/each}}</ul></div>{{/if}}
+    {{/if}}
+  </div>
+  {{/if}}
+
   <h2>Threading chart</h2>  
 
   <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}

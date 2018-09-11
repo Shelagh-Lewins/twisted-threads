@@ -1,0 +1,106 @@
+/* *** Broken twill chart *** */
+.broken_twill_chart {
+  clear: both;
+  float: left;
+  margin-bottom: 20px;
+  padding: 16px 0 16px 0;
+}
+
+.broken_twill_chart .row {
+  clear: both;
+  float: left;
+  white-space: nowrap;
+  position: relative;
+  color: #000000;
+  font-size: 0;
+}
+
+.broken_twill_chart .row_number,
+.broken_twill_chart .spacer {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  vertical-align: top; /* prevents empty span from changing layout */
+}
+
+.broken_twill_chart .row ul {
+  white-space: nowrap;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0;
+  vertical-align: top; /* prevents empty span from changing layout */
+}
+
+.broken_twill_chart .row:nth-child(2) .cell {
+  border-top: 1px solid #999999;
+}
+
+.broken_twill_chart .row .cell,
+.broken_twill_chart .row .remove_tablet,
+.broken_twill_chart .row .remove_row,
+.broken_twill_chart .row.column_number li {
+	border-bottom: 1px solid #999999;
+  display: inline-block;
+  width: 32px;
+  height: 64px;
+  border-left: 1px solid #999999;
+  line-height: 32px;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  vertical-align: top; /* prevents empty span from changing layout */
+  position: relative;
+  -webkit-print-color-adjust: exact;
+}
+
+.broken_twill_chart .row.column_number li {
+	border-bottom: none;
+}
+
+
+.broken_twill_chart .row .cell:nth-child(even) {
+	top: -34px;
+}
+
+.broken_twill_chart .row .cell {
+  background-size: 32px 32px;
+}
+
+.broken_twill_chart.editable .cell:active {
+  background-color: #9999FF !important;
+}
+
+.broken_twill_chart.editable .row li.remove_tablet,
+.broken_twill_chart.editable .row li.remove_row,
+.broken_twill_chart.editable .row li.cell {
+  cursor: pointer;
+}
+
+.broken_twill_chart.editable .row li.remove_tablet,
+.broken_twill_chart.editable .row li.remove_row {
+  background-color: #FFFFFF;
+  color: #FF3333;
+}
+
+.broken_twill_chart.editable .row li.remove_tablet {
+	border-top: 1px solid #999999;
+}
+
+.broken_twill_chart .row.column_number ul {
+  border: none;
+  color: #000000;
+}
+
+.broken_twill_chart .row.column_number li {
+  border-left: 1px solid rgba(0,0,0,0);
+}
+
+.broken_twill_chart .row .cell:last-child,
+.broken_twill_chart .row .remove_tablet:last-child {
+  border-right: 1px solid #999999;
+}

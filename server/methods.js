@@ -429,11 +429,11 @@ Meteor.methods({
       if (options.number_of_rows % 2 == 1)
         throw new Meteor.Error("odd-twill-rows", "error creating pattern from JSON. 3/1 broken twill pattern must have even number of rows");
 
-      var twill_pattern_chart = []; // corresponds to Data in GTT pattern. This is the grid showing the two-colour design.
+      var twill_pattern_chart = []; // corresponds to Data in GTT pattern. This is the chart showing the two-colour design.
 
-      var long_floats_chart = []; // corresponds to LongFloats in GTT pattern. This is the grid showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
+      var long_floats_chart = []; // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
 
-      // for now, set up a plain grid for each, this will give just background twill
+      // for now, set up a plain chart for each, this will give just background twill
       for (var i=0; i<options.number_of_rows / 2; i++)
       {
         twill_pattern_chart[i] = new Array();
@@ -913,6 +913,7 @@ Meteor.methods({
   },
   update_manual_weaving: function(pattern_id, data)
   {
+    check(pattern_id, String);
     check(data, Object);
 
     Patterns.update({_id: pattern_id}, {$set: {position_of_A: JSON.stringify(data.position_of_A)}});
@@ -966,6 +967,16 @@ Meteor.methods({
     auto_turn_sequence[turn_number - 1] = direction;
 
     Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: auto_turn_sequence}});
+  },
+  //////////////////////////////////////
+  // Broken twill
+  update_broken_twill_chart: function(pattern_id, data)
+  {
+    check(pattern_id, String);
+    check(data, Object);
+    console.log(`twill_array ${data.twill_pattern_chart}`);
+
+    Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(data.twill_pattern_chart)}});
   },
   //////////////////////////////////////
   // Recent patterns
