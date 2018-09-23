@@ -1498,7 +1498,6 @@ Meteor.my_functions = {
       // build the weaving chart from the charts
       var raw_pattern_chart = JSON.parse(pattern.twill_pattern_chart);
       var raw_long_floats_chart = JSON.parse(pattern.long_floats_chart);
-console.log(`raw_pattern_chart ${raw_pattern_chart}`);
 
       var twill_pattern_chart = []; // array for internal working in this function
 
@@ -1541,12 +1540,7 @@ console.log(`raw_pattern_chart ${raw_pattern_chart}`);
       {
         for (var j=0; j<number_of_tablets; j++)
         {
-          //console.log(`***`);
-          //console.log(`row ${i}`);
-          //console.log(`tablet ${j}`);
           temp_pattern_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_pattern_chart[i][j]);
-          //console.log(`value ${twill_pattern_chart[i][j]}`);
-          //console.log(`raw_pattern_chart ${raw_pattern_chart[i][j]}`);
         }
       }
 
@@ -1602,7 +1596,7 @@ console.log(`raw_pattern_chart ${raw_pattern_chart}`);
       {
         for (var j=0; j<number_of_tablets; j++)
         {
-          temp_long_floats_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(long_floats_chart[i][j]);
+          temp_long_floats_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_long_floats_chart[i][j]);
         }
       }
 
@@ -3359,6 +3353,8 @@ console.log(`raw_pattern_chart ${raw_pattern_chart}`);
     });    
   },
   update_broken_twill_chart: function(pattern_id) {
+    Session.set("hide_preview", true); // force a clean refresh of the preview
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
     if (pattern.edit_mode != "broken_twill")
@@ -3372,8 +3368,13 @@ console.log(`raw_pattern_chart ${raw_pattern_chart}`);
     }
 
     Meteor.call("update_broken_twill_chart", pattern_id, data, function() {
+      Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.save_preview_as_text(pattern_id);
+
+      Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
+      Meteor.my_functions.save_preview_as_text(pattern_id);
+      Session.set("hide_preview", false);
     });
   },
   get_twill_pattern_chart_as_array: function(number_of_rows, number_of_tablets)
@@ -3405,7 +3406,7 @@ console.log(`raw_pattern_chart ${raw_pattern_chart}`);
       }
     }
  console.log(`twill_array ${JSON.stringify(twill_array)}`);
-    return twill_array;
+    return twill_array.reverse();
   },
   ///////////////////////////////////
   // Searching

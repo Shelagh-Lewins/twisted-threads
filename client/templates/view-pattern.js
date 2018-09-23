@@ -605,7 +605,11 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.pattern_exists(pattern_id))
         return;
     
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1, number_of_tablets: 1}});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1, number_of_tablets: 1, edit_mode: 1}});
+
+    if (pattern.edit_mode == "broken_twill")
+        return; // threading is not editable for 3/1 broken twill
+
     var number_of_rows = pattern.number_of_rows;
     var number_of_tablets = pattern.number_of_tablets;
     var new_style = Meteor.my_functions.get_selected_style();
@@ -623,6 +627,9 @@ Template.view_pattern.events({
 
     var new_style = Meteor.my_functions.get_selected_style();
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
+
+    if (pattern.edit_mode == "broken_twill")
+        return; // threading is not editable for 3/1 broken twill
 
     var number_of_tablets = pattern.number_of_tablets;
 
@@ -650,6 +657,9 @@ Template.view_pattern.events({
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
+    if (pattern.edit_mode == "broken_twill")
+        return; // threading is not editable for 3/1 broken twill
+
     var new_orientation = "S";
     
     if (current_orientation[this].get() == "S")
@@ -676,6 +686,10 @@ Template.view_pattern.events({
 
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+    if (pattern.edit_mode == "broken_twill")
+        return; // threading is not editable for 3/1 broken twill
 
     Meteor.call('toggle_hole_handedness', pattern_id);
   },

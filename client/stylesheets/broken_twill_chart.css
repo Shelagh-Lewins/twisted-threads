@@ -64,7 +64,7 @@
 
 
 .broken_twill_chart .row .cell:nth-child(even) {
-	top: -34px;
+	top: 34px;
 }
 
 .broken_twill_chart .row .cell {
