@@ -895,14 +895,18 @@ Template.view_pattern.events({
     var pattern_id = Router.current().params._id;
     if (!Meteor.my_functions.pattern_exists(pattern_id))
         return;
+
+    // first row of even tablets is always background color
+    if (this.row == 1 && this.tablet %2 == 0)
+        return;
     
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1, number_of_tablets: 1}});
     var number_of_rows = pattern.number_of_rows;
     var number_of_tablets = pattern.number_of_tablets;
     var new_style = Meteor.my_functions.get_selected_style();
-//console.log('clicked');
-  //console.log(`row ${this.row}`);
-  //console.log(`tablet ${this.tablet}`);
+console.log('clicked');
+  console.log(`row ${this.row}`);
+  console.log(`tablet ${this.tablet}`);
     Meteor.my_functions.set_broken_twill_cell_style(this.row, this.tablet, new_style);
     Meteor.my_functions.update_broken_twill_chart(pattern_id);
 

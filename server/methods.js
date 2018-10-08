@@ -433,7 +433,7 @@ Meteor.methods({
 
       var long_floats_chart = []; // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
 
-      // for now, set up a plain chart for each, this will give just background twill
+      // set up a plain chart for each, this will give just background twill
       for (var i=0; i<options.number_of_rows / 2; i++)
       {
         twill_pattern_chart[i] = new Array();

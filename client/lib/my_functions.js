@@ -3368,13 +3368,17 @@ Meteor.my_functions = {
     }
 
     Meteor.call("update_broken_twill_chart", pattern_id, data, function() {
-      Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-      Meteor.my_functions.build_pattern_display_data(pattern_id);
+
+
       Meteor.my_functions.save_preview_as_text(pattern_id);
 
       Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
       Meteor.my_functions.save_preview_as_text(pattern_id);
+      Meteor.my_functions.build_pattern_display_data(pattern_id);
+      Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
       Session.set("hide_preview", false);
+
+           
     });
   },
   get_twill_pattern_chart_as_array: function(number_of_rows, number_of_tablets)
@@ -3406,7 +3410,7 @@ Meteor.my_functions = {
       }
     }
  console.log(`twill_array ${JSON.stringify(twill_array)}`);
-    return twill_array.reverse();
+    return twill_array;
   },
   ///////////////////////////////////
   // Searching

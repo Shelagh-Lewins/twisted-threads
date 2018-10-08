@@ -3,6 +3,7 @@
 UI.registerHelper('broken_twill_row_indexes', function() {
   // row 1 is at bottom of chart
   var broken_twill_row_indexes = [];
+  //for (var i=1; i<=Session.get("number_of_rows") / 2; i++)
   for (var i=Session.get("number_of_rows") / 2; i>=1; i--)
   {
     broken_twill_row_indexes.push(i);
