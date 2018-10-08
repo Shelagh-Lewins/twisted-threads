@@ -37,20 +37,21 @@ UI.registerHelper('broken_twill_data', function(row, tablet) {
   	data.style = 1;
   }
 
-  // long float?
-  var long_float_cell = current_long_floats_chart[(row) + "_" + (tablet)];
-  if (typeof long_float_cell === "undefined")
+  // twill reversal?
+  var twill_reversal_cell = current_twill_reversal_chart[(row) + "_" + (tablet)];
+  if (typeof twill_reversal_cell === "undefined")
   {
     return;
   }
 
-  value = long_float_cell.get();
+  value = twill_reversal_cell.get();
 
   if (value == ".") {
-  	data.long_float = false;
+  	data.twill_reversal = false;
   } else {
-  	data.long_float = true;
+  	data.twill_reversal = true;
   }
+  // console.log(`twill reversal: ${value}`);
 
   // get cell background colour
   var style = current_styles.list()[data.style-1];

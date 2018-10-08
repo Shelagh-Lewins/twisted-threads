@@ -905,7 +905,7 @@ Meteor.my_functions = {
     }
 
     // Analyse long floats data
-    var long_floats_chart = [];
+    var twill_reversal_chart = [];
 
     // GTT 1.11 calls long floats "Reversals" and has them in reverse order
     if (typeof pattern_data.LongFloats === "undefined")
@@ -938,7 +938,7 @@ Meteor.my_functions = {
             even_row[j] = "Y";
       }
 
-      long_floats_chart.push(even_row);
+      twill_reversal_chart.push(even_row);
 
       var odd_row = [];
 
@@ -963,7 +963,7 @@ Meteor.my_functions = {
         
       }
 
-      long_floats_chart.push(odd_row);
+      twill_reversal_chart.push(odd_row);
     }
 
     // set up packs
@@ -1017,16 +1017,16 @@ Meteor.my_functions = {
           }
         }        
 
-        var long_float = long_floats_chart[i][j];
+        var long_float = twill_reversal_chart[i][j];
 
         var previous_long_float = ".";
         if (i != 0)
-          previous_long_float = long_floats_chart[i-1][j];
+          previous_long_float = twill_reversal_chart[i-1][j];
 
         var next_long_float = ".";
 
         if ((i < number_of_rows - 1))
-          next_long_float = long_floats_chart[i+1][j];     
+          next_long_float = twill_reversal_chart[i+1][j];     
 
         // handle long floats
 
@@ -1497,7 +1497,7 @@ Meteor.my_functions = {
 
       // build the weaving chart from the charts
       var raw_pattern_chart = JSON.parse(pattern.twill_pattern_chart);
-      var raw_long_floats_chart = JSON.parse(pattern.long_floats_chart);
+      var raw_twill_reversal_chart = JSON.parse(pattern.twill_reversal_chart);
 
       var twill_pattern_chart = []; // array for internal working in this function
 
@@ -1547,14 +1547,14 @@ Meteor.my_functions = {
       current_twill_pattern_chart = temp_pattern_chart;
 
       // build the long floats chart
-      var long_floats_chart = []; // array for internal working in this function
+      var twill_reversal_chart = []; // array for internal working in this function
 
       for(var i=0; i<raw_pattern_chart.length; i++)
       {
         var even_row = [];
         for (var j=0; j<number_of_tablets; j++)
         {
-          even_row.push(raw_long_floats_chart[i][j]);
+          even_row.push(raw_twill_reversal_chart[i][j]);
 
           // replace X with Y in second row so we can identify first and second row of long float
           if ((j%2 == 1))
@@ -1562,7 +1562,7 @@ Meteor.my_functions = {
               even_row[j] = "Y";
         }
 
-        long_floats_chart.push(even_row);
+        twill_reversal_chart.push(even_row);
 
         var odd_row = [];
 
@@ -1570,14 +1570,14 @@ Meteor.my_functions = {
         {
           if (i == (raw_pattern_chart.length - 1)) // last row of LongFloats
           {
-            odd_row.push(raw_long_floats_chart[i][j]);
+            odd_row.push(raw_twill_reversal_chart[i][j]);
           }
           else
           {
             if (j%2 == 0)
-              odd_row.push(raw_long_floats_chart[i][j]);
+              odd_row.push(raw_twill_reversal_chart[i][j]);
             else
-              odd_row.push(raw_long_floats_chart[i+1][j]);
+              odd_row.push(raw_twill_reversal_chart[i+1][j]);
           }
 
           // replace X with Y in second row so we can identify first and second row of long float
@@ -1587,20 +1587,20 @@ Meteor.my_functions = {
           
         }
 
-        long_floats_chart.push(odd_row);
+        twill_reversal_chart.push(odd_row);
       }
 
-      var temp_long_floats_chart = {};
+      var temp_twill_reversal_chart = {};
 
       for (var i=0; i<raw_pattern_chart.length; i++)
       {
         for (var j=0; j<number_of_tablets; j++)
         {
-          temp_long_floats_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_long_floats_chart[i][j]);
+          temp_twill_reversal_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_twill_reversal_chart[i][j]);
         }
       }
 
-      current_long_floats_chart = temp_long_floats_chart;
+      current_twill_reversal_chart = temp_twill_reversal_chart;
 
       // create the pattern. This is from my_functions.convert_gtt_3_1_twill_pattern_to_json
       var twill_direction = pattern.twill_direction;
@@ -1687,16 +1687,16 @@ Meteor.my_functions = {
             }
           }        
 
-          var long_float = long_floats_chart[i][j];
+          var long_float = twill_reversal_chart[i][j];
 
           var previous_long_float = ".";
           if (i != 0)
-            previous_long_float = long_floats_chart[i-1][j];
+            previous_long_float = twill_reversal_chart[i-1][j];
 
           var next_long_float = ".";
 
           if ((i < number_of_rows - 1))
-            next_long_float = long_floats_chart[i+1][j];     
+            next_long_float = twill_reversal_chart[i+1][j];     
 
           // handle long floats
 
@@ -3352,7 +3352,7 @@ Meteor.my_functions = {
       Session.set("hide_preview", false);
     });    
   },
-  update_broken_twill_chart: function(pattern_id) {
+  update_twill_pattern_chart: function(pattern_id) {
     Session.set("hide_preview", true); // force a clean refresh of the preview
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
@@ -3367,7 +3367,7 @@ Meteor.my_functions = {
       twill_pattern_chart: Meteor.my_functions.get_twill_pattern_chart_as_array(number_of_rows, number_of_tablets)
     }
 
-    Meteor.call("update_broken_twill_chart", pattern_id, data, function() {
+    Meteor.call("update_twill_pattern_chart", pattern_id, data, function() {
 
 
       Meteor.my_functions.save_preview_as_text(pattern_id);
@@ -3409,7 +3409,65 @@ Meteor.my_functions = {
         }
       }
     }
- console.log(`twill_array ${JSON.stringify(twill_array)}`);
+ // console.log(`twill_array ${JSON.stringify(twill_array)}`);
+    return twill_array;
+  },
+  update_twill_reversal_chart: function(pattern_id) {
+    Session.set("hide_preview", true); // force a clean refresh of the preview
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+
+    if (pattern.edit_mode != "broken_twill")
+        return;
+
+    var number_of_rows = Session.get("number_of_rows");
+    var number_of_tablets = Session.get("number_of_tablets");
+
+    const data = {
+      twill_reversal_chart: Meteor.my_functions.get_twill_reversal_chart_as_array(number_of_rows, number_of_tablets)
+    }
+
+    Meteor.call("update_twill_reversal_chart", pattern_id, data, function() {
+
+
+      Meteor.my_functions.save_preview_as_text(pattern_id);
+
+      Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
+      Meteor.my_functions.save_preview_as_text(pattern_id);
+      Meteor.my_functions.build_pattern_display_data(pattern_id);
+      Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
+      Session.set("hide_preview", false);           
+    });
+  },
+  get_twill_reversal_chart_as_array: function(number_of_rows, number_of_tablets)
+  {
+    // turn the reactive array of objects into simple nested arrays of chart values
+    if (number_of_rows % 2 !== 0)
+    {
+      console.log("Error in get_twill_reversal_chart_as_array: number of rows must be even");
+    }
+    var twill_array = new Array(number_of_rows/2);
+
+    for (var i=0; i<number_of_rows/2; i++)
+    {
+      twill_array[i] = new Array(number_of_tablets);
+
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        var item = current_twill_reversal_chart[(i+1) + "_" + (j+1)];
+        if (typeof item !== "undefined")
+        {
+          twill_array[i][j] = item.get();
+        }
+
+        else
+        {
+          console.log("non-existent item in get_twill_pattern_chart_as_array");
+          console.log("identifier " + (i+1) + "_" + (j+1));
+        }
+      }
+    }
+ // console.log(`twill_array ${JSON.stringify(twill_array)}`);
     return twill_array;
   },
   ///////////////////////////////////
@@ -3522,7 +3580,6 @@ Meteor.my_functions = {
   // broken twill data as client-side object
   set_broken_twill_cell_style: function(row, tablet, style)
   {
-    console.log(`style ${style}`);
     var chart_value = ".";
     if (style == 1)
     {
@@ -3530,6 +3587,20 @@ Meteor.my_functions = {
     }
     current_twill_pattern_chart[(row) + "_" + (tablet)].set(chart_value);
     console.log(`chart value ${current_twill_pattern_chart[(row) + "_" + (tablet)].get()}`);
+  },
+  set_broken_twill_reversal: function(row, tablet)
+  {
+    // toggle the reversal chart value
+    var chart_value = current_twill_reversal_chart[(row) + "_" + (tablet)].get();
+    if (chart_value == '.')
+    {
+      chart_value = "X";
+    } else {
+      chart_value = ".";
+    }
+    console.log(`set_broken_twill_reversal to: ${chart_value}`);
+    current_twill_reversal_chart[(row) + "_" + (tablet)].set(chart_value);
+    console.log(`broken_twill_reversal is: ${current_twill_reversal_chart[(row) + "_" + (tablet)].get()}`);
   },
   find_style: function(style_value) // e,g, 2, "S1", may be regular or special
   {

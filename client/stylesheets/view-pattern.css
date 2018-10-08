@@ -722,7 +722,7 @@ body.weave button.styled_button:disabled {
   margin-left: -4px; /* remove space between inline-block elements */
 }
 
-.broken_twill .styles ul.row:nth-child(2) {
+.broken_twill .styles ul.row:nth-child(3) {
   display: none;
 }
 
@@ -730,7 +730,7 @@ body.weave button.styled_button:disabled {
   display: none;
 }
 
-.broken_twill .styles ul.row.style li.cell:nth-child(-n+2) {
+.broken_twill .styles ul.row.style li.cell:nth-child(-n+3) {
   display: inline-block;
 }
 
