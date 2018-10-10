@@ -76,6 +76,18 @@
   background-color: #9999FF !important;
 }
 
+.broken_twill_chart .row .cell.twill_reversal::before {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 62px;
+  margin: 1px;
+  border-radius: 4px;
+  -moz-box-shadow:    inset 0 0 0 2px #5555FF;
+  -webkit-box-shadow: inset 0 0 0 2px #5555FF;
+  box-shadow:         inset 0 0 0 2px #5555FF;
+}
+
 .broken_twill_chart.editable .row li.remove_tablet,
 .broken_twill_chart.editable .row li.remove_row,
 .broken_twill_chart.editable .row li.cell {

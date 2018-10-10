@@ -734,6 +734,22 @@ body.weave button.styled_button:disabled {
   display: inline-block;
 }
 
+.broken_twill .styles ul.row.style li.cell:nth-child(3) {
+  background: #FFFFFF !important;
+}
+
+.broken_twill .styles ul.row.style li.cell:nth-child(3)::before {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin: 1px;
+  border-radius: 4px;
+  -moz-box-shadow:    inset 0 0 0 2px #5555FF;
+  -webkit-box-shadow: inset 0 0 0 2px #5555FF;
+  box-shadow:         inset 0 0 0 2px #5555FF;
+}
+
 #styles_palette.show_special_styles.broken_twill .special_styles {
   display: inline-block;
 }
