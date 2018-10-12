@@ -2369,9 +2369,9 @@ Meteor.my_functions = {
           obj.background_color = options.background_color;
           current_styles.splice(selected_style-1, 1, obj);
 
-          // simulation pattern: weaving chart styles must also be updated
+          // simulation pattern, broken twill pattern: weaving chart styles must also be updated
           var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
-          if (pattern.edit_mode == "simulation")
+          if (pattern.edit_mode == "simulation" || pattern.edit_mode == "broken_twill")
           {
             var style_number = 7 + 4*7; // default to empty hole to avoid error
 

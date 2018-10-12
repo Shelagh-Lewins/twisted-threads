@@ -69,7 +69,7 @@
 
 .broken_twill_chart .row .cell {
   background-size: 32px 32px;
-  z-index: 100;
+  z-index: 2;
 }
 
 .broken_twill_chart.editable .cell:active {
