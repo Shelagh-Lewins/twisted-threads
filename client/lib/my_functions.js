@@ -3307,7 +3307,7 @@ Meteor.my_functions = {
   ///////////////////////////////////
   // 3/1 Broken twill patterns
   reset_broken_twill_weaving: function(pattern_id, simulation_mode) {
-    Session.set("hide_preview", true); // force a clean refresh of the preview
+    // Session.set("hide_preview", true); // force a clean refresh of the preview
 
     // remove and rebuild the current simulation pattern weaving
     var pattern = Patterns.findOne({_id: pattern_id});
@@ -3349,11 +3349,11 @@ Meteor.my_functions = {
       // TODO investigate whether this is required when it's not the user's pattern. No data will be saved to the db but the callbacks may be needed.
       Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, number_of_tablets);
       Meteor.my_functions.save_preview_as_text(pattern_id);
-      Session.set("hide_preview", false);
+      // Session.set("hide_preview", false);
     });    
   },
   update_twill_pattern_chart: function(pattern_id) {
-    Session.set("hide_preview", true); // force a clean refresh of the preview
+    // Session.set("hide_preview", true); // force a clean refresh of the preview
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
@@ -3376,7 +3376,7 @@ Meteor.my_functions = {
       Meteor.my_functions.save_preview_as_text(pattern_id);
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-      Session.set("hide_preview", false);
+      // Session.set("hide_preview", false);
 
            
     });
@@ -3667,6 +3667,14 @@ Meteor.my_functions = {
   // work around frequent failure of Meteor to register clicks on Styles palette
   style_cell_clicked: function(style, special_style)
   {
+    if ($('#width').hasClass("broken_twill")) {
+
+      if (style == 3) {
+        // style 3 in broken twill is used to apply twill direction change
+        Session.set('edit_style', false);
+      }
+    }
+
     if(special_style)
     {
       Session.set("selected_special_style", style);
@@ -3684,6 +3692,15 @@ Meteor.my_functions = {
   },
   edit_style_clicked: function()
   {
+    if ($('#width').hasClass("broken_twill")) {
+      var selected_style = Session.get("selected_style");
+      if (selected_style == 3) {
+        // style 3 in broken twill is used to apply twill direction change
+        Session.set('edit_style', false);
+        return;
+      }
+    }
+
     if (Session.equals('edit_style', true))
       Session.set('edit_style', false);
 

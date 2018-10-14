@@ -469,6 +469,13 @@ Template.styles_palette.helpers({
     }
 
     return warps;
+  },
+  broken_twill_hint: function() {
+    switch(Session.get("selected_style")) {
+      case 1: return "Draw with foreground colour";
+      case 2: return "Draw with background colour";
+      case 3: return "Change twill direction";
+    }
   }
 });
 
@@ -905,20 +912,13 @@ Template.view_pattern.events({
     var number_of_tablets = pattern.number_of_tablets;
     var new_style = Meteor.my_functions.get_selected_style();
 
-    console.log(`style ${new_style}`);
     if (new_style == 3) { // use style 3 for reversing twill direction
-      console.log('reversal');
       Meteor.my_functions.set_broken_twill_reversal(this.row, this.tablet);
       Meteor.my_functions.update_twill_reversal_chart(pattern_id);
     } else { // styles 1, 2 are background, foreground colour
-// console.log('clicked');
-//  console.log(`row ${this.row}`);
-  //console.log(`tablet ${this.tablet}`);
-  console.log('pattern');
       Meteor.my_functions.set_broken_twill_cell_style(this.row, this.tablet, new_style);
       Meteor.my_functions.update_twill_pattern_chart(pattern_id);
     }
-    
   },
   ///////////////////////////////////////////////////
   'click #add_tablet': function () {

@@ -1,4 +1,8 @@
-
+Template.row_number_bt.helpers({
+  row_number_double: function(number) {
+    return number * 2;
+  }
+})
 
 UI.registerHelper('broken_twill_row_indexes', function() {
   // row 1 is at bottom of chart

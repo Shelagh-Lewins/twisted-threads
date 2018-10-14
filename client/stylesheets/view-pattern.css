@@ -697,9 +697,16 @@ body.weave button.styled_button:disabled {
     border-color: #5555FF;
 }
 
+.simulation .styles .pagination ul {
+  border: none;
+}
+
 .simulation .styles .pagination ul li a {
-    background-color: #424A6C;
-    color: #FFFFFF;
+  background-color: transparent;
+  border-right: none;
+  color: #424A6C;
+  cursor: default;
+  font-weight: bold;
 }
 
 /* 3/1 Broken twill styles pagination */
@@ -707,19 +714,30 @@ body.weave button.styled_button:disabled {
   display: none;
 }
 
-#styles_palette.broken_twill .styles .box {
+
+.broken_twill .styles .box {
   display: block;
   height: 45px;
 }
 
-.broken_twill .styles ul.row {
-  width: 308px;
+
+.broken_twill .styles .hint {
+  color: #424A6C;
+  top: -17px;
+  position: relative;
 }
 
+.broken_twill .styles ul.row {
+  width: auto;
+}
 
 .broken_twill .styles ul.row.special {
   width: 36px;
   margin-left: -4px; /* remove space between inline-block elements */
+}
+
+.broken_twill .styles ul:nth-child(2) {
+  display: none;
 }
 
 .broken_twill .styles ul.row:nth-child(3) {
@@ -774,9 +792,16 @@ body.weave button.styled_button:disabled {
     border-color: #5555FF;
 }
 
+.broken_twill .styles .pagination ul {
+  border: none;
+}
+
 .broken_twill .styles .pagination ul li a {
-    background-color: #424A6C;
-    color: #FFFFFF;
+  background-color: transparent;
+  border-right: none;
+  color: #424A6C;
+  cursor: default;
+  font-weight: bold;
 }
 
 /* *** Edit Style *** */

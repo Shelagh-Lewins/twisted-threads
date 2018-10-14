@@ -104,6 +104,10 @@
 	border-top: 1px solid #999999;
 }
 
+.broken_twill_chart.editable .row li.remove_tablet:nth-child(even) {
+    top: 34px;
+}
+
 .broken_twill_chart .row.column_number ul {
   border: none;
   color: #000000;
