@@ -42,18 +42,18 @@ UI.registerHelper('broken_twill_data', function(row, tablet) {
   }
 
   // twill reversal?
-  var twill_reversal_cell = current_twill_reversal_chart[(row) + "_" + (tablet)];
-  if (typeof twill_reversal_cell === "undefined")
+  var twill_change_cell = current_twill_change_chart[(row) + "_" + (tablet)];
+  if (typeof twill_change_cell === "undefined")
   {
     return;
   }
 
-  value = twill_reversal_cell.get();
+  value = twill_change_cell.get();
 
   if (value == ".") {
-  	data.twill_reversal = false;
+  	data.twill_change = false;
   } else {
-  	data.twill_reversal = true;
+  	data.twill_change = true;
   }
   // console.log(`twill reversal: ${value}`);
 

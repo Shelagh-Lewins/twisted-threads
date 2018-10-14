@@ -76,7 +76,7 @@
   background-color: #9999FF !important;
 }
 
-.broken_twill_chart .row .cell.twill_reversal::before {
+.broken_twill_chart .row .cell.twill_change::before {
   content: "";
   display: block;
   width: 30px;
@@ -100,12 +100,8 @@
   color: #FF3333;
 }
 
-.broken_twill_chart.editable .row li.remove_tablet {
-	border-top: 1px solid #999999;
-}
-
 .broken_twill_chart.editable .row li.remove_tablet:nth-child(even) {
-    top: 34px;
+  top: 34px;
 }
 
 .broken_twill_chart .row.column_number ul {

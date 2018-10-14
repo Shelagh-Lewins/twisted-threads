@@ -431,23 +431,23 @@ Meteor.methods({
 
       var twill_pattern_chart = []; // corresponds to Data in GTT pattern. This is the chart showing the two-colour design.
 
-      var twill_reversal_chart = []; // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
+      var twill_change_chart = []; // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
 
       // set up a plain chart for each, this will give just background twill
       for (var i=0; i<options.number_of_rows / 2; i++)
       {
         twill_pattern_chart[i] = new Array();
-        twill_reversal_chart[i] = new Array();
+        twill_change_chart[i] = new Array();
 
         for (var j=0; j<options.number_of_tablets; j++)
         {
           twill_pattern_chart[i][j] = ".";
-          twill_reversal_chart[i][j] = ".";
+          twill_change_chart[i][j] = ".";
         }
       }
 
       Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(twill_pattern_chart)}});
-      Patterns.update({_id: pattern_id}, {$set: {twill_reversal_chart: JSON.stringify(twill_reversal_chart)}});
+      Patterns.update({_id: pattern_id}, {$set: {twill_change_chart: JSON.stringify(twill_change_chart)}});
     }
     /////////////////////////////////
 
@@ -978,13 +978,13 @@ Meteor.methods({
 
     Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(data.twill_pattern_chart)}});
   },
-  update_twill_reversal_chart: function(pattern_id, data)
+  update_twill_change_chart: function(pattern_id, data)
   {
     check(pattern_id, String);
     check(data, Object);
     // console.log(`twill_array ${data.twill_pattern_chart}`);
 
-    Patterns.update({_id: pattern_id}, {$set: {twill_reversal_chart: JSON.stringify(data.twill_reversal_chart)}});
+    Patterns.update({_id: pattern_id}, {$set: {twill_change_chart: JSON.stringify(data.twill_change_chart)}});
   },
   //////////////////////////////////////
   // Recent patterns

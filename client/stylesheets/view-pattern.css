@@ -723,8 +723,7 @@ body.weave button.styled_button:disabled {
 
 .broken_twill .styles .hint {
   color: #424A6C;
-  top: -17px;
-  position: relative;
+  display: block;
 }
 
 .broken_twill .styles ul.row {

@@ -296,11 +296,11 @@
     The arrows show turning the tablet forwards.<br>
   </div>
 
-  {{#unless equals edit_mode "simulation"}}
+  {{#if equals edit_mode "freehand"}}
     {{#if can_edit_pattern _id}}
     <br><button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
     {{/if}}
-    {{/unless}}
+  {{/if}}
   </div>
   <span class="done_loading {{rendered_manual}}"></span>
   

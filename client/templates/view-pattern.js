@@ -472,9 +472,9 @@ Template.styles_palette.helpers({
   },
   broken_twill_hint: function() {
     switch(Session.get("selected_style")) {
-      case 1: return "Draw with foreground colour";
-      case 2: return "Draw with background colour";
-      case 3: return "Change twill direction";
+      case 1: return "Selected tool: draw with foreground colour";
+      case 2: return "Selected tool: draw with background colour";
+      case 3: return "Selected tool: change twill direction";
     }
   }
 });
@@ -913,8 +913,8 @@ Template.view_pattern.events({
     var new_style = Meteor.my_functions.get_selected_style();
 
     if (new_style == 3) { // use style 3 for reversing twill direction
-      Meteor.my_functions.set_broken_twill_reversal(this.row, this.tablet);
-      Meteor.my_functions.update_twill_reversal_chart(pattern_id);
+      Meteor.my_functions.set_broken_twill_change(this.row, this.tablet);
+      Meteor.my_functions.update_twill_change_chart(pattern_id);
     } else { // styles 1, 2 are background, foreground colour
       Meteor.my_functions.set_broken_twill_cell_style(this.row, this.tablet, new_style);
       Meteor.my_functions.update_twill_pattern_chart(pattern_id);
