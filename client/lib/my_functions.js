@@ -78,7 +78,7 @@ Meteor.my_functions = {
 
     var pattern_obj = {}; // JSON object to hold pattern
 
-    pattern_obj.version = "2.02";
+    pattern_obj.version = "2.03";
     // version number
     /*
       1.1 first ever
@@ -88,6 +88,7 @@ Meteor.my_functions = {
       2 replaced style.forward_stroke, style.backward_stroke with style.warp to allow more, mutually exclusive thread types
       2.01 added weft_color
       2.02 added edit_mode (simulation, freehand)
+      2.03 added broken twill
     */
 
     var number_of_rows = pattern.number_of_rows;
@@ -174,6 +175,17 @@ Meteor.my_functions = {
       }
       pattern_obj.position_of_A = JSON.parse(pattern.position_of_A);
     }
+
+    // Broken twill
+    if (pattern.edit_mode == "broken_twill")
+    {
+      pattern_obj.twill_change_chart = pattern.twill_change_chart;
+      pattern_obj.twill_direction = pattern.twill_direction;
+      pattern_obj.twill_pattern_chart = pattern.twill_pattern_chart;
+
+      // TODO start row and start threading chart
+    }
+
     // weft color
     pattern_obj.weft_color = weft_color.get();
 
@@ -232,6 +244,8 @@ Meteor.my_functions = {
     weft_color: "#76a5af",
     preview_rotation: "left"
     // TODO add simulation pattern data
+
+    // TODO add broken twill pattern data
 
     
     */
@@ -1830,7 +1844,7 @@ Meteor.my_functions = {
     // must be an integer between 1 and number of tablets + 1 (new row at end)
     position = Math.floor(position);
     position = Math.max(position, 1);
-    position = Math.min(position, Session.get("number_of_rows")+1);
+    position = Math.min(position, number_of_rows+1);
 
     // only add a valid number of rows, integer between 1 & 20
     num_new_rows = Math.floor(num_new_rows);
@@ -1863,6 +1877,13 @@ Meteor.my_functions = {
   remove_weaving_row: function(pattern_id, position){
     if (Session.get('change_tablets_latch'))
         return;
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+
+    if (pattern.edit_mode == "broken_twill") {
+      Meteor.my_functions.remove_twill_row(pattern_id, position);
+      return;
+    }
 
     Session.set('change_tablets_latch', true);
  
@@ -1956,6 +1977,56 @@ Meteor.my_functions = {
       {
         current_manual_weaving_turns.list()[i].tablets.splice(position-1, 0, 1);
       }
+    } else if (pattern.edit_mode == "broken_twill") {
+      // broken twill charts
+      for (var i=0; i<number_of_rows/2; i++)
+      {
+        for (var j=number_of_tablets-1; j>= position-1; j--)
+        {
+          // twill pattern chart
+          // delete the existing ReactiveVar
+          // recreate a new one with the same style but greater tablet
+          var cell_value = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
+          delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
+          current_twill_pattern_chart[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_value);
+
+          // twill change chart
+          // delete the existing ReactiveVar
+          // recreate a new one with the same style but greater tablet
+          var cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
+          delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
+          current_twill_change_chart[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_value);
+        }
+
+        // add new tablet to row
+        current_twill_pattern_chart[(i + 1) + "_" + position] = new ReactiveVar('.');
+
+        current_twill_change_chart[(i + 1) + "_" + position] = new ReactiveVar('.');
+      }
+
+      // recalculate threading chart
+      const broken_twill_threading = [
+        [2,2,1,2],
+        [2,1,1,1],
+        [1,1,2,1],
+        [1,2,2,2]
+      ];
+
+      for (var i=0; i<4; i++)
+      {
+        for (var j=0; j<number_of_tablets; j++)
+        {
+          current_threading[(i + 1) + "_" + (j + 1)] = new ReactiveVar(broken_twill_threading[i][j%4]);
+        }
+      }
+
+      Session.set('number_of_tablets', number_of_tablets + 1);
+
+      //Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets + 1);
+      //Meteor.my_functions.save_orientation_to_db(pattern_id);
+
+      Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, true);
+      return;
     }
 
     // save to database
@@ -2023,6 +2094,101 @@ Meteor.my_functions = {
 
     Meteor.my_functions.save_weaving_to_db(pattern_id, number_of_rows, number_of_tablets - 1);
   },
+  ///////////////////////////////////////
+  // Broken twill: add and remove rows and tablets
+  add_twill_row: function(pattern_id, position, num_new_rows)
+  {
+    if (Session.get('change_tablets_latch'))
+        return;
+
+    Session.set('change_tablets_latch', true);
+
+    var number_of_tablets = Session.get("number_of_tablets");
+
+    // two rows of twill chart per weaving row
+    var number_of_rows = Session.get("number_of_rows") / 2;
+
+    // must be an integer between 1 and number of tablets + 1 (new row at end)
+    position = Math.floor(position);
+    position = Math.max(position, 1);
+    position = Math.min(position, number_of_rows+1);
+
+    // only add a valid number of rows, integer between 1 & 10
+    num_new_rows = Math.floor(num_new_rows);
+    num_new_rows = Math.max(num_new_rows, 1);
+    num_new_rows = Math.min(num_new_rows, 10);
+
+    for (var k=0; k<num_new_rows; k++)
+    {
+      // increment row number of cells in subsequent rows
+      for (var i=number_of_rows+k-1; i>= position-1; i--)
+      {
+        for (var j=0; j<number_of_tablets; j++)
+        {
+          // twill pattern chart
+          // delete the existing ReactiveVar
+          // recreate a new one with the same style but greater row
+          var cell_value = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
+          delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
+          current_twill_pattern_chart[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_value);
+
+          // twill change chart
+          // delete the existing ReactiveVar
+          // recreate a new one with the same style but greater row
+          var cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
+          delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
+          current_twill_change_chart[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_value);
+          // console.log(`new cell: ${(i + 2) + "_" + (j + 1)}, ${current_twill_change_chart[(i + 2) + "_" + (j + 1)].get()}`);
+        }
+      }
+      // add new row
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        current_twill_pattern_chart[position + "_" + (j + 1)] = new ReactiveVar('.');
+
+        current_twill_change_chart[position + "_" + (j + 1)] = new ReactiveVar('.');
+      }
+    }
+    Meteor.my_functions.update_twill_charts(pattern_id, (number_of_rows + num_new_rows)*2);
+  },
+  remove_twill_row: function(pattern_id, position) {
+    Session.set('change_tablets_latch', true);
+ 
+    var number_of_tablets = Session.get("number_of_tablets");
+    
+    // two rows of twill chart per weaving row
+    var number_of_rows = Session.get("number_of_rows") / 2;
+
+    if ((number_of_rows <= 1) || (position < 1) || (position > (number_of_rows)))
+      return;
+
+    // remove deleted row
+    for (var j=0; j<number_of_tablets; j++)
+    {
+      delete current_twill_pattern_chart[(position) + "_" + (j + 1)];
+      delete current_twill_change_chart[(position) + "_" + (j + 1)];
+    }
+
+    // decrement row number of cells in subsequent rows
+    for (var i=position; i<=number_of_rows-1; i++)
+    {
+      for (var j=0; j<number_of_tablets; j++)
+      {
+        // twill pattern chart
+        var cell_style = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
+        delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
+        current_twill_pattern_chart[(i) + "_" + (j + 1)] = new ReactiveVar(cell_style);
+
+        // twill change chart
+        var cell_style = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
+        delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
+        current_twill_change_chart[(i) + "_" + (j + 1)] = new ReactiveVar(cell_style);
+      }
+    }
+
+    Meteor.my_functions.update_twill_charts(pattern_id, (number_of_rows -1)*2);
+  },
+  ///////////////////////////////////////
   get_weaving_as_array: function(number_of_rows, number_of_tablets)
   {
     // turn the reactive array of objects into simple nested arrays of style values
@@ -2159,10 +2325,11 @@ Meteor.my_functions = {
 
     return auto_turn_sequence;
   },
-  save_threading_to_db: function(pattern_id, number_of_tablets, tablet, hole)
+  save_threading_to_db: function(pattern_id, number_of_tablets)
   {
     var threading_array = Meteor.my_functions.get_threading_as_array(number_of_tablets);
-    Meteor.call('save_threading_to_db', pattern_id, JSON.stringify(threading_array), tablet, hole, function(error, result){
+
+    Meteor.call('save_threading_to_db', pattern_id, JSON.stringify(threading_array), function(error, result){
       if (error)
         console.log("Error from server " + error);
     });
@@ -2175,11 +2342,12 @@ Meteor.my_functions = {
   {
     // this can be called while a tablet is being deleted, so don't use the Session var
     number_of_tablets = Object.keys(current_orientation).length;
-
+    console.log(`get_orientation_as_array. number_of_tablets ${Object.keys(current_orientation).length}`);
     var orientation_array = new Array();
 
     for (var i=0; i<number_of_tablets; i++)
     {
+      console.log(`i ${i}, value ${current_orientation[i + 1].get()}`);
       orientation_array.push(current_orientation[i + 1].get());
     }
 
@@ -3306,7 +3474,7 @@ Meteor.my_functions = {
   },
   ///////////////////////////////////
   // 3/1 Broken twill patterns
-  reset_broken_twill_weaving: function(pattern_id, simulation_mode) {
+  reset_broken_twill_weaving: function(pattern_id) {
     // Session.set("hide_preview", true); // force a clean refresh of the preview
 
     // remove and rebuild the current simulation pattern weaving
@@ -3354,7 +3522,6 @@ Meteor.my_functions = {
   },
   update_twill_pattern_chart: function(pattern_id) {
     // Session.set("hide_preview", true); // force a clean refresh of the preview
-
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
     if (pattern.edit_mode != "broken_twill")
@@ -3368,17 +3535,10 @@ Meteor.my_functions = {
     }
 
     Meteor.call("update_twill_pattern_chart", pattern_id, data, function() {
-
-
-      Meteor.my_functions.save_preview_as_text(pattern_id);
-
       Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
       Meteor.my_functions.save_preview_as_text(pattern_id);
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-      // Session.set("hide_preview", false);
-
-           
     });
   },
   get_twill_pattern_chart_as_array: function(number_of_rows, number_of_tablets)
@@ -3409,7 +3569,7 @@ Meteor.my_functions = {
         }
       }
     }
- // console.log(`twill_array ${JSON.stringify(twill_array)}`);
+
     return twill_array;
   },
   update_twill_change_chart: function(pattern_id) {
@@ -3428,10 +3588,6 @@ Meteor.my_functions = {
     }
 
     Meteor.call("update_twill_change_chart", pattern_id, data, function() {
-
-
-      Meteor.my_functions.save_preview_as_text(pattern_id);
-
       Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
       Meteor.my_functions.save_preview_as_text(pattern_id);
       Meteor.my_functions.build_pattern_display_data(pattern_id);
@@ -3469,6 +3625,32 @@ Meteor.my_functions = {
     }
  // console.log(`twill_array ${JSON.stringify(twill_array)}`);
     return twill_array;
+  },
+  update_twill_charts: function(pattern_id, number_of_rows, tablet_change) {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+
+    if (pattern.edit_mode != "broken_twill")
+        return;
+
+    var number_of_tablets = Session.get("number_of_tablets");
+
+    const data = {
+      twill_pattern_chart: Meteor.my_functions.get_twill_pattern_chart_as_array(number_of_rows, number_of_tablets),
+      twill_change_chart: Meteor.my_functions.get_twill_change_chart_as_array(number_of_rows, number_of_tablets)
+    }
+
+    if (tablet_change) {
+      data.orientation = Meteor.my_functions.get_orientation_as_array();
+      data.threading = Meteor.my_functions.get_threading_as_array();
+    }
+
+    Meteor.call("update_twill_charts", pattern_id, data, function() {
+      Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
+      Meteor.my_functions.save_preview_as_text(pattern_id);
+      Meteor.my_functions.build_pattern_display_data(pattern_id);
+      Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
+      Session.set("hide_preview", false);           
+    });
   },
   ///////////////////////////////////
   // Searching

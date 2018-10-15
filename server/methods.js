@@ -68,7 +68,8 @@ Meteor.methods({
     } */
 
     // if number_of_tablets and number_of_rows are both specified, a blank pattern will be built with style 1 for all weaving and threading cells
-
+    console.log('new pattern from JSON 1');
+    console.log(`options ${JSON.stringify(options)}`);
     check(options, {
       edit_mode: Match.Optional(String),
       number_of_tablets: Match.Optional(String),
@@ -94,11 +95,11 @@ Meteor.methods({
     {
       var data = options.data;
     }
-    // TODO import 3/1 broken twill pattern from file
     else if (typeof options.filename !== "undefined")
     {
       try {
         var data = JSON.parse(Assets.getText(options.filename));
+        console.log(`got data ${JSON.stringify(data)}`);
       }
       catch(e)
       {
@@ -182,7 +183,7 @@ Meteor.methods({
         [2,1,1,1],
         [1,1,2,1],
         [1,2,2,2]
-      ]
+      ];
 
       for (var i=0; i<4; i++)
       {
@@ -200,7 +201,6 @@ Meteor.methods({
           {
             data.threading[i][j] = broken_twill_threading[i][j%4];
           }
-
         }
       }
 
@@ -419,19 +419,19 @@ Meteor.methods({
     } else if (data.edit_mode == "broken_twill") {
 
       if (typeof options.twill_direction !== "undefined")
+      {
+        // new pattern
         var twill_direction = options.twill_direction;
-      else
-        throw new Meteor.Error("no-twill-direction", "error creating pattern from JSON. No twill direction for 3/1 broken twill pattern");
-
-      Patterns.update({_id: pattern_id}, {$set: {twill_direction: twill_direction}});
 
       // 3/1 twill must have an even number of rows
       if (options.number_of_rows % 2 == 1)
         throw new Meteor.Error("odd-twill-rows", "error creating pattern from JSON. 3/1 broken twill pattern must have even number of rows");
 
-      var twill_pattern_chart = []; // corresponds to Data in GTT pattern. This is the chart showing the two-colour design.
+      var twill_pattern_chart = [];
+      // corresponds to Data in GTT pattern. This is the chart showing the two-colour design.
 
-      var twill_change_chart = []; // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
+      var twill_change_chart = [];
+      // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
 
       // set up a plain chart for each, this will give just background twill
       for (var i=0; i<options.number_of_rows / 2; i++)
@@ -445,7 +445,24 @@ Meteor.methods({
           twill_change_chart[i][j] = ".";
         }
       }
+      }
+      else if (typeof options.data.twill_direction !== "undefined")
+      {
+        // loaded from JSON file
+        var twill_direction = options.data.twill_direction;
 
+        var twill_pattern_chart = JSON.parse(options.data.twill_pattern_chart);
+        // corresponds to Data in GTT pattern. This is the chart showing the two-colour design.
+
+        var twill_change_chart = JSON.parse(options.data.twill_change_chart);
+        // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
+      }
+      else
+      {
+        throw new Meteor.Error("no-twill-direction", "error creating pattern from JSON. No twill direction for 3/1 broken twill pattern");
+      }
+
+      Patterns.update({_id: pattern_id}, {$set: {twill_direction: twill_direction}});
       Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(twill_pattern_chart)}});
       Patterns.update({_id: pattern_id}, {$set: {twill_change_chart: JSON.stringify(twill_change_chart)}});
     }
@@ -687,11 +704,8 @@ Meteor.methods({
         Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
     }
   },
- save_threading_to_db: function(pattern_id, text, tablet, hole)
- // save_threading_to_db: function(pattern_id, text)
- // tablet, hole are only here for the debug text, they should be removed once the code is working.
+ save_threading_to_db: function(pattern_id, text)
   {
-    // console.log("starting save_threading_to_db. Tablet " + tablet + ", hole " + hole);
     check(pattern_id, String);
     check(text, String);
 
@@ -985,6 +999,21 @@ Meteor.methods({
     // console.log(`twill_array ${data.twill_pattern_chart}`);
 
     Patterns.update({_id: pattern_id}, {$set: {twill_change_chart: JSON.stringify(data.twill_change_chart)}});
+  },
+  update_twill_charts: function(pattern_id, data) {
+    check(pattern_id, String);
+    check(data, Object);
+
+    Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(data.twill_pattern_chart)}});
+    Patterns.update({_id: pattern_id}, {$set: {twill_change_chart: JSON.stringify(data.twill_change_chart)}});
+
+    if (data.orientation) {
+      Patterns.update({_id: pattern_id}, {$set: {orientation: JSON.stringify(data.orientation)}});
+    }
+
+    if (data.threading) {
+      Patterns.update({_id: pattern_id}, {$set: {threading: JSON.stringify(data.threading)}});
+    }
   },
   //////////////////////////////////////
   // Recent patterns

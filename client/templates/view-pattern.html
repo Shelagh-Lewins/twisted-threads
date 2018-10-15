@@ -239,6 +239,8 @@
 
   {{#if equals edit_mode "broken_twill"}}
   <h2>Broken twill design chart</h2>
+  <div class="hint">Each chart row represents two weaving rows.</div>
+  <div class="hint">Use the twill direction change tool to create smooth diagonal lines.</div>
 
   <div class="broken_twill_chart {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
     {{> column_numbers}}
@@ -249,6 +251,13 @@
     {{> remove_tablet}}
     {{/each}}</ul></div>{{/if}}
     {{/if}}
+  </div>
+
+  <div class="edit_twill_rows">
+      <button id="add_twill_row">Add rows</button> at 
+      <input type="number" placeholder="Position..." id="twill_row_to_add" min="2" max="{{add_twill_row_positions}}" size="3" value="2" step="2"><br >
+      Number of new rows:
+      <input type="number" placeholder="Number..." id="twill_num_new_rows" min="2" max="10" size="3" value="2" step="2"><br>
   </div>
   {{/if}}
 

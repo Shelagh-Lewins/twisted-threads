@@ -155,6 +155,9 @@ Template.view_pattern.helpers({
   add_row_positions: function() {
     return Session.get("number_of_rows") + 1;
   },
+  add_twill_row_positions: function() {
+    return Session.get("number_of_rows") + 2;
+  },
   can_add_tablets: function() {
     var pattern_id = Router.current().params._id;
     if (!Meteor.my_functions.pattern_exists(pattern_id))
@@ -640,7 +643,7 @@ Template.view_pattern.events({
 
     var number_of_tablets = pattern.number_of_tablets;
 
-    if (pattern.edit_mode == "simulation" || pattern.edit_mode == "broken_twill")
+    if (pattern.edit_mode == "simulation")
     {
       var old_style = current_threading[this.hole.toString() + "_" + this.tablet.toString()].get();
       Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, this.hole, old_style, new_style);
@@ -891,7 +894,7 @@ Template.view_pattern.events({
   },
   ////////////////////////////////////////
   // 3/1 Broken twill patterns
-  'click .broken_twill_chart li.cell': function(event, template){
+  'click .broken_twill_chart li.cell:not(.remove_row)': function(event, template){
     var pattern_id = Router.current().params._id;
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
         return;
@@ -969,14 +972,42 @@ Template.view_pattern.events({
     var pattern_id = Router.current().params._id;
 
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
-      return;
+        return;
 
     var position = $('#row_to_add').val();
     var style = Meteor.my_functions.get_selected_style();
     var num_new_rows = $('#num_new_rows').val();
 
     Meteor.my_functions.add_weaving_row(pattern_id, position, style, num_new_rows);
-  }
+  },
+  // modify broken twill chart size
+  'click #add_twill_row': function () {
+    // rows are added in multiples of 2
+    // add rows at indicated position, e.g. position 2 = new rows are #1, #2
+    if (!Meteor.my_functions.accept_click())
+        return;
+
+    var pattern_id = Router.current().params._id;
+
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+        return;
+
+    var position = $('#twill_row_to_add').val() / 2;
+    var num_new_rows = $('#twill_num_new_rows').val() / 2;
+
+    Meteor.my_functions.add_twill_row(pattern_id, position, num_new_rows);
+  } ,
+  'click .broken_twill_chart .remove_row': function () {
+    if (!Meteor.my_functions.accept_click())
+        return;
+
+    var pattern_id = Router.current().params._id;
+
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
+    Meteor.my_functions.remove_twill_row(pattern_id, parseInt(this));
+  },
 });
 
 
