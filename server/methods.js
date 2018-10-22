@@ -68,8 +68,8 @@ Meteor.methods({
     } */
 
     // if number_of_tablets and number_of_rows are both specified, a blank pattern will be built with style 1 for all weaving and threading cells
-    console.log('new pattern from JSON 1');
-    console.log(`options ${JSON.stringify(options)}`);
+    //console.log('new pattern from JSON 1');
+    //console.log(`options ${JSON.stringify(options)}`);
     check(options, {
       edit_mode: Match.Optional(String),
       number_of_tablets: Match.Optional(String),

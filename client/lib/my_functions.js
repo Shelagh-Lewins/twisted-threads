@@ -1945,16 +1945,19 @@ Meteor.my_functions = {
     }
 
     // threading
-    for (var i=0; i<4; i++)
-    {
-      for (var j=number_of_tablets-1; j>= position-1; j--)
+    // broken twill threading is generated automatically
+    if (pattern.edit_mode != "broken_twill") {
+      for (var i=0; i<4; i++)
       {
-        var cell_style = current_threading[(i + 1) + "_" + (j + 1)].get();
-        delete current_threading[(i + 1) + "_" + (j + 1)];
-        current_threading[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_style);
-      }
+        for (var j=number_of_tablets-1; j>= position-1; j--)
+        {
+          var cell_style = current_threading[(i + 1) + "_" + (j + 1)].get();
+          delete current_threading[(i + 1) + "_" + (j + 1)];
+          current_threading[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_style);
+        }
 
-      current_threading[(i + 1) + "_" + position] = new ReactiveVar(style);
+        current_threading[(i + 1) + "_" + position] = new ReactiveVar(style);
+      }
     }
 
     // orientation
@@ -1965,10 +1968,14 @@ Meteor.my_functions = {
     for (var j=number_of_tablets; j>=position; j--)
     {
       current_orientation[j+1].set(current_orientation[j].get());
+      console.log(`j: ${j}`);
+      console.log(`new orientation: ${current_orientation[j+1].get()}`);
     }
      
     // set the value of the new tablet to default "S"
     current_orientation[position].set("S");
+
+    console.log(`orientation keys 0: ${JSON.stringify(Object.keys(current_orientation))}`);
 
     // manual_weaving_turns
     if (pattern.edit_mode == "simulation")
@@ -2014,9 +2021,12 @@ Meteor.my_functions = {
 
       for (var i=0; i<4; i++)
       {
-        for (var j=0; j<number_of_tablets; j++)
+        // there is now one more tablet than before
+        for (var j=0; j<number_of_tablets+1; j++)
         {
+          console.log(`i ${i}, j ${j}, threading ${broken_twill_threading[i][j%4]}`);
           current_threading[(i + 1) + "_" + (j + 1)] = new ReactiveVar(broken_twill_threading[i][j%4]);
+          console.log(`new value: ${current_threading[(i + 1) + "_" + (j + 1)].get()}`);
         }
       }
 
@@ -2025,7 +2035,7 @@ Meteor.my_functions = {
       //Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets + 1);
       //Meteor.my_functions.save_orientation_to_db(pattern_id);
 
-      Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, true);
+      //Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, true);
       return;
     }
 
@@ -2342,6 +2352,7 @@ Meteor.my_functions = {
   {
     // this can be called while a tablet is being deleted, so don't use the Session var
     number_of_tablets = Object.keys(current_orientation).length;
+    console.log(`orientation keys 1: ${JSON.stringify(Object.keys(current_orientation))}`);
     console.log(`get_orientation_as_array. number_of_tablets ${Object.keys(current_orientation).length}`);
     var orientation_array = new Array();
 
@@ -3641,9 +3652,11 @@ Meteor.my_functions = {
 
     if (tablet_change) {
       data.orientation = Meteor.my_functions.get_orientation_as_array();
-      data.threading = Meteor.my_functions.get_threading_as_array();
+      console.log(`orientation: ${JSON.stringify(data.orientation)}`);
+      data.threading = Meteor.my_functions.get_threading_as_array(number_of_tablets);
+      console.log(`threading: ${JSON.stringify(data.threading)}`);
     }
-
+//return;
     Meteor.call("update_twill_charts", pattern_id, data, function() {
       Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
       Meteor.my_functions.save_preview_as_text(pattern_id);
