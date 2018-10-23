@@ -596,7 +596,7 @@ Template.view_pattern.events({
 
     Meteor.my_functions.add_tablet(pattern_id, -1, style);
   },
-  'click .pattern .remove_tablet': function () {
+  'click .pattern .remove_tablet, click .broken_twill_chart .remove_tablet': function () {
     if (!Meteor.my_functions.accept_click())
         return;
 
