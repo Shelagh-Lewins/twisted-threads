@@ -644,7 +644,7 @@ Meteor.methods({
       throw new Meteor.Error("too-many-tablets", "error saving pattern. Too many tablets.");
 
     // Save the individual cell data
-    var pattern = Patterns.findOne({_id: pattern_id}); // TODO remove
+    // var pattern = Patterns.findOne({_id: pattern_id}); // TODO remove
 
     Patterns.update({_id: pattern_id}, {$set: { weaving: text}});
 
@@ -1000,9 +1000,24 @@ Meteor.methods({
 
     Patterns.update({_id: pattern_id}, {$set: {twill_change_chart: JSON.stringify(data.twill_change_chart)}});
   },
-  update_twill_charts: function(pattern_id, data) {
+  update_twill_charts: function(pattern_id, data, number_of_rows, number_of_tablets) {
     check(pattern_id, String);
     check(data, Object);
+    check(number_of_rows, Number);
+    check(number_of_tablets, Number);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit cells in a pattern you created");
+
+    // try to prevent huge patterns that would fill up the database
+    if (number_of_rows > Meteor.settings.private.max_pattern_rows)
+      throw new Meteor.Error("too-many-rows", "error saving pattern. Too many rows.");
+
+    if (number_of_tablets > Meteor.settings.private.max_pattern_tablets)
+      throw new Meteor.Error("too-many-tablets", "error saving pattern. Too many tablets.");
 
     Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(data.twill_pattern_chart)}});
     Patterns.update({_id: pattern_id}, {$set: {twill_change_chart: JSON.stringify(data.twill_change_chart)}});
@@ -1014,6 +1029,19 @@ Meteor.methods({
     if (data.threading) {
       Patterns.update({_id: pattern_id}, {$set: {threading: JSON.stringify(data.threading)}});
     }
+
+    // copied from save_weaving_to_db
+    Patterns.update({_id: pattern_id}, {$set: { weaving: JSON.stringify(data.weaving)}});
+
+    // Record the number of rows
+    Patterns.update({_id: pattern_id}, {$set: {number_of_rows: number_of_rows}});
+
+    // Record the number of tablets
+    Patterns.update({_id: pattern_id}, {$set: {number_of_tablets: number_of_tablets}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
+
   },
   //////////////////////////////////////
   // Recent patterns

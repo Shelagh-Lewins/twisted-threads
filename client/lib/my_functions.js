@@ -1968,14 +1968,14 @@ Meteor.my_functions = {
     for (var j=number_of_tablets; j>=position; j--)
     {
       current_orientation[j+1].set(current_orientation[j].get());
-      console.log(`j: ${j}`);
-      console.log(`new orientation: ${current_orientation[j+1].get()}`);
+      //console.log(`j: ${j}`);
+      //console.log(`new orientation: ${current_orientation[j+1].get()}`);
     }
      
     // set the value of the new tablet to default "S"
     current_orientation[position].set("S");
 
-    console.log(`orientation keys 0: ${JSON.stringify(Object.keys(current_orientation))}`);
+    //console.log(`orientation keys 0: ${JSON.stringify(Object.keys(current_orientation))}`);
 
     // manual_weaving_turns
     if (pattern.edit_mode == "simulation")
@@ -1994,8 +1994,13 @@ Meteor.my_functions = {
           // delete the existing ReactiveVar
           // recreate a new one with the same style but greater tablet
           var cell_value = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
+          //console.log(`i ${i}`);
+          //console.log(`j ${j}`);
+          //console.log(`cell_value ${cell_value}`);
           delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
           current_twill_pattern_chart[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_value);
+          //console.log(`check. identifier ${(i + 1) + "_" + (j + 2)}`);
+          //console.log(`new value ${current_twill_pattern_chart[(i + 1) + "_" + (j + 2)].get()}`);
 
           // twill change chart
           // delete the existing ReactiveVar
@@ -2024,9 +2029,9 @@ Meteor.my_functions = {
         // there is now one more tablet than before
         for (var j=0; j<number_of_tablets+1; j++)
         {
-          console.log(`i ${i}, j ${j}, threading ${broken_twill_threading[i][j%4]}`);
+          //console.log(`i ${i}, j ${j}, threading ${broken_twill_threading[i][j%4]}`);
           current_threading[(i + 1) + "_" + (j + 1)] = new ReactiveVar(broken_twill_threading[i][j%4]);
-          console.log(`new value: ${current_threading[(i + 1) + "_" + (j + 1)].get()}`);
+          //console.log(`new value: ${current_threading[(i + 1) + "_" + (j + 1)].get()}`);
         }
       }
 
@@ -2035,7 +2040,7 @@ Meteor.my_functions = {
       //Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets + 1);
       //Meteor.my_functions.save_orientation_to_db(pattern_id);
 
-      //Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, true);
+      Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows);
       return;
     }
 
@@ -2352,13 +2357,13 @@ Meteor.my_functions = {
   {
     // this can be called while a tablet is being deleted, so don't use the Session var
     number_of_tablets = Object.keys(current_orientation).length;
-    console.log(`orientation keys 1: ${JSON.stringify(Object.keys(current_orientation))}`);
-    console.log(`get_orientation_as_array. number_of_tablets ${Object.keys(current_orientation).length}`);
+    //console.log(`orientation keys 1: ${JSON.stringify(Object.keys(current_orientation))}`);
+    // console.log(`get_orientation_as_array. number_of_tablets ${Object.keys(current_orientation).length}`);
     var orientation_array = new Array();
 
     for (var i=0; i<number_of_tablets; i++)
     {
-      console.log(`i ${i}, value ${current_orientation[i + 1].get()}`);
+      //console.log(`i ${i}, value ${current_orientation[i + 1].get()}`);
       orientation_array.push(current_orientation[i + 1].get());
     }
 
@@ -3580,7 +3585,7 @@ Meteor.my_functions = {
         }
       }
     }
-
+    // console.log(`twill pattern array: ${JSON.stringify(twill_array)}`);
     return twill_array;
   },
   update_twill_change_chart: function(pattern_id) {
@@ -3637,8 +3642,8 @@ Meteor.my_functions = {
  // console.log(`twill_array ${JSON.stringify(twill_array)}`);
     return twill_array;
   },
-  update_twill_charts: function(pattern_id, number_of_rows, tablet_change) {
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+  update_twill_charts: function(pattern_id, number_of_rows) {
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
 
     if (pattern.edit_mode != "broken_twill")
         return;
@@ -3647,21 +3652,23 @@ Meteor.my_functions = {
 
     const data = {
       twill_pattern_chart: Meteor.my_functions.get_twill_pattern_chart_as_array(number_of_rows, number_of_tablets),
-      twill_change_chart: Meteor.my_functions.get_twill_change_chart_as_array(number_of_rows, number_of_tablets)
+      twill_change_chart: Meteor.my_functions.get_twill_change_chart_as_array(number_of_rows, number_of_tablets),
+      weaving: Meteor.my_functions.get_weaving_as_array(number_of_rows, number_of_tablets)
     }
 
-    if (tablet_change) {
+    // tablet change
+    if (pattern.number_of_tablets !== number_of_tablets) {
       data.orientation = Meteor.my_functions.get_orientation_as_array();
-      console.log(`orientation: ${JSON.stringify(data.orientation)}`);
+      //console.log(`update_twill_charts tablet change. orientation: ${JSON.stringify(data.orientation)}`);
       data.threading = Meteor.my_functions.get_threading_as_array(number_of_tablets);
-      console.log(`threading: ${JSON.stringify(data.threading)}`);
+      //console.log(`update_twill_charts tablet change. threading: ${JSON.stringify(data.threading)}`);
     }
 //return;
-    Meteor.call("update_twill_charts", pattern_id, data, function() {
-      Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
-      Meteor.my_functions.save_preview_as_text(pattern_id);
+    Meteor.call("update_twill_charts", pattern_id, data, Session.get("number_of_rows"), Session.get("number_of_tablets"), function() {
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
+      Meteor.my_functions.save_preview_as_text(pattern_id);
+      // Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
       Session.set("hide_preview", false);           
     });
   },
