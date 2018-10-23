@@ -1394,7 +1394,7 @@ Meteor.my_functions = {
     Session.set("number_of_tablets", number_of_tablets);
 
     // Client-side weaving data is an object which references a ReactiveVar for each cell data point
-    var weaving_data = JSON.parse(pattern.weaving);
+    var weaving_data = JSON.parse(pattern.weavingt statusg);
     var temp = {};
 
     for (var i=0; i<number_of_rows; i++)
