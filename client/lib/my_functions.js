@@ -1877,13 +1877,13 @@ Meteor.my_functions = {
   remove_weaving_row: function(pattern_id, position){
     if (Session.get('change_tablets_latch'))
         return;
-console.log('in remove_weaving_row');
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
-    if (pattern.edit_mode == "broken_twill") {
+    /* if (pattern.edit_mode == "broken_twill") {
       Meteor.my_functions.remove_twill_row(pattern_id, position);
       return;
-    }
+    } */
 
     Session.set('change_tablets_latch', true);
  
@@ -3710,9 +3710,7 @@ console.log('in remove_weaving_row');
     // tablet change
     if (pattern.number_of_tablets !== number_of_tablets) {
       data.orientation = Meteor.my_functions.get_orientation_as_array();
-      //console.log(`update_twill_charts tablet change. orientation: ${JSON.stringify(data.orientation)}`);
       data.threading = Meteor.my_functions.get_threading_as_array(number_of_tablets);
-      //console.log(`update_twill_charts tablet change. threading: ${JSON.stringify(data.threading)}`);
     }
 //return;
     Meteor.call("update_twill_charts", pattern_id, data, Session.get("number_of_rows"), Session.get("number_of_tablets"), function() {
