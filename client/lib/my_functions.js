@@ -3708,9 +3708,6 @@ Meteor.my_functions = {
       data.threading = Meteor.my_functions.get_threading_as_array(number_of_tablets);
     }
 
-    Session.set("number_of_rows", number_of_rows);
-    Session.set("number_of_tablets", number_of_tablets);
-
     Meteor.call("update_twill_charts", pattern_id, data, number_of_rows, number_of_tablets, function() {
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
