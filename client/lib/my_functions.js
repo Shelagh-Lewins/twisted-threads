@@ -2235,13 +2235,25 @@ Meteor.my_functions = {
     {
       for (var j=0; j<number_of_tablets; j++)
       {
+        var cell_style;
+
         // twill pattern chart
-        var cell_style = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
+        if ((i) == 1 && (j + 1) %2 == 0) {
+          cell_style = "."; // first row of even tablets must be background colour
+          console.log(`row 1, even tablet ${j + 1}`);
+        } else {
+          var cell_style = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
+        }
+
         delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
         current_twill_pattern_chart[(i) + "_" + (j + 1)] = new ReactiveVar(cell_style);
 
         // twill change chart
-        var cell_style = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
+        if ((i) == 1 && (j + 1) %2 == 0) {
+          cell_style = "."; // first row of even tablets must not have twill change
+        } else {
+          var cell_style = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
+        }
         delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
         current_twill_change_chart[(i) + "_" + (j + 1)] = new ReactiveVar(cell_style);
       }
