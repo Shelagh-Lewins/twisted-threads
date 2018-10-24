@@ -285,7 +285,7 @@ Template.pattern_thumbnail.helpers({
         break;
 
       case "up":
-        return "up";
+        return "left"; // show the preview sideways
         break;
 
       case "right":

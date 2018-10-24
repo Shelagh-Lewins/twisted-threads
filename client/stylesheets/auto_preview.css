@@ -11,8 +11,11 @@ body.view_pattern .auto_preview {
 }
 
 .auto_preview.down,
-.auto_preview.up {
-    float:right;
+body.view_pattern .auto_preview.up {
+  float: left;
+  width: auto;
+  clear: none;
+  margin-left: 20px;
 }
 
 #auto_preview_wrapper {
@@ -44,7 +47,7 @@ body.view_pattern .auto_preview.left svg {
     transform: rotate(-90deg);
 }
 
-.auto_preview.up svg { 
+body.view_pattern .auto_preview.up svg { 
     -ms-transform: rotate(0deg);
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
@@ -73,6 +76,10 @@ body.view_pattern .auto_preview.left svg {
     float: right;
 }
 
+.auto_preview.up .holder {
+    clear: both;
+}
+
 .auto_preview.right.show_tablets .holder {
     margin-right: 36px;
 }
@@ -91,12 +98,21 @@ body.view_pattern .auto_preview.left svg {
     margin-right: 0 !important;
 }
 
+.auto_preview.up .border_holder {
+    top: 20px;
+}
+
+/* show_tablets is used in pattern view */
 .auto_preview.left.show_tablets .border_holder {
     left: 36px;
 }
 
 .auto_preview.right.show_tablets .border_holder {
     right: 36px;
+}
+
+.auto_preview.up.show_tablets .border_holder {
+    /* right: 36px; */
 }
 
 .auto_preview .repeat_border {
@@ -168,6 +184,12 @@ button.rotate_preview.visible {
   /*transform: scale(1, 0.75);*/
 }
 
+.auto_preview.up.show_tablets .tablet_numbers {
+  display: block;
+  width: auto;
+  /*transform: scale(1, 0.75);*/
+}
+
 .auto_preview.left.show_tablets .tablet_numbers {
   float: left;
   margin-right: 5px;
@@ -176,6 +198,11 @@ button.rotate_preview.visible {
 
 .auto_preview.right.show_tablets .tablet_numbers {
   position: absolute;
+  right: 0;
+}
+
+.auto_preview.up.show_tablets .tablet_numbers {
+  float: left;
   right: 0;
 }
 
@@ -193,6 +220,11 @@ button.rotate_preview.visible {
 
 .auto_preview.left .tablet_numbers .tablet_number {
   text-align: right;
+}
+
+.auto_preview.up .tablet_numbers .tablet_number {
+  float: right;
+  margin-right: 1px;
 }
 
 /* Positions */
@@ -217,6 +249,13 @@ button.rotate_preview.visible {
   right: 18px;
 }
 
+.auto_preview.up.show_tablets .tablet_positions {
+  clear: both;
+  display: block;
+  width: auto;
+  float: left;
+}
+
 .auto_preview .tablet_positions .position {
   display: block;
   width: 12px;
@@ -227,7 +266,12 @@ button.rotate_preview.visible {
   color: #FFFFFF;
   text-align: center;
   line-height: 9px;
- }
+}
+
+.auto_preview.up .tablet_positions .position {
+ float: right;
+ margin-right: 1px;
+}
 
 .tablet_positions .position.start {
   background-color: #6aa84f;

@@ -163,6 +163,8 @@ Meteor.methods({
     if (build_new)
     {
       // build pattern data
+      data.preview_rotation = "up";
+
       // weaving
       data.weaving = new Array();
 

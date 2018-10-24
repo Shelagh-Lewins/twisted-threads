@@ -10,12 +10,18 @@
   this.cell_height = 27; // this is made up
   this.max_image_width = 300;
 
+  if (Session.get('edit_mode') == "broken_twill") {
+    this.cell_width = 13;
+    this.cell_height = 35; // this is made up
+  }
+
   var pattern_id = Router.current().params._id;
   this.pattern_id = pattern_id;
   var pattern = Patterns.findOne({ _id: pattern_id}, { fields: {preview_rotation: 1}});
 
   if (typeof pattern !== "undefined")
   {
+    // console.log(`auto preview, rotation ${pattern.preview_rotation}`);
     if (typeof pattern.preview_rotation === "undefined") // old pattern
     {
       Meteor.call('rotate_preview', pattern_id); // switch to 'left and save'
@@ -115,6 +121,10 @@
         case "left":
           svg_style = "top: " + that.image_width() + "px;";
           break;
+
+        /* case "up":
+          svg_style = "left: " + that.image_width() + "px;";
+          break; */
       }
       if (typeof $('.auto_preview svg')[0] === "undefined")
       {
@@ -186,7 +196,7 @@ Template.auto_preview.helpers({
   },
   tablet_position: function() {
     // which hole is currently in position A?
-    if (Session.get("edit_mode") == "simulation")
+    if (Session.get("edit_mode") == "simulation" || Session.get("edit_mode") == "broken_twill")
     {
       var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {position_of_A: 1}});
 
@@ -225,6 +235,9 @@ Template.auto_preview.helpers({
 
       case "right":
         return "height: " + Template.instance().image_width() + "px; width: " + total_height + "px; position: relative;";
+
+      case "up": 
+        return "height: " + total_height + "px; width: " + Template.instance().image_width() + "px; position: relative;";;
     }
   },
   viewbox_width: function() {
@@ -250,6 +263,12 @@ Template.auto_preview.helpers({
 
 Template.auto_preview.events({
   "click .rotate_preview": function () {
+    // cannot rotate broken twill pattern, it is always 'up'
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { edit_mode: 1}});
+    if (pattern.edit_mode == "broken_twill")
+        return;
+
     Session.set('edited_pattern', true);
     Meteor.call("rotate_preview", this._id);
 

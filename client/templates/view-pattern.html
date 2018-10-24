@@ -33,12 +33,16 @@
     {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
   </div>
   {{/if}}
-
+preview rotation: {{preview_rotation}}
+{{#unless equals preview_rotation "up"}}
   {{#if session_equals "hide_preview" false}}
+  
   {{> auto_preview}}
   {{else}}
   <p class="loading_preview">Loading preview...</p>
+  
   {{/if}}
+{{/unless}}
 
   {{#if equals edit_mode "simulation"}}
   <h2>Weaving instructions</h2>
@@ -253,12 +257,23 @@
     {{/if}}
   </div>
 
+  {{#if equals preview_rotation "up"}}
+  {{#if session_equals "hide_preview" false}}
+  
+  {{> auto_preview}}
+  {{else}}
+  <p class="loading_preview">Loading preview...</p>
+  
+  {{/if}}
+  {{/if}}
+
   <div class="edit_twill_rows">
       <button id="add_twill_row">Add rows</button> at 
       <input type="number" placeholder="Position..." id="twill_row_to_add" min="2" max="{{add_twill_row_positions}}" size="3" value="2" step="2"><br >
       Number of new rows:
       <input type="number" placeholder="Number..." id="twill_num_new_rows" min="2" max="10" size="3" value="2" step="2"><br>
   </div>
+
   {{/if}}
 
   <h2>Threading chart</h2>  
