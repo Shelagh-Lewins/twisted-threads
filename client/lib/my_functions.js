@@ -2019,9 +2019,9 @@ Meteor.my_functions = {
         }
       }
 
-      Session.set('number_of_tablets', number_of_tablets + 1);
+      // Session.set('number_of_tablets', number_of_tablets + 1);
 
-      Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows);
+      Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, number_of_tablets+1);
       return;
     }
 
@@ -2147,9 +2147,9 @@ Meteor.my_functions = {
         }
       }
 
-      Session.set('number_of_tablets', number_of_tablets - 1);
+      // Session.set('number_of_tablets', number_of_tablets - 1);
 
-      Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows);
+      Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, number_of_tablets - 1);
       return;
     }
 
@@ -2210,7 +2210,7 @@ Meteor.my_functions = {
         current_twill_change_chart[position + "_" + (j + 1)] = new ReactiveVar('.');
       }
     }
-    Meteor.my_functions.update_twill_charts(pattern_id, (number_of_rows + num_new_rows)*2);
+    Meteor.my_functions.update_twill_charts(pattern_id, (number_of_rows + num_new_rows)*2, number_of_tablets);
   },
   remove_twill_row: function(pattern_id, position) {
     Session.set('change_tablets_latch', true);
@@ -2247,7 +2247,7 @@ Meteor.my_functions = {
       }
     }
 
-    Meteor.my_functions.update_twill_charts(pattern_id, (number_of_rows -1)*2);
+    Meteor.my_functions.update_twill_charts(pattern_id, (number_of_rows -1)*2, number_of_tablets);
   },
   ///////////////////////////////////////
   get_weaving_as_array: function(number_of_rows, number_of_tablets)
@@ -3688,13 +3688,13 @@ Meteor.my_functions = {
  // console.log(`twill_array ${JSON.stringify(twill_array)}`);
     return twill_array;
   },
-  update_twill_charts: function(pattern_id, number_of_rows) {
+  update_twill_charts: function(pattern_id, number_of_rows, number_of_tablets) {
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
 
     if (pattern.edit_mode != "broken_twill")
         return;
 
-    var number_of_tablets = Session.get("number_of_tablets");
+    // var number_of_tablets = Session.get("number_of_tablets");
 
     const data = {
       twill_pattern_chart: Meteor.my_functions.get_twill_pattern_chart_as_array(number_of_rows, number_of_tablets),
@@ -3707,13 +3707,14 @@ Meteor.my_functions = {
       data.orientation = Meteor.my_functions.get_orientation_as_array();
       data.threading = Meteor.my_functions.get_threading_as_array(number_of_tablets);
     }
-//return;
-    Meteor.call("update_twill_charts", pattern_id, data, number_of_rows, Session.get("number_of_tablets"), function() {
+
+    Session.set("number_of_rows", number_of_rows);
+    Session.set("number_of_tablets", number_of_tablets);
+
+    Meteor.call("update_twill_charts", pattern_id, data, number_of_rows, number_of_tablets, function() {
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-      Meteor.my_functions.save_preview_as_text(pattern_id);
-      // Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
-      Session.set("hide_preview", false);           
+      Meteor.my_functions.save_preview_as_text(pattern_id);        
     });
   },
   ///////////////////////////////////
