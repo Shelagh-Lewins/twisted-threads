@@ -1394,7 +1394,7 @@ Meteor.my_functions = {
     Session.set("number_of_tablets", number_of_tablets);
 
     // Client-side weaving data is an object which references a ReactiveVar for each cell data point
-    var weaving_data = JSON.parse(pattern.weavingt statusg);
+    var weaving_data = JSON.parse(pattern.weaving);
     var temp = {};
 
     for (var i=0; i<number_of_rows; i++)
@@ -1879,11 +1879,6 @@ Meteor.my_functions = {
         return;
 
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
-
-    /* if (pattern.edit_mode == "broken_twill") {
-      Meteor.my_functions.remove_twill_row(pattern_id, position);
-      return;
-    } */
 
     Session.set('change_tablets_latch', true);
  
@@ -3713,7 +3708,7 @@ Meteor.my_functions = {
       data.threading = Meteor.my_functions.get_threading_as_array(number_of_tablets);
     }
 //return;
-    Meteor.call("update_twill_charts", pattern_id, data, Session.get("number_of_rows"), Session.get("number_of_tablets"), function() {
+    Meteor.call("update_twill_charts", pattern_id, data, number_of_rows, Session.get("number_of_tablets"), function() {
       Meteor.my_functions.build_pattern_display_data(pattern_id);
       Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
       Meteor.my_functions.save_preview_as_text(pattern_id);
