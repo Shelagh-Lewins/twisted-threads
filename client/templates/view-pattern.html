@@ -34,17 +34,19 @@
   </div>
   {{/if}}
 
-  Preview orientation: <label><input type="radio" name="preview_orientation" value="horizontal" checked="{{#if equals preview_orientation 'horizontal'}}true{{/if}}">Horizontal</label><label><input type="radio" name="preview_orientation" value="vertical" checked="{{#if equals preview_orientation 'vertical'}}true{{/if}}">Vertical</label>
-
-{{#if equals preview_orientation "horizontal"}}
   {{#if session_equals "hide_preview" false}}
-  
-  {{> auto_preview}}
-  {{else}}
-  <p class="loading_preview">Loading preview...</p>
-  
+    Preview orientation: <label><input type="radio" name="preview_orientation" value="horizontal" checked="{{#if equals preview_orientation 'horizontal'}}true{{/if}}">Horizontal</label><label><input type="radio" name="preview_orientation" value="vertical" checked="{{#if equals preview_orientation 'vertical'}}true{{/if}}">Vertical</label>
   {{/if}}
-{{/if}}
+
+  {{#if equals preview_orientation "horizontal"}}
+    {{#if session_equals "hide_preview" false}}
+    
+    {{> auto_preview}}
+    {{else}}
+    <p class="loading_preview">Loading preview...</p>
+    
+    {{/if}}
+  {{/if}}
 
   {{#if equals edit_mode "simulation"}}
 

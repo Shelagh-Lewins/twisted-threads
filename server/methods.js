@@ -709,7 +709,7 @@ Meteor.methods({
   set_preview_orientation: function(pattern_id, rotation) {
     check(pattern_id, String);
     check(rotation, String);
-console.log(`set_preview_orientation ${rotation}`);
+
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, preview_rotation: 1 }});
 
     if (pattern.created_by != Meteor.userId())
