@@ -99,7 +99,7 @@ body.view_pattern .auto_preview.up svg {
 }
 
 .auto_preview.up .border_holder {
-    top: 20px;
+    top: 40px;
 }
 
 /* show_tablets is used in pattern view */
@@ -117,14 +117,24 @@ body.view_pattern .auto_preview.up svg {
 
 .auto_preview .repeat_border {
   display: none;
-}
-
-.auto_preview.auto .repeat_border:not(:first-child) {
-  display: block;
   border-left: 1px dotted #666666;
   position: absolute;
   width: 1px;
   height: 100%;
+  z-index: 10;
+}
+
+.auto_preview.auto .repeat_border:not(:first-child) {
+  display: block;
+}
+
+.auto_preview.up.auto .repeat_border:not(:first-child) {
+  display: block;
+  border-left: none;
+  border-top: 1px dotted #666666;
+  position: absolute;
+  width: 100%;
+  height: 1px;
   z-index: 10;
 }
 
@@ -208,7 +218,7 @@ button.rotate_preview.visible {
 
 .tablet_numbers .tablet_number {
   display: block;
-  width: 12px;
+  width: 9px;
   height: 9px;
   margin-top: 1px;
   font-size: 9px;
@@ -225,6 +235,11 @@ button.rotate_preview.visible {
 .auto_preview.up .tablet_numbers .tablet_number {
   float: right;
   margin-right: 1px;
+  width: 19px;
+  height: 19px;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
 }
 
 /* Positions */
@@ -258,7 +273,7 @@ button.rotate_preview.visible {
 
 .auto_preview .tablet_positions .position {
   display: block;
-  width: 12px;
+  width: 9px;
   height: 9px;
   margin-top: 1px;
   font-size: 8px;
@@ -271,6 +286,10 @@ button.rotate_preview.visible {
 .auto_preview.up .tablet_positions .position {
  float: right;
  margin-right: 1px;
+ width: 19px;
+  height: 19px;
+  font-size: 16px;
+  line-height: 19px;
 }
 
 .tablet_positions .position.start {

@@ -2803,7 +2803,7 @@ Meteor.my_functions = {
     Session.set('edited_pattern', true);
 
     // set session variables to avoid checking db every time
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, preview_rotation: 1}});
 
     Session.set("edit_mode", pattern.edit_mode);
 
@@ -2811,6 +2811,8 @@ Meteor.my_functions = {
       Session.set("simulation_mode", pattern.simulation_mode);
 
     Session.set('can_edit_pattern', Meteor.my_functions.can_edit_pattern(pattern_id));
+
+    Session.set("preview_rotation", pattern.preview_rotation);
   
     // intialise the 'undo' stack
     // ideally the undo stack would be maintained over server refreshes but I'm not sure a session var could hold multiple patterns, and nothing else except the database is persistent. Also it doesn't need to be reactive so a session var might be a performance hit.
@@ -3454,13 +3456,15 @@ Meteor.my_functions = {
     }
   },
   set_repeats: function(pattern_id) {
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, auto_turn_sequence: 1}});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, auto_turn_sequence: 1, preview_rotation: 1}});
 
     var number_of_repeats = 1;
 
-    if ((pattern.edit_mode == "simulation") && (pattern.simulation_mode == "auto") &&
-      Meteor.my_functions.does_pattern_repeat(pattern_id))
+    // repeats are only shown on horizontal preview for auto simulation patterns
+    if ((pattern.edit_mode == "simulation") && (pattern.simulation_mode == "auto") && (Session.get("preview_rotation") !== "up") &&
+      Meteor.my_functions.does_pattern_repeat(pattern_id)) {
         number_of_repeats = Math.floor(Meteor.my_params.max_auto_turns/pattern.auto_turn_sequence.length);
+    }
 
     Session.set("number_of_repeats", number_of_repeats);
   },

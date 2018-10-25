@@ -706,7 +706,20 @@ Meteor.methods({
         Patterns.update({_id: pattern_id}, {$set: {preview_rotation: "left"}});
     }
   },
- save_threading_to_db: function(pattern_id, text)
+  set_preview_orientation: function(pattern_id, rotation) {
+    check(pattern_id, String);
+    check(rotation, String);
+console.log(`set_preview_orientation ${rotation}`);
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, preview_rotation: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit a pattern you created");
+
+    Patterns.update({_id: pattern_id}, {$set: {preview_rotation: rotation}});
+
+  },
+  save_threading_to_db: function(pattern_id, text)
   {
     check(pattern_id, String);
     check(text, String);

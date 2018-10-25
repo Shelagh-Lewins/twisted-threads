@@ -261,6 +261,13 @@ Template.view_pattern.helpers({
         }
       ]
     });
+  },
+  'preview_orientation': function() {
+    // console.log(`data ${JSON.stringify(this.preview_rotation)}`);
+    if (Session.get("preview_rotation") == "up")
+      return "vertical";
+    else
+      return "horizontal";
   }
 });
 
@@ -483,6 +490,18 @@ Template.styles_palette.helpers({
 });
 
 Template.view_pattern.events({
+  "change input[name='preview_orientation']": function(event) {
+    var pattern_id = Router.current().params._id;
+
+    if (event.target.value == "horizontal") {
+      Session.set("preview_rotation", "left");
+      Meteor.call('set_preview_orientation', pattern_id, "left");
+    }
+    else if (event.target.value == "vertical") {
+      Session.set("preview_rotation", "up");
+      Meteor.call('set_preview_orientation', pattern_id, "up");
+    }
+  },
   "click #main_tabs .summary a": function() {
     Session.set("loading", true);
 

@@ -33,8 +33,10 @@
     {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
   </div>
   {{/if}}
-preview rotation: {{preview_rotation}}
-{{#unless equals preview_rotation "up"}}
+
+  Preview orientation: <label><input type="radio" name="preview_orientation" value="horizontal" checked="{{#if equals preview_orientation 'horizontal'}}true{{/if}}">Horizontal</label><label><input type="radio" name="preview_orientation" value="vertical" checked="{{#if equals preview_orientation 'vertical'}}true{{/if}}">Vertical</label>
+
+{{#if equals preview_orientation "horizontal"}}
   {{#if session_equals "hide_preview" false}}
   
   {{> auto_preview}}
@@ -42,9 +44,20 @@ preview rotation: {{preview_rotation}}
   <p class="loading_preview">Loading preview...</p>
   
   {{/if}}
-{{/unless}}
+{{/if}}
 
   {{#if equals edit_mode "simulation"}}
+
+  {{#if equals preview_orientation "vertical"}}
+  {{#if session_equals "hide_preview" false}}
+  
+  {{> auto_preview}}
+  {{else}}
+  <p class="loading_preview">Loading preview...</p>
+  
+  {{/if}}
+  {{/if}}
+
   <h2>Weaving instructions</h2>
     {{#if can_edit_pattern _id}}
 
@@ -229,6 +242,17 @@ preview rotation: {{preview_rotation}}
     {{> remove_tablet}}
     {{/each}}</ul></div>{{/if}}
     </div>
+
+    {{#if equals preview_orientation "vertical"}}
+    {{#if session_equals "hide_preview" false}}
+    
+    {{> auto_preview}}
+    {{else}}
+    <p class="loading_preview">Loading preview...</p>
+    
+    {{/if}}
+    {{/if}}
+  
 {{/if}}
 
     <div class="edit_rows">
@@ -257,7 +281,7 @@ preview rotation: {{preview_rotation}}
     {{/if}}
   </div>
 
-  {{#if equals preview_rotation "up"}}
+  {{#if equals preview_orientation "vertical"}}
   {{#if session_equals "hide_preview" false}}
   
   {{> auto_preview}}
