@@ -996,6 +996,9 @@ Meteor.methods({
     auto_turn_sequence[turn_number - 1] = direction;
 
     Patterns.update({_id: pattern_id}, {$set: {auto_turn_sequence: auto_turn_sequence}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   //////////////////////////////////////
   // Broken twill
@@ -1006,6 +1009,9 @@ Meteor.methods({
     // console.log(`twill_array ${data.twill_pattern_chart}`);
 
     Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(data.twill_pattern_chart)}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   update_twill_change_chart: function(pattern_id, data)
   {
@@ -1057,6 +1063,33 @@ Meteor.methods({
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);
 
+  },
+  set_twill_start_row: function(pattern_id, row_number) {
+    check(pattern_id, String);
+    check(row_number, Number);
+
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, edit_mode: 1, twill_start_row: 1, number_of_rows: 1 }});
+
+    if (pattern.created_by != Meteor.userId())
+        // Only the owner can edit a pattern
+        throw new Meteor.Error("not-authorized", "You can only edit twill start row in a pattern you created");
+
+    if (pattern.edit_mode !== "broken_twill")
+      throw new Meteor.Error("not-authorized", "You can only set twill start row in a broken twill pattern");
+
+    row_number = Math.floor(row_number);
+
+    if (row_number < 1)
+      throw new Meteor.Error("not-authorized", "Broken twill start row must be at least 1");
+
+    if (row_number > pattern.number_of_rows)
+      throw new Meteor.Error("not-authorized", "Broken twill start row cannot be greater than number of rows");
+
+    // Record the number of tablets
+    Patterns.update({_id: pattern_id}, {$set: {twill_start_row: row_number}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   //////////////////////////////////////
   // Recent patterns
