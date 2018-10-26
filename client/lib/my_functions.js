@@ -1727,9 +1727,20 @@ Meteor.my_functions = {
           var pack = (direction == "F") ? 1 : 2;
           new_turn.tablets.push(pack);
         }
-
+        console.log(`row ${i + 1}`);
+console.log(`pattern_obj.position_of_A ${pattern_obj.position_of_A}`);
+if (i == 0) { // first row
+threading_now = {};
+for (var k=0; k<4; k++) { // 4 holes
+  for (var l=0; l<number_of_tablets; l++) {
+      let hole_style = current_threading[(k+1) + "_" + (l+1)].get();
+      threading_now[(k+1) + "_" + (l+1)] = new ReactiveVar(hole_style);
+    }
+  }
+}
         pattern_obj.manual_weaving_turns[0] = new_turn;
         pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
+
       }
       // console.log(`pattern ${JSON.stringify(pattern_obj)}`);
 
@@ -3204,7 +3215,7 @@ Meteor.my_functions = {
     var tablet_turns = []; // for each tablet, number of turns
     var threading_row = [];
     var new_threads_row = [];
-
+console.log(`data.position_of_A ${data.position_of_A}`);
     // turn tablets
     for (var i=0; i<data.number_of_tablets; i++)
     {
