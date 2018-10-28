@@ -68,7 +68,7 @@ UI.registerHelper('is_selected_style', function() {
   }
 });
 
-UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
+UI.registerHelper('weaving_cell_data', function(row, tablet, type, offset_start_row) {
   // row, tablet are used for pattern cells and tablets: for tablets, "row" is really "hole"
   var data = {};
   var style_ref;
@@ -88,7 +88,11 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type) {
   }
   else if (type == "threading")
   {
-    var cell = current_threading[(row) + "_" + (tablet)];
+    if (offset_start_row) { // broken twill can show threading and weaving from an offset start row to facilitate repeating patterns
+      var cell = threading_now[(row) + "_" + (tablet)];
+    } else {
+      var cell = current_threading[(row) + "_" + (tablet)];
+    }
     if (typeof cell === "undefined")
     {
       return;

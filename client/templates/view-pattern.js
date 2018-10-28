@@ -1030,7 +1030,7 @@ Template.view_pattern.events({
   'change #twill_start_row': function(event) {
     if (!Meteor.my_functions.accept_click())
         return;
-console.log(event.target.value);
+
     var pattern_id = Router.current().params._id;
 
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
