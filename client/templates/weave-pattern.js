@@ -33,6 +33,13 @@ UI.registerHelper('selected_row', function(){
 
 Template.weave_row.helpers({
   selected_class: function(row_index) {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+
+    if (pattern.weaving_start_row) {
+      row_index = row_index - pattern.weaving_start_row + 1;
+    }
+
     if (Session.equals('current_weave_row', row_index))
         return "selected";
   }
@@ -47,9 +54,8 @@ Template.weave_row_buttons.helpers({
       row_index = row_index - pattern.weaving_start_row + 1;
     }
     if (Session.equals('current_weave_row', row_index)) {
-      console.log(`row_index ${row_index}`);
-        return true;
-      }
+      return true;
+    }
   }
 });
 

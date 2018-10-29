@@ -8,7 +8,7 @@ Template.print_pattern.onCreated(function(){
   // set session variables to avoid checking db every time
   if (Meteor.my_functions.pattern_exists(pattern_id));
   {
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1}});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, weaving_start_row: 1}});
 
     Session.set("edit_mode", pattern.edit_mode);
 
@@ -18,6 +18,10 @@ Template.print_pattern.onCreated(function(){
 
   Meteor.my_functions.clear_pattern_display_data();
   Meteor.my_functions.build_pattern_display_data(pattern_id);
+
+  if (pattern.weaving_start_row) {
+    Meteor.my_functions.rebuild_offset_threading(pattern_id, pattern.weaving_start_row);
+  }
 });
 
 Template.print_pattern.helpers({

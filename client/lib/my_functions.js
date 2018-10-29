@@ -2947,12 +2947,18 @@ Meteor.my_functions = {
       var row_number = 1; // default value
 
     var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
 
     var number_of_rows = Session.get("number_of_rows");
 
-    if (row_number == number_of_rows + 1)
+    if (pattern.weaving_start_row) {
+      if (row_number == number_of_rows + 1 - pattern.weaving_start_row) {
+        row_number = pattern.weaving_start_row;
+      }
+    } else if (row_number == number_of_rows + 1)
     {
-      var row_number = 1; // if at last row, go to first row
+      row_number = 1; // if at last row, go to first row
+
       // wait to allow the pattern to be updated in the DOM, then scroll the selected row into view
       setTimeout(function(){
         Meteor.my_functions.scroll_selected_row_into_view();
@@ -2961,6 +2967,10 @@ Meteor.my_functions = {
 
     // move the column numbers to sit above the selected row
     var selected_row_index = number_of_rows - row_number;
+
+    if (pattern.weaving_start_row) {    
+      selected_row_index = selected_row_index - pattern.weaving_start_row + 1;
+    }
 
     var new_top = $($('.row').not(".column_number")[selected_row_index]).position().top - $('.row').not(".column_number").position().top;
     $('.row.column_number').css({ top: new_top});
