@@ -1027,7 +1027,7 @@ Template.view_pattern.events({
 
     Meteor.my_functions.remove_twill_row(pattern_id, parseInt(this));
   },
-  'change #twill_start_row': function(event) {
+  'change #weaving_start_row': function(event) {
     if (!Meteor.my_functions.accept_click())
         return;
 
@@ -1036,7 +1036,9 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
 
-    Meteor.call("set_twill_start_row", pattern_id, parseInt(event.target.value));
+    Meteor.call("set_weaving_start_row", pattern_id, parseInt(event.target.value));
+
+    Meteor.my_functions.update_twill_charts(pattern_id, Session.get('number_of_rows'), Session.get('number_of_tablets'));
   }
 });
 

@@ -1727,34 +1727,8 @@ Meteor.my_functions = {
           var pack = (direction == "F") ? 1 : 2;
           new_turn.tablets.push(pack);
         }
-        /*
-        if (i+1 == pattern.twill_start_row) { // first row
-
-          console.log(`start row: ${pattern.twill_start_row}`);
-          console.log(`row ${i + 1}`);
-          console.log(`pattern_obj.position_of_A ${pattern_obj.position_of_A}`);
-
-
-          threading_now = {};
-          for (var k=0; k<4; k++) { // 4 holes
-            console.log(`hole ${k + 1}`);
-            for (var l=0; l<number_of_tablets; l++) {
-              console.log(`tablet ${l + 1}`);
-              console.log(`pattern_obj.position_of_A[l] ${pattern_obj.position_of_A[l]}`);
-              const thread_at_A = (k + pattern_obj.position_of_A[l]) % 4;
-              console.log(`thread_at_A ${thread_at_A}`);
-              let hole_style = current_threading[(thread_at_A+1) + "_" + (l+1)].get();
-              threading_now[(k+1) + "_" + (l+1)] = new ReactiveVar(hole_style);
-            }
-          }
-        } */
         pattern_obj.manual_weaving_turns[0] = new_turn;
-        //console.log(`row ${i+1}`);
-        console.log('call weave_row from build_pattern_display_data');
         pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
-        console.log('--------------');
-        //console.log('after weave row');
-
       }
       // console.log(`pattern ${JSON.stringify(pattern_obj)}`);
 
@@ -3229,12 +3203,10 @@ Meteor.my_functions = {
     var tablet_turns = []; // for each tablet, number of turns
     var threading_row = [];
     var new_threads_row = [];
-console.log(`data.position_of_A ${data.position_of_A}`);
-console.log(`data.number_of_tablets ${data.number_of_tablets}`);
+
     // turn tablets
     for (var i=0; i<data.number_of_tablets; i++)
     {
-      console.log(`tablet ${i+1}`);
       // find turn direction and number of turns
       var pack_number = new_row_sequence.tablets[i];
       var pack = new_row_sequence.packs[pack_number - 1];
@@ -3253,7 +3225,7 @@ console.log(`data.number_of_tablets ${data.number_of_tablets}`);
         var thread_to_show = Meteor.my_functions.modular_add(data.position_of_A[i], -1, 4);
       else // B: show thread in position A
         var thread_to_show = data.position_of_A[i];
-console.log(`thread_to_show ${thread_to_show}`);
+
       // threading[thread_to_show] = row of threading chart
       threading_row.push(data.threading[thread_to_show][i]);
       tablet_directions.push(direction);
@@ -3607,37 +3579,23 @@ console.log(`thread_to_show ${thread_to_show}`);
     }
 
     var manual_weaving_turns = current_manual_weaving_turns;
-console.log(`start row ${pattern.twill_start_row}`);
-threading_now = {};
+    
+    // weaving chart may start at a later row
+    // to allow the background twill to be set up for a repeating pattern
+    threading_now = {};
     for (var i=1; i<manual_weaving_turns.length; i++)
     {
-      console.log(`row ${i}`);
-      if (i == pattern.twill_start_row) { // first row of actual weaving
-
-        //console.log(`start row: ${pattern.twill_start_row}`);
-        
-        console.log(`data.position_of_A ${data.position_of_A}`);
-
-
-        
+      if (i == pattern.weaving_start_row) { // first row of actual weaving
         for (var k=0; k<4; k++) { // 4 holes
-          console.log(`hole ${k + 1}`);
           for (var l=0; l<number_of_tablets; l++) {
-            console.log(`tablet ${l + 1}`);
-            console.log(`data.position_of_A[l] ${data.position_of_A[l]}`);
             const thread_at_A = (k + data.position_of_A[l]) % 4;
-            console.log(`thread_at_A ${thread_at_A}`);
             let hole_style = current_threading[(thread_at_A+1) + "_" + (l+1)].get();
             threading_now[(k+1) + "_" + (l+1)] = new ReactiveVar(hole_style);
           }
         }
       }
-      console.log('***** call weave_row from reset_broken_twill_weaving');
-      data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);
 
-      console.log('===============');
-
-      
+      data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);  
     }
     
       

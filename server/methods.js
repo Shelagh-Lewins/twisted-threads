@@ -1064,11 +1064,11 @@ Meteor.methods({
     Meteor.call("save_pattern_edit_time", pattern_id);
 
   },
-  set_twill_start_row: function(pattern_id, row_number) {
+  set_weaving_start_row: function(pattern_id, row_number) {
     check(pattern_id, String);
     check(row_number, Number);
 
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, edit_mode: 1, twill_start_row: 1, number_of_rows: 1 }});
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {created_by: 1, edit_mode: 1, weaving_start_row: 1, number_of_rows: 1 }});
 
     if (pattern.created_by != Meteor.userId())
         // Only the owner can edit a pattern
@@ -1086,7 +1086,7 @@ Meteor.methods({
       throw new Meteor.Error("not-authorized", "Broken twill start row cannot be greater than number of rows");
 
     // Record the number of tablets
-    Patterns.update({_id: pattern_id}, {$set: {twill_start_row: row_number}});
+    Patterns.update({_id: pattern_id}, {$set: {weaving_start_row: row_number}});
 
     // Record the edit time
     Meteor.call("save_pattern_edit_time", pattern_id);

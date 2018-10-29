@@ -19,7 +19,15 @@ UI.registerHelper('tablet_indexes', function() {
 UI.registerHelper('row_indexes', function() {
   // row 1 is at bottom of chart
   var row_indexes = [];
-  for (var i=Session.get("number_of_rows"); i>=1; i--)
+  var start_row = 1;
+
+  var pattern_id = Router.current().params._id;
+  var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+
+  if (pattern.weaving_start_row) {
+    start_row = pattern.weaving_start_row;
+  }
+  for (var i=Session.get("number_of_rows"); i>=start_row; i--)
   {
     row_indexes.push(i);
   }
@@ -88,7 +96,10 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type, offset_start_
   }
   else if (type == "threading")
   {
-    if (offset_start_row) { // broken twill can show threading and weaving from an offset start row to facilitate repeating patterns
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1, weaving_start_row: 1}});
+
+    if (pattern.weaving_start_row) { // broken twill can show threading and weaving from an offset start row to facilitate repeating patterns
       var cell = threading_now[(row) + "_" + (tablet)];
     } else {
       var cell = current_threading[(row) + "_" + (tablet)];
@@ -102,8 +113,7 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type, offset_start_
     style_ref = cell.get();
 
     // for simulation patterns, map styles to show thread direction
-    var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
+    
 
     if (typeof pattern === "undefined")
         return;
