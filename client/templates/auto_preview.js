@@ -204,6 +204,9 @@ Template.auto_preview.helpers({
     {
       var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {position_of_A: 1}});
 
+      if (!pattern.position_of_A)
+        return;
+
       var position_of_A = JSON.parse(pattern.position_of_A);
 
       // offset start row

@@ -202,8 +202,11 @@ Template.create_new_pattern.events({
     event.preventDefault();
     var edit_mode = event.currentTarget.name;
     var number_of_rows = "0";
-    if(edit_mode != "simulation") // freehand, 3/1 twill
+    if (edit_mode == "freehand") {
       number_of_rows = $('#num_rows').val();
+    } else if (edit_mode == "broken_twill") {
+      number_of_rows = $('#num_twill_rows').val();
+    }
 
     var params = {
       edit_mode: edit_mode,

@@ -182,6 +182,7 @@ Meteor.my_functions = {
       pattern_obj.twill_change_chart = pattern.twill_change_chart;
       pattern_obj.twill_direction = pattern.twill_direction;
       pattern_obj.twill_pattern_chart = pattern.twill_pattern_chart;
+      pattern_obj.weaving_start_row = pattern.weaving_start_row;
 
       // TODO start row and start threading chart
     }
@@ -1388,6 +1389,9 @@ Meteor.my_functions = {
 
     var pattern = Patterns.findOne({_id: pattern_id});
 
+    if (!pattern.weaving)
+      return;
+
     var number_of_tablets = pattern.number_of_tablets;
     var number_of_rows = pattern.number_of_rows;
     Session.set("number_of_rows", number_of_rows);
@@ -1688,8 +1692,8 @@ Meteor.my_functions = {
           if (i > 0)
             last_color = twill_pattern_chart[i-1][j];
 
-          if (i<number_of_rows)
-          {
+          //if (i<number_of_rows)
+          //{
             if (next_color != current_color)
               color_change = true;
 
@@ -1699,7 +1703,7 @@ Meteor.my_functions = {
               if (i == 0) // tablet starts with foreground color
                 current_twill_position[j] =  (current_twill_position[j] + 3) % 4; // go back an extra turn
             }
-          }        
+          //}        
 
           var long_float = twill_change_chart[i][j];
 

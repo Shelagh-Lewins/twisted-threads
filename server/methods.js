@@ -177,7 +177,7 @@ Meteor.methods({
         }
       }
 
-      if (data.edit_mode == "broken_twill") {
+      if (options.edit_mode == "broken_twill") {
         data.weaving_start_row = 1;
       }
 
@@ -278,6 +278,10 @@ Meteor.methods({
       created_by: Meteor.userId(),           // _id of logged in user
       created_by_username: Meteor.user().username  // username of logged in user
     });
+
+    if (data.weaving_start_row) {
+    Patterns.update({_id: pattern_id}, {$set: {weaving_start_row: data.weaving_start_row}});
+    }
 
     // Tags
     for (var i=0; i<data.tags.length; i++)
@@ -429,28 +433,28 @@ Meteor.methods({
         // new pattern
         var twill_direction = options.twill_direction;
 
-      // 3/1 twill must have an even number of rows
-      if (options.number_of_rows % 2 == 1)
-        throw new Meteor.Error("odd-twill-rows", "error creating pattern from JSON. 3/1 broken twill pattern must have even number of rows");
+        // 3/1 twill must have an even number of rows
+        if (options.number_of_rows % 2 == 1)
+          throw new Meteor.Error("odd-twill-rows", "error creating pattern from JSON. 3/1 broken twill pattern must have even number of rows");
 
-      var twill_pattern_chart = [];
-      // corresponds to Data in GTT pattern. This is the chart showing the two-colour design.
+        var twill_pattern_chart = [];
+        // corresponds to Data in GTT pattern. This is the chart showing the two-colour design.
 
-      var twill_change_chart = [];
-      // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
+        var twill_change_chart = [];
+        // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
 
-      // set up a plain chart for each, this will give just background twill
-      for (var i=0; i<options.number_of_rows / 2; i++)
-      {
-        twill_pattern_chart[i] = new Array();
-        twill_change_chart[i] = new Array();
-
-        for (var j=0; j<options.number_of_tablets; j++)
+        // set up a plain chart for each, this will give just background twill
+        for (var i=0; i<options.number_of_rows / 2; i++)
         {
-          twill_pattern_chart[i][j] = ".";
-          twill_change_chart[i][j] = ".";
+          twill_pattern_chart[i] = new Array();
+          twill_change_chart[i] = new Array();
+
+          for (var j=0; j<options.number_of_tablets; j++)
+          {
+            twill_pattern_chart[i][j] = ".";
+            twill_change_chart[i][j] = ".";
+          }
         }
-      }
       }
       else if (typeof options.data.twill_direction !== "undefined")
       {
