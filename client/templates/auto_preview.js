@@ -205,6 +205,14 @@ Template.auto_preview.helpers({
       var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {position_of_A: 1}});
 
       var position_of_A = JSON.parse(pattern.position_of_A);
+
+      // offset start row
+      // find tablet position relative to start row position
+      if (typeof current_A_start !== "undefined") {
+        for (let i=0; i<position_of_A.length; i++) {
+          position_of_A[i] = Meteor.my_functions.modular_subtract(position_of_A[i], current_A_start[i], 4);
+        }
+      }
       var labels = ["A", "B", "C", "D"];
       return labels[position_of_A[this-1]];
     }

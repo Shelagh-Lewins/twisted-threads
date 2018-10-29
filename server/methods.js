@@ -177,6 +177,10 @@ Meteor.methods({
         }
       }
 
+      if (data.edit_mode == "broken_twill") {
+        data.weaving_start_row = 1;
+      }
+
       // threading
       data.threading = new Array(options.number_of_rows);
 

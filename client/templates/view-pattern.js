@@ -1038,7 +1038,7 @@ Template.view_pattern.events({
 
     Meteor.call("set_weaving_start_row", pattern_id, parseInt(event.target.value));
 
-    Meteor.my_functions.update_twill_charts(pattern_id, Session.get('number_of_rows'), Session.get('number_of_tablets'));
+    Meteor.my_functions.rebuild_offset_threading(pattern_id, parseInt(event.target.value));
   }
 });
 

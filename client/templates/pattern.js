@@ -34,6 +34,16 @@ UI.registerHelper('row_indexes', function() {
   return row_indexes;
 });
 
+UI.registerHelper('offset_row_number', function(row_number) {
+  var pattern_id = Router.current().params._id;
+  var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+
+  if (pattern.weaving_start_row) {
+    row_number = row_number + 1 - pattern.weaving_start_row;
+  }
+  return row_number;
+});
+
 UI.registerHelper('testreact', function(tablet) {
   //return Session.get("testreact");
   if (typeof testreact === "undefined")
@@ -100,7 +110,7 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type, offset_start_
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1, weaving_start_row: 1}});
 
     if (pattern.weaving_start_row) { // broken twill can show threading and weaving from an offset start row to facilitate repeating patterns
-      var cell = threading_now[(row) + "_" + (tablet)];
+      var cell = current_offset_threading[(row) + "_" + (tablet)];
     } else {
       var cell = current_threading[(row) + "_" + (tablet)];
     }

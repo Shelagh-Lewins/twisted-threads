@@ -19,7 +19,7 @@
 	<h2>Weaving chart</h2>
 	<div class="pattern view">{{> column_numbers}}
 	{{#each row_indexes}}
-	<div class="row"><span class="row_number">{{this}}</span><ul>
+	<div class="row"><span class="row_number">{{offset_row_number this}}</span><ul>
 
 	{{#each tablet_indexes}}
     {{#with row=.. tablet=this}}

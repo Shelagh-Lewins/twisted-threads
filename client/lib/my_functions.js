@@ -2018,8 +2018,6 @@ Meteor.my_functions = {
         }
       }
 
-      // Session.set('number_of_tablets', number_of_tablets + 1);
-
       Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, number_of_tablets+1);
       return;
     }
@@ -3349,6 +3347,16 @@ Meteor.my_functions = {
     
     return result;
   },
+  modular_subtract: function(a, b, modulus)
+  {
+    // addition in modular arithmetic
+    var result = (a - b) % modulus;
+
+    if (result < 0)
+      result += modulus;
+    
+    return result;
+  },
   weave_button: function(pattern_id) {
     // weave a new row to a simulation / manual pattern
     var pattern = Patterns.findOne({_id: pattern_id});
@@ -3582,7 +3590,9 @@ Meteor.my_functions = {
     
     // weaving chart may start at a later row
     // to allow the background twill to be set up for a repeating pattern
-    threading_now = {};
+    var temp_offset_threading = {};
+    current_A_start = [];
+
     for (var i=1; i<manual_weaving_turns.length; i++)
     {
       if (i == pattern.weaving_start_row) { // first row of actual weaving
@@ -3590,11 +3600,12 @@ Meteor.my_functions = {
           for (var l=0; l<number_of_tablets; l++) {
             const thread_at_A = (k + data.position_of_A[l]) % 4;
             let hole_style = current_threading[(thread_at_A+1) + "_" + (l+1)].get();
-            threading_now[(k+1) + "_" + (l+1)] = new ReactiveVar(hole_style);
+            temp_offset_threading[(k+1) + "_" + (l+1)] = new ReactiveVar(hole_style);
           }
         }
+        current_offset_threading = temp_offset_threading;
+        current_A_start = JSON.parse(JSON.stringify(data.position_of_A));
       }
-
       data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);  
     }
     
@@ -3610,6 +3621,59 @@ Meteor.my_functions = {
       Meteor.my_functions.save_preview_as_text(pattern_id);
       // Session.set("hide_preview", false);
     });    
+  },
+  rebuild_offset_threading: function(pattern_id, weaving_start_row) {
+    // rebuild the threading chart if the weaving_start_row has changed
+    // remove and rebuild the current simulation pattern weaving
+    var pattern = Patterns.findOne({_id: pattern_id});
+
+    if (!pattern.weaving_start_row)
+        return;
+
+    var number_of_rows = Session.get("number_of_rows");
+    var number_of_tablets = Session.get("number_of_tablets");
+
+    // reset all tablets to start position
+    var position_of_A = new Array();
+    for (var i=0; i<number_of_tablets; i++)
+    {
+      position_of_A.push(0);
+    }
+
+    // construct fresh pattern data
+    // although we only actually need the position_of_A
+    var data = {
+      number_of_tablets: number_of_tablets,
+      threading: Meteor.my_functions.get_threading_as_array(number_of_tablets),
+      orientations: Meteor.my_functions.get_orientation_as_array(),
+      position_of_A: position_of_A,
+      weaving: [],
+      manual_weaving_turns: [current_manual_weaving_turns[0]], // remove manual_weaving_turns except first row which gives UI default
+      manual_weaving_threads: [] // which thread shows
+    }
+
+    var manual_weaving_turns = current_manual_weaving_turns;
+    
+    // weaving chart may start at a later row
+    // to allow the background twill to be set up for a repeating pattern
+    temp_offset_threading = {};
+    for (var i=1; i<manual_weaving_turns.length; i++)
+    {
+      if (i == weaving_start_row) { // first row of actual weaving
+        for (var k=0; k<4; k++) { // 4 holes
+          for (var l=0; l<number_of_tablets; l++) {
+            const thread_at_A = (k + data.position_of_A[l]) % 4;
+            let hole_style = current_threading[(thread_at_A+1) + "_" + (l+1)].get();
+            temp_offset_threading[(k+1) + "_" + (l+1)] = new ReactiveVar(hole_style);
+          }
+        }
+        current_offset_threading = temp_offset_threading;
+        current_A_start = JSON.parse(JSON.stringify(data.position_of_A));
+        return;
+      }
+
+      data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);  
+    }
   },
   update_twill_pattern_chart: function(pattern_id) {
     // Session.set("hide_preview", true); // force a clean refresh of the preview
