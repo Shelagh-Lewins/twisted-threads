@@ -204,6 +204,7 @@ button.rotate_preview.visible {
   float: left;
   margin-right: 5px;
   margin-left: 0;
+  margin-top: 10px;
 }
 
 .auto_preview.right.show_tablets .tablet_numbers {
@@ -257,6 +258,7 @@ button.rotate_preview.visible {
   float: left;
   margin-right: 5px;
   margin-left: 0;
+  margin-top: 10px;
 }
 
 .right.show_tablets .tablet_positions {
@@ -317,3 +319,18 @@ button.rotate_preview.visible {
   padding: 0 16px 0 16px;
   text-align: center;
 }
+
+/* row number */
+svg .text {
+  font-size: 35px;
+}
+/*
+svg.left .text {
+  font-size: 35px;
+  transform: rotate(90deg);
+}
+
+svg.right .text {
+  font-size: 35px;
+  transform: rotate(90deg);
+} */

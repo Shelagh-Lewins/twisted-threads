@@ -109,6 +109,11 @@
     {{> auto_preview_element}}
   {{/with}}
 {{/each}}
+{{#if show_row_number this}}
+{{#with data this}}
+<g transform="translate({{x_offset}} {{y_offset}}) {{rotation}}"><text x="20" y="35" class="text">{{text}}</text></g>
+{{/with}}
+{{/if}}
 </template>
 
 <template name="auto_preview_weft">
