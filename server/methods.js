@@ -99,7 +99,6 @@ Meteor.methods({
     {
       try {
         var data = JSON.parse(Assets.getText(options.filename));
-        console.log(`got data ${JSON.stringify(data)}`);
       }
       catch(e)
       {
@@ -444,7 +443,9 @@ Meteor.methods({
         // corresponds to LongFloats in GTT pattern. This is the chart showing 'backsteps' in the turning schedule to adjust for smooth diagonal edges.
 
         // set up a plain chart for each, this will give just background twill
-        for (var i=0; i<options.number_of_rows / 2; i++)
+        // charts have an extra row at the end
+        // this extra row is not shown in preview or weaving chart but is used to determine the last even row
+        for (var i=0; i<(options.number_of_rows / 2) + 1; i++)
         {
           twill_pattern_chart[i] = new Array();
           twill_change_chart[i] = new Array();
@@ -503,6 +504,8 @@ Meteor.methods({
     Meteor.call("count_public_patterns", Meteor.userId());
 
     Patterns.update({_id: pattern_id}, {$set: {orientation: JSON.stringify(orientation)}});
+    var pattern = Patterns.findOne({_id: pattern_id});
+    console.log(`final number_of_rows ${pattern.number_of_rows}`);
 
     ///////////////////////////////////
     //

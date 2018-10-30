@@ -31,9 +31,6 @@ Template.view_pattern.rendered = function() {
     Session.set("hide_while_loading", false);
   }, 1);
 
-  
-
-
   /////////
   // collectionFS image MAY NOT NEED THIS AS NOT SCROLLING PICTURES
   // but nice reference for infinite scroll
