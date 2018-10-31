@@ -32,6 +32,11 @@ Template.broken_twill_row.helpers({
       if (row_number == (pattern.weaving_start_row) / 2)
         return "half_row";
     }
+  },
+  'last_row': function(row_number) {
+    console.log(`row_number ${row_number}`);
+    if (row_number > Session.get("number_of_rows") / 2)
+      return "last_row";
   }
 });
 

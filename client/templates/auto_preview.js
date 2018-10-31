@@ -203,7 +203,7 @@ Template.auto_preview.helpers({
 		if (Session.get("edit_mode") == "simulation" || Session.get("edit_mode") == "broken_twill")
 		{
 			var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {position_of_A: 1}});
-
+console.log(`position_of_A ${pattern.position_of_A}`);
 			if (!pattern.position_of_A)
 				return;
 

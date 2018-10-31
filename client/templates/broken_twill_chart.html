@@ -1,5 +1,5 @@
 <template name="broken_twill_row">
-<div class="row {{inactive this}} {{half_row this}}">{{> row_number_bt}}<ul>{{#each tablet_indexes}}
+<div class="row {{inactive this}} {{half_row this}} {{last_row this}}">{{> row_number_bt}}<ul>{{#each tablet_indexes}}
   {{#with row=.. tablet=this}}
     {{> broken_twill_cell}}
   {{/with}}

@@ -159,3 +159,18 @@
   top: 50%;
   z-index: 10;
 }
+
+/* last row only needs even cells and these only half height */
+/* these determine the previous row i.e. the last row of actual weaving */
+.broken_twill_chart .row.last_row {
+  height: 32px;
+}
+
+.broken_twill_chart .row.last_row .cell:nth-child(odd) {
+  visibility: hidden;
+  top: -32px;
+}
+
+.broken_twill_chart .row.last_row .cell:nth-child(even) {
+  top: 0;
+}
