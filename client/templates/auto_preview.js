@@ -329,7 +329,14 @@ Template.auto_preview_weft.helpers({
 Template.auto_preview_row.helpers({
 	show_row_number: function(row)
 	{
-		if (row % 5 == 0) {
+		var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+
+		// show all row numbers on vertical preview
+		if (Session.get("preview_rotation") == "up") {
+			return true;
+		} else if ((row - pattern.weaving_start_row + 1) % 5 == 0) {
+			// show every 5th number on horizontal preview
 			return true;
 		}
 	},

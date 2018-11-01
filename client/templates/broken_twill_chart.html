@@ -1,5 +1,5 @@
 <template name="broken_twill_row">
-<div class="row {{inactive this}} {{half_row this}} {{last_row this}}">{{> row_number_bt}}<ul>{{#each tablet_indexes}}
+<div class="row {{inactive this}} {{half_row this}} {{first_row this}} {{last_row this}}">{{> row_number_bt}}<ul>{{#each tablet_indexes}}
   {{#with row=.. tablet=this}}
     {{> broken_twill_cell}}
   {{/with}}
@@ -10,11 +10,12 @@
 
 <template name="broken_twill_cell">
 {{#with broken_twill_data row tablet}}
-<li class="cell no_select {{#if twill_change}}twill_change{{/if}} {{first_even_row row tablet}}" style="background-color: {{background_color}}; background-image: url('{{image}}')">{{long_float}}
+<li class="cell no_select {{#if twill_change}}twill_change{{/if}}" style="background-color: {{background_color}}; background-image: url('{{image}}')">{{long_float}}
 </li>
 {{/with}}
 </template>
 
 <template name="row_number_bt">
-<span class="row_number">{{row_number_double this}}</span>
+<span class="row_number {{inactive this "even"}} even">{{row_number_even this}}</span>
+<span class="row_number {{inactive this "odd"}} odd">{{row_number_odd this}}</span>
 </template>

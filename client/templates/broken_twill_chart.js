@@ -1,7 +1,46 @@
 Template.row_number_bt.helpers({
-  row_number_double: function(number) {
-    return number * 2;
-  }
+  row_number_even: function(number) {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+
+    if (number * 2 >= pattern.weaving_start_row) {
+      //in weaving chart
+      return (number * 2) - (pattern.weaving_start_row) + 1;
+    } else {
+      // unwoven start rows
+      return number * 2;
+    }
+  },
+  row_number_odd: function(number) {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+    
+    if (number * 2 > pattern.weaving_start_row) {
+      //in weaving chart
+      return (number * 2) - (pattern.weaving_start_row);
+    } else {
+      // unwoven start rows
+      return number * 2 - 1;
+    }
+  },
+  inactive: function(number, parity) {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+
+    var inactive = "inactive";
+
+    if (parity == "even") { // even row
+      if (number * 2 >= pattern.weaving_start_row) {
+        inactive = "";
+      }
+    } else { // odd row
+      if (number * 2 > pattern.weaving_start_row) {
+        inactive = "";
+      }
+    }
+
+    return inactive;
+  }  
 });
 
 Template.broken_twill_row.helpers({
@@ -23,8 +62,12 @@ Template.broken_twill_row.helpers({
         return "inactive";
     }
   },
+  'first_row': function(row_number) {
+
+    if (row_number == 1)
+      return "first_row";
+  },
   'half_row': function(row_number) {
-    // console.log(`half_row: row_number ${row_number}`);
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
 
@@ -34,17 +77,8 @@ Template.broken_twill_row.helpers({
     }
   },
   'last_row': function(row_number) {
-    console.log(`row_number ${row_number}`);
     if (row_number > Session.get("number_of_rows") / 2)
       return "last_row";
-  }
-});
-
-Template.broken_twill_cell.helpers({
-  'first_even_row': function(row_number, tablet) {
-
-    if (row_number == 1 && tablet % 2 == 0)
-      return "first_even_row";
   }
 });
 

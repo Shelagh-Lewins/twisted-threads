@@ -260,7 +260,6 @@ Template.view_pattern.helpers({
     });
   },
   'preview_orientation': function() {
-    // console.log(`data ${JSON.stringify(this.preview_rotation)}`);
     if (Session.get("preview_rotation") == "up")
       return "vertical";
     else
