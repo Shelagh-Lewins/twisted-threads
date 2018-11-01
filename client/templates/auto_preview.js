@@ -10,7 +10,7 @@
 
 	var pattern_id = Router.current().params._id;
 	this.pattern_id = pattern_id;
-	var pattern = Patterns.findOne({ _id: pattern_id}, { fields: {preview_rotation: 1}});
+	var pattern = Patterns.findOne({ _id: pattern_id}, { fields: {preview_rotation: 1, weaving_start_row: 1}});
 
 	Meteor.my_functions.set_repeats(pattern_id);
 
@@ -29,14 +29,26 @@
 			this.cell_width = 10;
 			this.cell_height = 27; // this is in proportion to cell_width
 		}
+
+		// allow for offset start row
+		this.number_of_rows = Session.get("number_of_rows");
+		if (pattern.weaving_start_row) {
+			this.number_of_rows -= (pattern.weaving_start_row - 1);
+		}
 	}
 
 	this.viewbox_width = function(){
-		return this.unit_width * (Session.get("number_of_tablets") + 1);
+		var row_number_allocation = 1;
+		if (Session.get("preview_rotation") == "up") {
+			row_number_allocation = 2;
+		}
+
+		return this.unit_width * (Session.get("number_of_tablets") + row_number_allocation);
 	};
 
 	this.viewbox_height = function(){
-		return this.unit_height * ((Session.get("number_of_rows") + 1) / 2);
+		// return this.unit_height * ((Session.get("number_of_rows") + 1) / 2);
+		return this.unit_height * ((this.number_of_rows + 1) / 2);
 	};
 
 	this.repeat_viewbox_height = function(){
@@ -83,14 +95,19 @@
 	};
 
 	this.image_width = function(){
-		return this.cell_width * (Session.get("number_of_tablets") + 1);
+		var row_number_allocation = 1;
+		if (Session.get("preview_rotation") == "up") {
+			row_number_allocation = 2;
+		}
+		
+		return this.cell_width * (Session.get("number_of_tablets") + row_number_allocation);
 	};
 
 	this.image_height = function(){
 		// elements overlap by half their height
 		// so total height is half their height * number of rows
 		// plus another half height that sticks out the top
-		var height = (1 + Session.get("number_of_rows")) * this.cell_height / 2;
+		var height = (1 + this.number_of_rows) * this.cell_height / 2;
 
 		return height;
 	};
@@ -172,6 +189,7 @@ Template.auto_preview.helpers({
 	},
 	repeat_offset: function() {
 		var height = Template.instance().unit_height * ((Session.get("number_of_rows") +1) / 2);
+
 		var offset = parseFloat(this) * (height - (0.5 * Template.instance().unit_height));
 
 		return offset;
@@ -203,7 +221,7 @@ Template.auto_preview.helpers({
 		if (Session.get("edit_mode") == "simulation" || Session.get("edit_mode") == "broken_twill")
 		{
 			var pattern = Patterns.findOne({ _id: Template.instance().pattern_id}, {fields: {position_of_A: 1}});
-console.log(`position_of_A ${pattern.position_of_A}`);
+// console.log(`position_of_A ${pattern.position_of_A}`);
 			if (!pattern.position_of_A)
 				return;
 
@@ -235,7 +253,7 @@ console.log(`position_of_A ${pattern.position_of_A}`);
 	rotation_correction: function() {
 		Template.instance().set_svg_style();
 
-		var total_width = Template.instance().image_width();
+		// var total_width = Template.instance().image_width();
 
 		var total_height = Template.instance().image_height() * Session.get("number_of_repeats");
 
@@ -315,7 +333,7 @@ Template.auto_preview_weft.helpers({
 		var data = {};
 
 		var unit_height = 113.08752;
-
+		
 		var row_up = Session.get("number_of_rows") - row;
 		data.y_offset = ((row_up) * unit_height/2);
 

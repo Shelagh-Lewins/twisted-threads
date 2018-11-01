@@ -165,7 +165,8 @@ body.view_pattern .auto_preview.up svg {
 /* weft colour and rotate preview */
 
 #preview_controls {
-  clear: both;
+  /* clear: both; */
+  overflow: hidden;
   margin-top: 0;
 }
 

@@ -17,8 +17,9 @@
   {{/if}}
 {{else}}
 
-{{#unless equals preview_rotation "up"}}
+
 <div id="preview_controls">
+  {{#unless equals edit_mode "broken_twill"}}
   <div id="weft_color" class="{{#if equals view_pattern_mode "charts"}}visible{{/if}}
   {{#if equals view_pattern_mode "summary"}}visible{{/if}}">
     <span class="hint">Weft colour</span>
@@ -29,12 +30,14 @@
     </div>
     {{/if}}
   </div>
+  {{/unless}}
 
+{{#unless equals preview_rotation "up"}}
   {{#if can_edit_pattern _id}}
   <button class="rotate_preview {{#if equals view_pattern_mode "charts"}}visible{{/if}}">Rotate preview</button>
   {{/if}}
-</div>
 {{/unless}}
+</div>
 
 <div class="auto_preview {{preview_rotation}} {{show_tablets}} {{simulation_mode}}">
   <div id="auto_preview_wrapper" style="{{preview_style}}">

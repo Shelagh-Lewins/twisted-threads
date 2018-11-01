@@ -35,7 +35,9 @@
   {{/if}}
 
   {{#if session_equals "hide_preview" false}}
+  {{#if can_edit_pattern _id}}
     Preview orientation: <label><input type="radio" name="preview_orientation" value="horizontal" checked="{{#if equals preview_orientation 'horizontal'}}true{{/if}}">Horizontal</label><label><input type="radio" name="preview_orientation" value="vertical" checked="{{#if equals preview_orientation 'vertical'}}true{{/if}}">Vertical</label>
+  {{/if}}
   {{/if}}
 
   {{#if equals preview_orientation "horizontal"}}
@@ -268,6 +270,7 @@
   {{/unless}}{{/unless}}
 
   {{#if equals edit_mode "broken_twill"}}
+  {{#if can_edit_pattern _id}}
   <h2>Broken twill design chart</h2>
   <div class="hint">Each chart row represents two weaving rows.</div>
   <div class="hint">Use the twill direction change tool to create smooth diagonal lines.</div>
@@ -282,6 +285,7 @@
     {{/each}}</ul></div>{{/if}}
     {{/if}}
   </div>
+  {{/if}}
 
   {{#if equals preview_orientation "vertical"}}
   {{#if session_equals "hide_preview" false}}
@@ -293,6 +297,7 @@
   {{/if}}
   {{/if}}
 
+  {{#if can_edit_pattern _id}}
   <div class="edit_twill_rows">
       <button id="add_twill_row">Add rows</button> at 
       <input type="number" placeholder="Position..." id="twill_row_to_add" min="2" max="{{add_twill_row_positions}}" size="3" value="2" step="2"><br >
@@ -304,6 +309,7 @@
     Start weaving chart from twill chart row:
       <input type="number" placeholder="Start row..." id="weaving_start_row" min="1" max="1000" size="3" value="{{weaving_start_row}}" step="1"><br>
   </div>
+  {{/if}}
 
   {{/if}}
 
