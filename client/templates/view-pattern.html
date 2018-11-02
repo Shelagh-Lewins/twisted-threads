@@ -36,7 +36,9 @@
 
   {{#if session_equals "hide_preview" false}}
   {{#if can_edit_pattern _id}}
-    Preview orientation: <label><input type="radio" name="preview_orientation" value="horizontal" checked="{{#if equals preview_orientation 'horizontal'}}true{{/if}}">Horizontal</label><label><input type="radio" name="preview_orientation" value="vertical" checked="{{#if equals preview_orientation 'vertical'}}true{{/if}}">Vertical</label>
+    Orientation of woven band: 
+    <div class="preview_orientation"><ul><li class="horizontal {{#if equals preview_orientation "horizontal"}}selected{{/if}}"><a class="horizontal">horizontal</a></li>
+      <li class="vertical {{#if equals preview_orientation "vertical"}}selected{{/if}}"><a class="vertical">vertical</a></li></ul></div>
   {{/if}}
   {{/if}}
 

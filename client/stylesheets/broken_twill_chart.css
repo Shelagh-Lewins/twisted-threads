@@ -66,8 +66,8 @@
 
 .broken_twill_chart .row .remove_row {
 	border-top: 1px solid #999999;
-	height: 33px;
-	top: 30px !important;
+	height: 32px;
+	top: 31px !important;
 }
 
 .broken_twill_chart .row.column_number li {
@@ -132,7 +132,7 @@
 .broken_twill_chart .row.column_number li {
 	border-left: 1px solid rgba(0,0,0,0);
 	height: 32px;
-	width: 33px;
+	width: 32px;
 	border: none;
 }
 
@@ -190,7 +190,7 @@
 
 .broken_twill_chart .row.last_row .cell:nth-child(even) {
 	top: 0;
-	height: 32px;
+	height: 30px;
 }
 
 /* first row */

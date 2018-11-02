@@ -240,8 +240,13 @@ Meteor.methods({
     data.name = options.name;
 
     // tags
-    if (typeof data.tags === "undefined")
+    if (typeof data.tags === "undefined") {
       data.tags = [];
+    }
+
+    if (data.edit_mode == "broken_twill") {
+      data.tags.push('3/1 broken twill');
+    }
 
     var description ="";
     if (typeof data.description !== "undefined")
@@ -285,6 +290,7 @@ Meteor.methods({
     // Tags
     for (var i=0; i<data.tags.length; i++)
     {
+      console.log(`add tag: ${data.tags[i]}`);
       Patterns.addTag(data.tags[i], { _id: pattern_id });
     }
 
@@ -505,7 +511,6 @@ Meteor.methods({
 
     Patterns.update({_id: pattern_id}, {$set: {orientation: JSON.stringify(orientation)}});
     var pattern = Patterns.findOne({_id: pattern_id});
-    console.log(`final number_of_rows ${pattern.number_of_rows}`);
 
     ///////////////////////////////////
     //

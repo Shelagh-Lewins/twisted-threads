@@ -882,3 +882,47 @@ body.weave button.styled_button:disabled {
 #edit_tablets {
   clear: both;
 }
+
+
+/* preview orientation buttonos */
+.preview_orientation {
+  display: inline-block;
+  padding: 0;
+  margin: 0 8px 0 0;
+  border-radius: 0;
+  vertical-align: middle;
+}
+
+.preview_orientation ul {
+  float: left;
+  border: 1px solid #424A6C;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px; 
+  font-size: 0;
+  overflow: hidden;
+}
+
+.preview_orientation ul li {
+  display: inline;
+  margin: 0;
+}
+
+.preview_orientation ul li a {
+  color: #424A6C;
+  padding: 4px 8px 4px 8px;
+  line-height: 1.5;
+  text-decoration: none;
+  display: inline-block;
+  border-right: 1px solid #424A6C;
+  cursor: pointer;
+}
+
+.preview_orientation ul li:last-child a {
+  border-right: none;
+}
+
+.preview_orientation ul li.selected a {
+  background-color: #424A6C;
+  color: #FFFFFF;
+}

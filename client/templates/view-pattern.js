@@ -486,14 +486,18 @@ Template.styles_palette.helpers({
 });
 
 Template.view_pattern.events({
-  "change input[name='preview_orientation']": function(event) {
+  "click .preview_orientation .horizontal a": function() {
     var pattern_id = Router.current().params._id;
 
-    if (event.target.value == "horizontal") {
+    if (Session.get("preview_rotation") == "up") {
       Session.set("preview_rotation", "left");
       Meteor.call('set_preview_orientation', pattern_id, "left");
     }
-    else if (event.target.value == "vertical") {
+  },
+  "click .preview_orientation .vertical a": function() {
+    var pattern_id = Router.current().params._id;
+
+    if (Session.get("preview_rotation") != "up") {
       Session.set("preview_rotation", "up");
       Meteor.call('set_preview_orientation', pattern_id, "up");
     }
