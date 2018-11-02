@@ -431,17 +431,25 @@
 {{/if}}
 </div>
 <div class="pagination"><ul>
-{{#if single_column}}
-<li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_1');">Styles 1</a></li>
-<li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_2');">Styles 2</a></li>
+
+{{#if equals edit_mode "simulation"}}
+<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a>Threading styles</a></li>
+{{else if equals edit_mode "broken_twill"}}
+<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a>Broken twill design tools</a></li>
 {{else}}
-<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">{{#if equals edit_mode "simulation"}}Threading styles{{else}}{{#if equals edit_mode "broken_twill"}}Broken twill design tools{{else}}Styles{{/if}}{{/if}}</a></li>
+  {{#if single_column}}
+  <li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_1');">Styles 1</a></li>
+  <li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_2');">Styles 2</a></li>
+  {{else}}
+  <li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">Styles</a></li>
+  {{/if}}
+  <li class="special no_select {{is_selected_style_palette "special"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('special');">Special</a></li>
 {{/if}}
-<li class="special no_select {{is_selected_style_palette "special"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('special');">Special</a></li>
 </ul></div>
 
 <input type="button" id="edit_style_button" class=" {{editing_style}}" value="{{#if equals edit_mode "simulation"}}Edit colour{{else}}{{#if equals edit_mode "broken_twill"}}Edit colour{{else}}Edit style{{/if}}{{/if}}" onclick="Meteor.my_functions.edit_style_clicked();">
-<div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>{{/each}}{{#if equals edit_mode "broken_twill"}}<span class="hint">{{broken_twill_hint}}</span>{{/if}}
+<div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>
+  {{/each}}{{#if equals edit_mode "broken_twill"}}<span class="hint">{{broken_twill_hint}}</span>{{/if}}
 <div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with weaving_cell_data 0 0 "special_styles"}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
 

@@ -478,9 +478,9 @@ Template.styles_palette.helpers({
   },
   broken_twill_hint: function() {
     switch(Session.get("selected_style")) {
-      case 1: return "Selected tool: draw with foreground colour";
-      case 2: return "Selected tool: draw with background colour";
-      case 3: return "Selected tool: change twill direction";
+      case 1: return "Draw with foreground colour";
+      case 2: return "Draw with background colour";
+      case 3: return "Change twill direction";
     }
   }
 });

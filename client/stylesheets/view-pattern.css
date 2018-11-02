@@ -715,7 +715,7 @@ body.weave button.styled_button:disabled {
 }
 
 
-.broken_twill .styles .box {
+#styles_palette.broken_twill .styles .box.all_styles {
   display: block;
   height: 45px;
 }
@@ -724,11 +724,13 @@ body.weave button.styled_button:disabled {
 .broken_twill .styles .hint {
   color: #424A6C;
   display: block;
-  width: 350px;
+  height: 45px;
+  line-height: 45px;
 }
 
 .broken_twill .styles ul.row {
   width: auto;
+  float: left
 }
 
 .broken_twill .styles ul.row.special {
