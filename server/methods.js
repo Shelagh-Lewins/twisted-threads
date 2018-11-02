@@ -162,7 +162,19 @@ Meteor.methods({
     if (build_new)
     {
       // build pattern data
-      data.preview_rotation = "up";
+      switch(options.edit_mode) {
+        case "freehand":
+          data.preview_rotation = "left";
+          break;
+
+        case "simulation":
+          data.preview_rotation = "up";
+          break;
+
+        case "broken_twill":
+          data.preview_rotation = "up";
+          break;
+      }
 
       // weaving
       data.weaving = new Array();
