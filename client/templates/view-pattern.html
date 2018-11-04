@@ -4,12 +4,12 @@
 {{> warp_svgs}}
 
 <div class="pattern_info">
-  <div class="name">
-  {{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
-  </div>
+	<div class="name">
+	{{> editable_field extendContext collection="patterns" property="name" data=name button_text="Edit name"}}
+	</div>
 
-  <div class="hint">
-  Pattern type: {{#if equals edit_mode "simulation"}}Simulation{{else}}{{#if equals edit_mode "broken_twill"}}3/1 broken twill{{else}}Freehand{{/if}}{{/if}}
+	<div class="hint">
+	Pattern type: {{#if equals edit_mode "simulation"}}Simulation{{else}}{{#if equals edit_mode "broken_twill"}}3/1 broken twill{{else}}Freehand{{/if}}{{/if}}
 </div>
 </div>
 
@@ -19,371 +19,386 @@
 
 <div id="main_tabs">
 <ul>
-  <li class="charts {{is_selected_main_tab "charts"}}" ><a>Pattern design</a></li>
-  <li class="summary {{is_selected_main_tab "summary"}}" ><a>Description</a></li>
+	<li class="charts {{is_selected_main_tab "charts"}}" ><a>Pattern design</a></li>
+	<li class="summary {{is_selected_main_tab "summary"}}" ><a>Description</a></li>
 </ul>
 
 <div class="keyline">&nbsp;</div>
 </div>
 
 {{#if equals view_pattern_mode "charts"}}
-  {{#if show_editable_field weaving_notes _id}}
-  <div class="pattern_info">
-    <h2>Weaving notes</h2>
-    {{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
-  </div>
-  {{/if}}
+	{{#if show_editable_field weaving_notes _id}}
+	<div class="pattern_info">
+		<h2>Weaving notes</h2>
+		{{> editable_field extendContext collection="patterns" property="weaving_notes" data=weaving_notes multiple=true button_text="Edit weaving notes" placeholder_text="Tap \"Edit weaving notes\" to enter weaving notes"}}
+	</div>
+	{{/if}}
 
-  {{#if session_equals "hide_preview" false}}
-  {{#if can_edit_pattern _id}}
-    Orientation of woven band: 
-    <div class="preview_orientation"><ul><li class="horizontal {{#if equals preview_orientation "horizontal"}}selected{{/if}}"><a class="horizontal">horizontal</a></li>
-      <li class="vertical {{#if equals preview_orientation "vertical"}}selected{{/if}}"><a class="vertical">vertical</a></li></ul></div>
-  {{/if}}
-  {{/if}}
+	{{#if session_equals "hide_preview" false}}
+	{{#if can_edit_pattern _id}}
+		Orientation of woven band: 
+		<div class="preview_orientation"><ul><li class="horizontal {{#if equals preview_orientation "horizontal"}}selected{{/if}}"><a class="horizontal">horizontal</a></li>
+			<li class="vertical {{#if equals preview_orientation "vertical"}}selected{{/if}}"><a class="vertical">vertical</a></li></ul></div>
+	{{/if}}
+	{{/if}}
 
-  {{#if equals preview_orientation "horizontal"}}
-    {{#if session_equals "hide_preview" false}}
-    
-    {{> auto_preview}}
-    {{else}}
-    <p class="loading_preview">Loading preview...</p>
-    
-    {{/if}}
-  {{/if}}
+	{{#if equals preview_orientation "horizontal"}}
+		{{#if session_equals "hide_preview" false}}
+		
+		{{> auto_preview}}
+		{{else}}
+		<p class="loading_preview">Loading preview...</p>
+		
+		{{/if}}
+	{{/if}}
 
-  {{#if equals edit_mode "simulation"}}
+	{{#if equals edit_mode "simulation"}}
 
-  {{#if equals preview_orientation "vertical"}}
-  {{#if session_equals "hide_preview" false}}
-  
-  {{> auto_preview}}
-  {{else}}
-  <p class="loading_preview">Loading preview...</p>
-  
-  {{/if}}
-  {{/if}}
+	{{#if equals preview_orientation "vertical"}}
+	{{#if session_equals "hide_preview" false}}
+	
+	{{> auto_preview}}
+	{{else}}
+	<p class="loading_preview">Loading preview...</p>
+	
+	{{/if}}
+	{{/if}}
 
-  <h2>Weaving instructions</h2>
-    {{#if can_edit_pattern _id}}
+	<h2>Weaving instructions</h2>
+		{{#if can_edit_pattern _id}}
 
 <div id="toolbar" class="{{simulation_mode}}"><div class="inner_tube">
-  <div class="tabs {{rendered_manual}}">
-    <ul>
-      <li class="auto {{#if equals simulation_mode "auto"}}selected{{/if}}"><a>Auto</a></li>
-      <li class="manual {{#if equals simulation_mode "manual"}}selected{{/if}}"><a>Manual</a></li>
-    </ul>
-  </div>
+	<div class="tabs {{rendered_manual}}">
+		<ul>
+			<li class="auto {{#if equals simulation_mode "auto"}}selected{{/if}}"><a>Auto</a></li>
+			<li class="manual {{#if equals simulation_mode "manual"}}selected{{/if}}"><a>Manual</a></li>
+		</ul>
+	</div>
 
 <div class="content {{simulation_mode}}" style="max-width: {{manual_pack_width}}px;">
-  {{#if equals simulation_mode "auto"}}
-    <span class="hint">
-      Turn all tablets together, forward or backward, following the sequence shown below
-    </span>
+	{{#if equals simulation_mode "auto"}}
+		<span class="hint">
+			Turn all tablets together, forward or backward, following the sequence shown below
+		</span>
 
-    <label for="num_auto_turns">Number of weaving rows:</label>
-    <input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="48" size="3" value="{{auto_turn_sequence.length}}" > (max 48)<br>
+		<label for="num_auto_turns">Number of weaving rows:</label>
+		<input type="number" placeholder="Rows..." id="num_auto_turns" min="1" max="48" size="3" value="{{auto_turn_sequence.length}}" > (max 48)<br>
 
-    {{> auto_sequence}}
+		{{> auto_sequence}}
 
-    <span class="hint">
-      {{#if does_pattern_repeat}}
-      Number of pattern repeats shown: {{auto_repeats}}
-      {{else}}
-      The pattern does not repeat
-      {{/if}}
-    </span>
+		<span class="hint">
+			{{#if does_pattern_repeat}}
+			Number of pattern repeats shown: {{auto_repeats}}
+			{{else}}
+			The pattern does not repeat
+			{{/if}}
+		</span>
 
-  {{else}}
-      <span class="hint">Design your pattern row by row, turning each pack of tablets separately to create the <a href="#" onclick="Meteor.my_functions.start_weaving();">interactive weaving chart</a></span>
+	{{else}}
+			<span class="hint">Design your pattern row by row, turning each pack of tablets separately to create the <a href="#" onclick="Meteor.my_functions.start_weaving();">interactive weaving chart</a></span>
 
-      <div class="packs">
-        <div class="packs_inner" style="width: {{manual_pack_width}}px;">
-          {{#each packs}}
-          <span class="row">
-            <span class="pack_number">
-              pack {{this.pack_number}}
-            </span>
+			<div class="packs">
+				<div class="packs_inner" style="width: {{manual_pack_width}}px;">
+					{{#each packs}}
+					<span class="row">
+						<span class="pack_number">
+							pack {{this.pack_number}}
+						</span>
 
-            <span class="direction">
-              {{this.direction}}
-            </span>
+						<span class="direction">
+							{{this.direction}}
+						</span>
 
-            <input type="number" placeholder="Turns..." class="num_manual_turns" min="0" max="3" size="2" value="{{this.number_of_turns}}" >
+						<input type="number" placeholder="Turns..." class="num_manual_turns" min="0" max="3" size="2" value="{{this.number_of_turns}}" >
 
-            <ul class="tablets">
-            {{#each this.tablets}}
-              <li class="{{#if selected}}selected{{/if}}">
-                {{tablet}}
-              </li>
-            {{/each}}
-            </ul>
-          </span>
-          {{/each}}
-        </div>
-      </div>
+						<ul class="tablets">
+						{{#each this.tablets}}
+							<li class="{{#if selected}}selected{{/if}}">
+								{{tablet}}
+							</li>
+						{{/each}}
+						</ul>
+					</span>
+					{{/each}}
+				</div>
+			</div>
 
-      <span class="hint">
-        {{#if equals number_of_rows 0}}
-          Click "weave" to add a row
-        {{else}}
-          To turn tablets separately, move them into different packs
-        {{/if}}
-      </span>
+			<span class="hint">
+				{{#if equals number_of_rows 0}}
+					Click "weave" to add a row
+				{{else}}
+					To turn tablets separately, move them into different packs
+				{{/if}}
+			</span>
 
-      <div class="weave_buttons">
-        <button id="unweave" class="styled_button" disabled="{{no_weaving_rows}}">Unweave</button>
-        <button id="weave" class="styled_button" disabled="{{weave_disabled}}">Weave</button>
-      </div>
-      <span class="hint rows">Current rows: {{number_of_rows}}</span>
-      <div class="clearing"></div>
-    {{/if}}
+			<span class="hint rows">Current rows: {{number_of_rows}}</span>
+
+			<div class="sim_weave_mode">
+				<ul><li class="{{#if equals sim_weave_mode "add_row"}}selected{{/if}}"><a id="weave_mode_add">Add row</a></li>
+ 
+				<li class="{{#if equals sim_weave_mode "edit_row"}}selected{{/if}}"><a id="weave_mode_edit">Edit row</a></li></ul>
+			</div>
+			{{#if equals sim_weave_mode "add_row"}}
+			<div class="weave_buttons">
+				<button id="unweave" class="styled_button" disabled="{{no_weaving_rows}}">Unweave</button>
+				<button id="weave" class="styled_button" disabled="{{weave_disabled}}">Weave</button>
+			</div>
+			{{else if equals sim_weave_mode "edit_row"}}
+				<div class="edit_row_buttons">
+					Row to edit: <input type="number" placeholder="Row..." id="row_to_edit" min="1" max="{{number_of_rows}}" size="3" value="{{row_to_edit}}" >
+					<button id="update_row" class="styled_button">Update row</button>
+				</div>
+			{{/if}}
+
+			<div class="clearing"></div>
+
+		{{/if}}
 
 </div></div>
 </div>
 {{else}}
-  {{#if equals simulation_mode "auto"}}
-    <span class="hint">Turn all tablets together, forward or backward, following the sequence shown below:</span>
-    
-    {{> auto_sequence}}
+	{{#if equals simulation_mode "auto"}}
+		<span class="hint">Turn all tablets together, forward or backward, following the sequence shown below:</span>
+		
+		{{> auto_sequence}}
 
-  {{else}}
-    Turn tablets individually forward or backward according to the <a href="#" onclick="Meteor.my_functions.start_weaving();">interactive weaving chart</a>.
-  {{/if}}
-    {{/if}}
-  {{/if}}
+	{{else}}
+		Turn tablets individually forward or backward according to the <a href="#" onclick="Meteor.my_functions.start_weaving();">interactive weaving chart</a>.
+	{{/if}}
+		{{/if}}
+	{{/if}}
 {{/if}}
 
 {{#if equals view_pattern_mode "summary"}}
-  {{#if can_edit_pattern _id}}
-    <button id="delete">Delete pattern</button>
-  {{/if}}
+	{{#if can_edit_pattern _id}}
+		<button id="delete">Delete pattern</button>
+	{{/if}}
 
-  <div class="pattern_info">
-    <div class="box summary">
-  <span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
-  </div>
-  <br>
+	<div class="pattern_info">
+		<div class="box summary">
+	<span class="tablets_count" title="{{number_of_tablets}} tablets"><span class="icon"></span>{{number_of_tablets}}</span><a href="{{pathFor route='user' _id=created_by}}"><span class="created_by" title="Created by {{created_by_username}}"><span class="icon"></span>{{created_by_username}}</span></a>
+	</div>
+	<br>
 
 {{#if session_equals "hide_preview" false}}
-  {{#if can_edit_pattern _id}}
-  <div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
-  {{else}}
-  <div class="box tags">{{> tags}}</div>
-  {{/if}}
+	{{#if can_edit_pattern _id}}
+	<div class="box tags"><span class="text">Tags: </span>{{> tagInput}}</div>
+	{{else}}
+	<div class="box tags">{{> tags}}</div>
+	{{/if}}
 {{/if}}
 
-  {{#if can_edit_pattern _id}}
-    {{#if isInRole 'verified' 'users'}}
-      {{#if image_limit_reached}}
-        You have added the maximum allowed number of pictures to this pattern.
-      {{else}}
-        {{#if show_image_uploader}}
-          {{> image_uploader}}
-        {{else}}
-          <button class="show_image_uploader">Add pictures</button>
-        {{/if}}
-      {{/if}}
-    {{else}}
-      In order to add images, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a>
-    {{/if}}
-  {{/if}}
+	{{#if can_edit_pattern _id}}
+		{{#if isInRole 'verified' 'users'}}
+			{{#if image_limit_reached}}
+				You have added the maximum allowed number of pictures to this pattern.
+			{{else}}
+				{{#if show_image_uploader}}
+					{{> image_uploader}}
+				{{else}}
+					<button class="show_image_uploader">Add pictures</button>
+				{{/if}}
+			{{/if}}
+		{{else}}
+			In order to add images, please verify your email address. <a href="{{pathFor route='account_settings'}}">More information</a>
+		{{/if}}
+	{{/if}}
 
-  <div id="pattern_images">
-  {{#each pattern_image}}
-    {{> image}}
-  {{/each}}
-  </div>
-  <div class="clearing"></div>
+	<div id="pattern_images">
+	{{#each pattern_image}}
+		{{> image}}
+	{{/each}}
+	</div>
+	<div class="clearing"></div>
 
-  {{#if can_edit_pattern _id}}<div class="box private">
-  <div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
-  <div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
-  </div>{{/if}}
+	{{#if can_edit_pattern _id}}<div class="box private">
+	<div class="controls"><button class="toggle_private">{{#if private}}Make pattern public{{else}}Make pattern private{{/if}}</button></div>
+	<div class="content">{{#if private}}Private: nobody else can see this pattern.{{else}}Public: other people can see and weave this pattern but they can't edit or delete it.{{/if}}</div>
+	</div>{{/if}}
 
-  {{#if show_editable_field description _id}}
-  <h2>Description</h2>
-  {{> editable_field extendContext collection="patterns" property="description" data=description multiple=true button_text="Edit description" placeholder_text="Tap \"Edit description\" to enter a description"}}
-  {{/if}}
+	{{#if show_editable_field description _id}}
+	<h2>Description</h2>
+	{{> editable_field extendContext collection="patterns" property="description" data=description multiple=true button_text="Edit description" placeholder_text="Tap \"Edit description\" to enter a description"}}
+	{{/if}}
 
-  </div>
+	</div>
 
-  <span class="done_loading {{rendered_manual}}"></span>
+	<span class="done_loading {{rendered_manual}}"></span>
 
 {{/if}}
 
 {{#if equals view_pattern_mode "charts"}}
-  {{#unless equals edit_mode "simulation"}}
-  {{#unless equals edit_mode "broken_twill"}}
-    {{#if can_edit_pattern _id}}
+	{{#unless equals edit_mode "simulation"}}
+	{{#unless equals edit_mode "broken_twill"}}
+		{{#if can_edit_pattern _id}}
 
-    <h2>Weaving Chart</h2>
-    <div class="hint">
-      To edit the chart, select styles from the palette at the bottom of the screen, then click chart cells.<br>
-    </div>
+		<h2>Weaving Chart</h2>
+		<div class="hint">
+			To edit the chart, select styles from the palette at the bottom of the screen, then click chart cells.<br>
+		</div>
 
-    <div id="toolbar" ><div class="inner_tube">
-    <button id="undo" disabled="{{undo_disabled}}" title="Undo">
-    {{#if equals undo_disabled "disabled"}}
-    <img src="../images/undo_disabled.svg" onerror="this.src='/images/undo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
-    <img src="../images/undo.svg" onerror="this.src='/images/undo.png';this.onerror=null;" width="32" height="32" >
-    {{/if}}</button>
-    <button id="redo" disabled="{{redo_disabled}}" title="Redo">
-    {{#if equals redo_disabled "disabled"}}
-    <img src="../images/redo_disabled.svg" onerror="this.src='/images/redo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
-    <img src="../images/redo.svg" onerror="this.src='/images/redo.png';this.onerror=null;" width="32" height="32" >
-    {{/if}}</button>
-    <button id="add_row_at_start" title="Add row at bottom"><img src="/images/row_bottom.svg" onerror="this.src='/images/row_bottom.png';this.onerror=null;" width="32" height="32" ></button>
-    <button id="add_row_at_end" title="Add row at top"><img src="/images/row_top.svg" onerror="this.src='/images/row_top.png';this.onerror=null;" width="32" height="32" ></button>
-    <button id="add_tablet_at_start" title="Add tablet at left"><img src="/images/tablet_left.svg" onerror="this.src='/images/tablet_left.png';this.onerror=null;" width="32" height="32" ></button>
-    <button id="add_tablet_at_end" title="Add tablet at right"><img src="/images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
-    </div></div>
+		<div id="toolbar" ><div class="inner_tube">
+		<button id="undo" disabled="{{undo_disabled}}" title="Undo">
+		{{#if equals undo_disabled "disabled"}}
+		<img src="../images/undo_disabled.svg" onerror="this.src='/images/undo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
+		<img src="../images/undo.svg" onerror="this.src='/images/undo.png';this.onerror=null;" width="32" height="32" >
+		{{/if}}</button>
+		<button id="redo" disabled="{{redo_disabled}}" title="Redo">
+		{{#if equals redo_disabled "disabled"}}
+		<img src="../images/redo_disabled.svg" onerror="this.src='/images/redo_disabled.png';this.onerror=null;" width="32" height="32" >{{else}}
+		<img src="../images/redo.svg" onerror="this.src='/images/redo.png';this.onerror=null;" width="32" height="32" >
+		{{/if}}</button>
+		<button id="add_row_at_start" title="Add row at bottom"><img src="/images/row_bottom.svg" onerror="this.src='/images/row_bottom.png';this.onerror=null;" width="32" height="32" ></button>
+		<button id="add_row_at_end" title="Add row at top"><img src="/images/row_top.svg" onerror="this.src='/images/row_top.png';this.onerror=null;" width="32" height="32" ></button>
+		<button id="add_tablet_at_start" title="Add tablet at left"><img src="/images/tablet_left.svg" onerror="this.src='/images/tablet_left.png';this.onerror=null;" width="32" height="32" ></button>
+		<button id="add_tablet_at_end" title="Add tablet at right"><img src="/images/tablet_right.svg" onerror="this.src='/images/tablet_right.png';this.onerror=null;" width="32" height="32" ></button>
+		</div></div>
 {{#if session_equals "hide_while_loading" false}}
-    <div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
-    {{> column_numbers}}
-    {{#each row_indexes}}
-    {{> pattern_row}}
-    {{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
-    {{#each tablet_indexes}}
-    {{> remove_tablet}}
-    {{/each}}</ul></div>{{/if}}
-    </div>
+		<div class="pattern view {{#if can_edit_pattern _id}}editable{{/if}}">
+		{{> column_numbers}}
+		{{#each row_indexes}}
+		{{> pattern_row}}
+		{{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
+		{{#each tablet_indexes}}
+		{{> remove_tablet}}
+		{{/each}}</ul></div>{{/if}}
+		</div>
 
-    {{#if equals preview_orientation "vertical"}}
-    {{#if session_equals "hide_preview" false}}
-    
-    {{> auto_preview}}
-    {{else}}
-    <p class="loading_preview">Loading preview...</p>
-    
-    {{/if}}
-    {{/if}}
-  
+		{{#if equals preview_orientation "vertical"}}
+		{{#if session_equals "hide_preview" false}}
+		
+		{{> auto_preview}}
+		{{else}}
+		<p class="loading_preview">Loading preview...</p>
+		
+		{{/if}}
+		{{/if}}
+	
 {{/if}}
 
-    <div class="edit_rows">
-      <button id="add_row">Add row</button> at 
-      <input type="number" placeholder="Position..." id="row_to_add" min="1" max="{{add_row_positions}}" size="3" value="1" ><br >
-      Number of new rows:
-      <input type="number" placeholder="Number..." id="num_new_rows" min="1" max="20" size="3" value="1" ><br>
-    </div>
-    {{/if}}
+		<div class="edit_rows">
+			<button id="add_row">Add row</button> at 
+			<input type="number" placeholder="Position..." id="row_to_add" min="1" max="{{add_row_positions}}" size="3" value="1" ><br >
+			Number of new rows:
+			<input type="number" placeholder="Number..." id="num_new_rows" min="1" max="20" size="3" value="1" ><br>
+		</div>
+		{{/if}}
 
-  {{/unless}}{{/unless}}
+	{{/unless}}{{/unless}}
 
-  {{#if equals edit_mode "broken_twill"}}
-  {{#if can_edit_pattern _id}}
-  <h2>Broken twill design chart</h2>
-  <div class="hint">Each chart row represents two weaving rows.</div>
-  <div class="hint">Use the twill direction change tool to create smooth diagonal lines.</div>
+	{{#if equals edit_mode "broken_twill"}}
+	{{#if can_edit_pattern _id}}
+	<h2>Broken twill design chart</h2>
+	<div class="hint">Each chart row represents two weaving rows.</div>
+	<div class="hint">Use the twill direction change tool to create smooth diagonal lines.</div>
 
-  <div class="broken_twill_chart {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
-    {{> column_numbers}}
-    {{#each broken_twill_row_indexes}}
-      {{> broken_twill_row}}
-    {{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
-    {{#each tablet_indexes}}
-    {{> remove_tablet}}
-    {{/each}}</ul></div>{{/if}}
-    {{/if}}
-  </div>
-  {{/if}}
+	<div class="broken_twill_chart {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
+		{{> column_numbers}}
+		{{#each broken_twill_row_indexes}}
+			{{> broken_twill_row}}
+		{{/each}}{{#if can_remove_tablets}}<div class="row"><span class="spacer"></span><ul>
+		{{#each tablet_indexes}}
+		{{> remove_tablet}}
+		{{/each}}</ul></div>{{/if}}
+		{{/if}}
+	</div>
+	{{/if}}
 
-  {{#if equals preview_orientation "vertical"}}
-  {{#if session_equals "hide_preview" false}}
-  
-  {{> auto_preview}}
-  {{else}}
-  <p class="loading_preview">Loading preview...</p>
-  
-  {{/if}}
-  {{/if}}
+	{{#if equals preview_orientation "vertical"}}
+	{{#if session_equals "hide_preview" false}}
+	
+	{{> auto_preview}}
+	{{else}}
+	<p class="loading_preview">Loading preview...</p>
+	
+	{{/if}}
+	{{/if}}
 
-  {{#if can_edit_pattern _id}}
-  <div class="edit_twill_rows">
-      <button id="add_twill_row">Add rows</button> at 
-      <input type="number" placeholder="Position..." id="twill_row_to_add" min="2" max="{{add_twill_row_positions}}" size="3" value="2" step="2"><br >
-      Number of new rows:
-      <input type="number" placeholder="Number..." id="twill_num_new_rows" min="2" max="10" size="3" value="2" step="2"><br>
-  </div>
+	{{#if can_edit_pattern _id}}
+	<div class="edit_twill_rows">
+			<button id="add_twill_row">Add rows</button> at 
+			<input type="number" placeholder="Position..." id="twill_row_to_add" min="2" max="{{add_twill_row_positions}}" size="3" value="2" step="2"><br >
+			Number of new rows:
+			<input type="number" placeholder="Number..." id="twill_num_new_rows" min="2" max="10" size="3" value="2" step="2"><br>
+	</div>
 
-  <div class="weaving_start_row">
-    Start weaving chart from twill chart row:
-      <input type="number" placeholder="Start row..." id="weaving_start_row" min="1" max="1000" size="3" value="{{weaving_start_row}}" step="1"><br>
-  </div>
-  {{/if}}
+	<div class="weaving_start_row">
+		Start weaving chart from twill chart row:
+			<input type="number" placeholder="Start row..." id="weaving_start_row" min="1" max="1000" size="3" value="{{weaving_start_row}}" step="1"><br>
+	</div>
+	{{/if}}
 
-  {{/if}}
+	{{/if}}
 
-  <h2>Threading chart</h2>  
+	<h2>Threading chart</h2>  
 
-  <div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
+	<div class="tablets {{#if can_edit_pattern _id}}editable{{/if}}">{{#if session_equals "hide_while_loading" false}}
 
-    {{> column_numbers}}
-    {{#each hole_indexes}}
-      {{> threading_row}}
-    {{/each}}
-    {{> orientation}}
+		{{> column_numbers}}
+		{{#each hole_indexes}}
+			{{> threading_row}}
+		{{/each}}
+		{{> orientation}}
 
-    {{/if}}
+		{{/if}}
 
-    {{#if can_edit_pattern _id}}
-    <div id="edit_tablets">
-      <button id="add_tablet" disabled="{{#unless equals can_add_tablets true}}disabled{{/unless}}">Add tablet</button> at 
-      <input type="number" placeholder="Position..." id="tablet_to_add" min="1" max="{{add_tablet_positions}}" size="3" value="1" ><br>
-      {{#if equals edit_mode "simulation"}}
-        <button id="remove_tablet" disabled="{{#unless equals can_remove_tablets true}}disabled{{/unless}}">Remove tablet</button>  
-        <input type="number" placeholder="Position..." id="tablet_to_remove" min="1" max="{{tablet_indexes.length}}" size="3" value="1" >
-      {{/if}}
-    </div>
-    {{/if}}
-  </div>
+		{{#if can_edit_pattern _id}}
+		<div id="edit_tablets">
+			<button id="add_tablet" disabled="{{#unless equals can_add_tablets true}}disabled{{/unless}}">Add tablet</button> at 
+			<input type="number" placeholder="Position..." id="tablet_to_add" min="1" max="{{add_tablet_positions}}" size="3" value="1" ><br>
+			{{#if equals edit_mode "simulation"}}
+				<button id="remove_tablet" disabled="{{#unless equals can_remove_tablets true}}disabled{{/unless}}">Remove tablet</button>  
+				<input type="number" placeholder="Position..." id="tablet_to_remove" min="1" max="{{tablet_indexes.length}}" size="3" value="1" >
+			{{/if}}
+		</div>
+		{{/if}}
+	</div>
 
-  {{#if can_edit_pattern _id}}
-  <div class="hint clearboth">
-    To edit the threading chart, select thread colours from the palette at the bottom of the screen, then click chart cells. Use X for an unthreaded hole.<br>
-  </div>
-  {{/if}}
+	{{#if can_edit_pattern _id}}
+	<div class="hint clearboth">
+		To edit the threading chart, select thread colours from the palette at the bottom of the screen, then click chart cells. Use X for an unthreaded hole.<br>
+	</div>
+	{{/if}}
 
-  {{#if show_editable_field threading_notes _id}}
-  <div class="pattern_info {{rendered_manual}}">
-    <h2>Threading notes</h2>
-    {{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
-  </div>
-  {{/if}}
+	{{#if show_editable_field threading_notes _id}}
+	<div class="pattern_info {{rendered_manual}}">
+		<h2>Threading notes</h2>
+		{{> editable_field extendContext collection="patterns" property="threading_notes" data=threading_notes multiple=true button_text="Edit threading notes" placeholder_text="Tap \"Edit threading notes\" to enter threading notes"}}
+	</div>
+	{{/if}}
 
-  <h2>Tablet labels</h2>
-  <div class="notation">
-  <img src="{{#if equals hole_handedness "clockwise"}}/images/tablet_labels.png{{else}}/images/tablet_labels_rev.png{{/if}}" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
+	<h2>Tablet labels</h2>
+	<div class="notation">
+	<img src="{{#if equals hole_handedness "clockwise"}}/images/tablet_labels.png{{else}}/images/tablet_labels_rev.png{{/if}}" alt="Tablet labels" title="Labels and turning direction" width="237" height="148"/>
 
-  <div class="hint">
-    The arrows show turning the tablet forwards.<br>
-  </div>
+	<div class="hint">
+		The arrows show turning the tablet forwards.<br>
+	</div>
 
-  {{#if equals edit_mode "freehand"}}
-    {{#if can_edit_pattern _id}}
-    <br><button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
-    {{/if}}
-  {{/if}}
-  </div>
-  <span class="done_loading {{rendered_manual}}"></span>
-  
+	{{#if equals edit_mode "freehand"}}
+		{{#if can_edit_pattern _id}}
+		<br><button id="change_handedness" title="Change direction of the hole labels">Change direction of ABCD</button>
+		{{/if}}
+	{{/if}}
+	</div>
+	<span class="done_loading {{rendered_manual}}"></span>
+	
 {{/if}}
 
 
 </template>
 
 <template name="pattern_row">
-  <div class="row">{{> row_number}}
-    <ul>
+	<div class="row">{{> row_number}}
+		<ul>
 {{#each tablet_indexes}}
-  {{#with row=.. tablet=this}}
-    {{> pattern_cell}}
-  {{/with}}
+	{{#with row=.. tablet=this}}
+		{{> pattern_cell}}
+	{{/with}}
 {{/each}}
 {{> remove_row}}
-    </ul>
-  </div>
+		</ul>
+	</div>
 </template>
 
 <template name="remove_row">
@@ -396,9 +411,9 @@
 
 <template name="threading_row">
 <div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each tablet_indexes}}
-  {{#with row=.. tablet=this type="threading"}}
-    {{> pattern_cell}}
-  {{/with}}
+	{{#with row=.. tablet=this type="threading"}}
+		{{> pattern_cell}}
+	{{/with}}
 {{/each}}</ul></div>
 </template>
 
@@ -407,26 +422,26 @@
 <div class="styles">
 <div class="edit_style {{editing_style}}">
 {{#if equals edit_mode "simulation"}}
-  <h2>Thread colour</h2>
+	<h2>Thread colour</h2>
 {{else}}
-  {{#if equals edit_mode "broken_twill"}}
-  <h2>Thread colour</h2>
-  {{else}}
-  <h2>Background</h2>
-  {{/if}}
+	{{#if equals edit_mode "broken_twill"}}
+	<h2>Thread colour</h2>
+	{{else}}
+	<h2>Background</h2>
+	{{/if}}
 {{/if}}
 <div class="colorpicker_holder"><input type="text" id="background_colorpicker"></div>
 {{#if equals edit_mode "freehand"}}
 <h2>Warp thread</h2>
 <div class="colorpicker_holder"><input type="text" id="line_colorpicker"></div>
 <ul class="warps">
-  {{#each edit_style_warp warp}}
-    <li class="{{#if equals on true}}on{{/if}}" title="{{title}}" onclick="Meteor.my_functions.edit_style_warp('{{new_warp}}');">
-      <svg viewBox="0 0 256 256">
-        <use style="fill: #FFFFFF; stroke: {{#if equals on true}}{{selected_stroke}}{{else}}#666666{{/if}};" xlink:href="{{symbol}}" x="0" y="0"/>
-    </svg>
-    </li>
-  {{/each}}
+	{{#each edit_style_warp warp}}
+		<li class="{{#if equals on true}}on{{/if}}" title="{{title}}" onclick="Meteor.my_functions.edit_style_warp('{{new_warp}}');">
+			<svg viewBox="0 0 256 256">
+				<use style="fill: #FFFFFF; stroke: {{#if equals on true}}{{selected_stroke}}{{else}}#666666{{/if}};" xlink:href="{{symbol}}" x="0" y="0"/>
+		</svg>
+		</li>
+	{{/each}}
 </ul>
 {{/if}}
 </div>
@@ -437,19 +452,19 @@
 {{else if equals edit_mode "broken_twill"}}
 <li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a>Broken twill design tools</a></li>
 {{else}}
-  {{#if single_column}}
-  <li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_1');">Styles 1</a></li>
-  <li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_2');">Styles 2</a></li>
-  {{else}}
-  <li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">Styles</a></li>
-  {{/if}}
-  <li class="special no_select {{is_selected_style_palette "special"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('special');">Special</a></li>
+	{{#if single_column}}
+	<li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_1');">Styles 1</a></li>
+	<li class="styles_2 no_select {{is_selected_style_palette "styles_2"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_2');">Styles 2</a></li>
+	{{else}}
+	<li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('all_styles');">Styles</a></li>
+	{{/if}}
+	<li class="special no_select {{is_selected_style_palette "special"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('special');">Special</a></li>
 {{/if}}
 </ul></div>
 
 <input type="button" id="edit_style_button" class=" {{editing_style}}" value="{{#if equals edit_mode "simulation"}}Edit colour{{else}}{{#if equals edit_mode "broken_twill"}}Edit colour{{else}}Edit style{{/if}}{{/if}}" onclick="Meteor.my_functions.edit_style_clicked();">
 <div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>
-  {{/each}}{{#if equals edit_mode "broken_twill"}}<span class="hint">{{broken_twill_hint}}</span>{{/if}}
+	{{/each}}{{#if equals edit_mode "broken_twill"}}<span class="hint">{{broken_twill_hint}}</span>{{/if}}
 <div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with weaving_cell_data 0 0 "special_styles"}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
 
@@ -474,12 +489,12 @@
 
 <template name="auto_sequence">
 <div class="auto_directions">
-  {{#each auto_turn_sequence}}
-    <span class="direction">
-      {{this.direction}}
-      <span class="turn_number">{{this.turn}}</span>
-    </span>
-  {{/each}}
+	{{#each auto_turn_sequence}}
+		<span class="direction">
+			{{this.direction}}
+			<span class="turn_number">{{this.turn}}</span>
+		</span>
+	{{/each}}
 </div>
 </template>
 

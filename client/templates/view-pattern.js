@@ -46,6 +46,9 @@ Template.view_pattern.rendered = function() {
 Template.view_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
   Meteor.my_functions.view_pattern_created(pattern_id); 
+
+  Session.set('sim_weave_mode', "add_row");
+  Session.set("row_to_edit", 1);
 });
 
 Template.pattern_not_found.helpers({
@@ -83,8 +86,14 @@ Template.view_pattern.helpers({
     if (Session.get('view_pattern_mode') == mode)
       return "selected";
   },
+  sim_weave_mode: function() {
+    return Session.get('sim_weave_mode');
+  },
   auto_repeats: function() {
     return Session.get("number_of_repeats");
+  },
+  row_to_edit: function() {
+    return Session.get("row_to_edit");
   },
   packs: function() {
     var packs = new Array();
@@ -910,6 +919,25 @@ Template.view_pattern.events({
         return;
 
     Meteor.my_functions.unweave_button(pattern_id);
+  },
+  'click #weave_mode_add': function() {
+    Session.set('sim_weave_mode', 'add_row');
+  },
+  'click #weave_mode_edit': function() {
+    Session.set('sim_weave_mode', 'edit_row');
+  },
+  'change #row_to_edit': function(event) {
+    var row_to_edit = Math.round(event.target.value);
+
+    if (row_to_edit < 1) {
+      row_to_edit = 1;
+    }
+
+    if (row_to_edit > Session.get('number_of_rows')) {
+      row_to_edit = Session.get('number_of_rows');
+    }
+
+    Session.set('row_to_edit', row_to_edit);
   },
   ////////////////////////////////////////
   // 3/1 Broken twill patterns
