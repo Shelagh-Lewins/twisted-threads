@@ -291,6 +291,12 @@ Template.auto_preview.helpers({
 	},
 	total_height: function() {
 		return Template.instance().image_height();
+	},
+	show_row_highlight: function() {
+		// the user is editing a row in a simulation pattern
+		if (Session.get('edit_mode') == 'simulation' && Session.get('sim_weave_mode') == 'edit_row') {
+			return true;
+		}
 	}
  });
 
@@ -344,16 +350,47 @@ Template.auto_preview_weft.helpers({
 	}
 });
 
+Template.auto_preview_row_highlight.helpers({
+	data: function(row)
+	{
+		var pattern_id = Router.current().params._id;
+		var pattern = Patterns.findOne({_id: pattern_id});
+
+		if (typeof pattern === "undefined")
+			return;
+
+		var number_of_tablets = pattern.number_of_tablets;
+
+		var data = {};
+
+		var unit_height = 113.08752;
+		
+		var row_up = Session.get("number_of_rows") - row;
+		data.y_offset = ((row_up) * unit_height/2);
+
+		data.color = "#FF0000";
+		data.scale = number_of_tablets - 0.2;
+
+		return data;
+	}
+});
+
 Template.auto_preview_row.helpers({
 	show_row_number: function(row)
 	{
 		var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
 
+    var row_offset = 0;
+
+    if (pattern.weaving_start_row) {
+    	row_offset = pattern.weaving_start_row;
+    }
+
 		// show all row numbers on vertical preview
 		if (Session.get("preview_rotation") == "up") {
 			return true;
-		} else if ((row - pattern.weaving_start_row + 1) % 5 == 0) {
+		} else if ((row - row_offset + 1) % 5 == 0) {
 			// show every 5th number on horizontal preview
 			return true;
 		}

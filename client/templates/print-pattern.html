@@ -32,11 +32,15 @@
 	</div>
 {{/if}}
 
+{{#unless is_sim_auto}}
 {{> weaving_key}}
+{{/unless}}
 
 {{#if string_exists weaving_notes}}
+{{#unless is_sim_auto}}
 <h2>Weaving notes</h2>
 <span class="text markdown">{{#markdown}}{{{weaving_notes}}}{{/markdown}}</span>
+{{/unless}}
 {{/if}}
 
 <h2>Threading chart</h2>

@@ -669,6 +669,12 @@ if (Meteor.isClient) {
     }
   });
 
+  ///////////////////////////////
+  // row being edited in simulation pattern
+  UI.registerHelper('row_to_edit', function() {
+    return Session.get("row_to_edit");
+  });
+
   ///////////////////////////////////
   // reacting to database changes
   Tracker.autorun(function (computation) {

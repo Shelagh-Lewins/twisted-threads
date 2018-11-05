@@ -80,7 +80,6 @@
     <svg id="svg4413" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 {{viewbox_width}} {{repeat_viewbox_height}}"  shape-rendering="geometricPrecision" width="{{total_width}}">
     
       {{#each repeats}}
-      <!--row indexes {{row_indexes}}-->
       <g class="preview" transform="translate(0 {{repeat_offset}})">
           {{#each row_indexes}}
             {{> auto_preview_weft}}
@@ -94,8 +93,17 @@
             {{> auto_preview_row}}
           {{/each}}
       </g>
-
       {{/each}}
+
+      {{#if show_row_highlight}}
+      <g class="preview">
+          {{#each row_indexes}}
+          {{#if session_equals "row_to_edit" this}}
+            {{> auto_preview_row_highlight}}
+          {{/if}}
+          {{/each}}
+      </g>
+      {{/if}}
       
     </svg>
     {{/if}}
@@ -125,12 +133,18 @@
 {{/with}}
 </template>
 
+<template name="auto_preview_row_highlight">
+{{#with data this}}
+  <g transform="translate(5 {{y_offset}})"><path transform='scale({{scale}} 1)' d="m41.711 79.918h-41.733v-42.689h41.733z" stroke="{{color}}" stroke-width="2" fill="rgba(0,0,0,0)" vector-effect="non-scaling-stroke"/></g>
+{{/with}}
+</template>
+
 <template name="auto_preview_element">
 {{#with data row tablet}}
 {{#if special}}
   <g transform="translate({{x_offset}} {{y_offset}})">
 {{#if equals shape "forward_2"}}
-{{> forward_2_svg}}
+{{> c}}
 {{/if}}
 {{#if equals shape "backward_2"}}
 {{> backward_2_svg}}

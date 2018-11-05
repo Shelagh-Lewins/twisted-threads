@@ -92,9 +92,6 @@ Template.view_pattern.helpers({
   auto_repeats: function() {
     return Session.get("number_of_repeats");
   },
-  row_to_edit: function() {
-    return Session.get("row_to_edit");
-  },
   packs: function() {
     var packs = new Array();
 
@@ -924,7 +921,9 @@ Template.view_pattern.events({
     Session.set('sim_weave_mode', 'add_row');
   },
   'click #weave_mode_edit': function() {
-    Session.set('sim_weave_mode', 'edit_row');
+    if (Session.get('number_of_rows') != 0) {
+      Session.set('sim_weave_mode', 'edit_row');
+    }
   },
   'change #row_to_edit': function(event) {
     var row_to_edit = Math.round(event.target.value);
