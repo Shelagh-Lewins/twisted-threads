@@ -95,7 +95,16 @@ Template.view_pattern.helpers({
   packs: function() {
     var packs = new Array();
 
-    var data = current_manual_weaving_turns.list()[0]; // row 0 is just for working
+    // weave new row "Add row" button is selected
+    if (Session.get('sim_weave_mode') == "add_row") {
+      var row_to_edit = 0;
+    // edit existing row. "Edit row" button is selected.
+    } else if (Session.get('sim_weave_mode') == "edit_row") {
+      row_to_edit = Session.get('row_to_edit');
+    }
+console.log('packs');
+console.log(`row_to_edit ${row_to_edit}`);
+    var data = current_manual_weaving_turns.list()[row_to_edit]; // row 0 is working row for weave new row.
     if (typeof data === "undefined")
         return; // can happen when tab first selected if there are no rows
     for (var i=Meteor.my_params.number_of_packs-1; i>=0; i--) // reverse order
@@ -826,7 +835,7 @@ Template.view_pattern.events({
       Meteor.my_functions.set_repeats(pattern_id);
     });
   },
-  // manual
+  // manual sim pattern
   'click .manual .direction': function() {
     var pattern_id = Router.current().params._id
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
@@ -835,8 +844,18 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.accept_click())
         return;
 
-    var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
+    // weave new row "Add row" button is selected
+    if (Session.get('sim_weave_mode') == "add_row") {
+      var row_to_edit = 0;
+    // edit existing row. "Edit row" button is selected.
+    } else if (Session.get('sim_weave_mode') == "edit_row") {
+      row_to_edit = Session.get('row_to_edit');
+    }
+console.log(`row to edit ${row_to_edit}`);
+console.log(`row 0 before ${JSON.stringify(current_manual_weaving_turns.valueOf()[0])}`);
 
+    var obj = current_manual_weaving_turns.valueOf()[row_to_edit]; // row 0 is working row for weave new row.
+console.log(`obj before ${JSON.stringify(obj)}`);
     var current_direction = obj.packs[this.pack_number - 1].direction;
     var new_direction = "F";
 
@@ -844,16 +863,25 @@ Template.view_pattern.events({
       new_direction = "B";
 
     obj.packs[this.pack_number - 1].direction = new_direction;
-    current_manual_weaving_turns.splice(0, 1, obj);
+    current_manual_weaving_turns.splice(row_to_edit, 1, obj);
+    console.log(`row 0 after ${JSON.stringify(current_manual_weaving_turns.valueOf()[0])}`);
+    console.log(`obj after ${JSON.stringify(obj)}`);
+    var current_direction = obj.packs[this.pack_number - 1].direction;
   },
   'input .manual .num_manual_turns': function(event)
   {
     // change number of turns for a pack in manual simulation pattern
-    //if (!Meteor.my_functions.accept_click())
-        //return;
     var pattern_id = Router.current().params._id
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
+
+    // weave new row "Add row" button is selected
+    if (Session.get('sim_weave_mode') == "add_row") {
+      var row_to_edit = 0;
+    // edit existing row. "Edit row" button is selected.
+    } else if (Session.get('sim_weave_mode') == "edit_row") {
+      row_to_edit = Session.get('row_to_edit');
+    }
 
     if (event.currentTarget.value != Math.floor(event.currentTarget.value))
       event.currentTarget.value = Math.floor(event.currentTarget.value); // user pastes in a non-integer value
@@ -864,16 +892,9 @@ Template.view_pattern.events({
     if (event.currentTarget.value < 0)
       event.currentTarget.value = 0;
 
-    //if (Session.get('manual_input_latch'))
-      //Session.set('manual_input_latch', true);
-
-    //var that = this;
-
-    //manual_input_timeout = setTimeout(function() {
-      var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
+      var obj = current_manual_weaving_turns.valueOf()[row_to_edit]; // row 0 is working row for weave new row.
       obj.packs[this.pack_number - 1].number_of_turns = parseInt(event.currentTarget.value);
-      current_manual_weaving_turns.splice(0, 1, obj);
-    //}, 300);    
+      current_manual_weaving_turns.splice(row_to_edit, 1, obj);   
   },
   'click .manual .tablets li': function(event) {
     var pattern_id = Router.current().params._id
@@ -883,7 +904,15 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.accept_click())
         return;
 
-    var obj = current_manual_weaving_turns.valueOf()[0]; // use row 0 as working row
+    // weave new row "Add row" button is selected
+    if (Session.get('sim_weave_mode') == "add_row") {
+      var row_to_edit = 0;
+    // edit existing row. "Edit row" button is selected.
+    } else if (Session.get('sim_weave_mode') == "edit_row") {
+      row_to_edit = Session.get('row_to_edit');
+    }
+
+    var obj = current_manual_weaving_turns.valueOf()[row_to_edit]; // row 0 is working row for weave new row.
     var new_pack = this.pack;
 
     if (obj.tablets[this.tablet-1] == this.pack)

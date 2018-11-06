@@ -29,13 +29,19 @@
 			this.cell_width = 10;
 			this.cell_height = 27; // this is in proportion to cell_width
 		}
-
-		// allow for offset start row
-		this.number_of_rows = Session.get("number_of_rows");
-		if (pattern.weaving_start_row) {
-			this.number_of_rows -= (pattern.weaving_start_row - 1);
-		}
 	}
+
+	this.number_of_rows = function() {
+		// allow for offset start row
+		var pattern = Patterns.findOne({ _id: this.pattern_id}, { fields: {weaving_start_row: 1}});
+
+		var number_of_rows = Session.get("number_of_rows");
+		if (pattern.weaving_start_row) {
+			number_of_rows -= (pattern.weaving_start_row - 1);
+		}
+
+		return number_of_rows;
+	};
 
 	this.viewbox_width = function(){
 		var row_number_allocation = 1;
@@ -47,8 +53,7 @@
 	};
 
 	this.viewbox_height = function(){
-		// return this.unit_height * ((Session.get("number_of_rows") + 1) / 2);
-		return this.unit_height * ((this.number_of_rows + 1) / 2);
+		return this.unit_height * ((this.number_of_rows() + 1) / 2);
 	};
 
 	this.repeat_viewbox_height = function(){
@@ -107,7 +112,7 @@
 		// elements overlap by half their height
 		// so total height is half their height * number of rows
 		// plus another half height that sticks out the top
-		var height = (1 + this.number_of_rows) * this.cell_height / 2;
+		var height = (1 + this.number_of_rows()) * this.cell_height / 2;
 
 		return height;
 	};
