@@ -925,7 +925,8 @@ Template.view_pattern.events({
       Session.set('sim_weave_mode', 'edit_row');
     }
   },
-  'change #row_to_edit': function(event) {
+  'input #row_to_edit': function(event) {
+    // input events fires on arrow click as well as blur and keyup
     var row_to_edit = Math.round(event.target.value);
 
     if (row_to_edit < 1) {

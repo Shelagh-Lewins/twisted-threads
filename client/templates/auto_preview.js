@@ -381,7 +381,7 @@ Template.auto_preview_row.helpers({
 		var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
 
-    var row_offset = 0;
+    var row_offset = 1;
 
     if (pattern.weaving_start_row) {
     	row_offset = pattern.weaving_start_row;
@@ -413,24 +413,27 @@ Template.auto_preview_row.helpers({
 			data.text -= (pattern.weaving_start_row -1);
 		}
 
-		switch(Session.get("preview_rotation"))
-		{
-			case "left":
-			data.rotation = "rotate(90 25 25)";
-				break;
-
-			case "right":
-			data.rotation = "rotate(-90 25 25)";
-				break;
-
-			case "up": 
-				break;
-		}
-
 		data.x_offset = ((Session.get("number_of_tablets") - 1) * unit_width) + unit_width;
 
 		var row_up = Session.get("number_of_rows") - row;
-				data.y_offset = ((row_up) * unit_height/2);
+		data.y_offset = ((row_up) * unit_height/2);
+
+		switch(Session.get("preview_rotation"))
+		{
+			case "left":
+				data.rotation = "rotate(90 25 25)";
+				data.y_offset += unit_height * 0.2;
+				break;
+
+			case "right":
+				data.rotation = "rotate(-90 25 25)";
+				data.y_offset += unit_height * 0.4;
+				break;
+
+			case "up": 
+				data.y_offset += unit_height * 0.3;
+				break;
+		}
 
 		return data;
 	}
