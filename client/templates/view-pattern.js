@@ -1081,7 +1081,18 @@ Template.view_pattern.events({
     Meteor.call("set_weaving_start_row", pattern_id, parseInt(event.target.value));
 
     Meteor.my_functions.rebuild_offset_threading(pattern_id, parseInt(event.target.value));
+  },
+  'click #update_row': function() {
+    var pattern_id = Router.current().params._id
+    if (!Meteor.my_functions.can_edit_pattern(pattern_id))
+      return;
+
+    if (!Meteor.my_functions.accept_click())
+        return;
+
+    let row_to_edit = Session.get('row_to_edit');
+
+    Meteor.my_functions.edit_row_button(pattern_id, row_to_edit);
   }
 });
-
 
