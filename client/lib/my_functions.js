@@ -3229,7 +3229,7 @@ Meteor.my_functions = {
 				var thread_to_show = Meteor.my_functions.modular_add(data.position_of_A[i], -1, 4);
 			else // B: show thread in position A
 				var thread_to_show = data.position_of_A[i];
-console.log('in weave_row');
+// console.log('in weave_row');
 
 			// threading[thread_to_show] = row of threading chart
 			threading_row.push(data.threading[thread_to_show][i]);
@@ -3477,7 +3477,7 @@ console.log('in weave_row');
 		if (pattern.simulation_mode == "manual")
 		{
 			// rebuild the pattern from the new row onwards
-			Session.set("hide_preview", true); // force a clean refresh of the preview
+			// Session.set("hide_preview", true); // force a clean refresh of the preview
 
 			var pattern = Patterns.findOne({_id: pattern_id});
 
@@ -3491,11 +3491,33 @@ console.log('in weave_row');
 			var manual_weaving_threads = pattern.manual_weaving_threads;
 			var weaving = JSON.parse(pattern.weaving);
 
-			var position_of_A = manual_weaving_threads[row_to_edit - 1];
+			// find position_of_A based on thread to show and whether tablet turned forwards or backwards
+			// previous row, thread to show
+			var last_row_threads = manual_weaving_threads[row_to_edit - 1];
+			// previous row, turning sequence
+			var last_row_turns = manual_weaving_turns[row_to_edit - 1];
+			var position_of_A = [];
 
-			manual_weaving_turns.splice(row_to_edit, rows_to_replace); // element 0 is for working. Corresponds to current_manual_weaving_turns
+			for (let i=0; i<number_of_tablets; i++) {
+				var pack_number = last_row_turns.tablets[i];
+				var direction = last_row_turns.packs[pack_number].direction;
+				if (direction == "F") {
+					// hole in position D shows
+					let positiion = Meteor.my_functions.modular_add(last_row_threads[i], 1, 4);
+					position_of_A.push(positiion);
+				} else {
+					// B. Hole in position A shows
+					position_of_A.push(last_row_threads[i]);
+				}
+			}
 
-			manual_weaving_turns.splice(row_to_edit - 1, rows_to_replace);
+			// use UI data for weaving turns in the row to edit
+			var obj = current_manual_weaving_turns.valueOf()[0];
+			current_manual_weaving_turns.splice(row_to_edit, 1, obj);
+
+			manual_weaving_turns.splice(row_to_edit, rows_to_replace); // element 0 is for working. Corresponds to current_manual_weaving_turns. Row 1 is element 1.
+
+			manual_weaving_threads.splice(row_to_edit - 1, rows_to_replace);
 			// element 0 is row 1
 
 			weaving.splice(row_to_edit - 1, rows_to_replace);
@@ -3511,14 +3533,14 @@ console.log('in weave_row');
 				manual_weaving_threads: manual_weaving_threads // which thread shows
 			}
 console.log(`initial data ${JSON.stringify(data)}`);
-			for (var i=manual_weaving_turns.length + 1; i<=number_of_rows; i++)
+			for (var i=manual_weaving_turns.length; i<=number_of_rows; i++)
 			{
 				console.log(`about to weave row ${i}`);
 				var new_row_sequence = current_manual_weaving_turns.list()[i];
+console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
+				//console.log(`new_row_sequence ${new_row_sequence}`);
 
-				console.log(`new_row_sequence ${new_row_sequence}`);
-
-				console.log(`new_row_sequence b ${JSON.stringify(new_row_sequence)}`);
+				console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
 
 				data = Meteor.my_functions.weave_row(data, new_row_sequence);
 			}

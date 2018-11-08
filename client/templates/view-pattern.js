@@ -951,7 +951,7 @@ Template.view_pattern.events({
     // set the working row to the edit row
     var obj = current_manual_weaving_turns.valueOf()[row_to_edit];
      
-    current_manual_weaving_turns.splice(0, 1, obj);    
+    current_manual_weaving_turns.splice(0, 1, obj);
   },
   ////////////////////////////////////////
   // 3/1 Broken twill patterns
