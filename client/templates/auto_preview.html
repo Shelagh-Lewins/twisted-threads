@@ -96,7 +96,7 @@
       {{/each}}
 
       {{#if show_row_highlight}}
-      <g class="preview">
+      <g class="preview row_highlight">
           {{#each row_indexes}}
           {{#if session_equals "row_to_edit" this}}
             {{> auto_preview_row_highlight}}

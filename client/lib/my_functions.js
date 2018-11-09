@@ -2461,10 +2461,13 @@ Meteor.my_functions = {
 			if (typeof $('.auto_preview .holder')[0] === "undefined") // user has switched to another screen? There is no auto preview in the doc
 					return;
 
-			var data = $('.auto_preview .holder')[0].innerHTML;
-			Meteor.call('save_preview_as_text', pattern_id, data);
+			var preview = $('.auto_preview .holder').clone()[0]; // use a deep copy not a reference
+
+			// don't show the row highlight in the saved image
+			$(preview).find('.row_highlight').remove();
+
+			Meteor.call('save_preview_as_text', pattern_id, preview.innerHTML);
 		}, 2000);
-		
 	},
 	///////////////////////////////
 	// Color pickers
@@ -3509,33 +3512,22 @@ Meteor.my_functions = {
 					position_of_A.push(0);
 				}
 			} else { // subsequent rows. Position of A depends on previous row
-				var last_row_threads = manual_weaving_threads[row_to_edit - 2];
-				console.log(`last_row_threads ${JSON.stringify(last_row_threads)}`);
+				var last_row_threads = manual_weaving_threads[row_to_edit - 2]; // -1 for last row, -1 for array starts with 0
 				// previous row, turning sequence
 				var last_row_turns = manual_weaving_turns[row_to_edit - 1];
 
-
-				console.log(`last_row_turns ${JSON.stringify(last_row_turns)}`);
-
 				for (let i=0; i<number_of_tablets; i++) {
 					var pack_index = last_row_turns.tablets[i] -1;
-					//console.log(`pack_index ${pack_index}`);
-					console.log(`last_row_turns.packs[${pack_index}] ${JSON.stringify(last_row_turns.packs[pack_index])}`);
 					var direction = last_row_turns.packs[pack_index].direction;
 					if (direction == "F") {
 						// hole in position D shows
 						let position = Meteor.my_functions.modular_add(last_row_threads[i], 1, 4);
 						position_of_A.push(position);
-						//position_of_A.push(last_row_threads[i]);
 					} else {
 						// B. Hole in position A shows
 						position_of_A.push(last_row_threads[i]);
-
-						//let position = Meteor.my_functions.modular_add(last_row_threads[i], 1, 4);
-						//position_of_A.push(position);
 					}
 				}
-				console.log(`position_of_A ${position_of_A}`);
 			}
 
 			// use UI data for weaving turns in the row to edit
@@ -3559,30 +3551,22 @@ Meteor.my_functions = {
 				manual_weaving_turns: manual_weaving_turns,
 				manual_weaving_threads: manual_weaving_threads // which thread shows
 			}
-// console.log(`initial data ${JSON.stringify(data)}`);
+
 			for (let i=manual_weaving_turns.length; i<=number_of_rows; i++)
 			{
-				console.log(`about to weave row ${i}`);
 				var new_row_sequence = current_manual_weaving_turns.list()[i];
-console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
-				//console.log(`new_row_sequence ${new_row_sequence}`);
-
-				// console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
 
 				data = Meteor.my_functions.weave_row(data, new_row_sequence);
 			}
 
-			console.log(`data ${JSON.stringify(data)}`);
-
 			Meteor.call("update_manual_weaving", pattern_id, data, function(){
-				//Session.set("number_of_rows", Session.get("number_of_rows"));
+				//console.log('callback 1');
 				Meteor.my_functions.set_repeats(pattern_id);
 				Meteor.my_functions.build_pattern_display_data(pattern_id);
 				Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
 				Meteor.my_functions.save_preview_as_text(pattern_id);
-
-		    
 		    Session.set("hide_preview", false);
+		    //console.log('callback 2');
 			});
 		}
 	},
