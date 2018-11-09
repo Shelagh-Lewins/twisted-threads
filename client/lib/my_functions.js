@@ -1790,9 +1790,17 @@ Meteor.my_functions = {
 			}
 			else
 			{
-				// show direction, number of turns for latest row
+				var working_row = manual_weaving_turns.length-1;
+				if (Session.get('sim_weave_mode') == "add_row") {
+				// set the working row to the latest row
 				// ensure it's a new object not a reference
-				manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[manual_weaving_turns.length-1]));
+				//manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[manual_weaving_turns.length-1]));
+				} else if (Session.get('sim_weave_mode') == "edit_row") {
+					// set the working row to the edit row
+					working_row = Session.get('row_to_edit')
+					//manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[Session.get('row_to_edit')]));
+				}
+				manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[working_row]));
 			}
 
 			current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
@@ -3477,7 +3485,7 @@ Meteor.my_functions = {
 		if (pattern.simulation_mode == "manual")
 		{
 			// rebuild the pattern from the new row onwards
-			// Session.set("hide_preview", true); // force a clean refresh of the preview
+			Session.set("hide_preview", true); // force a clean refresh of the preview
 
 			var pattern = Patterns.findOne({_id: pattern_id});
 
@@ -3501,7 +3509,7 @@ Meteor.my_functions = {
 					position_of_A.push(0);
 				}
 			} else { // subsequent rows. Position of A depends on previous row
-				var last_row_threads = manual_weaving_threads[row_to_edit - 1];
+				var last_row_threads = manual_weaving_threads[row_to_edit - 2];
 				console.log(`last_row_threads ${JSON.stringify(last_row_threads)}`);
 				// previous row, turning sequence
 				var last_row_turns = manual_weaving_turns[row_to_edit - 1];
@@ -3510,17 +3518,24 @@ Meteor.my_functions = {
 				console.log(`last_row_turns ${JSON.stringify(last_row_turns)}`);
 
 				for (let i=0; i<number_of_tablets; i++) {
-					var pack_number = last_row_turns.tablets[i];
-					var direction = last_row_turns.packs[pack_number].direction;
+					var pack_index = last_row_turns.tablets[i] -1;
+					//console.log(`pack_index ${pack_index}`);
+					console.log(`last_row_turns.packs[${pack_index}] ${JSON.stringify(last_row_turns.packs[pack_index])}`);
+					var direction = last_row_turns.packs[pack_index].direction;
 					if (direction == "F") {
 						// hole in position D shows
-						let positiion = Meteor.my_functions.modular_add(last_row_threads[i], 1, 4);
-						position_of_A.push(positiion);
+						let position = Meteor.my_functions.modular_add(last_row_threads[i], 1, 4);
+						position_of_A.push(position);
+						//position_of_A.push(last_row_threads[i]);
 					} else {
 						// B. Hole in position A shows
 						position_of_A.push(last_row_threads[i]);
+
+						//let position = Meteor.my_functions.modular_add(last_row_threads[i], 1, 4);
+						//position_of_A.push(position);
 					}
 				}
+				console.log(`position_of_A ${position_of_A}`);
 			}
 
 			// use UI data for weaving turns in the row to edit
@@ -3544,8 +3559,8 @@ Meteor.my_functions = {
 				manual_weaving_turns: manual_weaving_turns,
 				manual_weaving_threads: manual_weaving_threads // which thread shows
 			}
-console.log(`initial data ${JSON.stringify(data)}`);
-			for (var i=manual_weaving_turns.length; i<=number_of_rows; i++)
+// console.log(`initial data ${JSON.stringify(data)}`);
+			for (let i=manual_weaving_turns.length; i<=number_of_rows; i++)
 			{
 				console.log(`about to weave row ${i}`);
 				var new_row_sequence = current_manual_weaving_turns.list()[i];
@@ -3565,6 +3580,9 @@ console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
 				Meteor.my_functions.build_pattern_display_data(pattern_id);
 				Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
 				Meteor.my_functions.save_preview_as_text(pattern_id);
+
+		    
+		    Session.set("hide_preview", false);
 			});
 		}
 	},
