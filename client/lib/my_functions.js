@@ -3389,7 +3389,7 @@ Meteor.my_functions = {
 			data = Meteor.my_functions.weave_row(data, new_row_sequence);
 
 			Meteor.call("update_manual_weaving", pattern_id, data, function(){
-				Session.set("number_of_rows", Session.get("number_of_rows"));
+				//Session.set("number_of_rows", Session.get("number_of_rows"));
 				Meteor.my_functions.set_repeats(pattern_id);
 				Meteor.my_functions.build_pattern_display_data(pattern_id);
 				Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
@@ -3492,22 +3492,34 @@ Meteor.my_functions = {
 			var weaving = JSON.parse(pattern.weaving);
 
 			// find position_of_A based on thread to show and whether tablet turned forwards or backwards
-			// previous row, thread to show
-			var last_row_threads = manual_weaving_threads[row_to_edit - 1];
-			// previous row, turning sequence
-			var last_row_turns = manual_weaving_turns[row_to_edit - 1];
+
 			var position_of_A = [];
 
-			for (let i=0; i<number_of_tablets; i++) {
-				var pack_number = last_row_turns.tablets[i];
-				var direction = last_row_turns.packs[pack_number].direction;
-				if (direction == "F") {
-					// hole in position D shows
-					let positiion = Meteor.my_functions.modular_add(last_row_threads[i], 1, 4);
-					position_of_A.push(positiion);
-				} else {
-					// B. Hole in position A shows
-					position_of_A.push(last_row_threads[i]);
+			// previous row, thread to show
+			if (row_to_edit == 1) { // row 1 starts with all tablets in position 0
+				for (let i=0; i<number_of_tablets; i++) {
+					position_of_A.push(0);
+				}
+			} else { // subsequent rows. Position of A depends on previous row
+				var last_row_threads = manual_weaving_threads[row_to_edit - 1];
+				console.log(`last_row_threads ${JSON.stringify(last_row_threads)}`);
+				// previous row, turning sequence
+				var last_row_turns = manual_weaving_turns[row_to_edit - 1];
+
+
+				console.log(`last_row_turns ${JSON.stringify(last_row_turns)}`);
+
+				for (let i=0; i<number_of_tablets; i++) {
+					var pack_number = last_row_turns.tablets[i];
+					var direction = last_row_turns.packs[pack_number].direction;
+					if (direction == "F") {
+						// hole in position D shows
+						let positiion = Meteor.my_functions.modular_add(last_row_threads[i], 1, 4);
+						position_of_A.push(positiion);
+					} else {
+						// B. Hole in position A shows
+						position_of_A.push(last_row_threads[i]);
+					}
 				}
 			}
 
@@ -3540,12 +3552,20 @@ console.log(`initial data ${JSON.stringify(data)}`);
 console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
 				//console.log(`new_row_sequence ${new_row_sequence}`);
 
-				console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
+				// console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
 
 				data = Meteor.my_functions.weave_row(data, new_row_sequence);
 			}
 
 			console.log(`data ${JSON.stringify(data)}`);
+
+			Meteor.call("update_manual_weaving", pattern_id, data, function(){
+				//Session.set("number_of_rows", Session.get("number_of_rows"));
+				Meteor.my_functions.set_repeats(pattern_id);
+				Meteor.my_functions.build_pattern_display_data(pattern_id);
+				Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
+				Meteor.my_functions.save_preview_as_text(pattern_id);
+			});
 		}
 	},
 	set_repeats: function(pattern_id) {
