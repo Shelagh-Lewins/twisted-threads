@@ -1380,7 +1380,7 @@ Meteor.my_functions = {
 	},
 	build_pattern_display_data: function(pattern_id)
 	{
-		console.log('build_pattern_display_data start');
+		//console.log('build_pattern_display_data start');
 		// maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
 
 		// elements in reactive arrays need to be updated with arr.splice(pos, 1 new_value) to be reactive
@@ -1777,7 +1777,7 @@ Meteor.my_functions = {
 
 			// manual
 			var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
-console.log(`build_pattern_display_data. manual_weaving_turns ${JSON.stringify(manual_weaving_turns)}`);
+//console.log(`build_pattern_display_data. manual_weaving_turns ${JSON.stringify(manual_weaving_turns)}`);
 			//if (Session.get("number_of_rows") != 0) // if no weaving rows use the 0 row of manual_weaving_turns
 			//{
 				/*				console.log(`manual_weaving_turns ${JSON.stringify(manual_weaving_turns)}`);
@@ -2465,6 +2465,9 @@ console.log(`build_pattern_display_data. manual_weaving_turns ${JSON.stringify(m
 
 			// don't show the row highlight in the saved image
 			$(preview).find('.row_highlight').remove();
+
+			// don't show the row numbers in the saved image
+			$(preview).find('.text').remove();
 
 			Meteor.call('save_preview_as_text', pattern_id, preview.innerHTML);
 		}, 2000);
@@ -3432,27 +3435,28 @@ console.log(`build_pattern_display_data. manual_weaving_turns ${JSON.stringify(m
 
 			if (current_row_number <= 1)
 				return; // no rows to unweave
-console.log(`unweave. last_row_number ${last_row_number}`);
-console.log(`unweave. current_row_number ${current_row_number}`);
+//console.log(`unweave. last_row_number ${last_row_number}`);
+//console.log(`unweave. current_row_number ${current_row_number}`);
 			//if (last_row_number < 0) // this is the first row
 				//last_row_number = 0; // use default row
 
 
 			var last_row_data = data.manual_weaving_turns[last_row_number];
-			console.log(`unweave. last_row_data ${JSON.stringify(last_row_data)}`);
-			console.log(`unweave. new_row_sequence ${JSON.stringify(new_row_sequence)}`);
-			console.log(`unweave. manual_weaving_turns ${JSON.stringify(data.manual_weaving_turns)}`);
+			//console.log(`unweave. last_row_data ${JSON.stringify(last_row_data)}`);
+			//console.log(`unweave. new_row_sequence ${JSON.stringify(new_row_sequence)}`);
+			//console.log(`unweave. manual_weaving_turns ${JSON.stringify(data.manual_weaving_turns)}`);
 
 
-			// set working row
+			// set working row to the last remaining row after the unweave
+			// or if this is row 1, it will be the just-removed row 1
 			//var current_row_data;
 			//if (current_row_number == 1) {
-				data.manual_weaving_turns[0] = data.manual_weaving_turns[last_row_number-1];
+			data.manual_weaving_turns[0] = data.manual_weaving_turns[last_row_number-1];
 			//} else {
 				//data.manual_weaving_turns[0] = new_row_sequence;
 			//}
 
-						console.log(`unweave. current_row_data ${JSON.stringify(data.manual_weaving_turns[0])}`);
+						//console.log(`unweave. current_row_data ${JSON.stringify(data.manual_weaving_turns[0])}`);
 
 			//if (last_row_number == 1) { // set working row for first row
 				//data.manual_weaving_turns[0] = data.manual_weaving_turns[current_row_number];

@@ -235,6 +235,13 @@ if (Meteor.isClient) {
     return Session.get('thumbnails_in_row');
   });
 
+  UI.registerHelper('auto_preview_svg', function() {
+    var data = this.auto_preview;
+    //console.log("data " + data);
+    var src = 'data:image/svg+xml;base64,' + window.btoa(data);
+    return src;
+  });
+
   UI.registerHelper('my_patterns', function(){
     if (!Meteor.userId())
       return;

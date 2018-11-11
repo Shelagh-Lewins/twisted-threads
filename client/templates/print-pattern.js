@@ -42,6 +42,16 @@ Template.print_pattern.helpers({
         is_sim_auto = true;
 
     return is_sim_auto;
+  },
+  auto_preview_width: function() {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({ _id: pattern_id}, {fields: {number_of_tablets: 1 }});
+    return 10 * pattern.number_of_tablets;
+  },
+  auto_preview_height: function() {
+    var pattern_id = Router.current().params._id;
+    var pattern = Patterns.findOne({ _id: pattern_id}, {fields: {number_of_rows: 1 }});
+    return 10 * pattern.number_of_rows;
   }
 });
 

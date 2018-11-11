@@ -1,69 +1,90 @@
 body.print {
-  float: left;
-  overflow: auto;
-  width: auto;
-  height: auto;
-  background-color: #FFFFFF;
-  padding: 16px;
+	float: left;
+	overflow: auto;
+	width: auto;
+	height: auto;
+	background-color: #FFFFFF;
+	padding: 16px;
 }
 
 body.print h1 {
-  clear: both;
-  text-align: center;
-  font-weight: bold;
-  font-size: 20px;
+	clear: both;
+	text-align: center;
+	font-weight: bold;
+	font-size: 20px;
 }
 
 body.print h2 {
-  clear: both;
-  font-weight: bold;
-  font-size: 18px;
+	clear: both;
+	font-weight: bold;
+	font-size: 18px;
 }
 
 body.print p {
-  text-align: left;
-  margin: 0 0 8px 0;
+	text-align: left;
+	margin: 0 0 8px 0;
 }
 
 /* info section - key, weaving notes */
 .print .info {
-  margin: 16px 0 0 0;
+	margin: 16px 0 0 0;
 }
 
 .print .info .key h3 {
-  display: inline-block;
-  line-height: 32px;
-  height: 32px;
-  font-size: 16px;
+	display: inline-block;
+	line-height: 32px;
+	height: 32px;
+	font-size: 16px;
 }
 
 .print .info .key p {
-  display: inline-block;
-  line-height: 32px;
-  height: 32px;
-  font-size: 16px;
+	display: inline-block;
+	line-height: 32px;
+	height: 32px;
+	font-size: 16px;
 }
 
 .print .info .key .cell {
-  float:left;
-  width: 32px;
-  height: 32px;
-  margin: 0 8px 0 8px;
-  background: #FFFFFF;
-  border: 1px solid #999999;
-  line-height: 32px;
+	float:left;
+	width: 32px;
+	height: 32px;
+	margin: 0 8px 0 8px;
+	background: #FFFFFF;
+	border: 1px solid #999999;
+	line-height: 32px;
 }
 
 .print .info .key .cell.backward {
-  background: #BBBBBB;
+	background: #BBBBBB;
 }
 
 .print .info .key .cell.idle {
-  background-color: #FFFFFF;
-  background-image: url('/images/special_idle.svg');
-  background-size: 32px 32px;
+	background-color: #FFFFFF;
+	background-image: url('/images/special_idle.svg');
+	background-size: 32px 32px;
 }
 
 .print .info .key p:not(:first-of-type) {
-  padding-left: 16px;
+	padding-left: 16px;
+}
+
+/* preview */
+.print .pattern_thumbnail {
+	margin-bottom: -20px;
+	width: 100%;
+}
+
+.print .image.auto_preview {
+	background-size: contain;
+	background-position: center center;
+	background-repeat: no-repeat;
+
+	-ms-transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+	transform: rotate(90deg);
+
+	-webkit-transform-origin: 0 0;
+	-moz-transform-origin: 0 0;
+	-o-transform-origin: 0 0;
+	transform-origin: 0 0;
 }

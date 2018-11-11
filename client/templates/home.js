@@ -273,36 +273,12 @@ Template.pattern_thumbnail.helpers({
   use_auto_preview: function() {
     return true; // TODO see if the user has selected a different image
   },
-  auto_preview_svg: function() {
+  /* auto_preview_svg: function() {
     var data = this.auto_preview;
     //console.log("data " + data);
     var src = 'data:image/svg+xml;base64,' + window.btoa(data);
     return src;
-  },
-  auto_preview_rotation: function() {
-
-    switch(this.preview_rotation)
-    {
-      case "left":
-        return "left";
-        break;
-
-      case "up":
-        return "left"; // show the preview sideways
-        break;
-
-      case "right":
-        return "right";
-        break;
-
-      case "down":
-        return "down";
-        break;
-
-      default:
-        return "right";
-    }
-  },
+  }, */
   preview_url: function () {
     var pattern_id = this._id;
     var preview_url = "../images/default_pattern_thumbnail.png";
