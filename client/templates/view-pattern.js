@@ -1069,7 +1069,7 @@ Template.view_pattern.events({
 
     Meteor.my_functions.remove_twill_row(pattern_id, parseInt(this));
   },
-  'change #weaving_start_row': function(event) {
+  'input #weaving_start_row': function(event) {
     if (!Meteor.my_functions.accept_click())
         return;
 
@@ -1078,7 +1078,12 @@ Template.view_pattern.events({
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
 
-    Meteor.call("set_weaving_start_row", pattern_id, parseInt(event.target.value));
+    var start_row = parseInt(event.target.value);
+    if (start_row % 2 == 0) { // even row
+      start_row -= 1; // start weaving on odd row or pattern cannot repeat. e.g. 1, 3, 5.
+    }
+
+    Meteor.call("set_weaving_start_row", pattern_id, start_row);
 
     Meteor.my_functions.rebuild_offset_threading(pattern_id, parseInt(event.target.value));
   },
