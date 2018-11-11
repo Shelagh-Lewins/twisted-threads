@@ -1380,6 +1380,7 @@ Meteor.my_functions = {
 	},
 	build_pattern_display_data: function(pattern_id)
 	{
+		console.log('build_pattern_display_data start');
 		// maintain a local array of arrays with the data for the current pattern in optimum form. Getting each row out of the database when drawing it is very slow.
 
 		// elements in reactive arrays need to be updated with arr.splice(pos, 1 new_value) to be reactive
@@ -1688,8 +1689,6 @@ Meteor.my_functions = {
 					if (i > 0)
 						last_color = twill_pattern_chart[i-1][j];
 
-					//if (i<number_of_rows)
-					//{
 					if (next_color != current_color)
 						color_change = true;
 
@@ -1699,7 +1698,7 @@ Meteor.my_functions = {
 						if (i == 0) // tablet starts with foreground color
 							current_twill_position[j] =  (current_twill_position[j] + 3) % 4; // go back an extra turn
 					}
-					//}        
+       
 
 					var long_float = twill_change_chart[i][j];
 
@@ -1778,18 +1777,19 @@ Meteor.my_functions = {
 
 			// manual
 			var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
-
-			if (Session.get("number_of_rows") == 0)
-			{
-				// reset direction, number of turns to "F", 1
+console.log(`build_pattern_display_data. manual_weaving_turns ${JSON.stringify(manual_weaving_turns)}`);
+			//if (Session.get("number_of_rows") != 0) // if no weaving rows use the 0 row of manual_weaving_turns
+			//{
+				/*				console.log(`manual_weaving_turns ${JSON.stringify(manual_weaving_turns)}`);
+								// reset direction, number of turns to "F", 1
 				for (var i=0; i<manual_weaving_turns[0].packs.length; i++)
 				{
 					manual_weaving_turns[0].packs[i].direction = "F";
 					manual_weaving_turns[0].packs[i].number_of_turns = 1;
-				}
-			}
-			else
-			{
+				} */
+			//}
+			//else
+			//{
 				var working_row = manual_weaving_turns.length-1;
 				if (Session.get('sim_weave_mode') == "add_row") {
 				// set the working row to the latest row
@@ -1801,7 +1801,7 @@ Meteor.my_functions = {
 					//manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[Session.get('row_to_edit')]));
 				}
 				manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[working_row]));
-			}
+			//}
 
 			current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
 		}
@@ -3428,16 +3428,35 @@ Meteor.my_functions = {
 
 			var current_row_number = data.manual_weaving_turns.length;
 			var last_row_number = current_row_number - 1;
-			var new_row_sequence = data.manual_weaving_turns[current_row_number-1];
+			var new_row_sequence = data.manual_weaving_turns[last_row_number];
 
 			if (current_row_number <= 1)
 				return; // no rows to unweave
+console.log(`unweave. last_row_number ${last_row_number}`);
+console.log(`unweave. current_row_number ${current_row_number}`);
+			//if (last_row_number < 0) // this is the first row
+				//last_row_number = 0; // use default row
 
-			if (last_row_number < 0) // this is the first row
-				last_row_number = 0; // use default row
 
 			var last_row_data = data.manual_weaving_turns[last_row_number];
-			
+			console.log(`unweave. last_row_data ${JSON.stringify(last_row_data)}`);
+			console.log(`unweave. new_row_sequence ${JSON.stringify(new_row_sequence)}`);
+			console.log(`unweave. manual_weaving_turns ${JSON.stringify(data.manual_weaving_turns)}`);
+
+
+			// set working row
+			//var current_row_data;
+			//if (current_row_number == 1) {
+				data.manual_weaving_turns[0] = data.manual_weaving_turns[last_row_number-1];
+			//} else {
+				//data.manual_weaving_turns[0] = new_row_sequence;
+			//}
+
+						console.log(`unweave. current_row_data ${JSON.stringify(data.manual_weaving_turns[0])}`);
+
+			//if (last_row_number == 1) { // set working row for first row
+				//data.manual_weaving_turns[0] = data.manual_weaving_turns[current_row_number];
+			//}
 			var tablet_directions = []; // for each tablet, which direction it turns
 
 			// turn tablets

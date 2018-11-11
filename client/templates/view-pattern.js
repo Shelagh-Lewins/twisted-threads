@@ -892,7 +892,7 @@ Template.view_pattern.events({
     current_manual_weaving_turns.splice(0, 1, obj);
   },
   'click #weave': function () {
-    var pattern_id = Router.current().params._id
+    var pattern_id = Router.current().params._id;
     if (!Meteor.my_functions.can_edit_pattern(pattern_id))
       return;
 
@@ -917,8 +917,20 @@ Template.view_pattern.events({
     }
     Session.set('sim_weave_mode', 'add_row');
 
-    // set the working row to the last row of weaving
-    var obj = current_manual_weaving_turns.valueOf()[Session.get("number_of_rows")];
+    // set the packs UI
+    var obj;
+
+    // if no current rows of weaving, use the pattern's default row
+    if (Session.get("number_of_rows") == 0) {
+      var pattern_id = Router.current().params._id;
+      var pattern = Patterns.findOne({_id: pattern_id}, {fields: { manual_weaving_turns: 1}});
+      obj = pattern.manual_weaving_turns[0];
+    } else {
+      // set the working row to the last row of weaving
+      obj = current_manual_weaving_turns.valueOf()[Session.get("number_of_rows")];
+    }
+
+    
     current_manual_weaving_turns.splice(0, 1, obj);
   },
   'click #weave_mode_edit': function() {

@@ -421,8 +421,13 @@ Meteor.methods({
         {
           var pack = {
             pack_number: i,
-            direction: "F",
             number_of_turns: 1
+          }
+          if (i == 2) {
+            console.log('pack 2');
+            pack.direction = "B"; // suggested usage is pack 1 F, pack 2 B. Pack 3 F for borders.
+          } else {
+            pack.direction = "F";
           }
           new_turn.packs.push(pack);
         }
@@ -433,7 +438,7 @@ Meteor.methods({
         }
 
         data.manual_weaving_turns[0] = new_turn;
-
+console.log(`new_turn ${new_turn}`);
         Patterns.update({_id: pattern_id}, {$set: {manual_weaving_turns: JSON.stringify(data.manual_weaving_turns)}});
 
       /*
