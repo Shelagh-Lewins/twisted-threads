@@ -302,7 +302,6 @@ Meteor.methods({
     // Tags
     for (var i=0; i<data.tags.length; i++)
     {
-      console.log(`add tag: ${data.tags[i]}`);
       Patterns.addTag(data.tags[i], { _id: pattern_id });
     }
 
