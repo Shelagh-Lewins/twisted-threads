@@ -987,6 +987,8 @@ Template.view_pattern.events({
     if (Session.get("twill_chart_latch") == true)
         return;
 
+      console.log(`click: ${Session.get("twill_click_count")}`);
+
     // used to check if there has been another cell edited after this one
     const click_count = Session.get("twill_click_count") + 1;
     Session.set("twill_click_count", click_count);
