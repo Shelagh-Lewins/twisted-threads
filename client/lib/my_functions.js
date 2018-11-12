@@ -1,26 +1,10 @@
 Meteor.my_functions = {
 	accept_click: function()
 	{
-		//
 		if (Session.get('change_tablets_latch'))
 				return false;
 
 			else return true;
-
-	 // using a timer at all introduces random long delays, presumably because the client is busy updating client side data. This version only makes sure that the number of tablets is not being changed.
-
-		/*var accept_click = false;
-
-		if (Session.equals('click_latch', false))
-		{
-			Session.set('click_latch', true);
-			accept_click = true;
-
-			setTimeout(function(){
-				Session.set('click_latch', false);
-			}, 10);
-		}
-		return accept_click;*/
 	},
 	pattern_exists: function(pattern_id)
 	{
@@ -2839,7 +2823,7 @@ Meteor.my_functions = {
 			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
 
 			// ensure successive twill chart operations don't interfere with each other
-			Session.set("twill_click_count", 0);
+			Session.set("twill_chart_db_latch", false);
 			Session.set('twill_chart_latch', false);
 		}
 
@@ -3815,11 +3799,10 @@ Meteor.my_functions = {
 		}
 	},
 	update_twill_pattern_chart: function(pattern_id) {
-		// Session.set("hide_preview", true); // force a clean refresh of the preview
-		if (Session.get("twill_chart_latch") == true)
+		if (Session.get("twill_chart_db_latch") == true)
 				return;
 			
-		Session.set('twill_chart_latch', true);
+		Session.set('twill_chart_db_latch', true);
 
 		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
@@ -3838,7 +3821,7 @@ Meteor.my_functions = {
 			Meteor.my_functions.save_preview_as_text(pattern_id);
 			Meteor.my_functions.build_pattern_display_data(pattern_id);
 			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-			Session.set('twill_chart_latch', false);
+			Session.set('twill_chart_db_latch', false);
 		});
 	},
 	get_twill_pattern_chart_as_array: function(number_of_rows, number_of_tablets)
@@ -3873,11 +3856,10 @@ Meteor.my_functions = {
 		return twill_array;
 	},
 	update_twill_change_chart: function(pattern_id) {
-		//Session.set("hide_preview", true); // force a clean refresh of the preview
-		if (Session.get("twill_chart_latch") == true)
+		if (Session.get("twill_chart_db_latch") == true)
 				return;
 			
-		Session.set('twill_chart_latch', true);
+		Session.set('twill_chart_db_latch', true);
 
 		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
@@ -3896,8 +3878,7 @@ Meteor.my_functions = {
 			Meteor.my_functions.save_preview_as_text(pattern_id);
 			Meteor.my_functions.build_pattern_display_data(pattern_id);
 			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-			Session.set('twill_chart_latch', false);
-			//Session.set("hide_preview", false);           
+			Session.set('twill_chart_db_latch', false);          
 		});
 	},
 	get_twill_change_chart_as_array: function(number_of_rows, number_of_tablets)
