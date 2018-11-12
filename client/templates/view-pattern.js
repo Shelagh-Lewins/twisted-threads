@@ -47,12 +47,12 @@ Template.view_pattern.onCreated(function(){
   var pattern_id = Router.current().params._id;
   Meteor.my_functions.view_pattern_created(pattern_id); 
 
-  var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
+  /*var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
   if (pattern.edit_mode == "simulation") {
     Session.set('sim_weave_mode', "add_row");
     Session.set("row_to_edit", 1);
-  }
+  } */
 });
 
 Template.pattern_not_found.helpers({
@@ -982,6 +982,14 @@ Template.view_pattern.events({
     // first row of even tablets is always background color
     if (this.row == 1 && this.tablet %2 == 0)
         return;
+
+    // partway through updating pattern
+    if (Session.get("twill_chart_latch") == true)
+        return;
+
+    // used to check if there has been another cell edited after this one
+    const click_count = Session.get("twill_click_count") + 1;
+    Session.set("twill_click_count", click_count);
     
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1, number_of_tablets: 1}});
     var number_of_rows = pattern.number_of_rows;
@@ -989,11 +997,27 @@ Template.view_pattern.events({
     var new_style = Meteor.my_functions.get_selected_style();
 
     if (new_style == 3) { // use style 3 for reversing twill direction
+      // change just the UI chart
       Meteor.my_functions.set_broken_twill_change(this.row, this.tablet);
-      Meteor.my_functions.update_twill_change_chart(pattern_id);
+
+      setTimeout(function() {
+        // only rebuild the weaving chart and preview 
+        // if there hasn't been a subsequent click in this time
+        if (Session.get("twill_click_count") <= click_count) {
+          Meteor.my_functions.update_twill_change_chart(pattern_id);
+        }
+      }, 150);     
     } else { // styles 1, 2 are background, foreground colour
+      // change just the UI chart
       Meteor.my_functions.set_broken_twill_cell_style(this.row, this.tablet, new_style);
-      Meteor.my_functions.update_twill_pattern_chart(pattern_id);
+
+      // only rebuild the weaving chart and preview 
+      // if there hasn't been a subsequent click in this time
+      setTimeout(function() {
+        if (Session.get("twill_click_count") <= click_count) {
+          Meteor.my_functions.update_twill_pattern_chart(pattern_id);
+        }
+      }, 150); 
     }
   },
   ///////////////////////////////////////////////////
