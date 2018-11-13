@@ -2954,10 +2954,10 @@ Meteor.my_functions = {
 		var number_of_rows = Session.get("number_of_rows");
 
 		if (pattern.weaving_start_row) {
-			if (row_number == number_of_rows + 1 - pattern.weaving_start_row) {
-				row_number = pattern.weaving_start_row;
-			}
-		} else if (row_number == number_of_rows + 1)
+			number_of_rows = number_of_rows - pattern.weaving_start_row + 1;
+		}
+	
+		if (row_number >= number_of_rows + 1)
 		{
 			row_number = 1; // if at last row, go to first row
 
@@ -2969,10 +2969,6 @@ Meteor.my_functions = {
 
 		// move the column numbers to sit above the selected row
 		var selected_row_index = number_of_rows - row_number;
-
-		if (pattern.weaving_start_row) {    
-			selected_row_index = selected_row_index - pattern.weaving_start_row + 1;
-		}
 
 		var new_top = $($('.row').not(".column_number")[selected_row_index]).position().top - $('.row').not(".column_number").position().top;
 		$('.row.column_number').css({ top: new_top});
@@ -3022,7 +3018,7 @@ Meteor.my_functions = {
 		// index is a readable row number starting with 1 at the bottom
 		// Row number must be an integer between 1 and last row
 		var pattern_id = Router.current().params._id;
-		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {current_weave_row: 1}});
+		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {current_weave_row: 1, weaving_start_row: 1}});
 
 		if (typeof pattern === "undefined")
 			return;

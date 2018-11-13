@@ -60,7 +60,7 @@ Template.weave_row_buttons.helpers({
 });
 
 Template.weave_pattern.events({
-  'change #current_row_input': function () {
+  'input #current_row_input': function () {
     var row_number = $('#current_row_input').val();
     row_number = Meteor.my_functions.validate_row_number_input(row_number);
 
@@ -89,8 +89,13 @@ Template.weave_pattern.events({
   },
   'click #last_row': function() {
     var pattern_id = Router.current().params._id;
-    var pattern = Patterns.findOne({_id: pattern_id});
-    var row_number = pattern.number_of_rows;
+    var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+
+    var row_number = Session.get("number_of_rows");
+
+    if (pattern.weaving_start_row) {
+      row_number = row_number - pattern.weaving_start_row + 1;
+    }
 
     Meteor.my_functions.set_current_weave_row(row_number);
   },

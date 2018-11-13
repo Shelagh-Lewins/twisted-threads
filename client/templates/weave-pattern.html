@@ -7,7 +7,7 @@
 
 <button class="styled_button" onclick="Meteor.my_functions.stop_weaving();">Close weaving chart</button>
 
-<div class="row_controls"><label for="current_row_input">Row: </label><input type="text" id="current_row_input" value={{selected_row}}>
+<div class="row_controls"><label for="current_row_input">Row: </label><input type="number" id="current_row_input" value={{selected_row}} min="1" size="3">
 <input type="button" id="first_row" value="First row" />
 <input type="button" id="last_row" value="Last row" /></div>
 <div class="pattern weave">
