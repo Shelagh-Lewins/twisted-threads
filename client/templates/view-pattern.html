@@ -415,6 +415,7 @@
 <template name="threading_row">
 <div class="row"><span class="hole_number">{{hole_label this}}</span><ul>{{#each tablet_indexes}}
 	{{#with row=.. tablet=this type="threading"}}
+	tablet {{tablet}}
 		{{> pattern_cell}}
 	{{/with}}
 {{/each}}</ul></div>

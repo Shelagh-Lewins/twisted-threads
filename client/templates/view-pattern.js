@@ -970,7 +970,7 @@ Template.view_pattern.events({
 	'click .broken_twill_chart li.cell:not(.remove_row)': function(event, template){
 		clearTimeout(template.twill_timeout); // only update the weaving chart and database when the user pauses in clicking
 
-		if (Session.get("twill_chart_db_latch") == true)
+		if (Session.get("twill_chart_latch") == true)
 				return;
 
 		var pattern_id = Router.current().params._id;
@@ -994,15 +994,9 @@ Template.view_pattern.events({
 		var new_style = Meteor.my_functions.get_selected_style();
 
 		if (new_style == 3) { // use style 3 for reversing twill direction
-			// change the UI chart
 			Meteor.my_functions.set_broken_twill_change(this.row, this.tablet);
-
-			template.twill_timeout = setTimeout(function() {
-			// only rebuild the weaving chart and preview 
-			// if there hasn't been a subsequent click in this time
-				Session.set("twill_chart_latch", false);
-				Meteor.my_functions.update_twill_change_chart(pattern_id);
-			}, 200);     
+			Meteor.my_functions.update_twill_change_chart(pattern_id, this.row, this.tablet);
+  
 		} else { // styles 1, 2 correspond to background (.), foreground colour (X) in the chart
 			// is there any change?
 			const old_style = current_twill_pattern_chart[(this.row) + "_" + (this.tablet)].get();
@@ -1010,15 +1004,8 @@ Template.view_pattern.events({
 			if ((old_style == "X" && new_style == "1") || (old_style == "." && new_style == "2"))
 				return;
 
-			// change the UI chart
 			Meteor.my_functions.set_broken_twill_cell_style(this.row, this.tablet, new_style);
-
-			// only rebuild the weaving chart and preview 
-			// if there hasn't been a subsequent click in this time
-			template.twill_timeout = setTimeout(function() {
-				Session.set("twill_chart_latch", false);
-				Meteor.my_functions.update_twill_pattern_chart(pattern_id);
-			},  200); 
+			Meteor.my_functions.update_twill_pattern_chart(pattern_id, this.row, this.tablet);
 		}
 	},
 	///////////////////////////////////////////////////

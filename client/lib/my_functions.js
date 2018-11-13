@@ -2344,7 +2344,7 @@ Meteor.my_functions = {
 	},
 	get_manual_weaving_as_array: function(pattern_id)
 	{
-		// concert the reactive array to a regular array that can be stringified
+		// convert the reactive array to a regular array that can be stringified
 		var manual_weaving_turns = new Array();
 		var data = current_manual_weaving_turns.list();
 
@@ -2822,8 +2822,7 @@ Meteor.my_functions = {
 		if (pattern.edit_mode === "broken_twill") {
 			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
 
-			// ensure successive twill chart operations don't interfere with each other
-			Session.set("twill_chart_db_latch", false);
+			// ensure twill chart operations don't interfere with each other
 			Session.set('twill_chart_latch', false);
 		}
 
@@ -3209,10 +3208,11 @@ Meteor.my_functions = {
 		var tablet_turns = []; // for each tablet, number of turns
 		var threading_row = [];
 		var new_threads_row = [];
-
+console.log(`position_of_A ${data.position_of_A}`);
 		// turn tablets
 		for (var i=0; i<data.number_of_tablets; i++)
 		{
+			console.log('here');
 			// find turn direction and number of turns
 			var pack_number = new_row_sequence.tablets[i];
 			var pack = new_row_sequence.packs[pack_number - 1];
@@ -3231,8 +3231,7 @@ Meteor.my_functions = {
 				var thread_to_show = Meteor.my_functions.modular_add(data.position_of_A[i], -1, 4);
 			else // B: show thread in position A
 				var thread_to_show = data.position_of_A[i];
-// console.log('in weave_row');
-
+console.log(`thread_to_show ${thread_to_show}`);
 			// threading[thread_to_show] = row of threading chart
 			threading_row.push(data.threading[thread_to_show][i]);
 			tablet_directions.push(direction);
@@ -3245,7 +3244,10 @@ Meteor.my_functions = {
 
 		data.weaving.push(new_row);
 		data.manual_weaving_threads.push(new_threads_row);
-
+		 console.log('in weave_row');
+console.log(`new_threads_row ${JSON.stringify(new_threads_row)}`);
+		 console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
+console.log(`weave row. data.manual_weaving_threads ${JSON.stringify(data.manual_weaving_threads)}`);
 		// save the new row turning sequence
 		data.manual_weaving_turns.push(new_row_sequence);
 		data.manual_weaving_turns[0] = new_row_sequence; // retain current packs UI
@@ -3423,32 +3425,13 @@ Meteor.my_functions = {
 
 			if (current_row_number <= 1)
 				return; // no rows to unweave
-//console.log(`unweave. last_row_number ${last_row_number}`);
-//console.log(`unweave. current_row_number ${current_row_number}`);
-			//if (last_row_number < 0) // this is the first row
-				//last_row_number = 0; // use default row
-
 
 			var last_row_data = data.manual_weaving_turns[last_row_number];
-			//console.log(`unweave. last_row_data ${JSON.stringify(last_row_data)}`);
-			//console.log(`unweave. new_row_sequence ${JSON.stringify(new_row_sequence)}`);
-			//console.log(`unweave. manual_weaving_turns ${JSON.stringify(data.manual_weaving_turns)}`);
-
 
 			// set working row to the last remaining row after the unweave
 			// or if this is row 1, it will be the just-removed row 1
-			//var current_row_data;
-			//if (current_row_number == 1) {
 			data.manual_weaving_turns[0] = data.manual_weaving_turns[last_row_number-1];
-			//} else {
-				//data.manual_weaving_turns[0] = new_row_sequence;
-			//}
 
-						//console.log(`unweave. current_row_data ${JSON.stringify(data.manual_weaving_turns[0])}`);
-
-			//if (last_row_number == 1) { // set working row for first row
-				//data.manual_weaving_turns[0] = data.manual_weaving_turns[current_row_number];
-			//}
 			var tablet_directions = []; // for each tablet, which direction it turns
 
 			// turn tablets
@@ -3678,6 +3661,150 @@ Meteor.my_functions = {
 	},
 	///////////////////////////////////
 	// 3/1 Broken twill patterns
+	update_broken_twill_weaving: function(pattern_id, row, tablet) {
+		// update just the tablet that has changed
+		//Session.set("hide_preview", true); // force a clean refresh of the preview
+		// from the changed row
+//console.log(`row ${row}`);
+//console.log(`tablet ${tablet}`);
+
+		// two twill chart rows per pattern row
+		// plus a twill chart row for last row
+		var weaving_chart_start_row = (row * 2) -1;
+		var pattern = Patterns.findOne({_id: pattern_id});
+
+		// build pattern data for single tablet
+		// reset tablet to start position
+		var position_of_A = [0];
+
+		var threading = Meteor.my_functions.get_threading_as_array(number_of_tablets); // four elements, each is a row
+		for (let i=0; i<4; i++) {
+			threading[i] = [threading[i][tablet - 1]];
+		}
+		
+		var orientations = [Meteor.my_functions.get_orientation_as_array()[tablet-1]];
+
+		// construct manual weaving turns
+		var manual_weaving_turns = [JSON.parse(JSON.stringify(current_manual_weaving_turns[0]))]; // working row
+
+		// var manual_weaving_turns = JSON.parse(JSON.stringify(current_manual_weaving_turns)).splice(row);
+		//manual_weaving_turns.splice(row, manual_weaving_turns.length
+		// two twill chart rows per pattern row
+		// plus a twill chart row for last row
+		for (let i=weaving_chart_start_row; i<=Session.get("number_of_rows"); i++) {
+			manual_weaving_turns.push(JSON.parse(JSON.stringify(current_manual_weaving_turns[i])));
+		}
+
+		console.log(`manual_weaving_turns ${JSON.stringify(manual_weaving_turns)}`);
+
+		// data for single tablet
+		for (let i=0; i< manual_weaving_turns.length; i++) {
+			manual_weaving_turns[i].tablets = [manual_weaving_turns[i].tablets[tablet -1]];
+		}
+
+		// find position_of_A based on thread to show and whether tablet turned forwards or backwards
+		var manual_weaving_threads = pattern.manual_weaving_threads;
+		var position_of_A = [0]; // first row
+		if (weaving_chart_start_row != 1) {
+			// subsequent rows. Position of A depends on previous row
+			var last_row_threads = manual_weaving_threads[weaving_chart_start_row - 2]; // -1 for last row, -1 for array starts with 0
+				// previous row, turning sequence
+				var last_row_turns = manual_weaving_turns[weaving_chart_start_row - 1];
+
+				//for (let i=0; i<number_of_tablets; i++) {
+					var pack_index = last_row_turns.tablets[tablet - 1] -1;
+					var direction = last_row_turns.packs[pack_index].direction;
+					if (direction == "F") {
+						// hole in position D shows
+						let position = Meteor.my_functions.modular_add(last_row_threads[tablet - 1], 1, 4);
+						position_of_A[0] = position;
+					} else {
+						// B. Hole in position A shows
+						position_of_A[0] = last_row_threads[tablet - 1];
+					}
+				//}
+		}
+
+		var manual_weaving_threads_single = [];
+		for (let i=0; i< manual_weaving_threads.length; i++) {
+			console.log(`manual_weaving_threads[i] ${manual_weaving_threads[i]}`);
+			manual_weaving_threads_single.push(manual_weaving_threads[i][tablet -1]);
+		}
+
+		var data = {
+			number_of_tablets: 1,
+			threading: threading,
+			orientations: orientations,
+			position_of_A: position_of_A,
+			weaving: [],
+			manual_weaving_turns: [manual_weaving_turns[0]], // first row gives UI default
+			manual_weaving_threads: manual_weaving_threads_single // which thread shows
+		}
+		
+		console.log(`data.manual_weaving_threads ${JSON.stringify(data.manual_weaving_threads)}`);
+console.log(`data.position_of_A ${JSON.stringify(data.position_of_A)}`);
+		// prepare to weave all rows for this one tablet
+		// weaving chart may start at a later row
+		// to allow the background twill to be set up for a repeating pattern
+		current_A_start = [];
+
+		for (var i=1; i<manual_weaving_turns.length; i++)
+		{
+			if (i == pattern.weaving_start_row) { // first row of actual weaving
+				// update offset threading chart
+				for (var k=0; k<4; k++) { // 4 holes
+					const thread_at_A = (k + data.position_of_A[0]) % 4;
+					console.log(`identifier ${(thread_at_A+1) + "_" + (tablet)}`);
+					let hole_style = current_threading[(thread_at_A+1) + "_" + (tablet)].get();
+					current_offset_threading[(k+1) + "_" + (tablet)].set(hole_style);
+				}
+				current_A_start = JSON.parse(JSON.stringify(data.position_of_A));
+			}
+			console.log(`data before: ${JSON.stringify(data)}`);
+			data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);  
+		}
+		
+		
+		console.log(`data after weaving: ${JSON.stringify(data)}`);
+		// current pattern data
+		var new_weaving_data = {
+			position_of_A:JSON.parse(pattern.position_of_A),
+			weaving: JSON.parse(pattern.weaving),
+			//number_of_rows: Session.get("number_of_rows"),
+			manual_weaving_turns: [],
+			manual_weaving_threads: manual_weaving_threads
+		};
+
+		var temp = current_manual_weaving_turns.list();
+		for (var i=1; i<temp.length; i++)
+		{
+			new_weaving_data.manual_weaving_turns.push(temp[i]);
+		}
+
+		// insert the new tablet data into the full charts
+		new_weaving_data.position_of_A[tablet - 1] = data.position_of_A[0];
+
+		for (let i=weaving_chart_start_row; i<=Session.get("number_of_rows"); i++) {
+			console.log(`i ${i}`);
+			new_weaving_data.weaving[i-1][tablet-1] = data.weaving[i-weaving_chart_start_row][0];
+			current_weaving[(i) + "_" + (tablet)].set(data.weaving[i-weaving_chart_start_row][0]);
+			new_weaving_data.manual_weaving_threads[i-1][tablet-1] = data.manual_weaving_threads[i-weaving_chart_start_row][0];
+		}
+		
+
+		console.log(`new_weaving_data: ${JSON.stringify(new_weaving_data)}`);
+
+		Meteor.call("update_manual_weaving", pattern_id, new_weaving_data, function(){
+			//var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1}});
+			//Session.set("number_of_rows", pattern.number_of_rows);
+
+			Meteor.my_functions.set_repeats(pattern_id);
+			//Meteor.my_functions.build_pattern_display_data(pattern_id);
+			//Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, number_of_tablets);
+			Meteor.my_functions.save_preview_as_text(pattern_id);
+			//Session.set("hide_preview", false);
+		}); 
+	},
 	reset_broken_twill_weaving: function(pattern_id) {
 		// Session.set("hide_preview", true); // force a clean refresh of the preview
 
@@ -3722,6 +3849,7 @@ Meteor.my_functions = {
 						temp_offset_threading[(k+1) + "_" + (l+1)] = new ReactiveVar(hole_style);
 					}
 				}
+				
 				current_offset_threading = temp_offset_threading;
 				current_A_start = JSON.parse(JSON.stringify(data.position_of_A));
 			}
@@ -3794,11 +3922,12 @@ Meteor.my_functions = {
 			data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);  
 		}
 	},
-	update_twill_pattern_chart: function(pattern_id) {
-		if (Session.get("twill_chart_db_latch") == true)
+	update_twill_pattern_chart: function(pattern_id, row, tablet) {
+		// update the twill pattern, changing only the affected tablet and only from the affected row onwards
+		if (Session.get("twill_chart_latch") == true)
 				return;
 			
-		Session.set('twill_chart_db_latch', true);
+		Session.set('twill_chart_latch', true);
 
 		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
@@ -3816,8 +3945,9 @@ Meteor.my_functions = {
 			Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
 			Meteor.my_functions.save_preview_as_text(pattern_id);
 			Meteor.my_functions.build_pattern_display_data(pattern_id);
-			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-			Session.set('twill_chart_db_latch', false);
+			Meteor.my_functions.update_broken_twill_weaving(pattern_id, row, tablet);
+			// Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
+			Session.set('twill_chart_latch', false);
 		});
 	},
 	get_twill_pattern_chart_as_array: function(number_of_rows, number_of_tablets)
@@ -3852,10 +3982,10 @@ Meteor.my_functions = {
 		return twill_array;
 	},
 	update_twill_change_chart: function(pattern_id) {
-		if (Session.get("twill_chart_db_latch") == true)
+		if (Session.get("twill_chart_latch") == true)
 				return;
 			
-		Session.set('twill_chart_db_latch', true);
+		Session.set('twill_chart_latch', true);
 
 		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
@@ -3874,7 +4004,7 @@ Meteor.my_functions = {
 			Meteor.my_functions.save_preview_as_text(pattern_id);
 			Meteor.my_functions.build_pattern_display_data(pattern_id);
 			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-			Session.set('twill_chart_db_latch', false);          
+			Session.set('twill_chart_latch', false);          
 		});
 	},
 	get_twill_change_chart_as_array: function(number_of_rows, number_of_tablets)
