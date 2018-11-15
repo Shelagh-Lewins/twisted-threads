@@ -4019,24 +4019,14 @@ Meteor.my_functions = {
 
 		for (var i=0; i<(number_of_rows + 2)/2; i++)
 		{
-			raw_pattern_chart.push(new Array(number_of_tablets));
-
-			for (var j=0; j<number_of_tablets; j++)
-			{
-				raw_pattern_chart[i][j] = current_twill_pattern_chart[(i+1) + "_" + (j+1)].get();
-			}
+			raw_pattern_chart[i] = [current_twill_pattern_chart[(i+1) + "_1"].get()];
 		}
 
 		var raw_twill_change_chart = [];
 
 		for (var i=0; i<(number_of_rows + 2)/2; i++)
 		{
-			raw_twill_change_chart.push(new Array(number_of_tablets));
-
-			for (var j=0; j<number_of_tablets; j++)
-			{
-				raw_twill_change_chart[i][j] = current_twill_change_chart[(i+1) + "_" + (j+1)].get();
-			}
+			raw_twill_change_chart[i] = [current_twill_change_chart[(i+1) + "_1"].get()];
 		}
 
 		var twill_pattern_chart = []; // array for internal working in this function
@@ -4046,41 +4036,25 @@ Meteor.my_functions = {
 		for (var i=0; i<raw_pattern_chart.length; i++)
 		{
 			var even_row = [];
-			for (var j=0; j<number_of_tablets; j++)
-			{
-				even_row.push(raw_pattern_chart[i][j]);
-			}
+			even_row.push(raw_pattern_chart[i][0]);
 
 			twill_pattern_chart.push(even_row);
 
 			var odd_row = [];
 
-			for (var j=0; j<number_of_tablets; j++)
+			if (i == (raw_pattern_chart.length - 1)) // last row of Data
 			{
-				if (i == (raw_pattern_chart.length - 1)) // last row of Data
-				{
-					odd_row.push(raw_pattern_chart[i][j]);
-				}
+				odd_row.push(raw_pattern_chart[i][0]);
+			}
+			else
+			{
+				if ((tablet - 1)%2 == 0)
+					odd_row.push(raw_pattern_chart[i][0]);
 				else
-				{
-					if (j%2 == 0)
-						odd_row.push(raw_pattern_chart[i][j]);
-					else
-						odd_row.push(raw_pattern_chart[i+1][j]);
-				}
+					odd_row.push(raw_pattern_chart[i+1][0]);
 			}
 
 			twill_pattern_chart.push(odd_row);
-		}
-
-		var temp_pattern_chart = {};
-
-		for (var i=0; i<raw_pattern_chart.length; i++)
-		{
-			for (var j=0; j<number_of_tablets; j++)
-			{
-				temp_pattern_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_pattern_chart[i][j]);
-			}
 		}
 
 		// build the long floats chart
@@ -4089,52 +4063,34 @@ Meteor.my_functions = {
 		for(var i=0; i<raw_pattern_chart.length; i++)
 		{
 			var even_row = [];
-			for (var j=0; j<number_of_tablets; j++)
-			{
-				even_row.push(raw_twill_change_chart[i][j]);
+			even_row.push(raw_twill_change_chart[i][0]);
 
-				// replace X with Y in second row so we can identify first and second row of long float
-				if ((j%2 == 1))
-					if (even_row[j] == "X")
-						even_row[j] = "Y";
-			}
+			if (((tablet - 1)%2 == 1))
+				if (even_row[0] == "X")
+					even_row[0] = "Y";
 
 			twill_change_chart.push(even_row);
 
 			var odd_row = [];
 
-			for (var j=0; j<number_of_tablets; j++)
+			if (i == (raw_pattern_chart.length - 1)) // last row of LongFloats
 			{
-				if (i == (raw_pattern_chart.length - 1)) // last row of LongFloats
-				{
-					odd_row.push(raw_twill_change_chart[i][j]);
-				}
-				else
-				{
-					if (j%2 == 0)
-						odd_row.push(raw_twill_change_chart[i][j]);
-					else
-						odd_row.push(raw_twill_change_chart[i+1][j]);
-				}
-
-				// replace X with Y in second row so we can identify first and second row of long float
-				if ((j%2 == 0))
-				if (odd_row[j] == "X")
-					odd_row[j] = "Y";
-				
+				odd_row.push(raw_twill_change_chart[i][0]);
 			}
+			else
+			{
+				if ((tablet - 1)%2 == 0)
+					odd_row.push(raw_twill_change_chart[i][0]);
+				else
+					odd_row.push(raw_twill_change_chart[i+1][0]);
+			}
+
+			// replace X with Y in second row so we can identify first and second row of long float
+			if ((tablet - 1)%2 == 0)
+				if (odd_row[0] == "X")
+					odd_row[0] = "Y";
 
 			twill_change_chart.push(odd_row);
-		}
-
-		var temp_twill_change_chart = {};
-
-		for (var i=0; i<raw_pattern_chart.length; i++)
-		{
-			for (var j=0; j<number_of_tablets; j++)
-			{
-				temp_twill_change_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_twill_change_chart[i][j]);
-			}
 		}
 
 		// create the pattern. This is from my_functions.convert_gtt_3_1_twill_pattern_to_json
@@ -4147,19 +4103,16 @@ Meteor.my_functions = {
 		var current_twill_position = []; // for each tablet, what stage is it at in the twill_sequence? 0, 1, 2, 3
 		// tablets start with the previous row, so that if there is a color change in row 1, they will continue as in the non-existent previous row
 
-		for (var i=0; i<number_of_tablets; i++)
+		switch (twill_direction)
 		{
-			switch (twill_direction)
-			{
-				case "S":
-					current_twill_position.push((i + 3) % 4);
-					break;
+			case "S":
+				current_twill_position.push((tablet + 2) % 4);
+				break;
 
-				case "Z":
-					current_twill_position.push(3 - ((i + 0) % 4));
-					break;
-			}    
-		}
+			case "Z":
+				current_twill_position.push(3 - ((tablet - 1) % 4));
+				break;
+		}    
 
 		// set up the pattern
 		pattern_obj.position_of_A = current_twill_position;
@@ -4183,88 +4136,111 @@ Meteor.my_functions = {
 			new_turn.packs.push(pack);
 		}
 
-		// weave the pattern row by row
+		// build the manual turns by weaving the pattern
 		for (var i=0; i<number_of_rows; i++)
 		{
 			// put the tablets in the correct packs
 			new_turn.tablets = [];
-			
-			for (var j=0; j<number_of_tablets; j++)
+
+			// read the pattern chart
+			var current_color = twill_pattern_chart[i][0];
+			var next_color = current_color;
+			var last_color = ".";
+			var color_change = false;
+
+			// check for color change
+			// color change affects two rows
+			if (i<(number_of_rows - 1)) // last row has no next row
 			{
-				// read the pattern chart
-				var current_color = twill_pattern_chart[i][j];
-				var next_color = current_color;
-				var last_color = ".";
-				var color_change = false;
-
-				// check for color change
-				// color change affects two rows
-				if (i<(number_of_rows - 1)) // last row has no next row
-				{
-					next_color = twill_pattern_chart[i+1][j]; // problem
-				}
-
-				if (i > 0)
-					last_color = twill_pattern_chart[i-1][j];
-
-				if (next_color != current_color)
-					color_change = true;
-
-				if (last_color != current_color)
-				{
-					color_change = true;
-					if (i == 0) // tablet starts with foreground color
-						current_twill_position[j] =  (current_twill_position[j] + 3) % 4; // go back an extra turn
-				}
-		 
-				var long_float = twill_change_chart[i][j];
-
-				var previous_long_float = ".";
-				if (i != 0)
-					previous_long_float = twill_change_chart[i-1][j];
-
-				var next_long_float = ".";
-
-				if ((i < number_of_rows - 1))
-					next_long_float = twill_change_chart[i+1][j];     
-
-				// handle long floats
-				// advance in turning sequence
-				if ((!color_change))
-					 current_twill_position[j] =  (current_twill_position[j] + 1) % 4;        
-
-				if ((long_float == "Y")) // second pick of long float
-					current_twill_position[j] =  (current_twill_position[j] + 2) % 4;
-
-				var position = current_twill_position[j];
-				var direction = twill_sequence[position];
-
-				var pack = (direction == "F") ? 1 : 2;
-				new_turn.tablets.push(pack);
+				next_color = twill_pattern_chart[i+1][0]; // problem
 			}
-			pattern_obj.manual_weaving_turns[0] = new_turn;
+
+			if (i > 0)
+				last_color = twill_pattern_chart[i-1][0];
+
+			if (next_color != current_color)
+				color_change = true;
+
+			if (last_color != current_color)
+			{
+				color_change = true;
+				if (i == 0) // tablet starts with foreground color
+					current_twill_position[0] =  (current_twill_position[0] + 3) % 4; // go back an extra turn
+			}
+		 
+			var long_float = twill_change_chart[i][0];
+
+			var previous_long_float = ".";
+			if (i != 0)
+				previous_long_float = twill_change_chart[i-1][0];
+			// previous_long_float = twill_change_chart[i-1][j];
+
+			var next_long_float = ".";
+
+			if ((i < number_of_rows - 1))
+				next_long_float = twill_change_chart[i+1][0];     
+
+			// handle long floats
+			// advance in turning sequence
+			if ((!color_change))
+
+				 current_twill_position[0] =  (current_twill_position[0] + 1) % 4;        
+
+			if ((long_float == "Y")) // second pick of long float
+				current_twill_position[0] =  (current_twill_position[0] + 2) % 4;
+
+			var position = current_twill_position[0];
+			//var position = current_twill_position[j];
+			var direction = twill_sequence[position];
+
+			var pack = (direction == "F") ? 1 : 2;
+			new_turn.tablets.push(pack);
+console.log(`about to weave row ${i+1}`);
+			//pattern_obj.manual_weaving_turns[0] = new_turn;
 			pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
 		}
+		
 
 		var manual_weaving_turns = pattern_obj.manual_weaving_turns;
 
-		if (Session.get("number_of_rows") == 0)
-		{
-			// reset direction, number of turns to "F", 1
-			for (var i=0; i<manual_weaving_turns[0].packs.length; i++)
-			{
-				manual_weaving_turns[0].packs[i].direction = "F";
-				manual_weaving_turns[0].packs[i].number_of_turns = 1;
-			}
+		console.log(`new weaving ${JSON.stringify(manual_weaving_turns)}`);
+
+		for (let i=1; i<=number_of_rows; i++) {
+			console.log(`i ${i}`);
+
+			var new_turn = current_manual_weaving_turns[i].valueOf();
+			console.log(`new_turn before ${JSON.stringify(new_turn)}`);
+			new_turn.tablets[tablet - 1] = manual_weaving_turns[i-1].tablets[0];
+			console.log(`new_turn after ${JSON.stringify(new_turn)}`);
+
+
+			current_manual_weaving_turns.splice(i, 1, new_turn);
+
 		}
-		else
-		{
-			// show direction, number of turns for latest row
-			// ensure it's a new object not a reference
-			manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[manual_weaving_turns.length-1]));
+
+/*
+		var weaving_chart_start_row = (row * 2) -1; // odd tablet
+		if (tablet % 2 == 0) {
+			weaving_chart_start_row -= 1; // even tablet is offset
 		}
+
+console.log(`new_turn 2 ${JSON.stringify(new_turn)}`);
+		for (let i=weaving_chart_start_row; i<=number_of_rows; i++) {
+			console.log(`i ${i}`);
+			let index = i - weaving_chart_start_row;
+			console.log(`index ${index}`);
+
+			var new_turn = current_manual_weaving_turns[i].valueOf();
+			console.log(`new_turn 1 ${JSON.stringify(new_turn)}`);
+			new_turn.tablets[tablet - 1] = manual_weaving_turns[index].tablets[0];
+			//console.log(`new_turn 2 ${JSON.stringify(new_turn)}`);
+
+			current_manual_weaving_turns.splice(i, 1, new_turn);
+//			current_manual_weaving_turns[i].tablets[tablet] = manual_weaving_turns[number_of_rows - i].tablets[tablet];
+		} */
 		
-		current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
+		// TODO insert new weaving turns
+		// current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
 	},
 	///////////////////////////////////
 	// Searching
