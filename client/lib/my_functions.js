@@ -4002,7 +4002,7 @@ Meteor.my_functions = {
 		Meteor.call("update_twill_charts", pattern_id, data, number_of_rows, number_of_tablets, function() {
 			Meteor.my_functions.build_pattern_display_data(pattern_id);
 			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-			Meteor.my_functions.save_preview_as_text(pattern_id);        
+			Meteor.my_functions.save_preview_as_text(pattern_id);       
 		});
 	},
 	update_twill_weaving_turns: function(pattern_id, row, tablet) {
@@ -4013,10 +4013,31 @@ Meteor.my_functions = {
 		var number_of_rows = Session.get("number_of_rows");
 		var number_of_tablets = Session.get("number_of_tablets");
 
+		// get the twill chart for the changed tablet only
 		// twill charts have one row per two rows of weaving
-		var raw_pattern_chart = Meteor.my_functions.get_twill_pattern_chart_as_array(number_of_rows + 2, number_of_tablets);
+		var raw_pattern_chart = [];
 
-		var raw_twill_change_chart = Meteor.my_functions.get_twill_change_chart_as_array(number_of_rows + 2, number_of_tablets);
+		for (var i=0; i<(number_of_rows + 2)/2; i++)
+		{
+			raw_pattern_chart.push(new Array(number_of_tablets));
+
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				raw_pattern_chart[i][j] = current_twill_pattern_chart[(i+1) + "_" + (j+1)].get();
+			}
+		}
+
+		var raw_twill_change_chart = [];
+
+		for (var i=0; i<(number_of_rows + 2)/2; i++)
+		{
+			raw_twill_change_chart.push(new Array(number_of_tablets));
+
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				raw_twill_change_chart[i][j] = current_twill_change_chart[(i+1) + "_" + (j+1)].get();
+			}
+		}
 
 		var twill_pattern_chart = []; // array for internal working in this function
 
@@ -4031,7 +4052,6 @@ Meteor.my_functions = {
 			}
 
 			twill_pattern_chart.push(even_row);
-
 
 			var odd_row = [];
 
