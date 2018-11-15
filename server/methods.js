@@ -1036,7 +1036,6 @@ Meteor.methods({
   {
     check(pattern_id, String);
     check(data, Object);
-    // console.log(`twill_array ${data.twill_pattern_chart}`);
 
     Patterns.update({_id: pattern_id}, {$set: {twill_pattern_chart: JSON.stringify(data.twill_pattern_chart)}});
 
@@ -1047,9 +1046,11 @@ Meteor.methods({
   {
     check(pattern_id, String);
     check(data, Object);
-    // console.log(`twill_array ${data.twill_pattern_chart}`);
 
     Patterns.update({_id: pattern_id}, {$set: {twill_change_chart: JSON.stringify(data.twill_change_chart)}});
+
+    // Record the edit time
+    Meteor.call("save_pattern_edit_time", pattern_id);
   },
   update_twill_charts: function(pattern_id, data, number_of_rows, number_of_tablets) {
     check(pattern_id, String);

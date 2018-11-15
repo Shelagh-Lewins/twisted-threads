@@ -3961,8 +3961,6 @@ Meteor.my_functions = {
 		}
 
 		Meteor.call("update_twill_change_chart", pattern_id, data, function() {
-			//Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
-			//Meteor.my_functions.save_preview_as_text(pattern_id);
 			Meteor.my_functions.build_pattern_display_data(pattern_id);
 			Meteor.my_functions.update_broken_twill_weaving(pattern_id, row, tablet);
 			Session.set('twill_chart_latch', false);          
