@@ -1992,7 +1992,6 @@ Meteor.my_functions = {
 					} else {
 						cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
 					}
-					// cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
 
 					delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
 					current_twill_change_chart[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_value);
@@ -3215,14 +3214,6 @@ Meteor.my_functions = {
 		var threading_row = [];
 		var new_threads_row = [];
 
-		if (data.number_of_tablets)
-				 console.log('in weave_row');
-				 //console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
-				 //console.log(`data.number_of_tablets ${data.number_of_tablets}`);
-
-				 if (data.number_of_tablets)
-console.log(`position_of_A ${data.position_of_A}`);
-
 		// turn tablets
 		for (var i=0; i<data.number_of_tablets; i++)
 		{
@@ -3251,9 +3242,6 @@ console.log(`position_of_A ${data.position_of_A}`);
 			tablet_turns.push(number_of_turns);
 
 			new_threads_row.push(thread_to_show);
-
-					if (data.number_of_tablets)
-console.log(`thread_to_show ${thread_to_show}`);
 		}
 
 
@@ -3262,9 +3250,6 @@ console.log(`thread_to_show ${thread_to_show}`);
 		data.weaving.push(new_row);
 		data.manual_weaving_threads.push(new_threads_row);
 
-//console.log(`new_threads_row ${JSON.stringify(new_threads_row)}`);
-		 //console.log(`new_row_sequence ${JSON.stringify(new_row_sequence)}`);
-//console.log(`end of weave row. data.manual_weaving_threads ${JSON.stringify(data.manual_weaving_threads)}`);
 		// save the new row turning sequence
 		data.manual_weaving_turns.push(new_row_sequence);
 		data.manual_weaving_turns[0] = new_row_sequence; // retain current packs UI
@@ -3680,37 +3665,20 @@ console.log(`thread_to_show ${thread_to_show}`);
 	// 3/1 Broken twill patterns
 	update_broken_twill_weaving: function(pattern_id, row, tablet) {
 		// update just the tablet that has changed
-		//Session.set("hide_preview", true); // force a clean refresh of the preview
-		// from the changed row
-console.log(`row ${row}`);
-console.log(`tablet ${tablet}`);
+		// from the changed row onwards
 
-		// row is row in twill chart
-		// need to find row in weaving chart
+		// need to find row in weaving chart from row in twill chart
 		// two twill chart rows per pattern row
 		// plus a twill chart row for last row
 		var weaving_chart_start_row = (row * 2) -1; // odd tablet
 		if (tablet % 2 == 0) {
 			weaving_chart_start_row -= 1; // even tablet is offset
 		}
-console.log(`weaving_chart_start_row ${weaving_chart_start_row}`);
+
 		var pattern = Patterns.findOne({_id: pattern_id});
-
-		// build pattern data for single tablet
-		// reset tablet to start position
-		//var position_of_A = [0];
-
-		/* var threading = [];
-		// TODO find threading at row
-		for (let i=1; i<=4; i++) {
-			threading.push([current_threading[i + "_" + tablet].get()]);
-		}
-		console.log(`temp threading ${JSON.stringify(threading)}`); */
-		
-		var orientations = [Meteor.my_functions.get_orientation_as_array()[tablet-1]];
+				var orientations = [Meteor.my_functions.get_orientation_as_array()[tablet-1]];
 
 		// construct changed manual weaving turns as new object not reference
-		//var manual_weaving_turns = [JSON.parse(JSON.stringify(current_manual_weaving_turns[0]))]; // working row
 		var manual_weaving_turns_full = [];
 		var manual_weaving_turns_single = [];
 
@@ -3718,37 +3686,25 @@ console.log(`weaving_chart_start_row ${weaving_chart_start_row}`);
 		// plus a twill chart row for last row
 		// full weaving chart
 		for (let i=0; i<=Session.get("number_of_rows"); i++) {
-			manual_weaving_turns_full.push(JSON.parse(JSON.stringify(current_manual_weaving_turns[i].valueOf())));
+			manual_weaving_turns_full.push(current_manual_weaving_turns[i].valueOf());
 		}
-
-		console.log(`manual_weaving_turns_full 1 ${JSON.stringify(manual_weaving_turns_full)}`);
 
 		// build weaving chart for changes
 		// only one tablet
 		// only required rows
-		//for (let i=0; i<=Session.get("number_of_rows"); i++) {
 		for (let i=weaving_chart_start_row; i<=Session.get("number_of_rows"); i++) {
 			manual_weaving_turns_single.push(JSON.parse(JSON.stringify(current_manual_weaving_turns[i].valueOf()))); // valueOf provides a reference. Make sure we have a clean copy instead.
 		}
-		//console.log(`manual_weaving_turns_full 1 ${JSON.stringify(manual_weaving_turns_full)}`);
-//console.log(`weaving_chart_start_row ${JSON.stringify(weaving_chart_start_row)}`);
-//console.log(`manual_weaving_turns full ${JSON.stringify(manual_weaving_turns)}`);
-		
-//return;
-		// only take data for single tablet
+
+		// reduce to data for single tablet
 		for (let i=0; i<manual_weaving_turns_single.length; i++) {
 			manual_weaving_turns_single[i].tablets = [manual_weaving_turns_single[i].tablets[tablet -1]];
 		}
-		console.log(`manual_weaving_turns_single ${JSON.stringify(manual_weaving_turns_single)}`);
 
 		// find position_of_A based on thread to show and whether tablet turned forwards or backwards
-		// TODO find position of A and threading for start row
-console.log(`manual_weaving_turns_full 2 ${JSON.stringify(manual_weaving_turns_full)}`);
-		// there is no client-side versio of manual_weaving_threads
+		// there is no client-side version of manual_weaving_threads
 		var manual_weaving_threads = pattern.manual_weaving_threads;
 
-		// manual_weaving_threads.splice(0, weaving_chart_start_row - 1);
-		console.log(`manual_weaving_threads ${JSON.stringify(manual_weaving_threads)}`);
 		var position_of_A = [0]; // first row
 		var threading = [];
 		for (let i=1; i<=4; i++) {
@@ -3756,49 +3712,25 @@ console.log(`manual_weaving_turns_full 2 ${JSON.stringify(manual_weaving_turns_f
 			threading[i-1].push(current_threading[i + "_" + tablet].get());
 		}
 
-		console.log(`threading ${JSON.stringify(threading)}`);
-
 		if (weaving_chart_start_row != 1) {
 			// subsequent rows. Position of A depends on previous row
 			var last_row_threads = manual_weaving_threads[weaving_chart_start_row - 2]; // -1 for last row, -1 for array starts with 0
 			// previous row, turning sequence
 			var last_row_turns = manual_weaving_turns_full[weaving_chart_start_row - 1];
-			console.log(`last_row_turns ${JSON.stringify(last_row_turns)}`);
-			console.log(`last_row_threads ${JSON.stringify(last_row_threads)}`);
 
 			var pack_index = last_row_turns.tablets[tablet - 1] -1; // only one tablet
 
-			console.log(`pack_index ${pack_index}`);
-			//var direction = last_row_turns.packs[0].direction;
 			var direction = last_row_turns.packs[pack_index].direction;
-			console.log(`direction ${direction}`);
+
 			if (direction == "F") {
 				// hole in position D shows
 				let position = Meteor.my_functions.modular_add(last_row_threads[tablet - 1], 1, 4);
-				console.log(`F`);
 				position_of_A[0] = position;
 			} else {
 				// B. Hole in position A shows
-				console.log(`B`);
 				position_of_A[0] = last_row_threads[tablet - 1];
 			}
-			/*for (var k=0; k<4; k++) { // 4 holes
-				const thread_at_A = (k + position_of_A[0]) % 4;
-				console.log(`identifier ${(thread_at_A+1) + "_" + (tablet)}`);
-				let hole_style = current_threading[(thread_at_A+1) + "_" + (tablet)].get();
-				threading[k][0] = hole_style;
-			}  */
-
 		}
-			console.log(`threading: ${JSON.stringify(threading)}`);
-			console.log(`Position of A: ${position_of_A[0]}`);
-
-/*
-		var manual_weaving_threads_single = [];
-		for (let i=weaving_chart_start_row - 1; i< manual_weaving_threads.length; i++) {
-			console.log(`manual_weaving_threads[${i}] ${manual_weaving_threads[i]}`);
-			manual_weaving_threads_single.push([manual_weaving_threads[i][tablet - 1]]);
-		} */
 
 		var data = {
 			number_of_tablets: 1,
@@ -3806,88 +3738,40 @@ console.log(`manual_weaving_turns_full 2 ${JSON.stringify(manual_weaving_turns_f
 			orientations: orientations,
 			position_of_A: position_of_A,
 			weaving: [],
-			//manual_weaving_turns: [manual_weaving_turns[0]], // first row gives UI default
 			manual_weaving_turns: [],
-			// manual_weaving_turns: manual_weaving_turns_single,/ manual_weaving_turns: manual_weaving_turns_single,
-			// manual_weaving_threads: manual_weaving_threads_single // which thread shows
 			manual_weaving_threads: []
 		}
-		
-		console.log(`data.manual_weaving_threads ${JSON.stringify(data.manual_weaving_threads)}`);
-console.log(`data.position_of_A ${JSON.stringify(data.position_of_A)}`);
+
 		// prepare to weave changed rows for this one tablet
 
-		console.log(`manual_weaving_turns_single.length ${manual_weaving_turns_single.length}`);
-
 		for (var i=0; i<manual_weaving_turns_single.length; i++)
-		//for (var i=0; i<manual_weaving_turns_single.length; i++)
 		{
-			/*if (i == pattern.weaving_start_row) { // first row of actual weaving
-				for (var k=0; k<4; k++) { // 4 holes
-					const thread_at_A = (k + data.position_of_A[0]) % 4;
-					console.log(`identifier ${(thread_at_A+1) + "_" + (tablet)}`);
-					//let hole_style = current_threading[(thread_at_A+1) + "_" + (tablet)].get();
-					//current_offset_threading[(k+1) + "_" + (tablet)].set(hole_style);
-				} */
-				//current_A_start = JSON.parse(JSON.stringify(data.position_of_A));
-			//}
-			console.log(`data before: ${JSON.stringify(data)}`);
 			data = Meteor.my_functions.weave_row(data, manual_weaving_turns_single[i]);  
 		}
 		
-		console.log(`data after weaving: ${JSON.stringify(data)}`);
-		//return;
 		// current pattern data
 		var new_weaving_data = {
 			position_of_A:JSON.parse(pattern.position_of_A),
 			weaving: JSON.parse(pattern.weaving),
-			//number_of_rows: Session.get("number_of_rows"),
 			manual_weaving_turns: manual_weaving_turns_full,
 			manual_weaving_threads: manual_weaving_threads
 		};
-/*
-		var temp = current_manual_weaving_turns.list();
-		for (var i=0; i<temp.length; i++)
-		{
-			new_weaving_data.manual_weaving_turns.push(temp[i]);
-		} */
 
 		// insert the new tablet data into the full charts
 		new_weaving_data.position_of_A[tablet - 1] = data.position_of_A[0];
 
-		/* for (let i=weaving_chart_start_row; i<=Session.get("number_of_rows"); i++) {
-			console.log(`i ${i}`);
-			new_weaving_data.weaving[i-1][tablet-1] = data.weaving[i-weaving_chart_start_row][0];
-			current_weaving[(i) + "_" + (tablet)].set(data.weaving[i-weaving_chart_start_row][0]);
-			new_weaving_data.manual_weaving_threads[i-1][tablet-1] = data.manual_weaving_threads[i-weaving_chart_start_row][0];
-		} */
-
-		console.log(`new_weaving_data 1: ${JSON.stringify(new_weaving_data)}`);
-
 		for (let i=weaving_chart_start_row; i<=Session.get("number_of_rows"); i++) {
-			console.log(`i ${i}`);
 			let data_row = i - weaving_chart_start_row;		new_weaving_data.weaving[i-1][tablet-1] = data.weaving[data_row][0];
 			current_weaving[(i) + "_" + (tablet)].set(data.weaving[data_row][0]);
 			new_weaving_data.manual_weaving_threads[i-1][tablet-1] = data.manual_weaving_threads[data_row][0];
 		}
 		
-
-		console.log(`new_weaving_data 2: ${JSON.stringify(new_weaving_data)}`);
-
 		Meteor.call("update_manual_weaving", pattern_id, new_weaving_data, function(){
-			//var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1}});
-			//Session.set("number_of_rows", pattern.number_of_rows);
-
 			Meteor.my_functions.set_repeats(pattern_id);
-			//Meteor.my_functions.build_pattern_display_data(pattern_id);
-			//Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, number_of_tablets);
 			Meteor.my_functions.save_preview_as_text(pattern_id);
-			//Session.set("hide_preview", false);
 		}); 
 	},
 	reset_broken_twill_weaving: function(pattern_id) {
-		// Session.set("hide_preview", true); // force a clean refresh of the preview
-
 		// remove and rebuild the current simulation pattern weaving
 		var pattern = Patterns.findOne({_id: pattern_id});
 
@@ -4022,13 +3906,8 @@ console.log(`data.position_of_A ${JSON.stringify(data.position_of_A)}`);
 		}
 
 		Meteor.call("update_twill_pattern_chart", pattern_id, data, function() {
-			//Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
-			//Meteor.my_functions.save_preview_as_text(pattern_id);
-			//console.log(`current_manual_weaving_turns[3].valueOf() before ${JSON.stringify(current_manual_weaving_turns[3].valueOf())}`);
 			Meteor.my_functions.build_pattern_display_data(pattern_id);
-			//console.log(`current_manual_weaving_turns[3].valueOf() after ${JSON.stringify(current_manual_weaving_turns[3].valueOf())}`);
 			Meteor.my_functions.update_broken_twill_weaving(pattern_id, row, tablet);
-			// Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
 			Session.set('twill_chart_latch', false);
 		});
 	},
@@ -4063,7 +3942,7 @@ console.log(`data.position_of_A ${JSON.stringify(data.position_of_A)}`);
 
 		return twill_array;
 	},
-	update_twill_change_chart: function(pattern_id) {
+	update_twill_change_chart: function(pattern_id, row, tablet) {
 		if (Session.get("twill_chart_latch") == true)
 				return;
 			
@@ -4082,10 +3961,10 @@ console.log(`data.position_of_A ${JSON.stringify(data.position_of_A)}`);
 		}
 
 		Meteor.call("update_twill_change_chart", pattern_id, data, function() {
-			Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
-			Meteor.my_functions.save_preview_as_text(pattern_id);
+			//Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
+			//Meteor.my_functions.save_preview_as_text(pattern_id);
 			Meteor.my_functions.build_pattern_display_data(pattern_id);
-			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
+			Meteor.my_functions.update_broken_twill_weaving(pattern_id, row, tablet);
 			Session.set('twill_chart_latch', false);          
 		});
 	},
