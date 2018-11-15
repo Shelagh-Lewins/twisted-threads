@@ -100,10 +100,7 @@ UI.registerHelper('broken_twill_data', function(row, tablet) {
 		row: row,
 		long_float: this.long_float
 	}
-  //console.log('*****');
-  //console.log(`row ${row}`);
-  //console.log(`tablet ${tablet}`);
-
+  
 	// background or foreground colour?
 	var twill_cell = current_twill_pattern_chart[(row) + "_" + (tablet)];
   if (typeof twill_cell === "undefined")

@@ -1681,8 +1681,7 @@ Meteor.my_functions = {
 						color_change = true;
 						if (i == 0) // tablet starts with foreground color
 							current_twill_position[j] =  (current_twill_position[j] + 3) % 4; // go back an extra turn
-					}
-       
+					} 
 
 					var long_float = twill_change_chart[i][j];
 
@@ -1761,31 +1760,17 @@ Meteor.my_functions = {
 
 			// manual
 			var manual_weaving_turns = JSON.parse(pattern.manual_weaving_turns);
-//console.log(`build_pattern_display_data. manual_weaving_turns ${JSON.stringify(manual_weaving_turns)}`);
-			//if (Session.get("number_of_rows") != 0) // if no weaving rows use the 0 row of manual_weaving_turns
-			//{
-				/*				console.log(`manual_weaving_turns ${JSON.stringify(manual_weaving_turns)}`);
-								// reset direction, number of turns to "F", 1
-				for (var i=0; i<manual_weaving_turns[0].packs.length; i++)
-				{
-					manual_weaving_turns[0].packs[i].direction = "F";
-					manual_weaving_turns[0].packs[i].number_of_turns = 1;
-				} */
-			//}
-			//else
-			//{
+
 				var working_row = manual_weaving_turns.length-1;
 				if (Session.get('sim_weave_mode') == "add_row") {
 				// set the working row to the latest row
 				// ensure it's a new object not a reference
-				//manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[manual_weaving_turns.length-1]));
+
 				} else if (Session.get('sim_weave_mode') == "edit_row") {
 					// set the working row to the edit row
 					working_row = Session.get('row_to_edit')
-					//manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[Session.get('row_to_edit')]));
 				}
 				manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[working_row]));
-			//}
 
 			current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
 		}
@@ -2214,7 +2199,7 @@ Meteor.my_functions = {
 		// plus an extra row to determine last weaving row
 		var number_of_rows = (Session.get("number_of_rows") / 2) + 1;
 
-		if ((number_of_rows <= 1) || (position < 1) || (position > (number_of_rows)))
+		if ((number_of_rows <= 2) || (position < 1) || (position > (number_of_rows)))
 			return;
 
 		// remove deleted row
@@ -2821,7 +2806,7 @@ Meteor.my_functions = {
 		if (pattern.edit_mode === "simulation") {
 			Meteor.my_functions.reset_simulation_weaving(pattern_id);
 			Session.set('sim_weave_mode', "add_row");
-    	Session.set("row_to_edit", 1);
+			Session.set("row_to_edit", 1);
 		}
 
 		if (pattern.edit_mode === "broken_twill") {
@@ -3561,8 +3546,8 @@ Meteor.my_functions = {
 				Meteor.my_functions.build_pattern_display_data(pattern_id);
 				Meteor.my_functions.save_weaving_to_db(pattern_id, Session.get("number_of_rows"), Session.get("number_of_tablets"));
 				Meteor.my_functions.save_preview_as_text(pattern_id);
-		    Session.set("hide_preview", false);
-		    //console.log('callback 2');
+				Session.set("hide_preview", false);
+				//console.log('callback 2');
 			});
 		}
 	},
@@ -3830,7 +3815,6 @@ Meteor.my_functions = {
 			// TODO investigate whether this is required when it's not the user's pattern. No data will be saved to the db but the callbacks may be needed.
 			Meteor.my_functions.save_weaving_to_db(pattern_id, pattern.number_of_rows, number_of_tablets);
 			Meteor.my_functions.save_preview_as_text(pattern_id);
-			// Session.set("hide_preview", false);
 		});    
 	},
 	rebuild_offset_threading: function(pattern_id, weaving_start_row) {
@@ -3906,7 +3890,7 @@ Meteor.my_functions = {
 		}
 
 		Meteor.call("update_twill_pattern_chart", pattern_id, data, function() {
-			Meteor.my_functions.build_pattern_display_data(pattern_id);
+			Meteor.my_functions.update_twill_weaving_turns(pattern_id, row, tablet);
 			Meteor.my_functions.update_broken_twill_weaving(pattern_id, row, tablet);
 			Session.set('twill_chart_latch', false);
 		});
@@ -3961,7 +3945,7 @@ Meteor.my_functions = {
 		}
 
 		Meteor.call("update_twill_change_chart", pattern_id, data, function() {
-			Meteor.my_functions.build_pattern_display_data(pattern_id);
+			Meteor.my_functions.update_twill_weaving_turns(pattern_id, row, tablet);
 			Meteor.my_functions.update_broken_twill_weaving(pattern_id, row, tablet);
 			Session.set('twill_chart_latch', false);          
 		});
@@ -4020,6 +4004,247 @@ Meteor.my_functions = {
 			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
 			Meteor.my_functions.save_preview_as_text(pattern_id);        
 		});
+	},
+	update_twill_weaving_turns: function(pattern_id, row, tablet) {
+		// rebuild the manual weaving turns after a change to either twill pattern chart or twill change chart
+		var pattern = Patterns.findOne({_id: pattern_id});
+		var pattern_obj = {};
+
+		var number_of_rows = Session.get("number_of_rows");
+		var number_of_tablets = Session.get("number_of_tablets");
+
+		// twill charts have one row per two rows of weaving
+		var raw_pattern_chart = Meteor.my_functions.get_twill_pattern_chart_as_array(number_of_rows + 2, number_of_tablets);
+
+		var raw_twill_change_chart = Meteor.my_functions.get_twill_change_chart_as_array(number_of_rows + 2, number_of_tablets);
+
+		var twill_pattern_chart = []; // array for internal working in this function
+
+		// each row of raw pattern data corresponds to two picks, offset alternately
+		// build charts with one row per one row of weaving
+		for (var i=0; i<raw_pattern_chart.length; i++)
+		{
+			var even_row = [];
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				even_row.push(raw_pattern_chart[i][j]);
+			}
+
+			twill_pattern_chart.push(even_row);
+
+
+			var odd_row = [];
+
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				if (i == (raw_pattern_chart.length - 1)) // last row of Data
+				{
+					odd_row.push(raw_pattern_chart[i][j]);
+				}
+				else
+				{
+					if (j%2 == 0)
+						odd_row.push(raw_pattern_chart[i][j]);
+					else
+						odd_row.push(raw_pattern_chart[i+1][j]);
+				}
+			}
+
+			twill_pattern_chart.push(odd_row);
+		}
+
+		var temp_pattern_chart = {};
+
+		for (var i=0; i<raw_pattern_chart.length; i++)
+		{
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				temp_pattern_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_pattern_chart[i][j]);
+			}
+		}
+
+		// build the long floats chart
+		var twill_change_chart = []; // array for internal working in this function
+
+		for(var i=0; i<raw_pattern_chart.length; i++)
+		{
+			var even_row = [];
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				even_row.push(raw_twill_change_chart[i][j]);
+
+				// replace X with Y in second row so we can identify first and second row of long float
+				if ((j%2 == 1))
+					if (even_row[j] == "X")
+						even_row[j] = "Y";
+			}
+
+			twill_change_chart.push(even_row);
+
+			var odd_row = [];
+
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				if (i == (raw_pattern_chart.length - 1)) // last row of LongFloats
+				{
+					odd_row.push(raw_twill_change_chart[i][j]);
+				}
+				else
+				{
+					if (j%2 == 0)
+						odd_row.push(raw_twill_change_chart[i][j]);
+					else
+						odd_row.push(raw_twill_change_chart[i+1][j]);
+				}
+
+				// replace X with Y in second row so we can identify first and second row of long float
+				if ((j%2 == 0))
+				if (odd_row[j] == "X")
+					odd_row[j] = "Y";
+				
+			}
+
+			twill_change_chart.push(odd_row);
+		}
+
+		var temp_twill_change_chart = {};
+
+		for (var i=0; i<raw_pattern_chart.length; i++)
+		{
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				temp_twill_change_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_twill_change_chart[i][j]);
+			}
+		}
+
+		// create the pattern. This is from my_functions.convert_gtt_3_1_twill_pattern_to_json
+		var twill_direction = pattern.twill_direction;
+		
+		var number_of_rows = number_of_rows; // last rows are only there to determine last even row of weaving
+
+		var twill_sequence = ["F", "F", "B", "B"]; // turning sequence for an individual tablet to weave background twill
+
+		var current_twill_position = []; // for each tablet, what stage is it at in the twill_sequence? 0, 1, 2, 3
+		// tablets start with the previous row, so that if there is a color change in row 1, they will continue as in the non-existent previous row
+
+		for (var i=0; i<number_of_tablets; i++)
+		{
+			switch (twill_direction)
+			{
+				case "S":
+					current_twill_position.push((i + 3) % 4);
+					break;
+
+				case "Z":
+					current_twill_position.push(3 - ((i + 0) % 4));
+					break;
+			}    
+		}
+
+		// set up the pattern
+		pattern_obj.position_of_A = current_twill_position;
+		pattern_obj.manual_weaving_threads = [];
+		pattern_obj.manual_weaving_turns = [];
+		pattern_obj.weaving = [];
+
+		// set up packs
+		var new_turn = {
+			tablets: [], // for each tablet, the pack number
+			packs: [] // turning info for each pack
+		}
+
+		for (var i=1; i<=Meteor.my_params.number_of_packs; i++)
+		{
+			var pack = {
+				pack_number: i,
+				direction: (i == 2) ? "B" : "F", // second pack goes backwards
+				number_of_turns: 1
+			}
+			new_turn.packs.push(pack);
+		}
+
+		// weave the pattern row by row
+		for (var i=0; i<number_of_rows; i++)
+		{
+			// put the tablets in the correct packs
+			new_turn.tablets = [];
+			
+			for (var j=0; j<number_of_tablets; j++)
+			{
+				// read the pattern chart
+				var current_color = twill_pattern_chart[i][j];
+				var next_color = current_color;
+				var last_color = ".";
+				var color_change = false;
+
+				// check for color change
+				// color change affects two rows
+				if (i<(number_of_rows - 1)) // last row has no next row
+				{
+					next_color = twill_pattern_chart[i+1][j]; // problem
+				}
+
+				if (i > 0)
+					last_color = twill_pattern_chart[i-1][j];
+
+				if (next_color != current_color)
+					color_change = true;
+
+				if (last_color != current_color)
+				{
+					color_change = true;
+					if (i == 0) // tablet starts with foreground color
+						current_twill_position[j] =  (current_twill_position[j] + 3) % 4; // go back an extra turn
+				}
+		 
+				var long_float = twill_change_chart[i][j];
+
+				var previous_long_float = ".";
+				if (i != 0)
+					previous_long_float = twill_change_chart[i-1][j];
+
+				var next_long_float = ".";
+
+				if ((i < number_of_rows - 1))
+					next_long_float = twill_change_chart[i+1][j];     
+
+				// handle long floats
+				// advance in turning sequence
+				if ((!color_change))
+					 current_twill_position[j] =  (current_twill_position[j] + 1) % 4;        
+
+				if ((long_float == "Y")) // second pick of long float
+					current_twill_position[j] =  (current_twill_position[j] + 2) % 4;
+
+				var position = current_twill_position[j];
+				var direction = twill_sequence[position];
+
+				var pack = (direction == "F") ? 1 : 2;
+				new_turn.tablets.push(pack);
+			}
+			pattern_obj.manual_weaving_turns[0] = new_turn;
+			pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
+		}
+
+		var manual_weaving_turns = pattern_obj.manual_weaving_turns;
+
+		if (Session.get("number_of_rows") == 0)
+		{
+			// reset direction, number of turns to "F", 1
+			for (var i=0; i<manual_weaving_turns[0].packs.length; i++)
+			{
+				manual_weaving_turns[0].packs[i].direction = "F";
+				manual_weaving_turns[0].packs[i].number_of_turns = 1;
+			}
+		}
+		else
+		{
+			// show direction, number of turns for latest row
+			// ensure it's a new object not a reference
+			manual_weaving_turns[0] = JSON.parse(JSON.stringify(manual_weaving_turns[manual_weaving_turns.length-1]));
+		}
+		
+		current_manual_weaving_turns = new ReactiveArray(manual_weaving_turns);
 	},
 	///////////////////////////////////
 	// Searching
