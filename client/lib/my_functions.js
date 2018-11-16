@@ -1543,7 +1543,7 @@ Meteor.my_functions = {
 					temp_pattern_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_pattern_chart[i][j]);
 				}
 			}
-
+console.log(`build pattern data. raw_pattern_chart: ${JSON.stringify(raw_pattern_chart)}`);
 			current_twill_pattern_chart = temp_pattern_chart;
 
 			// build the long floats chart
@@ -1599,7 +1599,7 @@ Meteor.my_functions = {
 					temp_twill_change_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_twill_change_chart[i][j]);
 				}
 			}
-
+console.log(`build pattern data. raw_twill_change_chart: ${JSON.stringify(raw_twill_change_chart)}`);
 			current_twill_change_chart = temp_twill_change_chart;
 
 			// create the pattern. This is from my_functions.convert_gtt_3_1_twill_pattern_to_json
@@ -1654,7 +1654,7 @@ Meteor.my_functions = {
 			{
 				// put the tablets in the correct packs
 				new_turn.tablets = [];
-				
+				console.log(`generating row i: ${i}`);
 				for (var j=0; j<number_of_tablets; j++)
 				{
 					// read the pattern chart
@@ -1682,7 +1682,7 @@ Meteor.my_functions = {
 						if (i == 0) // tablet starts with foreground color
 							current_twill_position[j] =  (current_twill_position[j] + 3) % 4; // go back an extra turn
 					} 
-
+console.log(`color change: ${color_change}`)
 					var long_float = twill_change_chart[i][j];
 
 					var previous_long_float = ".";
@@ -1710,6 +1710,8 @@ Meteor.my_functions = {
 					new_turn.tablets.push(pack);
 				}
 				pattern_obj.manual_weaving_turns[0] = new_turn;
+				console.log(`first build. about to weave row ${i+1}`);
+				console.log(`first build. new turn ${JSON.stringify(new_turn)}`);
 				pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
 			}
 
@@ -4019,16 +4021,18 @@ Meteor.my_functions = {
 
 		for (var i=0; i<(number_of_rows + 2)/2; i++)
 		{
-			raw_pattern_chart[i] = [current_twill_pattern_chart[(i+1) + "_1"].get()];
+			raw_pattern_chart[i] = [current_twill_pattern_chart[(i+1) + "_" + tablet].get()];
 		}
 
 		var raw_twill_change_chart = [];
 
 		for (var i=0; i<(number_of_rows + 2)/2; i++)
 		{
-			raw_twill_change_chart[i] = [current_twill_change_chart[(i+1) + "_1"].get()];
+			raw_twill_change_chart[i] = [current_twill_change_chart[(i+1) + "_" + tablet].get()];
 		}
+console.log(`rebuild. raw_pattern_chart: ${JSON.stringify(raw_pattern_chart)}`);
 
+console.log(`rebuild. raw_twill_change_chart: ${JSON.stringify(raw_twill_change_chart)}`);
 		var twill_pattern_chart = []; // array for internal working in this function
 
 		// each row of raw pattern data corresponds to two picks, offset alternately
@@ -4056,7 +4060,7 @@ Meteor.my_functions = {
 
 			twill_pattern_chart.push(odd_row);
 		}
-
+console.log(`rebuild. twill_pattern_chart: ${JSON.stringify(twill_pattern_chart)}`);
 		// build the long floats chart
 		var twill_change_chart = []; // array for internal working in this function
 
@@ -4092,7 +4096,7 @@ Meteor.my_functions = {
 
 			twill_change_chart.push(odd_row);
 		}
-
+console.log(`rebuild. twill_change_chart: ${JSON.stringify(twill_change_chart)}`);
 		// create the pattern. This is from my_functions.convert_gtt_3_1_twill_pattern_to_json
 		var twill_direction = pattern.twill_direction;
 		
@@ -4141,7 +4145,7 @@ Meteor.my_functions = {
 		{
 			// put the tablets in the correct packs
 			new_turn.tablets = [];
-
+console.log(`generating row i: ${i}`);
 			// read the pattern chart
 			var current_color = twill_pattern_chart[i][0];
 			var next_color = current_color;
@@ -4167,7 +4171,7 @@ Meteor.my_functions = {
 				if (i == 0) // tablet starts with foreground color
 					current_twill_position[0] =  (current_twill_position[0] + 3) % 4; // go back an extra turn
 			}
-		 
+		 console.log(`color change: ${color_change}`);
 			var long_float = twill_change_chart[i][0];
 
 			var previous_long_float = ".";
@@ -4195,9 +4199,12 @@ Meteor.my_functions = {
 
 			var pack = (direction == "F") ? 1 : 2;
 			new_turn.tablets.push(pack);
-console.log(`about to weave row ${i+1}`);
+			pattern_obj.manual_weaving_turns[0] = new_turn;
+console.log(`rebuild. about to weave row ${i+1}`);
+console.log(`rebuild. New turn ${JSON.stringify(new_turn)}`);
 			//pattern_obj.manual_weaving_turns[0] = new_turn;
 			pattern_obj = Meteor.my_functions.weave_row(pattern_obj, JSON.parse(JSON.stringify(new_turn)));
+			console.log(`rebuild. returned data ${JSON.stringify(pattern_obj.manual_weaving_turns)}`);
 		}
 		
 
@@ -4209,9 +4216,9 @@ console.log(`about to weave row ${i+1}`);
 			console.log(`i ${i}`);
 
 			var new_turn = current_manual_weaving_turns[i].valueOf();
-			console.log(`new_turn before ${JSON.stringify(new_turn)}`);
-			new_turn.tablets[tablet - 1] = manual_weaving_turns[i-1].tablets[0];
-			console.log(`new_turn after ${JSON.stringify(new_turn)}`);
+			//console.log(`new_turn before ${JSON.stringify(new_turn)}`);
+			new_turn.tablets[tablet - 1] = manual_weaving_turns[i].tablets[0];
+			//console.log(`new_turn after ${JSON.stringify(new_turn)}`);
 
 
 			current_manual_weaving_turns.splice(i, 1, new_turn);
