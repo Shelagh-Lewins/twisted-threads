@@ -2810,9 +2810,6 @@ Meteor.my_functions = {
 
 		if (pattern.edit_mode === "broken_twill") {
 			Meteor.my_functions.reset_broken_twill_weaving(pattern_id);
-
-			// ensure twill chart operations don't interfere with each other
-			Session.set('twill_chart_latch', false);
 		}
 
 		// ensure successive add / remove tablet operations don't interfere with each other
@@ -3763,11 +3760,7 @@ Meteor.my_functions = {
 		}
 	},
 	update_twill_pattern_chart: function(pattern_id, row, tablet) {
-		// update the twill pattern, changing only the affected tablet and only from the affected row onwards
-		if (Session.get("twill_chart_latch") == true)
-				return;
-			
-		Session.set('twill_chart_latch', true);
+		// update the twill pattern, changing only the affected tablet
 
 		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
@@ -3781,9 +3774,9 @@ Meteor.my_functions = {
 			twill_pattern_chart: Meteor.my_functions.get_twill_pattern_chart_as_array(number_of_rows + 2, number_of_tablets)
 		}
 
+		Meteor.my_functions.update_broken_twill_pattern(pattern_id, row, tablet);
+
 		Meteor.call("update_twill_pattern_chart", pattern_id, data, function() {
-			Meteor.my_functions.update_broken_twill_pattern(pattern_id, row, tablet);
-			Session.set('twill_chart_latch', false);
 		});
 	},
 	get_twill_pattern_chart_as_array: function(number_of_rows, number_of_tablets)
@@ -3818,11 +3811,6 @@ Meteor.my_functions = {
 		return twill_array;
 	},
 	update_twill_change_chart: function(pattern_id, row, tablet) {
-		if (Session.get("twill_chart_latch") == true)
-				return;
-			
-		Session.set('twill_chart_latch', true);
-
 		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1}});
 
 		if (pattern.edit_mode != "broken_twill")
@@ -3835,9 +3823,9 @@ Meteor.my_functions = {
 			twill_change_chart: Meteor.my_functions.get_twill_change_chart_as_array(number_of_rows + 2, number_of_tablets)
 		}
 
-		Meteor.call("update_twill_change_chart", pattern_id, data, function() {
-			Meteor.my_functions.update_broken_twill_pattern(pattern_id, row, tablet);
-			Session.set('twill_chart_latch', false);          
+		Meteor.my_functions.update_broken_twill_pattern(pattern_id, row, tablet);
+
+		Meteor.call("update_twill_change_chart", pattern_id, data, function() {       
 		});
 	},
 	get_twill_change_chart_as_array: function(number_of_rows, number_of_tablets)

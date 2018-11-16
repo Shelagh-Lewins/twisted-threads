@@ -970,9 +970,6 @@ Template.view_pattern.events({
 	'click .broken_twill_chart li.cell:not(.remove_row)': function(event, template){
 		clearTimeout(template.twill_timeout); // only update the weaving chart and database when the user pauses in clicking
 
-		if (Session.get("twill_chart_latch") == true)
-				return;
-
 		var pattern_id = Router.current().params._id;
 		if (!Meteor.my_functions.can_edit_pattern(pattern_id))
 				return;
