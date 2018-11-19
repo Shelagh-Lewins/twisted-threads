@@ -492,7 +492,11 @@ Template.styles_palette.helpers({
 			case 2: return "Draw with background colour";
 			case 3: return "Change twill direction";
 		}
-	}
+	},
+  is_selected_twill_tool: function(twill_tool) {
+    if (Session.equals('twill_tool', twill_tool))
+      return "selected";
+  }
 });
 
 Template.view_pattern.events({

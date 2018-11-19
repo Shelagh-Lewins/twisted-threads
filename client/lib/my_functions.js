@@ -2830,6 +2830,10 @@ Meteor.my_functions = {
 
 		Session.set("selected_style", 1);
 		Session.set("selected_special_style", "S1");
+
+		// broken twill tools
+		if (pattern.edit_mode == "broken_twill")
+			Session.set('twill_tool', "twill_color"); // default to set twill color
 	},
 	refresh_view_pattern: function(pattern_id) {
 		Meteor.my_functions.view_pattern_created(pattern_id);
@@ -3759,6 +3763,14 @@ Meteor.my_functions = {
 			data = Meteor.my_functions.weave_row(data, manual_weaving_turns[i]);  
 		}
 	},
+	/////////////////////////////////
+	twill_tool_clicked: function(twill_tool)
+	{
+		Session.set('twill_tool', twill_tool);
+	},
+
+
+	/////////////////////////////////
 	update_twill_pattern_chart: function(pattern_id, row, tablet) {
 		// update the twill pattern, changing only the affected tablet
 
