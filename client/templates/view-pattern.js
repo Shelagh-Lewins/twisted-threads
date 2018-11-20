@@ -486,13 +486,6 @@ Template.styles_palette.helpers({
 
 		return warps;
 	},
-	broken_twill_hint: function() {
-		switch(Session.get("selected_style")) {
-			case 1: return "Draw with foreground colour";
-			case 2: return "Draw with background colour";
-			case 3: return "Change twill direction";
-		}
-	},
   is_selected_twill_tool: function(twill_tool) {
     if (Session.equals('twill_tool', twill_tool))
       return "selected";
@@ -651,7 +644,7 @@ Template.view_pattern.events({
 		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1, number_of_tablets: 1, edit_mode: 1}});
 
 		if (pattern.edit_mode == "broken_twill")
-				return; // threading is not editable for 3/1 broken twill
+				return; // weaving chart is not editable for 3/1 broken twill
 
 		var number_of_rows = pattern.number_of_rows;
 		var number_of_tablets = pattern.number_of_tablets;
@@ -669,10 +662,7 @@ Template.view_pattern.events({
 				return;
 
 		var new_style = Meteor.my_functions.get_selected_style();
-		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1}});
-
-		if (pattern.edit_mode == "broken_twill")
-				return; // threading is not editable for 3/1 broken twill
+		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1, weaving_start_row: 1}});
 
 		var number_of_tablets = pattern.number_of_tablets;
 
@@ -682,7 +672,17 @@ Template.view_pattern.events({
 			Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, this.hole, old_style, new_style);
 		}
 
-		Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
+    if (pattern.edit_mode == "broken_twill") {
+      const other_hole = Meteor.my_functions.find_broken_twill_hole(this.hole, this.tablet);
+      console.log(`other hole: ${other_hole}`);
+      Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
+      Meteor.my_functions.set_threading_cell_style(other_hole, this.tablet, new_style);
+
+      Meteor.my_functions.update_offset_threading(pattern_id, this.hole, this.tablet, pattern.weaving_start_row, new_style);
+      Meteor.my_functions.update_offset_threading(pattern_id, other_hole, this.tablet, pattern.weaving_start_row, new_style);
+    } else {
+      Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
+    }
 
 		Meteor.my_functions.save_threading_to_db(pattern_id, number_of_tablets, this.tablet, this.hole);
 
@@ -971,6 +971,7 @@ Template.view_pattern.events({
 	},
 	////////////////////////////////////////
 	// 3/1 Broken twill patterns
+  // edit broken twill chart
 	'click .broken_twill_chart li.cell:not(.remove_row)': function(event, template){
 		clearTimeout(template.twill_timeout); // only update the weaving chart and database when the user pauses in clicking
 
@@ -985,29 +986,21 @@ Template.view_pattern.events({
 		if (!Meteor.my_functions.pattern_exists(pattern_id))
 				return;
 
-		// first row of even tablets is always background color
-		if (this.row == 1 && this.tablet %2 == 0)
-				return;
+    // first row of even tablets is always background color, no twill direction change
+    if (this.row == 1 && this.tablet %2 == 0)
+        return;
 
-		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {number_of_rows: 1, number_of_tablets: 1}});
-		var number_of_rows = pattern.number_of_rows;
-		var number_of_tablets = pattern.number_of_tablets;
-		var new_style = Meteor.my_functions.get_selected_style();
+    // toggle foreground / background colour
+    if (Session.equals("twill_tool", "chart_color")) {
+      Meteor.my_functions.toggle_broken_twill_color(this.row, this.tablet);
+    } else if (Session.equals("twill_tool", "twill_direction")) {
+    // toggle twill direction (long floats)
+      Meteor.my_functions.toggle_broken_twill_direction(this.row, this.tablet);
+    }
 
-		if (new_style == 3) { // use style 3 for reversing twill direction
-			Meteor.my_functions.set_broken_twill_change(this.row, this.tablet);
-			Meteor.my_functions.update_twill_change_chart(pattern_id, this.row, this.tablet);
-  
-		} else { // styles 1, 2 correspond to background (.), foreground colour (X) in the chart
-			// is there any change?
-			const old_style = current_twill_pattern_chart[(this.row) + "_" + (this.tablet)].get();
+    Meteor.my_functions.update_twill_pattern_chart(pattern_id, this.row, this.tablet);
 
-			if ((old_style == "X" && new_style == "1") || (old_style == "." && new_style == "2"))
-				return;
-
-			Meteor.my_functions.set_broken_twill_cell_style(this.row, this.tablet, new_style);
-			Meteor.my_functions.update_twill_pattern_chart(pattern_id, this.row, this.tablet);
-		}
+    return;
 	},
 	///////////////////////////////////////////////////
 	'click #add_tablet': function () {
@@ -1110,7 +1103,7 @@ Template.view_pattern.events({
 
 		Meteor.call("set_weaving_start_row", pattern_id, start_row);
 
-		Meteor.my_functions.rebuild_offset_threading(pattern_id, parseInt(event.target.value));
+		Meteor.my_functions.rebuild_offset_threading(pattern_id, start_row);
 	},
 	'click #update_row': function() {
 		var pattern_id = Router.current().params._id

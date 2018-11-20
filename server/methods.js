@@ -195,6 +195,7 @@ Meteor.methods({
       // threading
       data.threading = new Array(options.number_of_rows);
 
+      // default threading is style 1 for background, style 2 for foreground
       const broken_twill_threading = [
         [2,2,1,2],
         [2,1,1,1],

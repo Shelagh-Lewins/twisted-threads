@@ -624,16 +624,11 @@ body.weave button.styled_button:disabled {
 }
 
 /* 3/1 Broken twill styles_palette */
-#styles_palette.broken_twill .styles {
+/* #styles_palette.broken_twill .styles {
 	width: 352px;
-}
+} */
 
-#styles_palette.broken_twill.show_special_styles #edit_style_button {
-	display: block;
-	background-color: #DDDDDD;
-	color: #999999;
-	border-color: #999999;
-}
+
 
 /* Simulation styles pagination */
 .simulation .styles .pagination ul li:nth-child(2) {
@@ -708,40 +703,22 @@ body.weave button.styled_button:disabled {
 }
 
 /* 3/1 Broken twill styles pagination */
-/*
-.broken_twill .styles .pagination ul li:nth-child(2) {
-	display: none;
-} */
-
-
-#styles_palette.broken_twill .styles .box.all_styles {
+#styles_palette.broken_twill .styles .box {
 	display: block;
 	height: 45px;
-}
-
-
-.broken_twill .styles .hint {
-	color: #424A6C;
-	display: block;
-	height: 45px;
-	line-height: 45px;
 }
 
 .broken_twill .styles ul.row {
-	width: auto;
-	float: left
+	width: 308px;
 }
+
 
 .broken_twill .styles ul.row.special {
 	width: 36px;
 	margin-left: -4px; /* remove space between inline-block elements */
 }
 
-.broken_twill .styles ul:nth-child(2) {
-	display: none;
-}
-
-.broken_twill .styles ul.row:nth-child(3) {
+.broken_twill .styles ul.row:nth-child(2) {
 	display: none;
 }
 
@@ -749,24 +726,8 @@ body.weave button.styled_button:disabled {
 	display: none;
 }
 
-.broken_twill .styles ul.row.style li.cell:nth-child(-n+3) {
+.broken_twill .styles ul.row.style li.cell:nth-child(-n+7) {
 	display: inline-block;
-}
-
-.broken_twill .styles ul.row.style li.cell:nth-child(3) {
-	background: #FFFFFF !important;
-}
-
-.broken_twill .styles ul.row.style li.cell:nth-child(3)::before {
-	content: "";
-	display: block;
-	width: 30px;
-	height: 30px;
-	margin: 1px;
-	border-radius: 4px;
-	-moz-box-shadow:    inset 0 0 0 2px #5555FF;
-	-webkit-box-shadow: inset 0 0 0 2px #5555FF;
-	box-shadow:         inset 0 0 0 2px #5555FF;
 }
 
 #styles_palette.show_special_styles.broken_twill .special_styles {
@@ -774,6 +735,10 @@ body.weave button.styled_button:disabled {
 }
 
 .broken_twill .styles .special_styles {
+	display: inline-block;
+}
+
+.broken_twill .styles ul.row.special li.cell:nth-child(7) {
 	display: inline-block;
 }
 
@@ -792,18 +757,6 @@ body.weave button.styled_button:disabled {
 .broken_twill.show_special_styles .styles ul.row.special li.cell.selected {
 		border-color: #5555FF;
 }
-/*
-.broken_twill .styles .pagination ul {
-	border: none;
-}
-
-.broken_twill .styles .pagination ul li a {
-	background-color: transparent;
-	border-right: none;
-	color: #424A6C;
-	cursor: default;
-	font-weight: bold;
-} */
 
 /* *** Edit Style *** */
 .edit_style {

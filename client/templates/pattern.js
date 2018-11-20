@@ -110,8 +110,10 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type, offset_start_
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, number_of_tablets: 1, weaving_start_row: 1}});
 
     if (pattern.weaving_start_row) { // broken twill can show threading and weaving from an offset start row to facilitate repeating patterns
+      console.log(`data offset ${current_offset_threading[(row) + "_" + (tablet)]}`);
       var cell = current_offset_threading[(row) + "_" + (tablet)];
     } else {
+      console.log(`data regular ${current_threading[(row) + "_" + (tablet)]}`);
       var cell = current_threading[(row) + "_" + (tablet)];
     }
     if (typeof cell === "undefined")

@@ -2833,7 +2833,7 @@ Meteor.my_functions = {
 
 		// broken twill tools
 		if (pattern.edit_mode == "broken_twill")
-			Session.set('twill_tool', "twill_color"); // default to set twill color
+			Session.set('twill_tool', "chart_color"); // default to set twill color
 	},
 	refresh_view_pattern: function(pattern_id) {
 		Meteor.my_functions.view_pattern_created(pattern_id);
@@ -3710,13 +3710,17 @@ Meteor.my_functions = {
 			Meteor.my_functions.save_preview_as_text(pattern_id);
 		});    
 	},
+	update_offset_threading: function(pattern_id, hole, tablet, weaving_start_row, new_style) {
+		// find thread to show
+		// find previous turn direction
+		// find hole to show
+		// find offset hole corresponding to original hole
+		// update offset threading
+	},
 	rebuild_offset_threading: function(pattern_id, weaving_start_row) {
 		// rebuild the threading chart if the weaving_start_row has changed
 		// remove and rebuild the current simulation pattern weaving
 		var pattern = Patterns.findOne({_id: pattern_id});
-
-		if (!pattern.weaving_start_row)
-				return;
 
 		var number_of_rows = Session.get("number_of_rows");
 		var number_of_tablets = Session.get("number_of_tablets");
@@ -4247,16 +4251,19 @@ Meteor.my_functions = {
 		current_threading[(hole) + "_" + (tablet)].set(style);
 	},
 	// broken twill data as client-side object
-	set_broken_twill_cell_style: function(row, tablet, style)
+	toggle_broken_twill_color: function(row, tablet)
 	{
-		var chart_value = ".";
-		if (style == 1)
-		{
-			chart_value = "X";
+		const chart_value = current_twill_pattern_chart[(row) + "_" + (tablet)].get();
+
+		var new_value = '.';
+
+		if (chart_value == '.') {
+			new_value = 'X';
 		}
-		current_twill_pattern_chart[(row) + "_" + (tablet)].set(chart_value);
+
+		current_twill_pattern_chart[(row) + "_" + (tablet)].set(new_value);
 	},
-	set_broken_twill_change: function(row, tablet)
+	toggle_broken_twill_direction: function(row, tablet)
 	{
 		// toggle the reversal chart value
 		var chart_value = current_twill_change_chart[(row) + "_" + (tablet)].get();
@@ -4268,6 +4275,36 @@ Meteor.my_functions = {
 		}
 
 		current_twill_change_chart[(row) + "_" + (tablet)].set(chart_value);
+	},
+	find_broken_twill_hole(hole, tablet)
+	// broken twill threading is in pairs. Each tablet has two foreground, two background threads.
+	// find the other thread for this tablet that is the same:
+	// the other foreground thread, or the other background thread
+	{
+	// corresponds to table in Meteor.methods.new_pattern_from_json
+		const broken_twill_threading = [
+      ["B","B","F","B"],
+      ["B","F","F","F"],
+      ["F","F","B","F"],
+      ["F","B","B","B"]
+    ];
+    const tablet_index = (tablet - 1) % 4;
+    const this_thread = broken_twill_threading[hole - 1][tablet_index];
+
+    var other_hole;
+    // find the other hole with the same thread, Foreground or Background
+    for (let i=0; i<3; i++) {
+    	// check the next three holes to find the other matching one
+    	const index = (i + hole) % 4;
+    	if (broken_twill_threading[index][tablet_index] == this_thread) {
+    		other_hole = index + 1;
+    		break;
+    	}
+    }
+    if (typeof other_hole === "undefined") {
+    	console.log(`Error in find_broken_twill_hole. No other hole found for row ${row}, tablet ${tablet}`);
+    }
+    return other_hole;
 	},
 	find_style: function(style_value) // e,g, 2, "S1", may be regular or special
 	{

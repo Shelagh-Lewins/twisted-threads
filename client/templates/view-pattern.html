@@ -454,8 +454,8 @@
 {{#if equals edit_mode "simulation"}}
 <li class="all_styles no_select {{is_selected_style_palette "all_styles"}}"><a>Threading styles</a></li>
 {{else if equals edit_mode "broken_twill"}}
-<li class="twill_color no_select {{is_selected_twill_tool "twill_color"}}"><a onclick="Meteor.my_functions.twill_tool_clicked('twill_color');">Set chart colour</a></li>
-	<li class="twill_direction no_select {{is_selected_twill_tool "twill_direction"}}"><a onclick="Meteor.my_functions.twill_tool_clicked('twill_direction');">Set twill reversals</a></li>
+<li class="chart_color no_select {{is_selected_twill_tool "chart_color"}}"><a onclick="Meteor.my_functions.twill_tool_clicked('chart_color');">Change chart colour</a></li>
+	<li class="twill_direction no_select {{is_selected_twill_tool "twill_direction"}}"><a onclick="Meteor.my_functions.twill_tool_clicked('twill_direction');">Change twill direction</a></li>
 {{else}}
 	{{#if single_column}}
 	<li class="styles_1 no_select {{is_selected_style_palette "styles_1"}}"><a onclick="Meteor.my_functions.styles_pagination_clicked('styles_1');">Styles 1</a></li>
@@ -469,7 +469,7 @@
 
 <input type="button" id="edit_style_button" class=" {{editing_style}}" value="{{#if equals edit_mode "simulation"}}Edit colour{{else}}{{#if equals edit_mode "broken_twill"}}Edit colour{{else}}Edit style{{/if}}{{/if}}" onclick="Meteor.my_functions.edit_style_clicked();">
 <div class="box {{style_page_class}}">{{#each style_pages}}<ul class="row style">{{#each styles this}}{{#with weaving_cell_data 0 0 "styles"}}{{> style_cell}}{{/with}}{{/each}}</ul>
-	{{/each}}{{#if equals edit_mode "broken_twill"}}<span class="hint">{{broken_twill_hint}}</span>{{/if}}
+	{{/each}}
 <div class="special_styles"><ul class="row special">{{#each special_styles}}{{#with weaving_cell_data 0 0 "special_styles"}}{{> style_cell}}{{/with}}{{/each}}</ul></div></div></div></div>
 {{/if}}</template>
 
