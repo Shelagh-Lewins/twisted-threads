@@ -3,6 +3,8 @@ Template.row_number_bt.helpers({
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
 
+    return number * 2;
+
     if (number * 2 >= pattern.weaving_start_row) {
       //in weaving chart
       return (number * 2) - (pattern.weaving_start_row) + 1;
@@ -14,6 +16,8 @@ Template.row_number_bt.helpers({
   row_number_odd: function(number) {
     var pattern_id = Router.current().params._id;
     var pattern = Patterns.findOne({_id: pattern_id}, {fields: { weaving_start_row: 1}});
+
+    return number * 2 - 1;
     
     if (number * 2 > pattern.weaving_start_row) {
       //in weaving chart
@@ -109,12 +113,14 @@ UI.registerHelper('broken_twill_data', function(row, tablet) {
   }
 
   var value = twill_cell.get();
-  //console.log(`value ${value}`);
 
+  // get cell background colour
   if (value == ".") {
-  	data.style = 2;
+  	// background, light
+    data.background_color = '#FFFFFF';
   } else {
-  	data.style = 1;
+  	// foreground, dark
+    data.background_color = '#666666';
   }
 
   // twill reversal?
@@ -131,11 +137,6 @@ UI.registerHelper('broken_twill_data', function(row, tablet) {
   } else {
   	data.twill_change = true;
   }
-  // console.log(`twill reversal: ${value}`);
-
-  // get cell background colour
-  var style = current_styles.list()[data.style-1];
-  data.background_color = style.background_color;
 
 	return data;
 });

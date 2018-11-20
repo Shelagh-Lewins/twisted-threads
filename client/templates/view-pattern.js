@@ -673,13 +673,30 @@ Template.view_pattern.events({
 		}
 
     if (pattern.edit_mode == "broken_twill") {
-      const other_hole = Meteor.my_functions.find_broken_twill_hole(this.hole, this.tablet);
-      console.log(`other hole: ${other_hole}`);
-      Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
-      Meteor.my_functions.set_threading_cell_style(other_hole, this.tablet, new_style);
+      // this is in the offset weaving chart
+      // set the offset threading style
+      Meteor.my_functions.set_offset_threading_cell_style(this.hole, this.tablet, new_style);
+      var old_style = current_threading[this.hole.toString() + "_" + this.tablet.toString()].get();
 
-      Meteor.my_functions.update_offset_threading(pattern_id, this.hole, this.tablet, pattern.weaving_start_row, new_style);
-      Meteor.my_functions.update_offset_threading(pattern_id, other_hole, this.tablet, pattern.weaving_start_row, new_style);
+      console.log(`offset hole ${this.hole}`);
+      
+
+      // find the corresponding hole in the original threading
+      const original_hole = Meteor.my_functions.find_threading_from_offset(pattern_id, this.hole, this.tablet);
+      console.log(`original_hole ${original_hole}`);
+      Meteor.my_functions.set_threading_cell_style(original_hole, this.tablet, new_style);
+      Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, this.hole, old_style, new_style);
+
+      // find the other hole with the same threading (foreground or background)
+      const other_hole = Meteor.my_functions.find_broken_twill_hole(original_hole, this.tablet);
+      Meteor.my_functions.set_threading_cell_style(other_hole, this.tablet, new_style);
+      console.log(`other hole ${other_hole}`);
+      
+
+      // find the corresponding hole in the offset threading
+      const other_offset_hole = Meteor.my_functions.find_offset_from_threading(pattern_id, other_hole, this.tablet);
+      Meteor.my_functions.set_offset_threading_cell_style(other_offset_hole, this.tablet, new_style);
+      Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, other_offset_hole, old_style, new_style);
     } else {
       Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
     }
@@ -993,12 +1010,14 @@ Template.view_pattern.events({
     // toggle foreground / background colour
     if (Session.equals("twill_tool", "chart_color")) {
       Meteor.my_functions.toggle_broken_twill_color(this.row, this.tablet);
+      Meteor.my_functions.update_twill_pattern_chart(pattern_id, this.row, this.tablet);
     } else if (Session.equals("twill_tool", "twill_direction")) {
     // toggle twill direction (long floats)
       Meteor.my_functions.toggle_broken_twill_direction(this.row, this.tablet);
+      Meteor.my_functions.update_twill_change_chart(pattern_id, this.row, this.tablet);
     }
 
-    Meteor.my_functions.update_twill_pattern_chart(pattern_id, this.row, this.tablet);
+    //Meteor.my_functions.update_twill_pattern_chart(pattern_id, this.row, this.tablet);
 
     return;
 	},

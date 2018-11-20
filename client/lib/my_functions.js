@@ -3591,12 +3591,13 @@ Meteor.my_functions = {
 		// map them to the four new styles
 		// replace old with new in weaving chart
 
-		var pattern = Patterns.findOne({_id: pattern_id}, {fields: {edit_mode: 1, simulation_mode: 1, auto_turn_threads: 1, manual_weaving_threads: 1}});
+		var pattern = Patterns.findOne({_id: pattern_id});
 
-		if (pattern.edit_mode != "simulation")
+		if (pattern.edit_mode != "simulation" && pattern.edit_mode != "broken_twill")
 					return;
 
 		var old_weaving_styles = Meteor.my_functions.map_weaving_styles(old_style);
+		console.log(`change sim thread colour. hole ${hole}`);
 		var new_weaving_styles = Meteor.my_functions.map_weaving_styles(new_style);
 
 		var number_of_rows = Session.get("number_of_rows");
@@ -3604,8 +3605,13 @@ Meteor.my_functions = {
 
 		if (pattern.simulation_mode == "auto")
 			var threads = pattern.auto_turn_threads;
-		else
+		else // broken twill pattern also fires this
 			var threads = pattern.manual_weaving_threads;
+
+		if (typeof pattern.weaving_start_row !== "undefined") {
+			const offset = (pattern.weaving_start_row + 1) % 4;
+			//hole = Meteor.my_functions.modular_add(offset, hole - 1, 4) + 1;
+		}
 
 		// Weaving chart
 		for (var i=0; i<number_of_rows; i++)
@@ -3618,8 +3624,9 @@ Meteor.my_functions = {
 			{   
 				for (var k=0; k<4; k++)
 				{
-					if (cell_style == old_weaving_styles[k])
+					if (cell_style == old_weaving_styles[k]) {
 						current_weaving[weaving_cell_index].set(new_weaving_styles[k]);
+					}
 				}
 			}     
 		}
@@ -3710,12 +3717,41 @@ Meteor.my_functions = {
 			Meteor.my_functions.save_preview_as_text(pattern_id);
 		});    
 	},
-	update_offset_threading: function(pattern_id, hole, tablet, weaving_start_row, new_style) {
-		// find thread to show
-		// find previous turn direction
-		// find hole to show
-		// find offset hole corresponding to original hole
-		// update offset threading
+	find_threading_from_offset: function(pattern_id, hole, tablet) {
+		var pattern = Patterns.findOne({_id: pattern_id});
+		const weaving_start_row = pattern.weaving_start_row;
+		const thread_to_show = pattern.manual_weaving_threads[weaving_start_row - 1][tablet-1];
+
+		// wind back to find the hole in the original threading chart that corresponds to this hole in the offset threading chart
+		const original_hole = Meteor.my_functions.modular_subtract(hole - 1, thread_to_show, 4);
+
+		const turns = current_manual_weaving_turns[weaving_start_row].valueOf();
+		const pack_index = turns.tablets[tablet - 1] - 1;
+		const direction = turns.packs[pack_index].direction;
+
+		if (direction == "B") { // hole 3 shows not hole 0
+			original_hole = Meteor.my_functions.modular_add(original_hole, 3, 4);
+		}
+
+		return original_hole + 1; // convert from index to hole number
+	},
+	find_offset_from_threading: function(pattern_id, hole, tablet) {
+		var pattern = Patterns.findOne({_id: pattern_id});
+		const weaving_start_row = pattern.weaving_start_row;
+		const thread_to_show = pattern.manual_weaving_threads[weaving_start_row - 1][tablet-1];
+
+		// wind forward to find the hole in the offset threading chart that corresponds to this hole in the original threading chart
+		const offset_hole = Meteor.my_functions.modular_add(hole - 1, thread_to_show, 4);
+
+		const turns = current_manual_weaving_turns[weaving_start_row].valueOf();
+		const pack_index = turns.tablets[tablet - 1] - 1;
+		const direction = turns.packs[pack_index].direction;
+
+		if (direction == "B") { // hole 3 shows not hole 0
+			offset_hole = Meteor.my_functions.modular_subtract(offset_hole, 3, 4);
+		}
+
+		return offset_hole + 1; // convert from index to hole number
 	},
 	rebuild_offset_threading: function(pattern_id, weaving_start_row) {
 		// rebuild the threading chart if the weaving_start_row has changed
@@ -4249,6 +4285,11 @@ Meteor.my_functions = {
 	set_threading_cell_style: function(hole, tablet, style)
 	{
 		current_threading[(hole) + "_" + (tablet)].set(style);
+	},
+	// threading data as client-side object
+	set_offset_threading_cell_style: function(hole, tablet, style)
+	{
+		current_offset_threading[(hole) + "_" + (tablet)].set(style);
 	},
 	// broken twill data as client-side object
 	toggle_broken_twill_color: function(row, tablet)
