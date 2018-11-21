@@ -1513,7 +1513,6 @@ Meteor.my_functions = {
 
 				twill_pattern_chart.push(even_row);
 
-
 				var odd_row = [];
 
 				for (var j=0; j<number_of_tablets; j++)
@@ -1534,17 +1533,32 @@ Meteor.my_functions = {
 				twill_pattern_chart.push(odd_row);
 			}
 
-			var temp_pattern_chart = {};
+			// deleting and recreating the reactiveVars here breaks reactivity, so only create vars if they did not already exist.
+			if (typeof current_twill_pattern_chart === "undefined")
+				current_twill_pattern_chart = {};
 
 			for (var i=0; i<raw_pattern_chart.length; i++)
 			{
 				for (var j=0; j<number_of_tablets; j++)
 				{
-					temp_pattern_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_pattern_chart[i][j]);
+					if (typeof current_twill_pattern_chart[(i + 1) + "_" + (j + 1)] === "undefined")
+						current_twill_pattern_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar();
+
+					current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].set(raw_pattern_chart[i][j]);
 				}
 			}
 
-			current_twill_pattern_chart = temp_pattern_chart;
+			// prune any leftover table cells
+			for(var key in current_twill_pattern_chart){
+				const indexes = key.split("_");
+				// indexes corresponds to i + 1, j + 1 as strings
+
+				if (typeof raw_pattern_chart[parseInt(indexes[0]-1)] === "undefined") {
+					delete current_twill_pattern_chart[key];
+				} else if (typeof raw_pattern_chart[parseInt(indexes[0]-1)][parseInt(indexes[1]-1)] === "undefined") {
+					delete current_twill_pattern_chart[key];
+				}
+			}
 
 			// build the long floats chart
 			var twill_change_chart = []; // array for internal working in this function
@@ -1590,17 +1604,32 @@ Meteor.my_functions = {
 				twill_change_chart.push(odd_row);
 			}
 
-			var temp_twill_change_chart = {};
+			// deleting and recreating the reactiveVars here breaks reactivity, so only create vars if they did not already exist.
+			if (typeof current_twill_change_chart === "undefined")
+				current_twill_change_chart = {};
 
 			for (var i=0; i<raw_pattern_chart.length; i++)
 			{
 				for (var j=0; j<number_of_tablets; j++)
 				{
-					temp_twill_change_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar(raw_twill_change_chart[i][j]);
+					if (typeof current_twill_change_chart[(i + 1) + "_" + (j + 1)] === "undefined")
+						current_twill_change_chart[(i + 1) + "_" + (j + 1)] = new ReactiveVar();
+
+					current_twill_change_chart[(i + 1) + "_" + (j + 1)].set(raw_twill_change_chart[i][j]);
 				}
 			}
 
-			current_twill_change_chart = temp_twill_change_chart;
+			// prune any leftover table cells
+			for(var key in current_twill_change_chart){
+				const indexes = key.split("_");
+				// indexes corresponds to i + 1, j + 1 as strings
+
+				if (typeof raw_twill_change_chart[parseInt(indexes[0]-1)] === "undefined") {
+					delete current_twill_change_chart[key];
+				} else if (typeof raw_twill_change_chart[parseInt(indexes[0]-1)][parseInt(indexes[1]-1)] === "undefined") {
+					delete current_twill_change_chart[key];
+				}
+			}
 
 			// create the pattern. This is from my_functions.convert_gtt_3_1_twill_pattern_to_json
 			var twill_direction = pattern.twill_direction;
@@ -1952,11 +1981,17 @@ Meteor.my_functions = {
 			// broken twill charts
 			for (var i=0; i<number_of_rows/2 + 1; i++) // 2 weaving rows per twill chart row. Plus an extra twill chart row at end for determining the final row direction
 			{
+				// add new tablet at end
+				current_twill_pattern_chart[(i + 1) + "_" + (number_of_tablets + 1)] = new ReactiveVar();
+
+				current_twill_change_chart[(i + 1) + "_" + (number_of_tablets + 1)] = new ReactiveVar();
+
 				for (var j=number_of_tablets-1; j>= position-1; j--)
 				{
+					// do not delete the existing ReactiveVar because that breaks reactivity
+					// copy its value to the var with a greater tablet
+
 					// twill pattern chart
-					// delete the existing ReactiveVar
-					// recreate a new one with the same style but greater tablet
 					var cell_value;
 
 					if ((i == 0) &&  (j % 2 ==0)) { // new tablet j+2 is even. first row must be background colour.
@@ -1965,26 +2000,22 @@ Meteor.my_functions = {
 						cell_value = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
 					}
 
-					delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
-					current_twill_pattern_chart[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_value);
+					current_twill_pattern_chart[(i + 1) + "_" + (j + 2)].set(cell_value);
 
 					// twill change chart
-					// delete the existing ReactiveVar
-					// recreate a new one with the same style but greater tablet
 					if ((i == 0) &&  (j % 2 ==0)) { // new tablet j+2 is even. first row must be no twill change.
 						cell_value = ".";
 					} else {
 						cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
 					}
 
-					delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
-					current_twill_change_chart[(i + 1) + "_" + (j + 2)] = new ReactiveVar(cell_value);
+					current_twill_change_chart[(i + 1) + "_" + (j + 2)].set(cell_value);
 				}
 
-				// add new tablet to row
-				current_twill_pattern_chart[(i + 1) + "_" + position] = new ReactiveVar('.');
+				//set value of new tablet
+				current_twill_pattern_chart[(i + 1) + "_" + position].set('.');
 
-				current_twill_change_chart[(i + 1) + "_" + position] = new ReactiveVar('.');
+				current_twill_change_chart[(i + 1) + "_" + position].set('.');
 			}
 
 			// recalculate threading chart
@@ -2032,6 +2063,8 @@ Meteor.my_functions = {
 			// remove deleted tablet
 			delete current_weaving[(i + 1) + "_" + position];
 
+			
+
 			for (var j=position; j<=number_of_tablets-1; j++)
 			{
 				var cell_style = current_weaving[(i + 1) + "_" + (j + 1)].get();
@@ -2076,10 +2109,6 @@ Meteor.my_functions = {
 			// broken twill charts
 			for (var i=0; i<number_of_rows/2; i++)
 			{
-				// remove deleted tablet
-				delete current_twill_pattern_chart[(i + 1) + "_" + position];
-				delete current_twill_change_chart[(i + 1) + "_" + position];
-
 				for (var j=position; j<=number_of_tablets-1; j++)
 				{
 					// move subsequent tablets down
@@ -2092,8 +2121,7 @@ Meteor.my_functions = {
 						cell_value = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
 					}
 
-					delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
-					current_twill_pattern_chart[(i + 1) + "_" + (j)] = new ReactiveVar(cell_value);
+					current_twill_pattern_chart[(i + 1) + "_" + (j)].set(cell_value);
 
 					// twill change chart
 					if ((i == 0) &&  (j % 2 ==0)) { // new tablet j is even. first row must be no twill change.
@@ -2102,10 +2130,11 @@ Meteor.my_functions = {
 						cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
 					}
 
-					//cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
-					delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
-					current_twill_change_chart[(i + 1) + "_" + (j)] = new ReactiveVar(cell_value);
+					current_twill_change_chart[(i + 1) + "_" + (j)].set(cell_value);
 				}
+				// remove last tablet
+				delete current_twill_pattern_chart[(i + 1) + "_" + number_of_tablets];
+				delete current_twill_change_chart[(i + 1) + "_" + number_of_tablets];
 			}
 
 			// recalculate threading chart
@@ -2163,29 +2192,38 @@ Meteor.my_functions = {
 			{
 				for (var j=0; j<number_of_tablets; j++)
 				{
+					// do not delete the existing ReactiveVar because that breaks reactivity
+					// copy its value to the var with a greater row
+
 					// twill pattern chart
-					// delete the existing ReactiveVar
-					// recreate a new one with the same style but greater row
 					var cell_value = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
-					delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
-					current_twill_pattern_chart[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_value);
+
+					if (i==number_of_rows+k-1) { // add new row at end
+						current_twill_pattern_chart[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_value);
+					} else {
+						current_twill_pattern_chart[(i + 2) + "_" + (j + 1)].set(cell_value);
+					}
+
+					if (i == position - 1) {
+						current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].set("."); // inserted row
+					}
 
 					// twill change chart
-					// delete the existing ReactiveVar
-					// recreate a new one with the same style but greater row
 					var cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
-					delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
-					current_twill_change_chart[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_value);
+	
+					if (i==number_of_rows+k-1) { // add new row at end
+						current_twill_change_chart[(i + 2) + "_" + (j + 1)] = new ReactiveVar(cell_value);
+						} else {
+						current_twill_change_chart[(i + 2) + "_" + (j + 1)].set(cell_value);
+					}
+
+					if (i == position - 1) {
+						current_twill_change_chart[(i + 1) + "_" + (j + 1)].set("."); // inserted row
+					}
 				}
 			}
-			// add new row
-			for (var j=0; j<number_of_tablets; j++)
-			{
-				current_twill_pattern_chart[position + "_" + (j + 1)] = new ReactiveVar('.');
-
-				current_twill_change_chart[position + "_" + (j + 1)] = new ReactiveVar('.');
-			}
 		}
+
 		// -1 for extra row in twill chart compared to weaving chart
 		Meteor.my_functions.update_twill_charts(pattern_id, (number_of_rows + num_new_rows - 1)*2, number_of_tablets);
 	},
@@ -2201,40 +2239,40 @@ Meteor.my_functions = {
 		if ((number_of_rows <= 2) || (position < 1) || (position > (number_of_rows)))
 			return;
 
-		// remove deleted row
-		for (var j=0; j<number_of_tablets; j++)
-		{
-			delete current_twill_pattern_chart[(position) + "_" + (j + 1)];
-			delete current_twill_change_chart[(position) + "_" + (j + 1)];
-		}
-
 		// decrement row number of cells in subsequent rows
 		for (var i=position; i<=number_of_rows-1; i++)
 		{
 			for (var j=0; j<number_of_tablets; j++)
 			{
-				var cell_style;
+				var cell_value;
 
 				// twill pattern chart
 				if ((i) == 1 && (j + 1) %2 == 0) {
-					cell_style = "."; // first row of even tablets must be background colour
+					cell_value = "."; // first row of even tablets must be background colour
 				} else {
-					var cell_style = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
+					var cell_value = current_twill_pattern_chart[(i + 1) + "_" + (j + 1)].get();
 				}
 
-				delete current_twill_pattern_chart[(i + 1) + "_" + (j + 1)];
-				current_twill_pattern_chart[(i) + "_" + (j + 1)] = new ReactiveVar(cell_style);
+				current_twill_pattern_chart[(i) + "_" + (j + 1)].set(cell_value);
 
 				// twill change chart
 				if ((i) == 1 && (j + 1) %2 == 0) {
-					cell_style = "."; // first row of even tablets must not have twill change
+					cell_value = "."; // first row of even tablets must not have twill change
 				} else {
-					var cell_style = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
+					var cell_value = current_twill_change_chart[(i + 1) + "_" + (j + 1)].get();
 				}
-				delete current_twill_change_chart[(i + 1) + "_" + (j + 1)];
-				current_twill_change_chart[(i) + "_" + (j + 1)] = new ReactiveVar(cell_style);
+
+				current_twill_change_chart[(i) + "_" + (j + 1)].set(cell_value);
 			}
 		}
+
+		// remove last row
+		for (var j=0; j<number_of_tablets; j++)
+		{
+			delete current_twill_pattern_chart[(number_of_rows) + "_" + (j + 1)];
+			delete current_twill_change_chart[(number_of_rows) + "_" + (j + 1)];
+		}
+
 		// -1 for removed row, -1 for extra row in twill chart compared to weaving chart
 		Meteor.my_functions.update_twill_charts(pattern_id, (number_of_rows - 2)*2, number_of_tablets);
 	},
