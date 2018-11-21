@@ -675,28 +675,31 @@ Template.view_pattern.events({
     if (pattern.edit_mode == "broken_twill") {
       // this is in the offset weaving chart
       // set the offset threading style
-      Meteor.my_functions.set_offset_threading_cell_style(this.hole, this.tablet, new_style);
-      var old_style = current_threading[this.hole.toString() + "_" + this.tablet.toString()].get();
+      var old_style = current_offset_threading[this.hole.toString() + "_" + this.tablet.toString()].get();
 
-      console.log(`offset hole ${this.hole}`);
+      Meteor.my_functions.set_offset_threading_cell_style(this.hole, this.tablet, new_style);
+      //var old_style = current_threading[this.hole.toString() + "_" + this.tablet.toString()].get();
       
+
+      //console.log(`offset hole ${this.hole}`);
+      //console.log(`old_style initial: ${old_style}`);
 
       // find the corresponding hole in the original threading
       const original_hole = Meteor.my_functions.find_threading_from_offset(pattern_id, this.hole, this.tablet);
-      console.log(`original_hole ${original_hole}`);
+      //console.log(`original_hole ${original_hole}`);
       Meteor.my_functions.set_threading_cell_style(original_hole, this.tablet, new_style);
-      Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, this.hole, old_style, new_style);
+      Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, original_hole, old_style, new_style);
 
       // find the other hole with the same threading (foreground or background)
       const other_hole = Meteor.my_functions.find_broken_twill_hole(original_hole, this.tablet);
       Meteor.my_functions.set_threading_cell_style(other_hole, this.tablet, new_style);
-      console.log(`other hole ${other_hole}`);
+      //console.log(`other hole ${other_hole}`);
       
 
       // find the corresponding hole in the offset threading
       const other_offset_hole = Meteor.my_functions.find_offset_from_threading(pattern_id, other_hole, this.tablet);
       Meteor.my_functions.set_offset_threading_cell_style(other_offset_hole, this.tablet, new_style);
-      Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, other_offset_hole, old_style, new_style);
+      Meteor.my_functions.change_sim_thread_color(pattern_id, this.tablet, other_hole, old_style, new_style);
     } else {
       Meteor.my_functions.set_threading_cell_style(this.hole, this.tablet, new_style);
     }

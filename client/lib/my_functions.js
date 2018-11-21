@@ -3597,7 +3597,9 @@ Meteor.my_functions = {
 					return;
 
 		var old_weaving_styles = Meteor.my_functions.map_weaving_styles(old_style);
-		console.log(`change sim thread colour. hole ${hole}`);
+		//console.log(`change sim thread colour. hole ${hole}`);
+		//console.log(`old_style ${old_style}`);
+		//console.log(`new_style ${new_style}`);
 		var new_weaving_styles = Meteor.my_functions.map_weaving_styles(new_style);
 
 		var number_of_rows = Session.get("number_of_rows");
@@ -3605,7 +3607,7 @@ Meteor.my_functions = {
 
 		if (pattern.simulation_mode == "auto")
 			var threads = pattern.auto_turn_threads;
-		else // broken twill pattern also fires this
+		else // broken twill pattern also satisfies this condition
 			var threads = pattern.manual_weaving_threads;
 
 		if (typeof pattern.weaving_start_row !== "undefined") {
@@ -3616,12 +3618,15 @@ Meteor.my_functions = {
 		// Weaving chart
 		for (var i=0; i<number_of_rows; i++)
 		{
+			//console.log(`row ${i+1}`);
 			var weaving_cell_index = (i+1) + "_" + tablet;
 			var cell_style = current_weaving[weaving_cell_index].get();
 			var thread_to_show = threads[i][tablet-1];
-
+//console.log(`thread_to_show ${thread_to_show}`);
+//console.log(`weaving_cell_index ${weaving_cell_index}`);
 			if (thread_to_show + 1 == hole)
 			{   
+				//console.log(`match`);
 				for (var k=0; k<4; k++)
 				{
 					if (cell_style == old_weaving_styles[k]) {
