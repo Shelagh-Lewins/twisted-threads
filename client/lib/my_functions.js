@@ -2129,12 +2129,10 @@ Meteor.my_functions = {
 		if (pattern.edit_mode == "broken_twill") {
 			const broken_twill_threading = Meteor.my_functions.broken_twill_threading();
 
-			//for (var j=number_of_tablets; j>position; j--) {
 			for (var j=position; j<=number_of_tablets-1; j++)
 			{
 				// find foreground, background colours of next tablet
 				// map to positions on this tablet
-console.log(`tablet ${j}`);
 				var tablet_index = (j) % 4;
 				var source_tablet = j + 1;
 
@@ -2144,7 +2142,7 @@ console.log(`tablet ${j}`);
 				}
 
 				background_style = current_threading[(background_index + 1) + "_" + (source_tablet)].get();
-console.log(`background_style ${background_style}`);
+
 				// tablets 2, 3, 4 have foreground colour in hole 2 (index 1)
 				let foreground_index = 1;
 				if (tablet_index == 0) { // tablet 1 has foreground colour in hole 4 (index 3)
@@ -2152,14 +2150,12 @@ console.log(`background_style ${background_style}`);
 				}
 
 				foreground_style = current_threading[(foreground_index + 1) + "_" + (source_tablet)].get();
-console.log(`foreground_style ${foreground_style}`);
+
 				for (var i=0; i<4; i++)
 				{
 					if (broken_twill_threading[i][(j - 1) % 4] == "B") {
-						console.log('B');
 						current_threading[(i + 1) + "_" + (j)].set(background_style);
 					} else {
-						console.log('F');
 						current_threading[(i + 1) + "_" + (j)].set(foreground_style);
 					}
 				}
