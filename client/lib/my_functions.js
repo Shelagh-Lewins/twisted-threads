@@ -1943,7 +1943,58 @@ Meteor.my_functions = {
 
 		// threading
 		// broken twill threading is generated automatically
-		if (pattern.edit_mode != "broken_twill") {
+		if (pattern.edit_mode == "broken_twill") {
+			// create reactive vars for new tablet
+			for (var i=0; i<4; i++)
+			{
+				current_threading[(i + 1) + "_" + (number_of_tablets + 1)] = new ReactiveVar();
+			}
+
+			const broken_twill_threading = Meteor.my_functions.broken_twill_threading();
+
+			for (var j=number_of_tablets; j>= position - 1; j--) {
+				// find foreground, background colours of this tablet
+				// map to positions on next tablet
+				// new tablet will use colours from previous tablet
+
+				// find a background cell from broken_twill_threading table
+
+				// tablets 1, 2, 4 have background color in hole 1 (index 0)
+
+				var tablet_index = 0; // new tablet at position 1 will copy colours from current tablet 1
+				var source_tablet = 1;
+				
+				// new tablet later than 1
+				if (j != 0) {
+					tablet_index = (j - 1) % 4;
+					source_tablet = j;
+				}
+
+				var background_index = 0;
+				if (tablet_index == 2) { // tablet 3 has background colour in hole 4 (index 3)
+					background_index = 3;
+				}
+
+				background_style = current_threading[(background_index + 1) + "_" + (source_tablet)].get();
+
+				// tablets 2, 3, 4 have foreground colour in hole 2 (index 1)
+				let foreground_index = 1;
+				if (tablet_index == 0) { // tablet 1 has foreground colour in hole 4 (index 3)
+					foreground_index = 3;
+				}
+
+				foreground_style = current_threading[(foreground_index + 1) + "_" + (source_tablet)].get();
+
+				for (var i=0; i<4; i++)
+				{
+					if (broken_twill_threading[i][j % 4] == "B") {
+						current_threading[(i + 1) + "_" + (j + 1)].set(background_style);
+					} else {
+						current_threading[(i + 1) + "_" + (j + 1)].set(foreground_style);
+					}
+				}
+			}
+		} else {
 			for (var i=0; i<4; i++)
 			{
 				for (var j=number_of_tablets-1; j>= position-1; j--)
@@ -2019,12 +2070,14 @@ Meteor.my_functions = {
 			}
 
 			// recalculate threading chart
-			const broken_twill_threading = [
+			/*const broken_twill_threading = [
 				[2,2,1,2],
 				[2,1,1,1],
 				[1,1,2,1],
 				[1,2,2,2]
-			];
+			]; */
+/*
+			const broken_twill_threading = Meteor.my_functions.broken_twill_threading();
 
 			for (var i=0; i<4; i++)
 			{
@@ -2033,7 +2086,7 @@ Meteor.my_functions = {
 				{
 					current_threading[(i + 1) + "_" + (j + 1)] = new ReactiveVar(broken_twill_threading[i][j%4]);
 				}
-			}
+			} */
 
 			Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, number_of_tablets+1);
 			return;
@@ -2063,8 +2116,6 @@ Meteor.my_functions = {
 			// remove deleted tablet
 			delete current_weaving[(i + 1) + "_" + position];
 
-			
-
 			for (var j=position; j<=number_of_tablets-1; j++)
 			{
 				var cell_style = current_weaving[(i + 1) + "_" + (j + 1)].get();
@@ -2075,7 +2126,51 @@ Meteor.my_functions = {
 
 		// threading
 		// broken twill threading is generated automatically
-		if (pattern.edit_mode != "broken_twill") {
+		if (pattern.edit_mode == "broken_twill") {
+			const broken_twill_threading = Meteor.my_functions.broken_twill_threading();
+
+			//for (var j=number_of_tablets; j>position; j--) {
+			for (var j=position; j<=number_of_tablets-1; j++)
+			{
+				// find foreground, background colours of next tablet
+				// map to positions on this tablet
+console.log(`tablet ${j}`);
+				var tablet_index = (j) % 4;
+				var source_tablet = j + 1;
+
+				var background_index = 0;
+				if (tablet_index == 2) { // tablet 3 has background colour in hole 4 (index 3)
+					background_index = 3;
+				}
+
+				background_style = current_threading[(background_index + 1) + "_" + (source_tablet)].get();
+console.log(`background_style ${background_style}`);
+				// tablets 2, 3, 4 have foreground colour in hole 2 (index 1)
+				let foreground_index = 1;
+				if (tablet_index == 0) { // tablet 1 has foreground colour in hole 4 (index 3)
+					foreground_index = 3;
+				}
+
+				foreground_style = current_threading[(foreground_index + 1) + "_" + (source_tablet)].get();
+console.log(`foreground_style ${foreground_style}`);
+				for (var i=0; i<4; i++)
+				{
+					if (broken_twill_threading[i][(j - 1) % 4] == "B") {
+						console.log('B');
+						current_threading[(i + 1) + "_" + (j)].set(background_style);
+					} else {
+						console.log('F');
+						current_threading[(i + 1) + "_" + (j)].set(foreground_style);
+					}
+				}
+			}
+
+			// delete last tablet
+			for (var i=0; i<4; i++)
+			{
+				delete current_threading[(i + 1) + "_" + number_of_tablets];
+			}
+		} else {
 			for (var i=0; i<4; i++)
 			{
 				delete current_threading[(i + 1) + "_" + position];
@@ -2135,23 +2230,6 @@ Meteor.my_functions = {
 				// remove last tablet
 				delete current_twill_pattern_chart[(i + 1) + "_" + number_of_tablets];
 				delete current_twill_change_chart[(i + 1) + "_" + number_of_tablets];
-			}
-
-			// recalculate threading chart
-			const broken_twill_threading = [
-				[2,2,1,2],
-				[2,1,1,1],
-				[1,1,2,1],
-				[1,2,2,2]
-			];
-
-			for (var i=0; i<4; i++)
-			{
-				// there is now one fewer tablet than before
-				for (var j=0; j<number_of_tablets-1; j++)
-				{
-					current_threading[(i + 1) + "_" + (j + 1)] = new ReactiveVar(broken_twill_threading[i][j%4]);
-				}
 			}
 
 			Meteor.my_functions.update_twill_charts(pattern_id, number_of_rows, number_of_tablets - 1);
@@ -4360,18 +4438,21 @@ Meteor.my_functions = {
 
 		current_twill_change_chart[(row) + "_" + (tablet)].set(chart_value);
 	},
-	find_broken_twill_hole(hole, tablet)
+	broken_twill_threading: function() {
+		// table in Meteor.methods.new_pattern_from_json is similar but uses style 1 for Background, style 2 for Foreground
+		return [
+      ["B","B","F","B"], // hole 1
+      ["B","F","F","F"], // hole 2
+      ["F","F","B","F"], // hole 3
+      ["F","B","B","B"] // hole 4
+    ];
+	},
+	find_broken_twill_hole: function(hole, tablet)
 	// broken twill threading is in pairs. Each tablet has two foreground, two background threads.
 	// find the other thread for this tablet that is the same:
 	// the other foreground thread, or the other background thread
 	{
-	// corresponds to table in Meteor.methods.new_pattern_from_json
-		const broken_twill_threading = [
-      ["B","B","F","B"],
-      ["B","F","F","F"],
-      ["F","F","B","F"],
-      ["F","B","B","B"]
-    ];
+		const broken_twill_threading = Meteor.my_functions.broken_twill_threading();
     const tablet_index = (tablet - 1) % 4;
     const this_thread = broken_twill_threading[hole - 1][tablet_index];
 
@@ -4480,15 +4561,6 @@ Meteor.my_functions = {
 	},
 	edit_style_clicked: function()
 	{
-		if ($('#width').hasClass("broken_twill")) {
-			var selected_style = Session.get("selected_style");
-			if (selected_style == 3) {
-				// style 3 in broken twill is used to apply twill direction change
-				Session.set('edit_style', false);
-				return;
-			}
-		}
-
 		if (Session.equals('edit_style', true))
 			Session.set('edit_style', false);
 
