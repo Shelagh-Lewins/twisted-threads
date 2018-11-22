@@ -90,6 +90,9 @@ UI.registerHelper('weaving_cell_data', function(row, tablet, type, offset_start_
   // row, tablet are used for pattern cells and tablets: for tablets, "row" is really "hole"
   var data = {};
   var style_ref;
+  
+  if (Session.get('change_tablets_latch'))
+        return;
 
   if (type == "styles")
   {
