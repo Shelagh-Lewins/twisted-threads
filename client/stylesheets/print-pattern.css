@@ -5,6 +5,7 @@ body.print {
 	height: auto;
 	background-color: #FFFFFF;
 	padding: 16px;
+	-webkit-print-color-adjust: exact; /* enable Chrome to print background colours and images */
 }
 
 body.print h1 {
