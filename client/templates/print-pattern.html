@@ -11,9 +11,17 @@
 <p class="url">Printed from {{hostname}}{{pathFor route='pattern'}}</p>
 <p class="created_by">Created by {{created_by_username}}</p>
 
+
+
 <div class="pattern_thumbnail" style="height: {{auto_preview_width}}px;">
-<div class="image auto_preview" style="background-image: url('{{auto_preview_svg}}'); width: {{auto_preview_width}}px; height: {{auto_preview_height}}px; margin-left: {{auto_preview_height}}px;"></div>
+	{{#each print_repeats}}
+{{#with index=this auto_preview=../auto_preview auto_preview_width=../auto_preview_width auto_preview_height=../auto_preview_height }}
+<div class="image auto_preview" style="background-image: url('{{auto_preview_svg}}'); width: {{auto_preview_width}}px; height: {{auto_preview_height}}px; margin-left: {{margin auto_preview_width auto_preview_height}}px;"></div>
+{{/with}}
+{{/each}}
 </div>
+
+
 
 {{#if is_sim_auto}}
 	<h2>Weaving directions</h2>

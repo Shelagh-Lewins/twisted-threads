@@ -73,6 +73,7 @@ body.print p {
 .print .pattern_thumbnail {
 	margin-bottom: -20px;
 	width: 100%;
+	overflow: hidden;
 }
 
 .print .image.auto_preview {
@@ -88,4 +89,10 @@ body.print p {
 	-moz-transform-origin: 0 0;
 	-o-transform-origin: 0 0;
 	transform-origin: 0 0;
+
+		float: left;
+}
+
+.print .image.auto_preview:not(:first-child) {
+
 }
