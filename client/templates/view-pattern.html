@@ -52,8 +52,6 @@
 		{{/if}}
 	{{/if}}
 
-	{{#if equals edit_mode "simulation"}}
-
 	{{#if equals preview_orientation "vertical"}}
 	{{#if session_equals "hide_preview" false}}
 	
@@ -63,6 +61,8 @@
 	
 	{{/if}}
 	{{/if}}
+
+	{{#if equals edit_mode "simulation"}}
 
 	<h2>Weaving instructions</h2>
 		{{#if can_edit_pattern _id}}
