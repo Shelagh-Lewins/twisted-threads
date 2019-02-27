@@ -52,17 +52,20 @@
 		{{/if}}
 	{{/if}}
 
-	{{#if equals preview_orientation "vertical"}}
-	{{#if session_equals "hide_preview" false}}
-	
-	{{> auto_preview}}
-	{{else}}
-	<p class="loading_preview">Loading preview...</p>
-	
-	{{/if}}
-	{{/if}}
+	{{#unless equals edit_mode "broken_twill"}}
 
-	{{#if equals edit_mode "simulation"}}
+		{{#if equals preview_orientation "vertical"}}
+		{{#if session_equals "hide_preview" false}}
+		
+		{{> auto_preview}}
+		{{else}}
+		<p class="loading_preview">Loading preview...</p>
+		
+		{{/if}}
+		{{/if}}
+	{{/unless}}
+
+	{{#if equals edit_mode "simulation"}}	
 
 	<h2>Weaving instructions</h2>
 		{{#if can_edit_pattern _id}}
@@ -262,11 +265,10 @@
 		{{#each tablet_indexes}}
 		{{> remove_tablet}}
 		{{/each}}</ul></div>{{/if}}
-		</div>
+		</div>YOOO!!!!
 
 		{{#if equals preview_orientation "vertical"}}
 		{{#if session_equals "hide_preview" false}}
-		
 		{{> auto_preview}}
 		{{else}}
 		<p class="loading_preview">Loading preview...</p>
