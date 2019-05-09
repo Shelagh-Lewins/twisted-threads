@@ -1,4 +1,6 @@
 Meteor.startup(function () {
+  Patterns.rawCollection().createIndex({ private: 1, name_sort: 1 });
+
   process.env.MAIL_URL = Meteor.settings['private'].MAIL_URL;
   process.env.ROOT_URL = Meteor.settings['private'].ROOT_URL;
 

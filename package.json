@@ -1,0 +1,29 @@
+{
+  "name": "twisted-threads",
+  "version": "1.0.0",
+  "description": "An app for tablet weaving, build with Meteor.",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.26.0",
+    "bcrypt": "2.0.1",
+    "bcrypt-pbkdf": "1.0.1",
+    "node-pre-gyp": "^0.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shelagh-Lewins/twisted-threads.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shelagh-Lewins/twisted-threads/issues"
+  },
+  "homepage": "https://github.com/Shelagh-Lewins/twisted-threads#readme"
+}
