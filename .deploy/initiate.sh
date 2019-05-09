@@ -1,9 +1,13 @@
 #!/bin/bash
 set -e
 
+# use to reference other scripts in the same directory as this one
+my_dir=`dirname $0`
+
+# load environment variables: SERVER
+. $my_dir/.env
+
 ### Configuration ###
-# deploy to new server "phoenix"
-SERVER=twistedthreads@167.99.204.102
 APP_DIR=/var/www/twistedthreads
 KEYFILE=
 REMOTE_SCRIPT_PATH=/tmp/deploy-twistedthreads.sh
@@ -33,7 +37,7 @@ else
   run meteor bundle package.tar.gz
 fi
 run scp $KEYARG package.tar.gz $SERVER:$APP_DIR/
-run scp $KEYARG .deploy/work.sh $SERVER:$REMOTE_SCRIPT_PATH
+run scp $KEYARG $my_dir/work.sh $SERVER:$REMOTE_SCRIPT_PATH
 echo
 echo "---- Running deployment script on remote server ----"
 run ssh $KEYARG $SERVER bash $REMOTE_SCRIPT_PATH
